@@ -24,7 +24,7 @@ namespace
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
-      m_typingSent(false), m_peerTypingUser(0)
+      m_typingSent(false), m_peerTypingUser(0), m_secretId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -67,6 +67,8 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     connect(session, SIGNAL(dialogChanged(TgPeer)), this, SLOT(onPeerChanged(TgPeer)));
     connect(session, SIGNAL(readOutbox(TgPeer,int)), this, SLOT(onReadOutbox(TgPeer,int)));
     connect(session, SIGNAL(stateChanged()), this, SIGNAL(peerChanged()));
+    connect(session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
+    connect(session, SIGNAL(secretChatsChanged()), this, SLOT(onSecretChatsChanged()));
 
     m_typingTimer = new QTimer(this);
     m_typingTimer->setSingleShot(true);
@@ -258,7 +260,7 @@ void MessagesModel::openMedia(int row)
 
 bool MessagesModel::canDeleteForEveryone(int row) const
 {
-    if (row < 0 || row >= m_rows.size()) return false;
+    if (row < 0 || row >= m_rows.size() || m_secretId) return false;
     // One-to-one chats and basic groups let anyone revoke; a channel post needs rights we
     // do not track, so it is offered only for our own posts there.
     if (m_peer.kind == TgPeer::User) return true;
@@ -383,6 +385,13 @@ QString MessagesModel::lastSeenText(const TgPeerInfo &info) const
 
 QString MessagesModel::subtitle() const
 {
+    if (m_secretId) {
+        TgSecretChat sc = m_session->secretChat(m_secretId);
+        if (sc.state == 1) return tr("wants to start a secret chat");
+        if (sc.state == 0) return tr("waiting to be accepted...");
+        if (sc.ttl > 0) return tr("end-to-end encrypted, self-destruct %1s").arg(sc.ttl);
+        return tr("end-to-end encrypted");
+    }
     if (m_peer.isNull()) return QString();
     if (m_peerTypingTimer->isActive()) {
         if (m_peer.isGroup()) return tr("%1 is typing...").arg(m_session->peers().userName(m_peerTypingUser));
@@ -417,8 +426,9 @@ void MessagesModel::onPeerTypingIdle() { emit peerChanged(); }
 
 void MessagesModel::open(const QString &peerKey)
 {
+    if (peerKey.startsWith(QLatin1String("secret:"))) { openSecret(peerKey.mid(7).toInt()); return; }
     TgPeer p = TgPeer::fromKey(peerKey);
-    if (p == m_peer && !m_rows.isEmpty()) return;
+    if (p == m_peer && m_secretId == 0 && !m_rows.isEmpty()) return;
     close();
     beginResetModel();
     m_peer = m_session->peers().withHash(p);
@@ -435,6 +445,29 @@ void MessagesModel::open(const QString &peerKey)
     m_session->loadHistory(m_peer, 0, HistoryPage);
 }
 
+void MessagesModel::openSecret(int id)
+{
+    if (m_secretId == id && !m_rows.isEmpty()) return;
+    close();
+    TgSecretChat sc = m_session->secretChat(id);
+    beginResetModel();
+    m_secretId = id;
+    // Borrow the peer for the header (name, avatar, presence).
+    TgPeer u; u.kind = TgPeer::User; u.id = sc.peerUserId;
+    m_peer = m_session->peers().withHash(u);
+    m_rows.clear();
+    QList<TgMessage> hist = m_session->secretHistory(id);
+    for (int i = 0; i < hist.size(); ++i) { Row r; r.m = hist.at(i); m_rows.append(r); }
+    endResetModel();
+    m_error.clear();
+    m_loading = false;
+    m_hasOlder = false;
+    emit chatChanged();
+    emit peerChanged();
+    emit countChanged();
+    emit loadingChanged();
+}
+
 void MessagesModel::close()
 {
     if (m_peer.isNull()) return;
@@ -443,6 +476,7 @@ void MessagesModel::close()
     m_peerTypingTimer->stop();
     beginResetModel();
     m_peer = TgPeer();
+    m_secretId = 0;
     m_rows.clear();
     endResetModel();
     m_loading = false;
@@ -501,7 +535,7 @@ void MessagesModel::onHistoryFailed(const TgPeer &peer, const QString &error)
 
 void MessagesModel::markRead()
 {
-    if (m_peer.isNull()) return;
+    if (m_peer.isNull() || m_secretId) return;
     int maxId = 0;
     for (int i = m_rows.size() - 1; i >= 0; --i)
         if (m_rows.at(i).m.id > 0) { maxId = m_rows.at(i).m.id; break; }
@@ -573,7 +607,9 @@ void MessagesModel::onReadOutbox(const TgPeer &peer, int maxId)
 void MessagesModel::send(const QString &text)
 {
     QString t = text.trimmed();
-    if (m_peer.isNull() || t.isEmpty()) return;
+    if (t.isEmpty()) return;
+    if (m_secretId) { m_session->sendSecretText(m_secretId, t); return; }  // the echo appends the row
+    if (m_peer.isNull()) return;
     if (m_typingSent) { m_typingSent = false; m_typingTimer->stop(); }
     Row r;
     r.m.peer = m_peer;
@@ -720,4 +756,64 @@ void MessagesModel::deleteMessage(int row, bool forEveryone)
     m_rows.removeAt(row);
     endRemoveRows();
     emit countChanged();
+}
+
+// -- secret (end-to-end) chats ---------------------------------------------------------------------
+
+int MessagesModel::secretState() const
+{
+    return m_secretId ? m_session->secretChat(m_secretId).state : -1;
+}
+
+int MessagesModel::secretTtl() const
+{
+    return m_secretId ? m_session->secretChat(m_secretId).ttl : 0;
+}
+
+QString MessagesModel::secretKeyHex() const
+{
+    if (!m_secretId) return QString();
+    QByteArray h = m_session->secretKeyHash(m_secretId);
+    QString out;
+    for (int i = 0; i < h.size(); ++i) {
+        out += QString::fromLatin1("%1").arg(uchar(h.at(i)), 2, 16, QLatin1Char('0'));
+        if (i % 2 == 1 && i + 1 < h.size()) out += QLatin1Char(' ');
+    }
+    return out.toUpper();
+}
+
+void MessagesModel::acceptSecret()
+{
+    if (m_secretId) m_session->acceptSecretChat(m_secretId);
+}
+
+void MessagesModel::discardSecret()
+{
+    if (m_secretId) m_session->discardSecretChat(m_secretId);
+}
+
+void MessagesModel::setSecretTtl(int seconds)
+{
+    if (m_secretId) m_session->setSecretTtl(m_secretId, seconds);
+}
+
+void MessagesModel::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+{
+    Q_UNUSED(randomId);
+    if (id != m_secretId) return;
+    Row r;
+    r.m.text = text;
+    r.m.out = out;
+    r.m.date = date;
+    r.m.fromId = out ? m_session->selfId() : m_peer.id;
+    beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
+    m_rows.append(r);
+    endInsertRows();
+    emit countChanged();
+    emit messageAppended();
+}
+
+void MessagesModel::onSecretChatsChanged()
+{
+    if (m_secretId) emit peerChanged();   // state/ttl may have changed (accept/ready/ttl)
 }

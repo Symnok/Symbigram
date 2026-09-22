@@ -80,9 +80,10 @@ const QHash<quint32, TlObject::Entry *> &TlSchema::table()
     static QHash<quint32, TlObject::Entry *> *t = 0;
     if (t) return *t;
     t = new QHash<quint32, TlObject::Entry *>;
-    t->reserve(3000);
-    const char *p = packedTable;
-    const char *end = packedTable + packedLength;
+    t->reserve(3200);
+    for (int pass = 0; pass < 2; ++pass) {
+    const char *p = pass == 0 ? packedTable : secretPackedTable;
+    const char *end = p + (pass == 0 ? packedLength : secretPackedLength);
     while (p < end) {
         const char *semi = p;
         while (semi < end && *semi != ';') ++semi;
@@ -104,6 +105,7 @@ const QHash<quint32, TlObject::Entry *> &TlSchema::table()
             t->insert(ctor, e);
         }
         p = semi + 1;
+    }
     }
     return *t;
 }

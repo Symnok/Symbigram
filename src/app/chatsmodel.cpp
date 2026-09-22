@@ -32,6 +32,8 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
     roles[InitialsRole] = "initials";
     roles[ColorRole] = "color";
     roles[AvatarRole] = "avatar";
+    roles[SecretRole] = "secret";
+    roles[SecretStateRole] = "secretState";
     setRoleNames(roles);
 
     connect(session, SIGNAL(dialogsChanged()), this, SLOT(onDialogsChanged()));
@@ -42,6 +44,8 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onAvatarReady(QString,QString)));
     connect(session, SIGNAL(archiveChanged()), this, SLOT(onArchiveChanged()));
     connect(session, SIGNAL(foldersChanged()), this, SLOT(onFoldersChanged()));
+    connect(session, SIGNAL(secretChatsChanged()), this, SLOT(onSecretsChanged()));
+    m_secrets = session->secretChats();
 
     m_typingTimer = new QTimer(this);
     m_typingTimer->setInterval(1000);
@@ -51,7 +55,12 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
 
 int ChatsModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_view.size();
+    return parent.isValid() ? 0 : secretCount() + m_view.size();
+}
+
+int ChatsModel::secretCount() const
+{
+    return m_folderSel == -1 ? m_secrets.size() : 0;   // only in the All-chats view
 }
 
 bool ChatsModel::hasMore() const
@@ -150,8 +159,12 @@ QString ChatsModel::timeText(int unixTime)
 
 QVariant ChatsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() >= m_view.size()) return QVariant();
-    const TgDialog &d = m_view.at(index.row());
+    if (!index.isValid()) return QVariant();
+    int sc = secretCount();
+    if (index.row() < sc) return secretData(index.row(), role);
+    int row = index.row() - sc;
+    if (row >= m_view.size()) return QVariant();
+    const TgDialog &d = m_view.at(row);
     const TgPeerInfo info = m_session->peers().info(d.peer);
     const QString key = d.peer.key();
     switch (role) {
@@ -187,6 +200,41 @@ QVariant ChatsModel::data(const QModelIndex &index, int role) const
     }
 }
 
+QVariant ChatsModel::secretData(int row, int role) const
+{
+    if (row < 0 || row >= m_secrets.size()) return QVariant();
+    const TgSecretChat &s = m_secrets.at(row);
+    TgPeer u; u.kind = TgPeer::User; u.id = s.peerUserId;
+    const TgPeerInfo info = m_session->peers().info(u);
+    QString name = m_session->peers().userName(s.peerUserId);
+    if (name.isEmpty()) name = tr("Secret chat");
+    switch (role) {
+    case PeerKeyRole: return s.key();
+    case TitleRole: return name;
+    case SubtitleRole:
+        if (s.state == 1) return tr("wants to start a secret chat");
+        if (s.state == 0) return tr("waiting to be accepted...");
+        return tr("secret chat");
+    case TimeTextRole: return QString();
+    case UnreadRole: return 0;
+    case MutedRole: return false;
+    case PinnedRole: return true;              // kept at the top of the list
+    case GroupRole: return false;
+    case OnlineRole: return info.online;
+    case TypingRole: return false;
+    case InitialsRole: return initials(name);
+    case ColorRole: return QLatin1String("#7bc862");   // secret-chat green
+    case AvatarRole: {
+        if (info.photoId == 0) return QString();
+        QString path = m_media->peerPhoto(u, info);
+        return path.isEmpty() ? QString() : QUrl::fromLocalFile(path).toString();
+    }
+    case SecretRole: return true;
+    case SecretStateRole: return s.state;
+    default: return QVariant();
+    }
+}
+
 QVariantMap ChatsModel::get(int row) const
 {
     QVariantMap m;
@@ -200,8 +248,14 @@ QVariantMap ChatsModel::get(int row) const
 
 int ChatsModel::indexOf(const QString &peerKey) const
 {
+    int sc = secretCount();
+    if (peerKey.startsWith(QLatin1String("secret:"))) {
+        for (int i = 0; i < m_secrets.size(); ++i)
+            if (m_secrets.at(i).key() == peerKey) return sc ? i : -1;
+        return -1;
+    }
     for (int i = 0; i < m_view.size(); ++i)
-        if (m_view.at(i).peer.key() == peerKey) return i;
+        if (m_view.at(i).peer.key() == peerKey) return sc + i;
     return -1;
 }
 
@@ -214,6 +268,7 @@ void ChatsModel::loadMore()
 void ChatsModel::refresh() { m_session->refreshDialogs(); m_session->loadFolders(); if (m_folderSel == -2) m_session->loadArchive(); emit countChanged(); }
 void ChatsModel::setMuted(const QString &peerKey, bool muted) { m_session->setMuted(TgPeer::fromKey(peerKey), muted); }
 void ChatsModel::clearHistory(const QString &peerKey) { m_session->deleteHistory(TgPeer::fromKey(peerKey)); }
+void ChatsModel::discardSecret(const QString &peerKey) { if (peerKey.startsWith(QLatin1String("secret:"))) m_session->discardSecretChat(peerKey.mid(7).toInt()); }
 
 void ChatsModel::onDialogsChanged()
 {
@@ -249,7 +304,7 @@ void ChatsModel::onDialogChanged(const TgPeer &peer)
         const QList<TgDialog> &src = sourceList();
         int si = -1;
         for (int j = 0; j < src.size(); ++j) if (src.at(j).peer == peer) { si = j; break; }
-        if (si >= 0) m_view[i] = src.at(si);
+        if (si >= 0) m_view[i - secretCount()] = src.at(si);
         emit dataChanged(index(i), index(i));
     } else {
         // It may now match (or no longer match) the current folder.
@@ -289,4 +344,13 @@ void ChatsModel::onTypingTimer()
         refreshRow(TgPeer::fromKey(keys.at(i)));
     }
     if (!any) m_typingTimer->stop();
+}
+
+void ChatsModel::onSecretsChanged()
+{
+    // Secret rows live only in the All-chats view; a full reset keeps the row maths simple.
+    beginResetModel();
+    m_secrets = m_session->secretChats();
+    endResetModel();
+    emit countChanged();
 }

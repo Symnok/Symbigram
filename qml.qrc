@@ -10,5 +10,7 @@
         <file>images/logo.png</file>
         <file>images/muted.png</file>
         <file>images/pinned.png</file>
+        <file>images/lock.png</file>
+        <file>images/lock_green.png</file>
     </qresource>
 </RCC>

@@ -110,13 +110,31 @@ Page {
         MenuLayout {
             MenuItem {
                 text: contextMenu.item && contextMenu.item.muted ? qsTr("Unmute") : qsTr("Mute")
+                visible: contextMenu.item ? contextMenu.item.secret !== true : true
                 onClicked: app.chats.setMuted(contextMenu.item.peerKey, !contextMenu.item.muted)
             }
             MenuItem {
                 text: qsTr("Clear history")
+                visible: contextMenu.item ? contextMenu.item.secret !== true : true
                 onClicked: { clearDialog.peerKey = contextMenu.item.peerKey; clearDialog.title = contextMenu.item.title; clearDialog.open() }
             }
+            MenuItem {
+                text: qsTr("Delete secret chat")
+                visible: contextMenu.item ? contextMenu.item.secret === true : false
+                onClicked: { secretDeleteDialog.peerKey = contextMenu.item.peerKey; secretDeleteDialog.title = contextMenu.item.title; secretDeleteDialog.open() }
+            }
         }
+    }
+
+    QueryDialog {
+        id: secretDeleteDialog
+        property string peerKey
+        property string title
+        titleText: qsTr("Delete secret chat")
+        message: qsTr("End the secret chat with \"%1\"? Its messages live only on this device and will be removed here.").arg(title)
+        acceptButtonText: qsTr("Delete")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: app.chats.discardSecret(peerKey)
     }
 
     // -- header: me and the connection --
@@ -240,7 +258,20 @@ Page {
                     color: "#4ccb4c"
                     border.color: "#1c2a3a"
                     border.width: 2
-                    visible: model.online
+                    visible: model.online && !model.secret
+                }
+                Rectangle {
+                    // secret-chat lock badge
+                    anchors { left: parent.left; bottom: parent.bottom }
+                    width: 18; height: 18; radius: 9
+                    color: "#1c2a3a"
+                    visible: model.secret === true
+                    Image {
+                        anchors.centerIn: parent
+                        source: "qrc:/images/lock.png"
+                        width: 12; height: 12
+                        smooth: true
+                    }
                 }
             }
             Column {
@@ -258,6 +289,7 @@ Page {
                         role: "Title"
                         text: model.title
                         elide: Text.ElideRight
+                        color: model.secret === true ? "#5ab943" : platformStyle.colorNormalLight
                     }
                     Image {
                         id: mutedMark
@@ -272,7 +304,7 @@ Page {
                     text: model.subtitle
                     elide: Text.ElideRight
                     visible: text != ""
-                    color: model.typing ? "#8fd18f" : platformStyle.colorNormalMid
+                    color: model.secret === true ? "#5ab943" : (model.typing ? "#8fd18f" : platformStyle.colorNormalMid)
                 }
             }
             Column {

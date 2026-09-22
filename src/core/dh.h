@@ -26,6 +26,8 @@ namespace DhValidation
 {
     /// Full parameter check; throws TlException. `note` receives a one-line summary.
     void validateParameters(int g, const BigInt &dhPrime, const BigInt &ga, QString *note = 0);
+    /// The generator + safe-prime part alone (no public value), for messages.getDhConfig.
+    void validatePrime(int g, const BigInt &dhPrime, QString *note = 0);
     /// Bounds check for a DH public value: 2^(2048-64) <= value <= p - 2^(2048-64).
     void validatePublicValue(const BigInt &value, const BigInt &dhPrime, const char *name);
     bool isProbablePrime(const BigInt &n);

@@ -35,6 +35,8 @@ HEADERS += \
     $$PWD/src/core/tgapi.h \
     $$PWD/src/core/srp.h \
     $$PWD/src/core/qrcode.h \
+    $$PWD/src/core/secretchat.h \
+    $$PWD/src/core/secretapi.h \
     $$PWD/src/core/telegramsession.h \
     $$PWD/src/core/tgcredentials.h
 
@@ -43,6 +45,7 @@ SOURCES += \
     $$PWD/src/core/tlreader.cpp \
     $$PWD/src/core/tlobject.cpp \
     $$PWD/src/core/tlschema_data.cpp \
+    $$PWD/src/core/secretschema_data.cpp \
     $$PWD/src/core/bigint.cpp \
     $$PWD/src/core/sha2.cpp \
     $$PWD/src/core/aes.cpp \
@@ -57,6 +60,8 @@ SOURCES += \
     $$PWD/src/core/tgapi.cpp \
     $$PWD/src/core/srp.cpp \
     $$PWD/src/core/qrcode.cpp \
+    $$PWD/src/core/secretchat.cpp \
+    $$PWD/src/core/secretapi.cpp \
     $$PWD/src/core/telegramsession.cpp
 
 win32:LIBS += -ladvapi32

@@ -45,7 +45,9 @@ public:
         TypingRole,
         InitialsRole,
         ColorRole,
-        AvatarRole      // file:// url of the profile picture, or "" (fall back to initials)
+        AvatarRole,     // file:// url of the profile picture, or "" (fall back to initials)
+        SecretRole,     // true for an end-to-end secret chat row
+        SecretStateRole // 0 requested-by-me, 1 requested-to-me, 2 ready
     };
 
     explicit ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -67,6 +69,7 @@ public:
     Q_INVOKABLE void selectFolder(int listIndex);
     Q_INVOKABLE void setMuted(const QString &peerKey, bool muted);
     Q_INVOKABLE void clearHistory(const QString &peerKey);
+    Q_INVOKABLE void discardSecret(const QString &peerKey);
 
     /// Initials and a stable colour for the avatar circle.
     static QString initials(const QString &title);
@@ -88,10 +91,13 @@ private slots:
     void onAvatarReady(const QString &key, const QString &path);
     void onArchiveChanged();
     void onFoldersChanged();
+    void onSecretsChanged();
 
 private:
     void refreshRow(const TgPeer &peer);
     void rebuild();
+    int secretCount() const;      // secret rows shown above the dialogs (All-chats view only)
+    QVariant secretData(int row, int role) const;
     const QList<TgDialog> &sourceList() const;
 
     TelegramSession *m_session;
@@ -99,6 +105,7 @@ private:
     int m_folderSel;
     int m_folderList;              // index into folderNames() (0 = All, last = Archive)
     QList<TgDialog> m_view;        // the dialogs currently shown, after folder filtering
+    QList<TgSecretChat> m_secrets; // secret chats, pinned above the list in the All-chats view
     MediaCache *m_media;
     QHash<QString, int> m_typingUntil;      // peer key -> unix time the "typing" hint ends
     QHash<QString, qint64> m_typingWho;

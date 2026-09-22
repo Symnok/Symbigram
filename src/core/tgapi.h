@@ -105,6 +105,15 @@ public:
     /// messages.sendMedia with an uploaded file as a photo or as a document.
     static QByteArray sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
                                         bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId);
+    static QByteArray inputUser(const TgPeer &user);
+    // -- secret chats --
+    static QByteArray getDhConfig(int version, int randomLength);
+    static QByteArray requestEncryption(const TgPeer &user, int randomId, const QByteArray &gA);
+    static QByteArray acceptEncryption(int chatId, qint64 accessHash, const QByteArray &gB, qint64 fingerprint);
+    static QByteArray sendEncrypted(int chatId, qint64 accessHash, qint64 randomId, const QByteArray &data);
+    static QByteArray sendEncryptedService(int chatId, qint64 accessHash, qint64 randomId, const QByteArray &data);
+    static QByteArray discardEncryption(int chatId);
+    static QByteArray readEncryptedHistory(int chatId, qint64 accessHash, int maxDate);
     static QByteArray exportAuthorization(int dcId);
     static QByteArray importAuthorization(qint64 id, const QByteArray &bytes);
 

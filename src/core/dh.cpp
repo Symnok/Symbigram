@@ -170,10 +170,15 @@ bool DhValidation::isProbablePrime(const BigInt &n)
 
 void DhValidation::validateParameters(int g, const BigInt &dhPrime, const BigInt &ga, QString *note)
 {
+    validatePrime(g, dhPrime, note);
+    validatePublicValue(ga, dhPrime, "g_a");
+}
+
+void DhValidation::validatePrime(int g, const BigInt &dhPrime, QString *note)
+{
     if (g < 2 || g > 7) throw TlException(QString::fromLatin1("DH generator out of range: %1").arg(g));
     if (dhPrime.bitLength() != 2048)
         throw TlException(QString::fromLatin1("DH prime is %1 bits, expected 2048").arg(dhPrime.bitLength()));
-    validatePublicValue(ga, dhPrime, "g_a");
 
     QByteArray primeBytes = dhPrime.toBytesBE(256);
     static QByteArray builtIn;

@@ -404,6 +404,72 @@ QByteArray TgApi::sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts
     return w.toByteArray();
 }
 
+QByteArray TgApi::inputUser(const TgPeer &user)
+{
+    TlWriter w(20);
+    w.writeConstructor(Tl::InputUser).writeLong(user.id).writeLong(user.accessHash);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::getDhConfig(int version, int randomLength)
+{
+    TlWriter w(12);
+    w.writeConstructor(Tl::MessagesGetDhConfig).writeInt(version).writeInt(randomLength);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::requestEncryption(const TgPeer &user, int randomId, const QByteArray &gA)
+{
+    TlWriter w(gA.size() + 32);
+    w.writeConstructor(Tl::MessagesRequestEncryption).writeRaw(inputUser(user)).writeInt(randomId).writeBytes(gA);
+    return w.toByteArray();
+}
+
+namespace
+{
+    QByteArray inputEncryptedChat(int chatId, qint64 accessHash)
+    {
+        TlWriter w(16);
+        w.writeConstructor(Tl::InputEncryptedChat).writeInt(chatId).writeLong(accessHash);
+        return w.toByteArray();
+    }
+}
+
+QByteArray TgApi::acceptEncryption(int chatId, qint64 accessHash, const QByteArray &gB, qint64 fingerprint)
+{
+    TlWriter w(gB.size() + 32);
+    w.writeConstructor(Tl::MessagesAcceptEncryption).writeRaw(inputEncryptedChat(chatId, accessHash)).writeBytes(gB).writeLong(fingerprint);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::sendEncrypted(int chatId, qint64 accessHash, qint64 randomId, const QByteArray &data)
+{
+    TlWriter w(data.size() + 32);
+    w.writeConstructor(Tl::MessagesSendEncrypted).writeInt(0).writeRaw(inputEncryptedChat(chatId, accessHash)).writeLong(randomId).writeBytes(data);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::sendEncryptedService(int chatId, qint64 accessHash, qint64 randomId, const QByteArray &data)
+{
+    TlWriter w(data.size() + 32);
+    w.writeConstructor(Tl::MessagesSendEncryptedService).writeRaw(inputEncryptedChat(chatId, accessHash)).writeLong(randomId).writeBytes(data);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::discardEncryption(int chatId)
+{
+    TlWriter w(12);
+    w.writeConstructor(Tl::MessagesDiscardEncryption).writeInt(0).writeInt(chatId);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::readEncryptedHistory(int chatId, qint64 accessHash, int maxDate)
+{
+    TlWriter w(24);
+    w.writeConstructor(Tl::MessagesReadEncryptedHistory).writeRaw(inputEncryptedChat(chatId, accessHash)).writeInt(maxDate);
+    return w.toByteArray();
+}
+
 QByteArray TgApi::exportAuthorization(int dcId)
 {
     TlWriter w(8);

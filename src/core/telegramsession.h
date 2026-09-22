@@ -12,6 +12,7 @@
 
 #include "authkeyhandshake.h"
 #include "mtprotoclient.h"
+#include "secretchat.h"
 #include "srp.h"
 #include "tgapi.h"
 #include "tgtypes.h"
@@ -98,6 +99,20 @@ public:
     /// Persists the update position; called by the app before it quits.
     void saveState();
 
+    // -- secret (end-to-end) chats --
+    QList<TgSecretChat> secretChats() const;
+    TgSecretChat secretChat(int id) const;
+    /// Opens a secret chat with a user (must be a known user with an access hash).
+    void requestSecretChat(const TgPeer &user);
+    void acceptSecretChat(int id);
+    void discardSecretChat(int id);
+    /// Returns the random id that secretMessageSent/secretMessageFailed will carry.
+    qint64 sendSecretText(int id, const QString &text);
+    void setSecretTtl(int id, int seconds);
+    /// The in-memory message buffer of a secret chat (device-local, lost on restart).
+    QList<TgMessage> secretHistory(int id) const { return m_secretHistory.value(id); }
+    QByteArray secretKeyHash(int id) const;
+
     // -- files --
     /// Fetches an attachment (a photo size, or a document with an empty sizeType) into
     /// targetPath; the job id identifies the downloadProgress/Finished/Failed signals.
@@ -144,6 +159,14 @@ signals:
     void resolveFailed(const QString &error);
     void notice(const QString &text);
     void log(const QString &line);
+    // secret chats
+    void secretChatsChanged();
+    void secretChatRequested(int id, qint64 userId);
+    void secretChatReady(int id);
+    void secretChatDiscarded(int id);
+    void secretMessageReceived(int id, qint64 randomId, const QString &text, int date, bool out);
+    void secretMessageSent(int id, qint64 randomId, int date);
+    void secretMessageFailed(int id, qint64 randomId, const QString &error);
 
 private slots:
     void onConnected();
@@ -167,17 +190,20 @@ private:
         ReadHistory, SetTyping, UpdateStatus, ResolveUsername, ResolvePhone, ContactsSearch,
         DeleteHistory, DeleteMessages, UpdateNotifySettings, GetUser,
         GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization,
-        GetArchive, GetFolders
+        GetArchive, GetFolders,
+        GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
         int offsetId;
         bool more;              // GetDialogs: appending a page rather than replacing
         int folderId;           // GetDialogs/GetArchive: which folder
+        int secretChatId;       // secret-chat requests
+        SecretChat *secret;     // RequestEncryption: the in-progress chat awaiting its id
         QString query;
     };
 
@@ -208,6 +234,17 @@ private:
     bool isAuthGone(const QString &type) const;
     void handleMigrate(const QString &type);
     static int unixNow();
+
+    // -- secret chats --
+    void ensureDhConfig();
+    void handleEncryptedChat(const TlObject &chat);
+    void handleEncryptedMessage(const TlObject &message, int date);
+    void sendSecretService(SecretChat *chat, const QByteArray &body);
+    void appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
+    void loadSecrets();
+    void saveSecrets();
+    QString secretFilePath() const;
+    TgSecretChat lightSecret(const SecretChat *c) const;
 
     // -- files --
     struct Download
@@ -303,6 +340,17 @@ private:
     QHash<qint64, Upload> m_uploads;
     int m_nextJobId;
     QList<QString> m_recentSeen;   // "peerkey:id" of the last messages delivered, for dedup
+
+    // secret chats
+    QHash<int, SecretChat *> m_secretChats;
+    int m_dhG;
+    QByteArray m_dhP;
+    int m_dhVersion;
+    bool m_dhReady;
+    QList<TgPeer> m_secretRequestQueue;   // peers waiting for the DH config to request
+    QList<int> m_secretAcceptQueue;       // chat ids waiting for the DH config to accept
+    QHash<int, QList<TgMessage> > m_secretHistory;   // secret messages, in memory only
+    QHash<int, QSet<qint64> > m_secretSeen;          // random ids already delivered (redelivery dedup)
 };
 
 #endif // TELEGRAMSESSION_H

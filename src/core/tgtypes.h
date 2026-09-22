@@ -125,6 +125,20 @@ struct TgFolder
     bool contains(const TgDialog &d, const TgPeerInfo &info, int now) const;
 };
 
+/// A secret (end-to-end) chat, as the UI sees it.
+struct TgSecretChat
+{
+    TgSecretChat() : id(0), peerUserId(0), state(0), isCreator(false), ttl(0) {}
+    int id;
+    qint64 peerUserId;
+    int state;            // 0 requested-by-me, 1 requested-to-me, 2 ready, 3 discarded
+    bool isCreator;
+    int ttl;              // self-destruct timer, seconds (0 = off)
+    QByteArray keyHash;   // for the verification screen
+    /// Peer key like a normal chat, but with a "secret:" scheme so models can tell them apart.
+    QString key() const { return QLatin1String("secret:") + QString::number(id); }
+};
+
 /// The server's update sequence position.
 struct TgUpdateState
 {
@@ -140,5 +154,7 @@ Q_DECLARE_METATYPE(QList<TgMessage>)
 Q_DECLARE_METATYPE(QList<TgDialog>)
 Q_DECLARE_METATYPE(TgFolder)
 Q_DECLARE_METATYPE(QList<TgFolder>)
+Q_DECLARE_METATYPE(TgSecretChat)
+Q_DECLARE_METATYPE(QList<TgSecretChat>)
 
 #endif // TGTYPES_H

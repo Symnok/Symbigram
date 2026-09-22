@@ -256,6 +256,53 @@ namespace Tl
     const quint32 InputPeerChannelFromMessage = 0xbd2a0840;
     const quint32 TextWithEntities = 0x751f3146;
     const quint32 UpdateDialogUnreadMark = 0xb658f23e;
+
+    // --- secret chats (end-to-end) ---
+    const int SecretLayer = 73;                    // the secret-chat layer we advertise
+    const quint32 MessagesGetDhConfig = 0x26cf8950;
+    const quint32 MessagesDhConfig = 0x2c221edd;
+    const quint32 MessagesDhConfigNotModified = 0xc0e24635;
+    const quint32 MessagesRequestEncryption = 0xf64daf43;
+    const quint32 MessagesAcceptEncryption = 0x3dbc0415;
+    const quint32 MessagesDiscardEncryption = 0xf393aea0;
+    const quint32 MessagesSetEncryptedTyping = 0x791451ed;
+    const quint32 MessagesReadEncryptedHistory = 0x7f4b690a;
+    const quint32 MessagesSendEncrypted = 0x44fa7a15;
+    const quint32 MessagesSendEncryptedFile = 0x5559481d;
+    const quint32 MessagesSendEncryptedService = 0x32d439a4;
+    const quint32 MessagesSentEncryptedMessage = 0x560f8935;
+    const quint32 MessagesSentEncryptedFile = 0x9493ff32;
+    const quint32 EncryptedChatEmpty = 0xab7ec0a0;
+    const quint32 EncryptedChatWaiting = 0x66b25953;
+    const quint32 EncryptedChatRequested = 0x48f1d94c;
+    const quint32 EncryptedChat = 0x61f0d4c7;
+    const quint32 EncryptedChatDiscarded = 0x1e1c7c45;
+    const quint32 InputEncryptedChat = 0xf141b5e1;
+    const quint32 EncryptedMessage = 0xed18c118;
+    const quint32 EncryptedMessageService = 0x23734b06;
+    const quint32 UpdateNewEncryptedMessage = 0x12bcbd9a;
+    const quint32 UpdateEncryption = 0xb4a2e88d;
+    const quint32 UpdateEncryptedChatTyping = 0x1710f156;
+    const quint32 UpdateEncryptedMessagesRead = 0x38fe25b7;
+    // hand-used secret-schema constructors
+    const quint32 DecryptedMessage73 = 0x91cc4674;         // decryptedMessage (layer 73)
+    const quint32 DecryptedMessageService = 0x73164160;
+    const quint32 DecryptedMessageLayer = 0x1be31789;
+    const quint32 DecryptedMessageActionNotifyLayer = 0xf3048883;
+    const quint32 DecryptedMessageActionSetMessageTTL = 0xa1733aec;
+    const quint32 DecryptedMessageActionReadMessages = 0x0c4f40be;
+    const quint32 DecryptedMessageActionDeleteMessages = 0x65614304;
+    const quint32 DecryptedMessageActionFlushHistory = 0x6719e45c;
+    const quint32 DecryptedMessageActionTyping = 0xccb27641;
+    const quint32 DecryptedMessageMediaEmpty = 0x089f5c4a;
+
+    // --- phone-code login (harness only; the app stays QR-only) ---
+    const quint32 AuthSendCode = 0xa677244f;
+    const quint32 AuthSignIn = 0x8d52a951;
+    const quint32 AuthResendCode = 0xcae47523;
+    const quint32 AuthSentCode = 0x5e002502;
+    const quint32 AuthSentCodeSuccess = 0x2390fe44;
+    const quint32 CodeSettings = 0xad253d78;
 }
 
 #endif // TLCONSTRUCTORS_H

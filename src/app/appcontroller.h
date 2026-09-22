@@ -118,6 +118,8 @@ public slots:
     /// Opens a file picker and sends the chosen file to the open chat, as a photo or a
     /// document. Nothing happens if the user cancels.
     void attachFile(bool asPhoto);
+    /// Starts an end-to-end secret chat with the person of an existing 1:1 chat.
+    void startSecretChat(const QString &peerKey);
     void openUrl(const QString &url);
     void copyText(const QString &text);
     void clearNotice();
@@ -151,6 +153,9 @@ private slots:
     void onReconnectTimer();
     void onSessionLog(const QString &line);
     void onNotice(const QString &text);
+    void onSecretRequested(int id, qint64 adminId);
+    void onSecretReady(int id);
+    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
 
 private:
     void setState(const QString &s);

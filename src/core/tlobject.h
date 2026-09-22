@@ -85,6 +85,8 @@ public:
 private:
     static const char *const packedTable;
     static const int packedLength;
+    static const char *const secretPackedTable;   // the end-to-end (secret chat) schema
+    static const int secretPackedLength;
     static const QHash<quint32, TlObject::Entry *> &table();
     static QVariant readValue(TlReader &r, const QByteArray &spec, QVector<int> &flags);
     static QVariantList readElements(TlReader &r, const QByteArray &elementSpec, QVector<int> &flags);

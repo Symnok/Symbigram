@@ -37,6 +37,9 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool hasOlder READ hasOlder NOTIFY loadingChanged)
     Q_PROPERTY(QString error READ error NOTIFY loadingChanged)
+    Q_PROPERTY(bool isSecret READ isSecret NOTIFY chatChanged)
+    Q_PROPERTY(int secretState READ secretState NOTIFY peerChanged)      // 0 by-me, 1 to-me, 2 ready
+    Q_PROPERTY(int secretTtl READ secretTtl NOTIFY peerChanged)
 public:
     enum Roles {
         MsgIdRole = Qt::UserRole + 1,
@@ -69,7 +72,10 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
 
-    QString peerKey() const { return m_peer.isNull() ? QString() : m_peer.key(); }
+    QString peerKey() const { return m_secretId ? (QLatin1String("secret:") + QString::number(m_secretId)) : (m_peer.isNull() ? QString() : m_peer.key()); }
+    bool isSecret() const { return m_secretId != 0; }
+    int secretState() const;
+    int secretTtl() const;
     TgPeer peer() const { return m_peer; }
     QString title() const;
     QString subtitle() const;
@@ -94,6 +100,12 @@ public:
     /// Called by the composer as the text changes: drives the typing notification.
     Q_INVOKABLE void composing(const QString &text);
     Q_INVOKABLE void setMuted(bool muted);
+    /// Secret chats: accept an incoming request, close/discard, change TTL, and the
+    /// key fingerprint (SHA-256 of the shared key) as spaced hex for the verify screen.
+    Q_INVOKABLE void acceptSecret();
+    Q_INVOKABLE void discardSecret();
+    Q_INVOKABLE void setSecretTtl(int seconds);
+    Q_INVOKABLE QString secretKeyHex() const;
     Q_INVOKABLE void deleteMessage(int row, bool forEveryone);
     /// Photos: fetch the size to save and copy it out. Documents/video/etc.: fetch the
     /// whole file. Drives MediaStateRole/MediaProgressRole for the row.
@@ -128,6 +140,8 @@ private slots:
     void onPeerTypingIdle();
     void onPeerChanged(const TgPeer &peer);
     void onReadOutbox(const TgPeer &peer, int maxId);
+    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
+    void onSecretChatsChanged();
     void onMediaReady(const QString &key, const QString &path);
     void onMediaFailed(const QString &key, const QString &error);
     void onMediaProgress(const QString &key, int percent);
@@ -148,6 +162,7 @@ private:
         int progress;
     };
     void prepareMedia(Row &r);
+    void openSecret(int id);
     int rowByKey(const QString &key) const;
     static QString mediaKindName(TgMedia::Kind k);
     QString mediaInfoText(const TgMedia &m) const;
@@ -161,6 +176,7 @@ private:
     TelegramSession *m_session;
     MediaCache *m_media;
     TgPeer m_peer;
+    int m_secretId;          // non-zero when the open chat is a secret (end-to-end) chat
     QList<Row> m_rows;
     bool m_loading;
     bool m_hasOlder;

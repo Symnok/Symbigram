@@ -19,13 +19,82 @@ Page {
     Menu {
         id: menu
         MenuLayout {
-            MenuItem { text: chat.hasOlder ? qsTr("Load older messages") : qsTr("Reload"); onClicked: chat.hasOlder ? chat.loadOlder() : reopen() }
-            MenuItem { text: chat.peerMuted ? qsTr("Unmute") : qsTr("Mute"); onClicked: chat.setMuted(!chat.peerMuted) }
-            MenuItem { text: qsTr("Mark as read"); onClicked: chat.markRead() }
+            MenuItem { text: chat.hasOlder ? qsTr("Load older messages") : qsTr("Reload"); visible: !chat.isSecret; onClicked: chat.hasOlder ? chat.loadOlder() : reopen() }
+            MenuItem { text: chat.peerMuted ? qsTr("Unmute") : qsTr("Mute"); visible: !chat.isSecret; onClicked: chat.setMuted(!chat.peerMuted) }
+            MenuItem { text: qsTr("Mark as read"); visible: !chat.isSecret; onClicked: chat.markRead() }
+            MenuItem {
+                text: qsTr("Start secret chat")
+                visible: !chat.isSecret && !chat.peerIsGroup && !chat.peerIsChannel && chat.peerKey != ""
+                onClicked: app.startSecretChat(chat.peerKey)
+            }
+            MenuItem {
+                text: qsTr("Verify encryption key")
+                visible: chat.isSecret && chat.secretState == 2
+                onClicked: { verifyDialog.hex = chat.secretKeyHex(); verifyDialog.open() }
+            }
+            MenuItem {
+                text: qsTr("Self-destruct timer")
+                visible: chat.isSecret && chat.secretState == 2
+                onClicked: ttlDialog.open()
+            }
+            MenuItem {
+                text: qsTr("Delete secret chat")
+                visible: chat.isSecret
+                onClicked: discardDialog.open()
+            }
         }
     }
 
     function reopen() { var k = chat.peerKey; chat.close(); chat.open(k) }
+
+    QueryDialog {
+        id: discardDialog
+        titleText: qsTr("Delete secret chat")
+        message: qsTr("End this secret chat? Its messages, which live only on this device, will be removed here.")
+        acceptButtonText: qsTr("Delete")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: { chat.discardSecret(); chat.close(); pageStack.pop() }
+    }
+
+    SelectionDialog {
+        id: ttlDialog
+        property variant secsList: [0, 5, 30, 60, 3600, 86400, 604800]
+        titleText: qsTr("Self-destruct timer")
+        selectedIndex: -1
+        model: [qsTr("Off"), qsTr("5 seconds"), qsTr("30 seconds"), qsTr("1 minute"), qsTr("1 hour"), qsTr("1 day"), qsTr("1 week")]
+        onAccepted: if (selectedIndex >= 0) chat.setSecretTtl(secsList[selectedIndex])
+    }
+
+    CommonDialog {
+        id: verifyDialog
+        property string hex: ""
+        titleText: qsTr("Encryption key")
+        buttonTexts: [qsTr("Close")]
+        content: Item {
+            width: parent.width
+            height: verifyCol.height + 2 * platformStyle.paddingLarge
+            Column {
+                id: verifyCol
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: platformStyle.paddingLarge }
+                spacing: platformStyle.paddingMedium
+                Label {
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    font.pixelSize: platformStyle.fontSizeSmall
+                    color: platformStyle.colorNormalLight
+                    text: qsTr("If this key matches on both phones, no one is intercepting the chat. Compare it with %1 in person or over a trusted channel.").arg(chat.title)
+                }
+                Label {
+                    width: parent.width
+                    wrapMode: Text.WrapAnywhere
+                    font.family: "Courier"
+                    font.pixelSize: platformStyle.fontSizeMedium
+                    horizontalAlignment: Text.AlignHCenter
+                    text: verifyDialog.hex
+                }
+            }
+        }
+    }
 
     Menu {
         id: attachMenu
@@ -93,7 +162,21 @@ Page {
         }
         Column {
             anchors { left: avatar.right; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
-            Label { width: parent.width; text: chat.title; elide: Text.ElideRight; font.bold: true }
+            Row {
+                width: parent.width
+                spacing: platformStyle.paddingSmall
+                Image {
+                    source: "qrc:/images/lock.png"
+                    visible: chat.isSecret
+                    width: 16; height: 16; smooth: true
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Label {
+                    width: parent.width - (chat.isSecret ? 16 + platformStyle.paddingSmall : 0)
+                    text: chat.title; elide: Text.ElideRight; font.bold: true
+                    color: chat.isSecret ? "#8fd18f" : "white"
+                }
+            }
             Label {
                 width: parent.width
                 font.pixelSize: platformStyle.fontSizeSmall
@@ -104,10 +187,45 @@ Page {
         }
     }
 
+    // -- secret-chat status / accept bar --
+    Rectangle {
+        id: secretBar
+        anchors { top: heading.bottom; left: parent.left; right: parent.right }
+        color: "#12321c"
+        visible: chat.isSecret && chat.secretState != 2
+        height: visible ? secretCol.height + 2 * platformStyle.paddingMedium : 0
+        Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: "#2f6b3f"; visible: secretBar.visible }
+        Column {
+            id: secretCol
+            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+            spacing: platformStyle.paddingMedium
+            Label {
+                width: parent.width
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: "#bfe6c6"
+                text: chat.secretState == 1
+                      ? qsTr("%1 wants to start an end-to-end encrypted chat.").arg(chat.title)
+                      : qsTr("Waiting for the other side to come online and accept...")
+            }
+            Row {
+                spacing: platformStyle.paddingLarge
+                visible: chat.secretState == 1
+                Button { text: qsTr("Accept"); onClicked: chat.acceptSecret() }
+                Button { text: qsTr("Decline"); onClicked: { chat.discardSecret(); chat.close(); pageStack.pop() } }
+            }
+            Button {
+                text: qsTr("Cancel request")
+                visible: chat.secretState == 0
+                onClicked: { chat.discardSecret(); chat.close(); pageStack.pop() }
+            }
+        }
+    }
+
     // -- messages --
     ListView {
         id: list
-        anchors { top: heading.bottom; left: parent.left; right: parent.right; bottom: composerRow.top }
+        anchors { top: secretBar.bottom; left: parent.left; right: parent.right; bottom: composerRow.top }
         model: chat
         clip: true
         spacing: platformStyle.paddingSmall
@@ -180,7 +298,7 @@ Page {
         }
         ToolButton {
             id: attachButton
-            visible: !chat.peerIsChannel
+            visible: !chat.peerIsChannel && !chat.isSecret
             anchors { left: parent.left; leftMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             iconSource: "toolbar-add"
             enabled: app.connection == "online"
@@ -190,11 +308,13 @@ Page {
             id: composer
             visible: !chat.peerIsChannel
             anchors {
-                left: attachButton.right; leftMargin: platformStyle.paddingSmall
+                left: attachButton.visible ? attachButton.right : parent.left
+                leftMargin: platformStyle.paddingSmall
                 right: sendButton.left; rightMargin: platformStyle.paddingSmall
                 verticalCenter: parent.verticalCenter
             }
-            placeholderText: qsTr("message")
+            placeholderText: chat.isSecret ? qsTr("encrypted message") : qsTr("message")
+            enabled: !chat.isSecret || chat.secretState == 2
             wrapMode: TextEdit.Wrap
             platformMaxImplicitHeight: 120
             onTextChanged: chat.composing(text)
@@ -205,7 +325,7 @@ Page {
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: Math.max(80, implicitWidth)
             text: qsTr("Send")
-            enabled: composer.text.length > 0 && chat.peerKey != "" && app.connection == "online"
+            enabled: composer.text.length > 0 && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
             onClicked: {
                 chat.send(composer.text)
                 composer.text = ""

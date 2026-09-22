@@ -94,6 +94,9 @@ AppController::AppController(QObject *parent)
     connect(m_session, SIGNAL(selfChanged()), this, SIGNAL(selfChanged()));
     connect(m_session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessage(TgMessage)));
     connect(m_session, SIGNAL(peerResolved(TgPeer)), this, SLOT(onPeerResolved(TgPeer)));
+    connect(m_session, SIGNAL(secretChatRequested(int,qint64)), this, SLOT(onSecretRequested(int,qint64)));
+    connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
+    connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
     connect(m_session, SIGNAL(resolveFailed(QString)), this, SLOT(onResolveFailed(QString)));
     connect(m_session, SIGNAL(notice(QString)), this, SLOT(onNotice(QString)));
     connect(m_session, SIGNAL(log(QString)), this, SLOT(onSessionLog(QString)));
@@ -454,6 +457,45 @@ void AppController::findPeer(const QString &query)
 void AppController::onPeerResolved(const TgPeer &peer)
 {
     emit peerFound(peer.key());
+}
+
+void AppController::startSecretChat(const QString &peerKey)
+{
+    TgPeer p = TgPeer::fromKey(peerKey);
+    if (p.kind != TgPeer::User) { setNotice(tr("Secret chats can only be started with a person.")); return; }
+    m_session->requestSecretChat(p);
+    setNotice(tr("Starting a secret chat..."));
+}
+
+void AppController::onSecretRequested(int id, qint64 adminId)
+{
+    Q_UNUSED(id);
+    QString who = m_session->peers().userName(adminId);
+    setNotice(who.isEmpty() ? tr("Someone wants to start a secret chat.")
+                            : tr("%1 wants to start a secret chat.").arg(who));
+    if (!appInForeground() && notifications())
+        m_notifier->notify(tr("Secret chat"), tr("%1 wants to start a secret chat").arg(who));
+}
+
+void AppController::onSecretReady(int id)
+{
+    Q_UNUSED(id);
+    setNotice(tr("Secret chat is ready."));
+}
+
+void AppController::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+{
+    Q_UNUSED(randomId); Q_UNUSED(date);
+    if (out) return;
+    const QString key = QLatin1String("secret:") + QString::number(id);
+    const bool foreground = appInForeground();
+    if (foreground && m_chat->peerKey() == key) return;
+    if (foreground) return;
+    if (!notifications()) return;               // global switch (secret chats are never archived/muted in v1)
+    TgSecretChat sc = m_session->secretChat(id);
+    QString who = m_session->peers().userName(sc.peerUserId);
+    m_notifier->notify(who.isEmpty() ? tr("Secret chat") : who, text.isEmpty() ? tr("Encrypted message") : text);
+    m_notifier->setPendingCount(m_notifier->pendingCount() + 1);
 }
 
 void AppController::onResolveFailed(const QString &error)

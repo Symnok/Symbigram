@@ -17,6 +17,8 @@
 #include "dh.h"
 #include "inflate.h"
 #include "qrcode.h"
+#include "secretapi.h"
+#include "secretchat.h"
 #include "srp.h"
 #include "telegramservers.h"
 #include "telegramsession.h"
@@ -165,6 +167,54 @@ static int selfTest()
     int size = 0;
     check(QrCode::encode(QLatin1String("tg://login?token=AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA"), modules, size) && size == 33, "encode login url (version 4)");
 
+
+    say(QLatin1String("secret chats"));
+    {
+        // The Telegram built-in 2048-bit safe prime, g = 3. Simulate both ends of a secret
+        // chat locally: creator A and participant B exchange keys and messages.
+        QByteArray p = hex(
+            "c71caeb9c6b1c9048e6c522f70f13f73980d40238e3e21c14934d037563d930f48198a0aa7c14058229493d22530f4dbfa336f6e0ac925139543aed44cce7c37"
+            "20fd51f69458705ac68cd4fe6b6b13abdc9746512969328454f18faf8c595f642477fe96bb2a941d5bcd1d4ac8cc49880708fa9b378e3c4f3a9060bee67cf9a4"
+            "a4a695811051907e162753b56b0f6b410dba74d8a84b2a14b3144e0ef1284754fd17ed950d5965b4b9dd46582db1178d169c6bc465b0d6ff9ca3928fef5b9ae4"
+            "e418fc15e83ebea0f87fa9ff5eed70050ded2849f47bf959d956850ce929851f0d8115f635b105ee2e4e15d04b2454bf6f4fadf034b10403119cd8e3b92fcc5b");
+        int g = 3;
+        SecretChat a, b;
+        QByteArray gA = a.startAsCreator(2000, 42, g, p);
+        QByteArray gB = b.acceptAsParticipant(7, 99, 1000, 2000, gA, g, p);
+        bool ok = a.finishAsCreator(7, 99, 1000, 2000, gB, b.keyFingerprint());
+        check(ok && a.keyFingerprint() == b.keyFingerprint(), "DH key exchange agrees on the key");
+
+        // A (creator) sends; B decrypts. The creator out_seq_no is odd, so the first one is 1.
+        int seq = -1;
+        QByteArray enc = a.encryptMessage(SecretApi::textMessage(11, 0, QString::fromUtf8("hello secret \xd0\xbc\xd0\xb8\xd1\x80")));
+        SecretContent c1 = SecretApi::read(b.decryptMessage(enc, seq));
+        check(c1.kind == SecretContent::Text && c1.text == QString::fromUtf8("hello secret \xd0\xbc\xd0\xb8\xd1\x80") && seq == 1, "creator -> participant text, out_seq 1");
+
+        // B (participant) replies; A decrypts. The participant out_seq_no is even, so first is 0.
+        QByteArray enc2 = b.encryptMessage(SecretApi::textMessage(12, 0, QLatin1String("reply back")));
+        SecretContent c2 = SecretApi::read(a.decryptMessage(enc2, seq));
+        check(c2.kind == SecretContent::Text && c2.text == QLatin1String("reply back") && seq == 0, "participant -> creator text, out_seq 0");
+
+        // A second creator message advances the odd out_seq to 3.
+        QByteArray enc3 = a.encryptMessage(SecretApi::textMessage(13, 0, QLatin1String("second")));
+        SecretContent c3 = SecretApi::read(b.decryptMessage(enc3, seq));
+        check(c3.text == QLatin1String("second") && seq == 3, "creator second message, out_seq 3");
+
+        // A tampered ciphertext must be rejected.
+        QByteArray bad = enc3;
+        bad[bad.size() - 1] = bad.at(bad.size() - 1) ^ 0x01;
+        bool rejected = false;
+        try { int s2; b.decryptMessage(bad, s2); } catch (const TlException &) { rejected = true; }
+        check(rejected, "tampered secret message rejected");
+
+        // A service action round-trips.
+        SecretContent c4 = SecretApi::read(SecretApi::read(SecretApi::notifyLayer(1, 73)).kind == SecretContent::NotifyLayer
+                                           ? SecretApi::notifyLayer(1, 73) : QByteArray());
+        check(SecretApi::read(SecretApi::notifyLayer(1, 73)).kind == SecretContent::NotifyLayer
+              && SecretApi::read(SecretApi::notifyLayer(1, 73)).layer == 73, "notifyLayer service message");
+        Q_UNUSED(c4);
+    }
+
     say(failures ? QString::fromLatin1("%1 FAILURE(S)").arg(failures) : QLatin1String("all passed"));
     return failures ? 1 : 0;
 }
@@ -243,6 +293,12 @@ public:
         connect(m_session, SIGNAL(readOutbox(TgPeer,int)), this, SLOT(onReadOutbox(TgPeer,int)));
         connect(m_session, SIGNAL(peerResolved(TgPeer)), this, SLOT(onResolved(TgPeer)));
         connect(m_session, SIGNAL(resolveFailed(QString)), this, SLOT(onResolveFailed(QString)));
+        connect(m_session, SIGNAL(secretChatRequested(int,qint64)), this, SLOT(onSecretRequested(int,qint64)));
+        connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
+        connect(m_session, SIGNAL(secretChatDiscarded(int)), this, SLOT(onSecretDiscarded(int)));
+        connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
+        connect(m_session, SIGNAL(secretMessageSent(int,qint64,int)), this, SLOT(onSecretSent(int,qint64,int)));
+        connect(m_session, SIGNAL(secretMessageFailed(int,qint64,QString)), this, SLOT(onSecretFailed(int,qint64,QString)));
         connect(m_session, SIGNAL(notice(QString)), this, SLOT(onNotice(QString)));
         connect(m_session, SIGNAL(log(QString)), this, SLOT(onLog(QString)));
 
@@ -295,6 +351,12 @@ private slots:
     void onReadOutbox(const TgPeer &p, int maxId) { say(QString::fromLatin1("[read by peer] %1 up to %2").arg(m_session->peers().title(p)).arg(maxId)); }
     void onResolved(const TgPeer &p) { say(QString::fromLatin1("[resolved] %1 -> %2 (%3)").arg(m_session->peers().title(p)).arg(p.key()).arg(p.accessHash)); }
     void onResolveFailed(const QString &e) { say(QLatin1String("[resolve failed] ") + e); }
+    void onSecretRequested(int id, qint64 userId) { say(QString::fromLatin1("[secret] incoming request, chat %1 from user %2 - 'acceptsecret %1' to accept").arg(id).arg(userId)); }
+    void onSecretReady(int id) { say(QString::fromLatin1("[secret] chat %1 is ready (key hash %2)").arg(id).arg(QString::fromLatin1(m_session->secretChat(id).keyHash.left(8).toHex()))); }
+    void onSecretDiscarded(int id) { say(QString::fromLatin1("[secret] chat %1 discarded").arg(id)); }
+    void onSecretMessage(int id, qint64 rid, const QString &text, int date, bool out) { say(QString::fromLatin1("[secret %1] %2 %3: %4").arg(id).arg(QDateTime::fromTime_t(date).toString(QLatin1String("HH:mm:ss"))).arg(out ? QLatin1String("me") : QLatin1String("them")).arg(text)); Q_UNUSED(rid); }
+    void onSecretSent(int id, qint64 rid, int date) { say(QString::fromLatin1("[secret %1] sent (random %2, date %3)").arg(id).arg(rid).arg(date)); }
+    void onSecretFailed(int id, qint64 rid, const QString &e) { say(QString::fromLatin1("[secret %1] send failed: %2").arg(id).arg(e)); Q_UNUSED(rid); }
     void onNotice(const QString &n) { say(QLatin1String("[notice] ") + n); }
     void onLog(const QString &l) { say(QLatin1String("  . ") + l); }
 
@@ -372,6 +434,12 @@ private:
         else if (cmd == QLatin1String("clear") && a.size() >= 2) m_session->deleteHistory(peerAt(a.at(1)));
         else if (cmd == QLatin1String("password") && a.size() >= 2) m_session->checkPassword(QStringList(a.mid(1)).join(QLatin1String(" ")));
         else if (cmd == QLatin1String("logout")) m_session->logOut();
+        else if (cmd == QLatin1String("secret") && a.size() >= 2) { TgPeer p = peerAt(a.at(1)); if (p.kind == TgPeer::User) m_session->requestSecretChat(p); else say(QLatin1String("secret chats need a user; open the dialog first")); }
+        else if (cmd == QLatin1String("secrets")) { QList<TgSecretChat> sc = m_session->secretChats(); say(QString::fromLatin1("[secrets] %1").arg(sc.size())); for (int i = 0; i < sc.size(); ++i) say(QString::fromLatin1("  chat %1 user %2 state %3 creator %4 ttl %5").arg(sc.at(i).id).arg(sc.at(i).peerUserId).arg(sc.at(i).state).arg(sc.at(i).isCreator).arg(sc.at(i).ttl)); }
+        else if (cmd == QLatin1String("acceptsecret") && a.size() >= 2) m_session->acceptSecretChat(a.at(1).toInt());
+        else if (cmd == QLatin1String("secretsend") && a.size() >= 3) m_session->sendSecretText(a.at(1).toInt(), QStringList(a.mid(2)).join(QLatin1String(" ")));
+        else if (cmd == QLatin1String("secretttl") && a.size() >= 3) m_session->setSecretTtl(a.at(1).toInt(), a.at(2).toInt());
+        else if (cmd == QLatin1String("discardsecret") && a.size() >= 2) m_session->discardSecretChat(a.at(1).toInt());
         else if (cmd == QLatin1String("del") && a.size() >= 3) m_session->deleteMessages(peerAt(a.at(1)), QList<int>() << a.at(2).toInt(), a.value(3) == QLatin1String("all"));
         else if (cmd == QLatin1String("get") && a.size() >= 2) {
             // get <message id> [size]: downloads the attachment of a message shown by history

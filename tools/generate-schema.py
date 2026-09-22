@@ -107,8 +107,10 @@ def main():
     if len(sys.argv) < 3:
         print(__doc__)
         return 2
-    schema_path, out_path = sys.argv[1], sys.argv[2]
-    layer = sys.argv[3] if len(sys.argv) > 3 else '0'
+    secret = '--secret' in sys.argv
+    argv = [a for a in sys.argv if a != '--secret']
+    schema_path, out_path = argv[1], argv[2]
+    layer = argv[3] if len(argv) > 3 else '0'
 
     entries = {}
     skipped = 0
@@ -134,14 +136,17 @@ def main():
         f.write('// Do not edit. Re-run the generator against a newer schema instead.\n')
         f.write('// The encoding is documented in the generator and in tlobject.cpp.\n')
         f.write('#include "tlobject.h"\n\n')
-        f.write('const int TlSchema::Layer = %s;\n\n' % layer)
+        sym = 'secretPackedTable' if secret else 'packedTable'
+        lensym = 'secretPackedLength' if secret else 'packedLength'
+        if not secret:
+            f.write('const int TlSchema::Layer = %s;\n\n' % layer)
         f.write('// "<ctor-hex>:<field-spec>" entries, semicolon separated.\n')
-        f.write('const char *const TlSchema::packedTable =\n')
+        f.write('const char *const TlSchema::%s =\n' % sym)
         for i, c in enumerate(chunks):
             esc = c.replace('\\', '\\\\').replace('"', '\\"')
             sep = '' if i < len(chunks) - 1 else ';'
             f.write('    "%s"%s\n' % (esc, sep))
-        f.write('\nconst int TlSchema::packedLength = %d;\n' % len(packed))
+        f.write('\nconst int TlSchema::%s = %d;\n' % (lensym, len(packed)))
 
     print('%d constructors written to %s' % (len(entries), out_path))
     if skipped:

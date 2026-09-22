@@ -1,7 +1,10 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "telegramsession.h"
+#include "secretapi.h"
+#include "bigint.h"
 #include "crypto.h"
+#include "dh.h"
 #include "telegramservers.h"
 #include "tlconstructors.h"
 #include "tlreader.h"
@@ -32,7 +35,8 @@ TelegramSession::TelegramSession(QObject *parent)
     : QObject(parent), m_moved(0), m_srp(0), m_state(Disconnected), m_dcId(TelegramServers::DefaultDc), m_signedIn(false),
       m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false), m_selfId(0),
       m_archiveHasMore(false), m_archiveLoaded(false), m_dialogsHaveMore(false), m_dialogsLoading(false),
-      m_differencePending(false), m_online(false), m_nextJobId(1)
+      m_differencePending(false), m_online(false), m_nextJobId(1),
+      m_dhG(0), m_dhVersion(0), m_dhReady(false)
 {
     m_client = new MtprotoClient(this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -69,6 +73,7 @@ void TelegramSession::setSessionFile(const QString &path)
 {
     m_sessionFile = path;
     loadSessionFile();
+    loadSecrets();
 }
 
 void TelegramSession::loadSessionFile()
@@ -155,6 +160,12 @@ void TelegramSession::forgetSession(const QString &reason)
     m_archivedPeers.clear();
     m_folders.clear();
     m_archiveLoaded = false;
+    qDeleteAll(m_secretChats);
+    m_secretChats.clear();
+    m_secretHistory.clear();
+    m_secretSeen.clear();
+    m_dhReady = false;
+    if (!m_sessionFile.isEmpty()) QFile::remove(secretFilePath());
     m_peers.clear();
     m_qrUrl.clear();
     m_qrToken.clear();
@@ -446,6 +457,7 @@ void TelegramSession::startSync()
     refreshDialogs();
     loadFolders();
     loadArchive();
+    ensureDhConfig();
     if (m_online) send(UpdateStatus, TgApi::updateStatus(true));
 }
 
@@ -789,6 +801,8 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             }
             QVariantList others = diff.vec("other_updates");
             for (int i = 0; i < others.size(); ++i) applyUpdate(TlSchema::toObject(others.at(i)));
+            QVariantList encs = diff.vec("new_encrypted_messages");
+            for (int i = 0; i < encs.size(); ++i) handleEncryptedMessage(TlSchema::toObject(encs.at(i)), unixNow());
             TlObject st = diff.has("state") ? diff.obj("state") : diff.obj("intermediate_state");
             if (!st.isNull()) {
                 m_updateState = TgApi::readState(st);
@@ -816,6 +830,63 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             emit foldersChanged();
             break;
         }
+        case GetDhConfig: {
+            TlObject o = TlSchema::readObject(r);
+            if (o.ctor() == Tl::MessagesDhConfig) {
+                m_dhG = o.intOr("g");
+                m_dhP = o.bytes("p");
+                m_dhVersion = o.intOr("version");
+                // Validate the prime and generator once (the slow safe-prime check); the
+                // config is the same for every secret chat, so this is paid once.
+                QString note;
+                try {
+                    DhValidation::validatePrime(m_dhG, BigInt::fromBytesBE(m_dhP), &note);
+                    m_dhReady = true;
+                    emit log(QLatin1String("secret chats: ") + note);
+                } catch (const TlException &e) {
+                    emit log(QLatin1String("secret chats: DH config rejected: ") + e.message());
+                    m_dhReady = false;
+                }
+            }
+            if (m_dhReady) {
+                QList<TgPeer> reqs = m_secretRequestQueue; m_secretRequestQueue.clear();
+                for (int i = 0; i < reqs.size(); ++i) requestSecretChat(reqs.at(i));
+                QList<int> accs = m_secretAcceptQueue; m_secretAcceptQueue.clear();
+                for (int i = 0; i < accs.size(); ++i) acceptSecretChat(accs.at(i));
+            }
+            break;
+        }
+        case RequestEncryption: {
+            TlObject o = TlSchema::readObject(r);
+            SecretChat *chat = req.secret;
+            emit log(QString::fromLatin1("secret: requestEncryption result ctor 0x%1").arg(o.ctor(), 0, 16));
+            if (!chat) break;
+            if (o.ctor() == Tl::EncryptedChatWaiting || o.ctor() == Tl::EncryptedChat || o.ctor() == Tl::EncryptedChatRequested) {
+                int id = o.intOr("id");
+                chat->setAccess(id, o.longOr("access_hash"));
+                m_secretChats.insert(id, chat);
+                if (o.ctor() == Tl::EncryptedChat) handleEncryptedChat(o);   // instantly accepted (rare)
+                saveSecrets();
+                emit secretChatsChanged();
+            } else {
+                delete chat;   // discarded
+            }
+            break;
+        }
+        case AcceptEncryption: {
+            TlObject o = TlSchema::readObject(r);
+            handleEncryptedChat(o);
+            break;
+        }
+        case SendEncrypted: {
+            TlObject o = TlSchema::readObject(r);
+            int date = o.intOr("date", unixNow());
+            saveSecrets();
+            emit secretMessageSent(req.secretChatId, req.randomId, date);
+            break;
+        }
+        case DiscardEncryption:
+            break;
         case GetHistory: {
             TlObject o = TlSchema::readObject(r);
             TgHistoryPage page = TgApi::readHistory(o, m_peers);
@@ -1093,6 +1164,21 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         break;
     case GetArchive:
     case GetFolders:
+    case GetDhConfig:
+        m_secretRequestQueue.clear();
+        m_secretAcceptQueue.clear();
+        break;
+    case RequestEncryption:
+        if (req.secret) delete req.secret;
+        emit notice(tr("Could not start the secret chat: %1").arg(type));
+        break;
+    case AcceptEncryption:
+        emit notice(tr("Could not accept the secret chat: %1").arg(type));
+        break;
+    case SendEncrypted:
+        emit secretMessageFailed(req.secretChatId, req.randomId, type);
+        break;
+    case DiscardEncryption:
     case GetState:
     case GetSelf:
     case ReadHistory:
@@ -1303,6 +1389,15 @@ void TelegramSession::applyUpdate(const TlObject &u)
     case Tl::UpdateDialogFilterOrder:
         // A folder was added, changed, removed or reordered: re-read the set.
         loadFolders();
+        break;
+    case Tl::UpdateEncryption:
+        handleEncryptedChat(u.obj("chat"));
+        break;
+    case Tl::UpdateNewEncryptedMessage:
+        handleEncryptedMessage(u.obj("message"), u.intOr("date", unixNow()));
+        break;
+    case Tl::UpdateEncryptedMessagesRead:
+    case Tl::UpdateEncryptedChatTyping:
         break;
     case Tl::UpdateChannelTooLong:
         // A channel this client cannot catch up incrementally; the list refresh shows the
@@ -1587,4 +1682,269 @@ void TelegramSession::finishUpload(qint64 randomId, const QString &error)
     if (u.file) { u.file->close(); delete u.file; }
     // The peer is empty for a job that never started; the model matches by random id.
     emit messageFailed(u.peer, randomId, error);
+}
+
+
+// -- secret (end-to-end) chats -------------------------------------------------------------------------------
+
+QString TelegramSession::secretFilePath() const
+{
+    return QFileInfo(m_sessionFile).absolutePath() + QLatin1String("/secretchats.dat");
+}
+
+void TelegramSession::ensureDhConfig()
+{
+    if (m_dhReady || !m_client->isReady()) return;
+    send(GetDhConfig, TgApi::getDhConfig(m_dhVersion, 256));
+}
+
+TgSecretChat TelegramSession::lightSecret(const SecretChat *c) const
+{
+    TgSecretChat t;
+    t.id = c->chatId();
+    t.peerUserId = c->peerUserId();
+    t.state = int(c->state());
+    t.isCreator = c->isCreator();
+    t.ttl = c->ttl();
+    t.keyHash = c->keyHash();
+    return t;
+}
+
+QList<TgSecretChat> TelegramSession::secretChats() const
+{
+    QList<TgSecretChat> out;
+    for (QHash<int, SecretChat *>::const_iterator it = m_secretChats.constBegin(); it != m_secretChats.constEnd(); ++it)
+        if (it.value()->state() != SecretChat::Discarded) out.append(lightSecret(it.value()));
+    return out;
+}
+
+TgSecretChat TelegramSession::secretChat(int id) const
+{
+    SecretChat *c = m_secretChats.value(id, 0);
+    return c ? lightSecret(c) : TgSecretChat();
+}
+
+QByteArray TelegramSession::secretKeyHash(int id) const
+{
+    SecretChat *c = m_secretChats.value(id, 0);
+    return c ? c->keyHash() : QByteArray();
+}
+
+void TelegramSession::appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+{
+    // Telegram redelivers unacknowledged encrypted messages, so drop a random id we have
+    // already seen in this chat (our own echo is seen first, then the server delivery).
+    if (randomId != 0) {
+        QSet<qint64> &seen = m_secretSeen[id];
+        if (seen.contains(randomId)) return;
+        seen.insert(randomId);
+    }
+    TgMessage m;
+    m.text = text;
+    m.date = date;
+    m.out = out;
+    m.fromId = out ? m_selfId : 0;
+    m_secretHistory[id].append(m);
+    emit secretMessageReceived(id, randomId, text, date, out);
+}
+
+void TelegramSession::requestSecretChat(const TgPeer &user)
+{
+    TgPeer u = m_peers.withHash(user);
+    if (u.kind != TgPeer::User || u.accessHash == 0) { emit notice(tr("Secret chats can only be opened with a person.")); return; }
+    if (!m_dhReady) { m_secretRequestQueue.append(u); ensureDhConfig(); return; }
+    SecretChat *chat = new SecretChat;
+    int rid = qint32(Crypto::randomUInt64());
+    QByteArray gA = chat->startAsCreator(u.id, rid, m_dhG, m_dhP);
+    Request rq;
+    rq.secret = chat;
+    send(RequestEncryption, TgApi::requestEncryption(u, rid, gA), rq);
+    emit log(QString::fromLatin1("secret: requested a chat with user %1").arg(u.id));
+}
+
+void TelegramSession::acceptSecretChat(int id)
+{
+    SecretChat *chat = m_secretChats.value(id, 0);
+    if (!chat || chat->state() != SecretChat::RequestedToMe) return;
+    if (!m_dhReady) { if (!m_secretAcceptQueue.contains(id)) m_secretAcceptQueue.append(id); ensureDhConfig(); return; }
+    QByteArray gB = chat->acceptAsParticipant(chat->chatId(), chat->accessHash(), chat->adminId(), m_selfId,
+                                              chat->incomingGa(), m_dhG, m_dhP);
+    Request rq;
+    rq.secretChatId = id;
+    send(AcceptEncryption, TgApi::acceptEncryption(chat->chatId(), chat->accessHash(), gB, chat->keyFingerprint()), rq);
+    saveSecrets();
+}
+
+void TelegramSession::discardSecretChat(int id)
+{
+    emit log(QString::fromLatin1("secret: discarding chat %1 (sending discardEncryption)").arg(id));
+    SecretChat *chat = m_secretChats.value(id, 0);
+    if (m_client->isReady()) send(DiscardEncryption, TgApi::discardEncryption(id));
+    if (chat) { m_secretChats.remove(id); delete chat; }
+    saveSecrets();
+    emit secretChatDiscarded(id);
+    emit secretChatsChanged();
+}
+
+void TelegramSession::sendSecretService(SecretChat *chat, const QByteArray &body)
+{
+    if (!chat || chat->state() != SecretChat::Ready || !m_client->isReady()) return;
+    qint64 rid = qint64(Crypto::randomUInt64());
+    QByteArray data = chat->encryptMessage(body);
+    Request rq;
+    rq.secretChatId = chat->chatId();
+    rq.randomId = rid;
+    send(SendEncrypted, TgApi::sendEncryptedService(chat->chatId(), chat->accessHash(), rid, data), rq);
+    saveSecrets();
+}
+
+qint64 TelegramSession::sendSecretText(int id, const QString &text)
+{
+    SecretChat *chat = m_secretChats.value(id, 0);
+    if (!chat || chat->state() != SecretChat::Ready) { emit secretMessageFailed(id, 0, tr("The secret chat is not ready.")); return 0; }
+    qint64 rid = qint64(Crypto::randomUInt64());
+    QByteArray data = chat->encryptMessage(SecretApi::textMessage(rid, chat->ttl(), text));
+    Request rq;
+    rq.secretChatId = id;
+    rq.randomId = rid;
+    send(SendEncrypted, TgApi::sendEncrypted(id, chat->accessHash(), rid, data), rq);
+    saveSecrets();
+    // Optimistic local echo, matched to the ack by random id.
+    appendSecretMessage(id, rid, text, unixNow(), true);
+    return rid;
+}
+
+void TelegramSession::setSecretTtl(int id, int seconds)
+{
+    SecretChat *chat = m_secretChats.value(id, 0);
+    if (!chat) return;
+    chat->setTtl(seconds);
+    qint64 rid = qint64(Crypto::randomUInt64());
+    sendSecretService(chat, SecretApi::setTtl(rid, seconds));
+    saveSecrets();
+    emit secretChatsChanged();
+}
+
+void TelegramSession::handleEncryptedChat(const TlObject &chat)
+{
+    if (chat.isNull()) return;
+    int id = chat.intOr("id");
+    switch (chat.ctor()) {
+    case Tl::EncryptedChatRequested: {
+        emit log(QString::fromLatin1("secret: incoming request for chat %1").arg(id));
+        if (m_secretChats.contains(id)) return;
+        SecretChat *c = new SecretChat;
+        c->setIncomingRequest(id, chat.longOr("access_hash"), chat.longOr("admin_id"),
+                              chat.longOr("participant_id"), chat.bytes("g_a"));
+        m_secretChats.insert(id, c);
+        saveSecrets();
+        emit secretChatRequested(id, c->adminId());
+        emit secretChatsChanged();
+        break;
+    }
+    case Tl::EncryptedChat: {
+        SecretChat *c = m_secretChats.value(id, 0);
+        if (!c) return;
+        if (c->state() == SecretChat::RequestedByMe) {
+            // My request was accepted: finish the key from their g_b.
+            emit log(QString::fromLatin1("secret: chat %1 accepted by peer, finishing key").arg(id));
+            bool ok = c->finishAsCreator(id, chat.longOr("access_hash"), chat.longOr("admin_id"),
+                                         chat.longOr("participant_id"), chat.bytes("g_a_or_b"), chat.longOr("key_fingerprint"));
+            if (!ok) { emit log(QLatin1String("secret: key fingerprint MISMATCH, discarding")); discardSecretChat(id); return; }
+            emit log(QString::fromLatin1("secret: chat %1 key fingerprint OK").arg(id));
+        } else if (c->state() != SecretChat::Ready) {
+            return;
+        }
+        c->setAccess(id, chat.longOr("access_hash"));
+        // The very first out message on a layer >= 46 chat announces our layer.
+        if (c->outSeqCount() == 0) { emit log(QString::fromLatin1("secret: chat %1 ready, sending notifyLayer(%2)").arg(id).arg(Tl::SecretLayer)); sendSecretService(c, SecretApi::notifyLayer(qint64(Crypto::randomUInt64()), Tl::SecretLayer)); }
+        saveSecrets();
+        emit secretChatReady(id);
+        emit secretChatsChanged();
+        break;
+    }
+    case Tl::EncryptedChatDiscarded: {
+        emit log(QString::fromLatin1("secret: chat %1 was DISCARDED by the peer/server").arg(id));
+        SecretChat *c = m_secretChats.value(id, 0);
+        if (c) { m_secretChats.remove(id); delete c; saveSecrets(); }
+        emit secretChatDiscarded(id);
+        emit secretChatsChanged();
+        break;
+    }
+    default:
+        break;   // encryptedChatWaiting / empty: nothing to do
+    }
+}
+
+void TelegramSession::handleEncryptedMessage(const TlObject &message, int date)
+{
+    if (message.isNull()) return;
+    int id = message.intOr("chat_id");
+    SecretChat *chat = m_secretChats.value(id, 0);
+    if (!chat || chat->state() != SecretChat::Ready) {
+        emit log(QString::fromLatin1("secret: message for unknown/not-ready chat %1").arg(id));
+        return;
+    }
+    try {
+        int senderSeq = -1;
+        QByteArray body = chat->decryptMessage(message.bytes("bytes"), senderSeq);
+        SecretContent c = SecretApi::read(body);
+        int when = message.intOr("date", date);
+        switch (c.kind) {
+        case SecretContent::Text:
+            appendSecretMessage(id, c.randomId, c.text, when, false);
+            break;
+        case SecretContent::SetTtl:
+            chat->setTtl(c.ttl);
+            emit secretChatsChanged();
+            break;
+        case SecretContent::NotifyLayer:
+            emit log(QString::fromLatin1("secret: chat %1 peer advertised layer %2").arg(id).arg(c.layer));
+            break;
+        case SecretContent::FlushHistory:
+        case SecretContent::Delete:
+        case SecretContent::Read:
+        case SecretContent::Typing:
+        case SecretContent::Unsupported:
+            break;
+        }
+        saveSecrets();
+    } catch (const TlException &e) {
+        emit log(QLatin1String("secret: could not decrypt a message: ") + e.message());
+    }
+}
+
+// -- persistence -----------------------------------------------------------------------------------------
+
+void TelegramSession::saveSecrets()
+{
+    if (m_sessionFile.isEmpty()) return;
+    QString path = secretFilePath();
+    if (m_secretChats.isEmpty()) { QFile::remove(path); return; }
+    QFile f(path);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) return;
+    QDataStream s(&f);
+    s.setVersion(QDataStream::Qt_4_7);
+    s << quint32(0x53474d53) << qint32(m_secretChats.size());   // "SGMS"
+    for (QHash<int, SecretChat *>::const_iterator it = m_secretChats.constBegin(); it != m_secretChats.constEnd(); ++it)
+        it.value()->save(s);
+}
+
+void TelegramSession::loadSecrets()
+{
+    qDeleteAll(m_secretChats);
+    m_secretChats.clear();
+    QFile f(secretFilePath());
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QDataStream s(&f);
+    s.setVersion(QDataStream::Qt_4_7);
+    quint32 magic = 0;
+    qint32 count = 0;
+    s >> magic >> count;
+    if (magic != 0x53474d53) return;
+    for (int i = 0; i < count && s.status() == QDataStream::Ok; ++i) {
+        SecretChat *c = new SecretChat;
+        if (c->load(s) && c->chatId() != 0) m_secretChats.insert(c->chatId(), c);
+        else delete c;
+    }
 }
