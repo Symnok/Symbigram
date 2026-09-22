@@ -44,6 +44,11 @@ namespace
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
     const char *const KeyDownloadCustom = "downloads/folder";
+    const char *const KeyProxyEnabled = "proxy/enabled";
+    const char *const KeyProxyHost = "proxy/host";
+    const char *const KeyProxyPort = "proxy/port";
+    const char *const KeyProxyUser = "proxy/user";
+    const char *const KeyProxyPass = "proxy/pass";
     const int ReconnectMinMs = 5000;
     const int ReconnectMaxMs = 60000;
 
@@ -82,6 +87,7 @@ AppController::AppController(QObject *parent)
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
     applyDownloadFolder();
+    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
     m_notifier = new Notifier(this);
     m_notifier->setEnabled(notifications());
     m_notifier->setVibrate(vibrate());
@@ -316,6 +322,41 @@ void AppController::applyDownloadFolder()
     QString chosen = custom.isEmpty() ? folderForDrive(letters.at(downloadDriveIndex())) : custom;
     QDir().mkpath(chosen);
     if (m_chat) m_chat->setDownloadFolder(chosen);
+}
+
+// -- SOCKS5 proxy ----------------------------------------------------------------------------------
+
+bool AppController::proxyEnabled() const { return m_settings.value(QLatin1String(KeyProxyEnabled), false).toBool(); }
+QString AppController::proxyHost() const { return m_settings.value(QLatin1String(KeyProxyHost)).toString(); }
+QString AppController::proxyPort() const { return m_settings.value(QLatin1String(KeyProxyPort)).toString(); }
+QString AppController::proxyUser() const { return m_settings.value(QLatin1String(KeyProxyUser)).toString(); }
+QString AppController::proxyPass() const { return m_settings.value(QLatin1String(KeyProxyPass)).toString(); }
+
+void AppController::saveProxy(bool enabled, const QString &host, const QString &port, const QString &user, const QString &pass)
+{
+    m_settings.setValue(QLatin1String(KeyProxyEnabled), enabled);
+    m_settings.setValue(QLatin1String(KeyProxyHost), host.trimmed());
+    m_settings.setValue(QLatin1String(KeyProxyPort), port.trimmed());
+    m_settings.setValue(QLatin1String(KeyProxyUser), user);
+    m_settings.setValue(QLatin1String(KeyProxyPass), pass);
+    applyProxy();
+    emit settingsChanged();
+}
+
+void AppController::setProxyEnabled(bool on)
+{
+    m_settings.setValue(QLatin1String(KeyProxyEnabled), on);
+    applyProxy();
+    emit settingsChanged();
+}
+
+void AppController::applyProxy()
+{
+    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
+    // Reconnect so the change takes effect on a live connection.
+    bool wasConnected = m_session->state() != TelegramSession::Disconnected;
+    if (wasConnected) m_session->disconnectFromServer();
+    if (m_wantOnline) { m_reconnect->stop(); m_reconnectDelay = ReconnectMinMs; connectSession(); }
 }
 QString AppController::myName() const { return m_session->selfName(); }
 

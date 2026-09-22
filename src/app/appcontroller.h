@@ -52,6 +52,11 @@ class AppController : public QObject
     Q_PROPERTY(int downloadDriveIndex READ downloadDriveIndex WRITE setDownloadDriveIndex NOTIFY settingsChanged)
     Q_PROPERTY(QString downloadFolder READ downloadFolder NOTIFY settingsChanged)
     Q_PROPERTY(bool downloadCustom READ downloadCustom NOTIFY settingsChanged)
+    Q_PROPERTY(bool proxyEnabled READ proxyEnabled NOTIFY settingsChanged)
+    Q_PROPERTY(QString proxyHost READ proxyHost NOTIFY settingsChanged)
+    Q_PROPERTY(QString proxyPort READ proxyPort NOTIFY settingsChanged)
+    Q_PROPERTY(QString proxyUser READ proxyUser NOTIFY settingsChanged)
+    Q_PROPERTY(QString proxyPass READ proxyPass NOTIFY settingsChanged)
     Q_PROPERTY(QString myName READ myName NOTIFY selfChanged)
     Q_PROPERTY(QString mySubtitle READ mySubtitle NOTIFY selfChanged)
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
@@ -99,6 +104,11 @@ public:
     void setDownloadDriveIndex(int index);
     QString downloadFolder() const;                // the resolved path (custom, or <drive>/.../Symbigram)
     bool downloadCustom() const;                   // true if a folder was picked instead of a drive
+    bool proxyEnabled() const;
+    QString proxyHost() const;
+    QString proxyPort() const;
+    QString proxyUser() const;
+    QString proxyPass() const;
     QString myName() const;
     QString mySubtitle() const;
     ChatsModel *chats() const { return m_chats; }
@@ -132,6 +142,9 @@ public slots:
     void startSecretChat(const QString &peerKey);
     /// Opens a native folder picker so the user can choose any download folder.
     void chooseDownloadFolder();
+    /// Store SOCKS5 proxy settings, apply them, and reconnect so they take effect.
+    void saveProxy(bool enabled, const QString &host, const QString &port, const QString &user, const QString &pass);
+    void setProxyEnabled(bool on);
     void openUrl(const QString &url);
     void copyText(const QString &text);
     void clearNotice();
@@ -180,6 +193,7 @@ private:
     static QStringList presentDriveLetters();      // among C:, E:, F: which exist
     static QString folderForDrive(const QString &drive);
     void applyDownloadFolder();                    // create it + hand it to the chat model
+    void applyProxy();                             // push current settings to the session + reconnect
 
     QSettings m_settings;
     TelegramSession *m_session;

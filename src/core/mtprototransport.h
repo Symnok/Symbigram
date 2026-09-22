@@ -10,6 +10,7 @@
 
 #include <QAbstractSocket>
 #include <QByteArray>
+#include <QNetworkProxy>
 #include <QObject>
 #include <QString>
 
@@ -23,6 +24,7 @@ public:
     explicit MtprotoTransport(QObject *parent = 0);
 
     void connectToHost(const QString &host, int port);
+    void setProxy(const QNetworkProxy &proxy) { m_proxy = proxy; }
     void close();
     bool isConnected() const;
     /// Sends one MTProto packet (a whole number of 4-byte words).
@@ -48,6 +50,7 @@ private:
     QByteArray m_inbuf;
     bool m_tagSent;
     bool m_open;
+    QNetworkProxy m_proxy;
 };
 
 #endif // MTPROTOTRANSPORT_H

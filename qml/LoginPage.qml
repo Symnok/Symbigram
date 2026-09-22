@@ -17,6 +17,44 @@ Page {
             visible: app.connection == "offline"
             onClicked: app.reconnect()
         }
+        ToolButton { iconSource: "toolbar-menu"; onClicked: loginMenu.open() }
+    }
+
+    Menu {
+        id: loginMenu
+        MenuLayout {
+            MenuItem { text: qsTr("SOCKS5 proxy"); onClicked: { proxyDialog.load(); proxyDialog.open() } }
+            MenuItem { text: qsTr("Reconnect"); onClicked: app.reconnect() }
+        }
+    }
+
+    CommonDialog {
+        id: proxyDialog
+        titleText: qsTr("SOCKS5 proxy")
+        buttonTexts: [app.proxyEnabled ? qsTr("Save") : qsTr("Enable"), qsTr("Cancel"), qsTr("Off")]
+        content: Column {
+            width: parent.width
+            spacing: platformStyle.paddingMedium
+            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
+            Label { text: qsTr("Server"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyHostField; width: parent.width; placeholderText: qsTr("host or IP"); inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+            Label { text: qsTr("Port"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyPortField; width: parent.width; placeholderText: "1080"; inputMethodHints: Qt.ImhDigitsOnly }
+            Label { text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+            Label { text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
+        }
+        onButtonClicked: {
+            if (index == 0) app.saveProxy(true, proxyHostField.text, proxyPortField.text, proxyUserField.text, proxyPassField.text)
+            else if (index == 2) app.setProxyEnabled(false)
+        }
+        function load() {
+            proxyHostField.text = app.proxyHost
+            proxyPortField.text = app.proxyPort
+            proxyUserField.text = app.proxyUser
+            proxyPassField.text = app.proxyPass
+        }
     }
 
     // seconds left on the code, for the countdown under it
@@ -84,14 +122,24 @@ Page {
                     width: platformStyle.graphicSizeLarge
                     height: platformStyle.graphicSizeLarge
                 }
-                Label {
+                Column {
                     anchors.centerIn: parent
                     width: parent.width - 2 * platformStyle.paddingLarge
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.Wrap
-                    color: "#404040"
+                    spacing: platformStyle.paddingMedium
                     visible: app.qrToken == "" && app.connection == "offline"
-                    text: qsTr("No connection. Tap the refresh button to try again.")
+                    Label {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.Wrap
+                        color: "#404040"
+                        text: app.proxyEnabled ? qsTr("No connection through the proxy. Check the proxy or tap Reconnect.")
+                                               : qsTr("No connection. Tap Reconnect, or set up a proxy if Telegram is blocked.")
+                    }
+                    Button {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: app.proxyEnabled ? qsTr("Proxy: %1").arg(app.proxyHost != "" ? app.proxyHost : qsTr("on")) : qsTr("Set up proxy")
+                        onClicked: { proxyDialog.load(); proxyDialog.open() }
+                    }
                 }
             }
             Label {

@@ -64,6 +64,32 @@ Page {
         }
     }
 
+    CommonDialog {
+        id: proxyDialog
+        titleText: qsTr("SOCKS5 proxy")
+        buttonTexts: [qsTr("Save"), qsTr("Cancel")]
+        content: Column {
+            width: parent.width
+            spacing: platformStyle.paddingMedium
+            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
+            Label { text: qsTr("Server"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyHostField; width: parent.width; placeholderText: qsTr("host or IP"); inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+            Label { text: qsTr("Port"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyPortField; width: parent.width; placeholderText: "1080"; inputMethodHints: Qt.ImhDigitsOnly }
+            Label { text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+            Label { text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
+        }
+        onButtonClicked: if (index == 0) app.saveProxy(true, proxyHostField.text, proxyPortField.text, proxyUserField.text, proxyPassField.text)
+        function load() {
+            proxyHostField.text = app.proxyHost
+            proxyPortField.text = app.proxyPort
+            proxyUserField.text = app.proxyUser
+            proxyPassField.text = app.proxyPass
+        }
+    }
+
     function languageName() {
         for (var i = 0; i < languageDialog.model.count; ++i)
             if (languageDialog.model.get(i).code == app.language)
@@ -182,6 +208,50 @@ Page {
                 }
                 onClicked: autoSwitch.checked = !autoSwitch.checked
             }
+            ListItem {
+                id: proxyItem
+                ListItemText {
+                    anchors { left: proxyItem.paddingItem.left; right: proxySwitch.left; verticalCenter: parent.verticalCenter }
+                    role: "Title"
+                    text: qsTr("SOCKS5 proxy")
+                    wrapMode: Text.Wrap
+                }
+                Switch {
+                    id: proxySwitch
+                    anchors { right: proxyItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    checked: app.proxyEnabled
+                    onCheckedChanged: if (checked != app.proxyEnabled) app.setProxyEnabled(checked)
+                }
+                onClicked: proxySwitch.checked = !proxySwitch.checked
+            }
+            ListItem {
+                id: proxyServerItem
+                subItemIndicator: true
+                enabled: app.proxyEnabled
+                opacity: enabled ? 1 : 0.4
+                Column {
+                    anchors { left: proxyServerItem.paddingItem.left; right: proxyServerItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Proxy server") }
+                    Label {
+                        width: parent.width
+                        text: app.proxyHost != "" ? (app.proxyHost + ":" + app.proxyPort) : qsTr("not set")
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { proxyDialog.load(); proxyDialog.open() }
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("Route the connection through a SOCKS5 proxy. Changing it reconnects.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
+
             ListItem {
                 id: downloadsItem
                 subItemIndicator: true

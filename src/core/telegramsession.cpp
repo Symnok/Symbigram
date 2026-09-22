@@ -195,6 +195,18 @@ void TelegramSession::connectToServer()
     m_client->connectToDc(TelegramServers::hostFor(m_dcId), TelegramServers::DefaultPort, m_authKey);
 }
 
+void TelegramSession::setProxy(bool enabled, const QString &host, int port, const QString &user, const QString &pass)
+{
+    if (enabled && !host.isEmpty())
+        m_proxy = QNetworkProxy(QNetworkProxy::Socks5Proxy, host, quint16(port), user, pass);
+    else
+        m_proxy = QNetworkProxy(QNetworkProxy::NoProxy);
+    m_client->setProxy(m_proxy);
+    if (m_moved) m_moved->setProxy(m_proxy);
+    for (QHash<int, DcLink>::const_iterator it = m_dcLinks.constBegin(); it != m_dcLinks.constEnd(); ++it)
+        if (it.value().client) it.value().client->setProxy(m_proxy);
+}
+
 void TelegramSession::disconnectFromServer()
 {
     m_qrPoll->stop();
@@ -321,6 +333,7 @@ void TelegramSession::handleLoginStep(const TgQrLoginStep &step, bool fromMovedD
         emit log(QString::fromLatin1("login token migrates to dc%1").arg(step.dcId));
         m_moved = new MtprotoClient(this);
         m_moved->setInfo(m_info);
+        m_moved->setProxy(m_proxy);
         connect(m_moved, SIGNAL(connected()), this, SLOT(onMovedConnected()));
         connect(m_moved, SIGNAL(disconnected(QString)), this, SLOT(onMovedDisconnected(QString)));
         connect(m_moved, SIGNAL(rpcResult(quint64,QByteArray)), this, SLOT(onRpcResult(quint64,QByteArray)));
@@ -1481,6 +1494,7 @@ MtprotoClient *TelegramSession::clientForDc(int dcId)
     link.dcId = dcId;
     link.client = new MtprotoClient(this);
     link.client->setInfo(m_info);
+    link.client->setProxy(m_proxy);
     link.client->setProperty("dcId", dcId);
     connect(link.client, SIGNAL(connected()), this, SLOT(onDcConnected()));
     connect(link.client, SIGNAL(disconnected(QString)), this, SLOT(onDcDisconnected(QString)));

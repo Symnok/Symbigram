@@ -31,6 +31,7 @@ void MtprotoTransport::connectToHost(const QString &host, int port)
     m_inbuf.clear();
     m_tagSent = false;
     m_open = true;
+    m_socket->setProxy(m_proxy);
     m_connectTimer->start();
     m_socket->connectToHost(host, quint16(port));
 }

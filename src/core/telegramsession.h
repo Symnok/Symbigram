@@ -19,6 +19,7 @@
 
 #include <QHash>
 #include <QList>
+#include <QNetworkProxy>
 #include <QSet>
 #include <QObject>
 #include <QString>
@@ -51,6 +52,8 @@ public:
 
     /// Opens the link: with a signed-in session it syncs, otherwise it starts the QR login.
     void connectToServer();
+    /// Route all connections through a SOCKS5 proxy (or none when host is empty).
+    void setProxy(bool enabled, const QString &host, int port, const QString &user, const QString &pass);
     void disconnectFromServer();
 
     // -- login --
@@ -311,6 +314,7 @@ private:
     int m_dcId;
     bool m_signedIn;
     TgUpdateState m_updateState;
+    QNetworkProxy m_proxy;
     bool m_stateDirty;
 
     // login

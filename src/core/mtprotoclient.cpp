@@ -9,6 +9,7 @@
 #include "tlreader.h"
 #include "tlwriter.h"
 
+#include <QNetworkProxy>
 #include <QTimer>
 
 namespace
@@ -65,6 +66,11 @@ void MtprotoClient::connectToDc(const QString &host, int port, const AuthKey &ke
     m_session = key.isValid() ? new MtprotoSession(key) : 0;
     m_connectionInitialised = false;
     m_transport->connectToHost(host, port);
+}
+
+void MtprotoClient::setProxy(const QNetworkProxy &proxy)
+{
+    m_transport->setProxy(proxy);
 }
 
 void MtprotoClient::close()

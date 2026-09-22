@@ -23,6 +23,7 @@
 class MtprotoTransport;
 class MtprotoSession;
 class QTimer;
+class QNetworkProxy;
 
 /// What the client tells the server about itself in initConnection.
 struct ClientInfo
@@ -46,6 +47,7 @@ public:
     ~MtprotoClient();
 
     void setInfo(const ClientInfo &info) { m_info = info; }
+    void setProxy(const QNetworkProxy &proxy);
     const ClientInfo &info() const { return m_info; }
 
     /// Connects and, without a valid key, negotiates one. connected() follows.
