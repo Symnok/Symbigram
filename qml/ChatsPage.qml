@@ -157,12 +157,22 @@ Page {
                 height: platformStyle.graphicSizeMedium
                 radius: width / 2
                 color: model.color
+                clip: true
                 Label {
                     anchors.centerIn: parent
                     text: model.initials
                     color: "white"
                     font.bold: true
                     font.pixelSize: platformStyle.fontSizeMedium
+                    visible: avatarImage.status != Image.Ready
+                }
+                Image {
+                    id: avatarImage
+                    anchors.fill: parent
+                    source: model.avatar
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    asynchronous: true
                 }
                 Rectangle {
                     // presence dot for people who are online

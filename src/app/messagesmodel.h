@@ -9,6 +9,8 @@
 
 #include "tgtypes.h"
 
+class MediaCache;
+
 #include <QAbstractListModel>
 #include <QList>
 #include <QString>
@@ -30,6 +32,7 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(bool peerMuted READ peerMuted NOTIFY peerChanged)
     Q_PROPERTY(QString initials READ initials NOTIFY peerChanged)
     Q_PROPERTY(QString color READ color NOTIFY chatChanged)
+    Q_PROPERTY(QString avatar READ avatar NOTIFY peerChanged)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool hasOlder READ hasOlder NOTIFY loadingChanged)
@@ -50,10 +53,18 @@ public:
         ServiceRole,
         ForwardedRole,
         ReplyRole,
-        EditedRole
+        EditedRole,
+        MediaKindRole,      // "", "photo", "video", "voice", "audio", "sticker", "gif", "document"
+        MediaThumbRole,     // file:// url of a thumbnail/image to show, or ""
+        MediaStateRole,     // "none", "idle", "loading", "ready", "failed"
+        MediaProgressRole,  // 0..100
+        MediaInfoRole,      // "1.2 MB", "0:12", "video 0:30" - the caption line for non-photos
+        MediaWidthRole,
+        MediaHeightRole,
+        LocalPathRole       // the full downloaded file, once it exists
     };
 
-    MessagesModel(TelegramSession *session, QObject *parent = 0);
+    MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -68,6 +79,7 @@ public:
     bool peerMuted() const;
     QString initials() const;
     QString color() const;
+    QString avatar() const;
     bool loading() const { return m_loading; }
     bool hasOlder() const { return m_hasOlder; }
     QString error() const { return m_error; }
@@ -83,6 +95,16 @@ public:
     Q_INVOKABLE void composing(const QString &text);
     Q_INVOKABLE void setMuted(bool muted);
     Q_INVOKABLE void deleteMessage(int row, bool forEveryone);
+    /// Photos: fetch the size to save and copy it out. Documents/video/etc.: fetch the
+    /// whole file. Drives MediaStateRole/MediaProgressRole for the row.
+    Q_INVOKABLE void downloadMedia(int row);
+    /// Copies the (downloaded) attachment to a user-visible folder; notice() reports where.
+    Q_INVOKABLE void saveMedia(int row);
+    /// Opens the downloaded attachment with the phone's handler for its type.
+    Q_INVOKABLE void openMedia(int row);
+    Q_INVOKABLE bool canDeleteForEveryone(int row) const;
+    /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
+    void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto);
 
 signals:
     void chatChanged();
@@ -99,23 +121,36 @@ private slots:
     void onMessageReceived(const TgMessage &m);
     void onMessageEdited(const TgMessage &m);
     void onMessagesDeleted(const TgPeer &peer, const QList<int> &ids);
-    void onMessageSent(const TgPeer &peer, qint64 randomId, int msgId, int date);
+    void onMessageSent(const TgPeer &peer, qint64 randomId, const TgMessage &message);
     void onMessageFailed(const TgPeer &peer, qint64 randomId, const QString &error);
     void onTyping(const TgPeer &peer, qint64 userId);
     void onTypingIdle();
     void onPeerTypingIdle();
     void onPeerChanged(const TgPeer &peer);
     void onReadOutbox(const TgPeer &peer, int maxId);
+    void onMediaReady(const QString &key, const QString &path);
+    void onMediaFailed(const QString &key, const QString &error);
+    void onMediaProgress(const QString &key, int percent);
 
 private:
     struct Row
     {
-        Row() : randomId(0), pending(false), failed(false) {}
+        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), progress(0) {}
         TgMessage m;
         qint64 randomId;      // outgoing: for matching the send result
         bool pending;
         bool failed;
+        QString thumbPath;    // a small image to show (stripped preview, then the fetched size)
+        QString fullPath;     // the whole file, once downloaded
+        QString awaitKey;     // the cache key this row is currently waiting on
+        bool mediaLoading;
+        bool mediaFailed;
+        int progress;
     };
+    void prepareMedia(Row &r);
+    int rowByKey(const QString &key) const;
+    static QString mediaKindName(TgMedia::Kind k);
+    QString mediaInfoText(const TgMedia &m) const;
     int rowById(int id) const;
     int rowByRandomId(qint64 randomId) const;
     void sendRow(int row);
@@ -124,6 +159,7 @@ private:
     QString lastSeenText(const TgPeerInfo &info) const;
 
     TelegramSession *m_session;
+    MediaCache *m_media;
     TgPeer m_peer;
     QList<Row> m_rows;
     bool m_loading;

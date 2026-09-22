@@ -96,6 +96,16 @@ public:
     static QByteArray deleteHistory(const TgPeer &peer, bool justClear);
     static QByteArray deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke);
     static QByteArray updateNotifySettings(const TgPeer &peer, bool muted);
+    /// upload.getFile for a location built by fileLocation()/peerPhotoLocation().
+    static QByteArray getFile(const QByteArray &location, qint64 offset, int limit);
+    static QByteArray fileLocation(const TgMedia &media, const QString &sizeType);
+    static QByteArray peerPhotoLocation(const TgPeer &peer, qint64 photoId);
+    static QByteArray saveFilePart(qint64 fileId, int part, int totalParts, bool big, const QByteArray &bytes);
+    /// messages.sendMedia with an uploaded file as a photo or as a document.
+    static QByteArray sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
+                                        bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId);
+    static QByteArray exportAuthorization(int dcId);
+    static QByteArray importAuthorization(qint64 id, const QByteArray &bytes);
 
     // -- readers --
     static TgQrLoginStep readLoginToken(const TlObject &o);
@@ -107,6 +117,12 @@ public:
     static TgHistoryPage readHistory(const TlObject &response, TgPeerCache &cache);
     static TgPeer readPeer(const TlObject &peer);
     static QString describeMedia(const TlObject &media);
+    /// The attachment of a MessageMedia (photo or document), or an invalid TgMedia.
+    static TgMedia readMedia(const TlObject &media);
+    /// The messages carried by an Updates object (the result of a send with media).
+    static QList<TgMessage> messagesIn(const TlObject &updates);
+    /// The mime type a file name suggests.
+    static QString mimeTypeFor(const QString &fileName);
     static QString describeAction(const TlObject &action, const TgPeerCache &cache);
     /// The id the server gave a message we just sent, or 0.
     static int sentMessageId(const TlObject &updates);

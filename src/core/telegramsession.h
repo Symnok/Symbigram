@@ -21,6 +21,7 @@
 #include <QObject>
 #include <QString>
 
+class QFile;
 class QTimer;
 
 class TelegramSession : public QObject
@@ -89,6 +90,17 @@ public:
     /// Persists the update position; called by the app before it quits.
     void saveState();
 
+    // -- files --
+    /// Fetches an attachment (a photo size, or a document with an empty sizeType) into
+    /// targetPath; the job id identifies the downloadProgress/Finished/Failed signals.
+    int downloadFile(const TgMedia &media, const QString &sizeType, const QString &targetPath);
+    /// A profile / chat picture (the small one).
+    int downloadPeerPhoto(const TgPeer &peer, qint64 photoId, int dcId, const QString &targetPath);
+    void cancelDownload(int jobId);
+    /// Uploads a file and sends it, as a photo or as a document; returns the random id
+    /// that uploadProgress and messageSent/messageFailed will carry.
+    qint64 sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption);
+
 signals:
     void stateChanged();
     /// The link failed or was lost, with the reason; the owner decides about reconnecting.
@@ -107,7 +119,12 @@ signals:
     void messageReceived(const TgMessage &message);
     void messageEdited(const TgMessage &message);
     void messagesDeleted(const TgPeer &peer, const QList<int> &ids);
-    void messageSent(const TgPeer &peer, qint64 randomId, int msgId, int date);
+    /// The server's version of a message we sent (id, date, and the media for uploads).
+    void messageSent(const TgPeer &peer, qint64 randomId, const TgMessage &message);
+    void downloadProgress(int jobId, qint64 received, qint64 total);
+    void downloadFinished(int jobId, const QString &path);
+    void downloadFailed(int jobId, const QString &error);
+    void uploadProgress(qint64 randomId, qint64 sent, qint64 total);
     void messageFailed(const TgPeer &peer, qint64 randomId, const QString &error);
     void typing(const TgPeer &peer, qint64 userId);
     void peerChanged(const TgPeer &peer);
@@ -130,13 +147,16 @@ private slots:
     void onSrpDone();
     void onSaveTimer();
     void onLogOutTimeout();
+    void onDcConnected();
+    void onDcDisconnected(const QString &reason);
 
 private:
     enum Kind {
         ExportToken, ImportToken, GetPassword, CheckPassword, LogOut,
         GetSelf, GetState, GetDifference, GetDialogs, GetHistory, SendMessage,
         ReadHistory, SetTyping, UpdateStatus, ResolveUsername, ResolvePhone, ContactsSearch,
-        DeleteHistory, DeleteMessages, UpdateNotifySettings, GetUser
+        DeleteHistory, DeleteMessages, UpdateNotifySettings, GetUser,
+        GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization
     };
     struct Request
     {
@@ -175,6 +195,51 @@ private:
     void handleMigrate(const QString &type);
     static int unixNow();
 
+    // -- files --
+    struct Download
+    {
+        Download() : jobId(0), dcId(0), offset(0), total(0), file(0), active(false), migrations(0) {}
+        int jobId;
+        int dcId;
+        QByteArray location;
+        qint64 offset, total;
+        QString path;
+        QFile *file;
+        bool active;
+        int migrations;
+    };
+    struct Upload
+    {
+        Upload() : randomId(0), file(0), fileId(0), parts(0), nextPart(0), size(0), big(false), asPhoto(false) {}
+        qint64 randomId;
+        TgPeer peer;
+        QString path, fileName, caption;
+        QFile *file;
+        qint64 fileId;
+        int parts, nextPart;
+        qint64 size;
+        bool big, asPhoto;
+    };
+    struct DcLink
+    {
+        DcLink() : client(0), dcId(0), authorized(false), importing(false) {}
+        MtprotoClient *client;
+        int dcId;
+        bool authorized;
+        bool importing;
+    };
+    quint64 sendOn(MtprotoClient *client, Kind kind, const QByteArray &body, const Request &req);
+    MtprotoClient *clientForDc(int dcId);
+    int addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total);
+    void pumpDownloads();
+    void requestChunk(Download &d, MtprotoClient *client);
+    void finishDownload(int jobId, const QString &error);
+    void failTransfersOnDc(int dcId, const QString &error);
+    void failAllTransfers(const QString &error);
+    void sendNextPart(Upload &u);
+    void finishUpload(qint64 randomId, const QString &error);
+    void dcAuthorized(int dcId);
+
     ClientInfo m_info;
     MtprotoClient *m_client;
     MtprotoClient *m_moved;            // the connection to the datacenter a login token migrated to
@@ -211,6 +276,14 @@ private:
     bool m_dialogsLoading;
     bool m_differencePending;
     bool m_online;
+
+    QHash<int, AuthKey> m_dcKeys;          // keys for the other datacenters, persisted
+    QHash<int, DcLink> m_dcLinks;
+    QHash<int, Download> m_downloads;
+    QList<int> m_downloadOrder;
+    QHash<qint64, Upload> m_uploads;
+    int m_nextJobId;
+    QList<QString> m_recentSeen;   // "peerkey:id" of the last messages delivered, for dedup
 };
 
 #endif // TELEGRAMSESSION_H

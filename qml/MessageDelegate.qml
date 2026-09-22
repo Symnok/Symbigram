@@ -1,17 +1,21 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 //
-// One message: date separator, sender (in groups), forwarded/reply lines, text or the
-// attachment note, time and delivery marks. Outgoing on the right, incoming on the left,
-// service messages centred.
+// One message: date separator, sender (in groups), forwarded/reply lines, the attachment
+// (a photo shown inline, or a file row with a download/save control) and/or text, time and
+// delivery marks. Outgoing on the right, incoming on the left, service messages centred.
 import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Item {
     id: root
     signal pressAndHold
+    // tapping a ready image opens the viewer; a file row's button downloads / saves / opens
+    signal openImage(string path, int row)
 
     property int maxBubbleWidth: width * 0.82
+    property bool isPhoto: model.mediaKind == "photo" || model.mediaKind == "sticker" || model.mediaKind == "gif"
+    property bool hasFileRow: model.mediaKind != "" && !isPhoto
 
     height: column.height + platformStyle.paddingSmall
 
@@ -33,7 +37,6 @@ Item {
             }
         }
 
-        // service messages: one centred line
         Label {
             width: parent.width - 4 * platformStyle.paddingLarge
             anchors.horizontalCenter: parent.horizontalCenter
@@ -48,11 +51,12 @@ Item {
         Rectangle {
             id: bubble
             visible: !model.service
-            function w(label) { return label.visible ? label.paintedWidth : 0 }
-            property real innerWidth: Math.max(Math.max(w(bodyLabel), Math.max(w(noteLabel), timeRow.width)),
-                                               Math.max(w(senderLabel), Math.max(w(fwdLabel), w(replyLabel))))
+            function w(item) { return item.visible ? item.paintedWidth : 0 }
+            property real textWidth: Math.max(w(bodyLabel), Math.max(w(senderLabel), Math.max(w(fwdLabel), w(replyLabel))))
+            property real innerWidth: Math.max(Math.max(textWidth, timeRow.width),
+                                               isPhoto && photo.shownWidth > 0 ? photo.shownWidth : (hasFileRow ? fileRow.width : 0))
             width: Math.min(maxBubbleWidth, innerWidth + 2 * platformStyle.paddingMedium)
-            height: visible ? inner.height + timeRow.height + 2 * platformStyle.paddingMedium + platformStyle.paddingSmall : 0
+            height: inner.height + timeRow.height + 2 * platformStyle.paddingMedium + platformStyle.paddingSmall
             radius: 8
             color: model.failed ? "#6b2b2b" : (model.out ? "#1f5e8a" : "#3a3a3a")
             opacity: model.pending ? 0.6 : 1
@@ -61,13 +65,18 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onPressAndHold: root.pressAndHold()
+                onClicked: {
+                    if (isPhoto && model.mediaState == "ready") root.openImage(model.localPath != "" ? model.localPath : model.mediaThumb, index)
+                    else if (isPhoto && model.mediaState == "idle") chat.downloadMedia(index)
+                }
             }
 
             Column {
                 id: inner
                 anchors { left: parent.left; top: parent.top; margins: platformStyle.paddingMedium }
                 width: maxBubbleWidth - 2 * platformStyle.paddingMedium
-                spacing: 2
+                spacing: 3
+
                 Label {
                     id: senderLabel
                     visible: model.sender != ""
@@ -97,10 +106,98 @@ Item {
                     width: parent.width
                     elide: Text.ElideRight
                 }
+
+                // -- a photo / sticker shown inline --
+                Item {
+                    id: photo
+                    visible: isPhoto
+                    property real maxW: maxBubbleWidth - 2 * platformStyle.paddingMedium
+                    property real ar: (model.mediaWidth > 0 && model.mediaHeight > 0) ? (model.mediaHeight / model.mediaWidth) : 0.75
+                    property real shownWidth: image.status == Image.Ready ? Math.min(maxW, image.sourceSize.width, 260) : Math.min(maxW, 200)
+                    width: shownWidth
+                    height: shownWidth * (image.status == Image.Ready ? (image.sourceSize.height / image.sourceSize.width) : ar)
+                    Rectangle { anchors.fill: parent; radius: 6; color: "#20000000"; visible: image.status != Image.Ready }
+                    Image {
+                        id: image
+                        anchors.fill: parent
+                        source: model.mediaThumb
+                        fillMode: Image.PreserveAspectCrop
+                        clip: true
+                        smooth: true
+                        asynchronous: true
+                    }
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: model.mediaState == "loading" && image.status != Image.Ready
+                        visible: running
+                    }
+                    // a "tap to load" hint when nothing is showing yet
+                    Label {
+                        anchors.centerIn: parent
+                        visible: model.mediaState == "idle" && image.status != Image.Ready
+                        text: qsTr("Tap to load")
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                    }
+                    Label {
+                        anchors.centerIn: parent
+                        visible: model.mediaState == "failed"
+                        text: qsTr("Failed - tap to retry")
+                        color: "#ff9b9b"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                    }
+                }
+
+                // -- a file / video / voice row --
+                Row {
+                    id: fileRow
+                    visible: hasFileRow
+                    spacing: platformStyle.paddingMedium
+                    Rectangle {
+                        width: platformStyle.graphicSizeMedium
+                        height: platformStyle.graphicSizeMedium
+                        radius: 6
+                        color: "#5a86b0"
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label {
+                            anchors.centerIn: parent
+                            color: "white"
+                            font.pixelSize: platformStyle.fontSizeSmall
+                            text: model.mediaState == "ready" ? "✓"
+                                : (model.mediaState == "loading" ? model.mediaProgress + "%"
+                                : (model.mediaKind == "voice" || model.mediaKind == "audio" ? "♪"
+                                : (model.mediaKind == "video" ? "▶" : "↓")))
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (model.mediaState == "ready") chat.openMedia(index)
+                                else if (model.mediaState != "loading") chat.downloadMedia(index)
+                            }
+                        }
+                    }
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label {
+                            text: model.mediaKind == "voice" ? qsTr("Voice message")
+                                : (model.mediaKind == "video" ? qsTr("Video") : model.mediaInfo)
+                            color: "white"
+                            font.pixelSize: platformStyle.fontSizeSmall
+                            width: maxBubbleWidth - 2 * platformStyle.paddingMedium - platformStyle.graphicSizeMedium - platformStyle.paddingMedium
+                            elide: Text.ElideMiddle
+                        }
+                        Label {
+                            text: model.mediaState == "ready" ? qsTr("tap to open") : (model.mediaState == "loading" ? qsTr("downloading %1%").arg(model.mediaProgress) : (model.mediaKind == "voice" || model.mediaKind == "video" ? model.mediaInfo : qsTr("tap to download")))
+                            color: "#c0d4e6"
+                            font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                        }
+                    }
+                }
+
                 Label {
                     id: bodyLabel
                     width: parent.width
-                    text: model.body != "" ? model.body : ""
+                    text: model.body
                     visible: model.body != ""
                     wrapMode: Text.Wrap
                     color: "white"
@@ -108,7 +205,7 @@ Item {
                 Label {
                     id: noteLabel
                     width: parent.width
-                    visible: model.note != ""
+                    visible: model.body == "" && !isPhoto && !hasFileRow && model.note != ""
                     text: "[" + model.note + "]"
                     wrapMode: Text.Wrap
                     font.italic: true

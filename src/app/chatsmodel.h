@@ -14,6 +14,7 @@
 #include <QVariantMap>
 
 class TelegramSession;
+class MediaCache;
 class QTimer;
 
 class ChatsModel : public QAbstractListModel
@@ -36,10 +37,11 @@ public:
         OnlineRole,
         TypingRole,
         InitialsRole,
-        ColorRole
+        ColorRole,
+        AvatarRole      // file:// url of the profile picture, or "" (fall back to initials)
     };
 
-    explicit ChatsModel(TelegramSession *session, QObject *parent = 0);
+    explicit ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -69,11 +71,13 @@ private slots:
     void onPeerChanged(const TgPeer &peer);
     void onTyping(const TgPeer &peer, qint64 userId);
     void onTypingTimer();
+    void onAvatarReady(const QString &key, const QString &path);
 
 private:
     void refreshRow(const TgPeer &peer);
 
     TelegramSession *m_session;
+    MediaCache *m_media;
     QHash<QString, int> m_typingUntil;      // peer key -> unix time the "typing" hint ends
     QHash<QString, qint64> m_typingWho;
     QTimer *m_typingTimer;

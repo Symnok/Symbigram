@@ -33,7 +33,7 @@ struct TgPeer
 /// A user or a chat, as far as the responses have said so far.
 struct TgPeerInfo
 {
-    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false) {}
+    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false), photoId(0), photoDcId(0) {}
     TgPeer peer;
     QString title;         // display name or chat title
     QString firstName, lastName, username, phone;
@@ -43,6 +43,30 @@ struct TgPeerInfo
     int statusKind;        // 0 unknown, 1 online, 2 offline with lastSeen, 3 recently, 4 last week, 5 last month, 6 long ago
     int membersCount;
     bool isBroadcast;      // a channel (not a megagroup)
+    qint64 photoId;        // profile / chat picture, 0 when none
+    int photoDcId;
+};
+
+/// An attachment: what is needed to fetch it, plus what a text client shows about it.
+struct TgMedia
+{
+    enum Kind { None, Photo, Video, Document, Voice, Audio, Sticker, Gif, Other };
+    TgMedia() : kind(None), id(0), accessHash(0), dcId(0), width(0), height(0), fileSize(0), duration(0) {}
+    bool isValid() const { return id != 0; }
+    Kind kind;
+    qint64 id;
+    qint64 accessHash;
+    QByteArray fileReference;   // short-lived: a stale one fails with FILE_REFERENCE_EXPIRED
+    int dcId;
+    QString sizeType;           // photos: the size to show ("m"); documents: empty
+    QString bigSizeType;        // photos: the size to save
+    QString thumbSizeType;      // documents: the thumbnail's size name, if any
+    QByteArray strippedThumb;   // a tiny inline preview, when the message carried one
+    int width, height;
+    qint64 fileSize;
+    int duration;
+    QString mimeType;
+    QString fileName;
 };
 
 /// One message, reduced to what a text-only client displays.
@@ -62,6 +86,7 @@ struct TgMessage
     bool mentioned;
     int editDate;
     QString forwardedFrom;
+    TgMedia media;
 };
 
 /// A chat in the dialog list.

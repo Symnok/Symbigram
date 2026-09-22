@@ -19,6 +19,11 @@ namespace
     const int QrPollMs = 2500;
     const int DialogPageSize = 40;
     const int SaveIntervalMs = 15000;
+    /// Download chunk: must be a multiple of 4 KB dividing 1 MB. Upload part: divides 1 MB.
+    const int ChunkSize = 128 * 1024;
+    const int PartSize = 128 * 1024;
+    const qint64 BigFileThreshold = Q_INT64_C(10) * 1024 * 1024;
+    const int MaxActiveDownloads = 3;
 }
 
 int TelegramSession::unixNow() { return int(QDateTime::currentDateTime().toTime_t()); }
@@ -26,7 +31,7 @@ int TelegramSession::unixNow() { return int(QDateTime::currentDateTime().toTime_
 TelegramSession::TelegramSession(QObject *parent)
     : QObject(parent), m_moved(0), m_srp(0), m_state(Disconnected), m_dcId(TelegramServers::DefaultDc), m_signedIn(false),
       m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false), m_selfId(0),
-      m_dialogsHaveMore(false), m_dialogsLoading(false), m_differencePending(false), m_online(false)
+      m_dialogsHaveMore(false), m_dialogsLoading(false), m_differencePending(false), m_online(false), m_nextJobId(1)
 {
     m_client = new MtprotoClient(this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -80,6 +85,17 @@ void TelegramSession::loadSessionFile()
     quint8 signedIn = 0;
     s >> m_authKey.key >> m_authKey.keyId >> m_authKey.serverSalt >> m_authKey.timeOffset >> m_dcId >> signedIn
       >> m_updateState.pts >> m_updateState.qts >> m_updateState.date >> m_updateState.seq >> m_selfId;
+    m_dcKeys.clear();
+    if (s.status() == QDataStream::Ok && !s.atEnd()) {
+        qint32 count = 0;
+        s >> count;
+        for (int i = 0; i < count && s.status() == QDataStream::Ok; ++i) {
+            qint32 dc = 0;
+            AuthKey k;
+            s >> dc >> k.key >> k.keyId >> k.serverSalt >> k.timeOffset;
+            if (k.isValid()) m_dcKeys.insert(dc, k);
+        }
+    }
     if (s.status() != QDataStream::Ok || !m_authKey.isValid()) {
         // A half-written file: sign in again rather than crash on every launch.
         m_authKey = AuthKey();
@@ -101,6 +117,9 @@ void TelegramSession::saveSessionFile()
     s.setVersion(QDataStream::Qt_4_7);
     s << SessionMagic << m_authKey.key << m_authKey.keyId << m_authKey.serverSalt << m_authKey.timeOffset << m_dcId
       << quint8(m_signedIn ? 1 : 0) << m_updateState.pts << m_updateState.qts << m_updateState.date << m_updateState.seq << m_selfId;
+    s << qint32(m_dcKeys.size());
+    for (QHash<int, AuthKey>::const_iterator it = m_dcKeys.constBegin(); it != m_dcKeys.constEnd(); ++it)
+        s << qint32(it.key()) << it.value().key << it.value().keyId << it.value().serverSalt << it.value().timeOffset;
     m_stateDirty = false;
 }
 
@@ -121,6 +140,11 @@ void TelegramSession::forgetSession(const QString &reason)
     m_client->close();
     if (m_moved) { m_moved->deleteLater(); m_moved = 0; }
     m_requests.clear();
+    failAllTransfers(tr("Signed out."));
+    QList<int> dcs = m_dcLinks.keys();
+    for (int i = 0; i < dcs.size(); ++i) m_dcLinks[dcs.at(i)].client->deleteLater();
+    m_dcLinks.clear();
+    m_dcKeys.clear();
     m_authKey = AuthKey();
     m_signedIn = false;
     m_updateState = TgUpdateState();
@@ -158,6 +182,7 @@ void TelegramSession::disconnectFromServer()
     m_requests.clear();
     m_client->close();
     if (m_moved) { m_moved->deleteLater(); m_moved = 0; }
+    failAllTransfers(tr("Not connected."));
     m_online = false;
     setState(Disconnected);
 }
@@ -182,6 +207,7 @@ void TelegramSession::onDisconnected(const QString &reason)
     m_online = false;
     m_dialogsLoading = false;
     m_differencePending = false;
+    failAllTransfers(reason);
     if (m_loggingOut) {
         // logOut's answer never came, or came as the connection closed: the local key
         // goes either way - the user asked to sign out.
@@ -194,9 +220,14 @@ void TelegramSession::onDisconnected(const QString &reason)
 
 quint64 TelegramSession::send(Kind kind, const QByteArray &body, const Request &req)
 {
+    return sendOn(m_client, kind, body, req);
+}
+
+quint64 TelegramSession::sendOn(MtprotoClient *client, Kind kind, const QByteArray &body, const Request &req)
+{
     Request r = req;
     r.kind = kind;
-    quint64 id = m_client->invoke(body);
+    quint64 id = client->invoke(body);
     m_requests.insert(id, r);
     return id;
 }
@@ -523,6 +554,7 @@ qint64 TelegramSession::sendText(const TgPeer &peer, const QString &text, int re
     Request r;
     r.peer = m_peers.withHash(peer);
     r.randomId = qint64(Crypto::randomUInt64());
+    r.query = text;
     send(SendMessage, TgApi::sendMessage(r.peer, text, r.randomId, replyToId), r);
     return r.randomId;
 }
@@ -717,18 +749,101 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
                     if (u.ctor() == Tl::UpdateNewMessage) checkPts(u);
                 }
             }
+            TgMessage sent;
+            sent.id = id;
+            sent.date = date;
+            sent.out = true;
+            sent.peer = req.peer;
+            sent.fromId = m_selfId;
+            sent.text = req.query;
             int di = dialogIndex(req.peer);
             if (di >= 0) {
                 m_dialogs[di].topMessageId = qMax(m_dialogs[di].topMessageId, id);
                 m_dialogs[di].topMessageDate = qMax(m_dialogs[di].topMessageDate, date);
                 m_dialogs[di].lastOut = true;
                 m_dialogs[di].lastFromId = m_selfId;
+                m_dialogs[di].lastText = sent.text;
                 sortDialogs();
             }
-            emit messageSent(req.peer, req.randomId, id, date);
+            emit messageSent(req.peer, req.randomId, sent);
             if (di >= 0) emit dialogChanged(req.peer);
             break;
         }
+        case SendMedia: {
+            TlObject o = TlSchema::readObject(r);
+            m_peers.absorb(o);
+            QVariantList list = o.vec("updates");
+            for (int i = 0; i < list.size(); ++i) {
+                TlObject u = TlSchema::toObject(list.at(i));
+                if (u.ctor() == Tl::UpdateNewMessage) checkPts(u);
+            }
+            QList<TgMessage> msgs = TgApi::messagesIn(o);
+            TgMessage sent;
+            if (!msgs.isEmpty()) sent = msgs.first();
+            else { sent.id = TgApi::sentMessageId(o); sent.date = unixNow(); }
+            sent.out = true;
+            sent.peer = req.peer;
+            sent.fromId = m_selfId;
+            int di = dialogIndex(req.peer);
+            if (di >= 0) {
+                m_dialogs[di].topMessageId = qMax(m_dialogs[di].topMessageId, sent.id);
+                m_dialogs[di].topMessageDate = qMax(m_dialogs[di].topMessageDate, sent.date);
+                m_dialogs[di].lastOut = true;
+                m_dialogs[di].lastFromId = m_selfId;
+                m_dialogs[di].lastText = sent.text.isEmpty() ? sent.note : sent.text;
+                sortDialogs();
+            }
+            m_uploads.remove(req.randomId);
+            emit messageSent(req.peer, req.randomId, sent);
+            if (di >= 0) emit dialogChanged(req.peer);
+            break;
+        }
+        case SaveFilePart: {
+            if (!m_uploads.contains(req.randomId)) break;
+            if (!r.readBool()) { finishUpload(req.randomId, tr("the server rejected a part of the file")); break; }
+            Upload &u = m_uploads[req.randomId];
+            emit uploadProgress(u.randomId, qMin(u.size, qint64(u.nextPart) * PartSize), u.size);
+            if (u.nextPart >= u.parts) {
+                u.file->close();
+                Request rq;
+                rq.peer = u.peer;
+                rq.randomId = u.randomId;
+                send(SendMedia, TgApi::sendUploadedMedia(u.peer, u.fileId, u.parts, u.big, u.fileName, u.asPhoto,
+                                                         TgApi::mimeTypeFor(u.fileName), u.caption, u.randomId), rq);
+            } else {
+                sendNextPart(u);
+            }
+            break;
+        }
+        case GetFile: {
+            if (!m_downloads.contains(req.offsetId)) break;
+            Download &d = m_downloads[req.offsetId];
+            TlObject o = TlSchema::readObject(r);
+            if (o.ctor() == Tl::UploadFileCdnRedirect) { finishDownload(d.jobId, tr("the file is served from a CDN, which is not supported")); break; }
+            if (o.ctor() != Tl::UploadFile) { finishDownload(d.jobId, tr("unexpected reply")); break; }
+            QByteArray bytes = o.bytes("bytes");
+            if (!bytes.isEmpty()) {
+                if (d.file->write(bytes) != bytes.size()) { finishDownload(d.jobId, tr("could not write the file")); break; }
+                d.offset += bytes.size();
+                emit downloadProgress(d.jobId, d.offset, d.total);
+            }
+            // A short read means the end, whatever the declared size said.
+            if (bytes.size() < ChunkSize || (d.total > 0 && d.offset >= d.total)) finishDownload(d.jobId, QString());
+            else requestChunk(d, clientForDc(d.dcId));
+            break;
+        }
+        case ExportAuthorization: {
+            TlObject o = TlSchema::readObject(r);
+            int dc = req.offsetId;
+            if (!m_dcLinks.contains(dc)) break;
+            Request rq;
+            rq.offsetId = dc;
+            sendOn(m_dcLinks[dc].client, ImportAuthorization, TgApi::importAuthorization(o.longOr("id"), o.bytes("bytes")), rq);
+            break;
+        }
+        case ImportAuthorization:
+            dcAuthorized(req.offsetId);
+            break;
         case ResolveUsername:
         case ResolvePhone: {
             TlObject o = TlSchema::readObject(r);
@@ -791,11 +906,12 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     Request req = m_requests.take(requestId);
     emit log(QString::fromLatin1("rpc error %1 %2 (request kind %3)").arg(code).arg(type).arg(int(req.kind)));
 
-    if (isAuthGone(type) && req.kind != LogOut && req.kind != ExportToken && req.kind != ImportToken) {
+    if (isAuthGone(type) && req.kind != LogOut && req.kind != ExportToken && req.kind != ImportToken
+        && req.kind != GetFile && req.kind != ImportAuthorization) {
         forgetSession(tr("The session was ended (%1). Please sign in again.").arg(type));
         return;
     }
-    if (type.contains(QLatin1String("_MIGRATE_")) && req.kind != ExportToken && req.kind != ImportToken) {
+    if (type.contains(QLatin1String("_MIGRATE_")) && req.kind != ExportToken && req.kind != ImportToken && req.kind != GetFile) {
         handleMigrate(type);
         return;
     }
@@ -851,6 +967,31 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         break;
     case SendMessage:
         emit messageFailed(req.peer, req.randomId, type);
+        break;
+    case SendMedia:
+    case SaveFilePart:
+        finishUpload(req.randomId, type);
+        break;
+    case GetFile: {
+        if (!m_downloads.contains(req.offsetId)) break;
+        Download &d = m_downloads[req.offsetId];
+        if (type.contains(QLatin1String("FILE_MIGRATE_")) && d.migrations < 2) {
+            // The file lives on another datacenter: carry on there.
+            ++d.migrations;
+            d.dcId = type.mid(type.lastIndexOf(QLatin1Char('_')) + 1).toInt();
+            d.active = false;
+            pumpDownloads();
+        } else if (type.contains(QLatin1String("FILE_REFERENCE"))) {
+            finishDownload(d.jobId, QLatin1String("FILE_REFERENCE_EXPIRED"));
+        } else {
+            finishDownload(d.jobId, type);
+        }
+        break;
+    }
+    case ExportAuthorization:
+    case ImportAuthorization:
+        failTransfersOnDc(req.offsetId, type);
+        if (m_dcLinks.contains(req.offsetId)) { m_dcLinks[req.offsetId].client->deleteLater(); m_dcLinks.remove(req.offsetId); }
         break;
     case ResolveUsername:
     case ResolvePhone:
@@ -1101,6 +1242,234 @@ void TelegramSession::applyMessage(const TgMessage &msg, bool fromDifference)
     if (msg.peer.isNull()) return;
     TgMessage m = msg;
     fillSender(m);
+    // A pushed update and the follow-up getDifference both carry the same message; deliver
+    // it once, or every message-driven action (rows, notifications) happens twice.
+    if (m.id > 0) {
+        QString key = m.peer.key() + QLatin1Char(':') + QString::number(m.id);
+        if (m_recentSeen.contains(key)) { touchDialog(m); return; }
+        m_recentSeen.append(key);
+        while (m_recentSeen.size() > 200) m_recentSeen.removeFirst();
+    }
     touchDialog(m);
     emit messageReceived(m);
+}
+
+// -- files ------------------------------------------------------------------------------------------------------
+
+MtprotoClient *TelegramSession::clientForDc(int dcId)
+{
+    if (dcId == 0 || dcId == m_dcId) return m_client;
+    if (m_dcLinks.contains(dcId)) return m_dcLinks[dcId].client;
+    // A key per datacenter, and an authorisation carried over from the home one: the
+    // file servers only answer sessions the account has been imported into.
+    DcLink link;
+    link.dcId = dcId;
+    link.client = new MtprotoClient(this);
+    link.client->setInfo(m_info);
+    link.client->setProperty("dcId", dcId);
+    connect(link.client, SIGNAL(connected()), this, SLOT(onDcConnected()));
+    connect(link.client, SIGNAL(disconnected(QString)), this, SLOT(onDcDisconnected(QString)));
+    connect(link.client, SIGNAL(rpcResult(quint64,QByteArray)), this, SLOT(onRpcResult(quint64,QByteArray)));
+    connect(link.client, SIGNAL(rpcError(quint64,int,QString)), this, SLOT(onRpcError(quint64,int,QString)));
+    connect(link.client, SIGNAL(log(QString)), this, SIGNAL(log(QString)));
+    m_dcLinks.insert(dcId, link);
+    emit log(QString::fromLatin1("opening dc%1 for files (%2 key)").arg(dcId).arg(m_dcKeys.contains(dcId) ? QLatin1String("stored") : QLatin1String("new")));
+    link.client->connectToDc(TelegramServers::hostFor(dcId), TelegramServers::DefaultPort, m_dcKeys.value(dcId));
+    return link.client;
+}
+
+void TelegramSession::onDcConnected()
+{
+    MtprotoClient *client = qobject_cast<MtprotoClient *>(sender());
+    if (!client) return;
+    int dc = client->property("dcId").toInt();
+    if (!m_dcLinks.contains(dc)) return;
+    if (!m_dcKeys.contains(dc) || m_dcKeys.value(dc).keyId != client->authKey().keyId) {
+        m_dcKeys.insert(dc, client->authKey());
+        m_stateDirty = true;
+        saveSessionFile();
+    }
+    if (m_dcLinks[dc].importing) return;
+    m_dcLinks[dc].importing = true;
+    Request rq;
+    rq.offsetId = dc;
+    send(ExportAuthorization, TgApi::exportAuthorization(dc), rq);
+}
+
+void TelegramSession::onDcDisconnected(const QString &reason)
+{
+    MtprotoClient *client = qobject_cast<MtprotoClient *>(sender());
+    if (!client) return;
+    int dc = client->property("dcId").toInt();
+    emit log(QString::fromLatin1("dc%1 link lost: %2").arg(dc).arg(reason));
+    failTransfersOnDc(dc, reason);
+    m_dcLinks.remove(dc);
+    client->deleteLater();
+}
+
+void TelegramSession::dcAuthorized(int dcId)
+{
+    if (!m_dcLinks.contains(dcId)) return;
+    m_dcLinks[dcId].authorized = true;
+    m_dcLinks[dcId].importing = false;
+    emit log(QString::fromLatin1("dc%1 authorised for files").arg(dcId));
+    pumpDownloads();
+}
+
+int TelegramSession::addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total)
+{
+    Download d;
+    d.jobId = m_nextJobId++;
+    d.dcId = dcId;
+    d.location = location;
+    d.path = targetPath;
+    d.total = total;
+    QDir().mkpath(QFileInfo(targetPath).absolutePath());
+    d.file = new QFile(targetPath + QLatin1String(".part"), this);
+    if (!d.file->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        delete d.file;
+        d.file = 0;
+        int id = d.jobId;
+        QTimer::singleShot(0, this, SLOT(onSaveTimer()));
+        emit downloadFailed(id, tr("could not create the file"));
+        return id;
+    }
+    m_downloads.insert(d.jobId, d);
+    m_downloadOrder.append(d.jobId);
+    pumpDownloads();
+    return d.jobId;
+}
+
+int TelegramSession::downloadFile(const TgMedia &media, const QString &sizeType, const QString &targetPath)
+{
+    qint64 total = sizeType.isEmpty() || sizeType == media.bigSizeType ? media.fileSize : 0;
+    return addDownload(media.dcId, TgApi::fileLocation(media, sizeType), targetPath, total);
+}
+
+int TelegramSession::downloadPeerPhoto(const TgPeer &peer, qint64 photoId, int dcId, const QString &targetPath)
+{
+    return addDownload(dcId, TgApi::peerPhotoLocation(m_peers.withHash(peer), photoId), targetPath, 0);
+}
+
+void TelegramSession::cancelDownload(int jobId)
+{
+    if (!m_downloads.contains(jobId)) return;
+    Download d = m_downloads.take(jobId);
+    m_downloadOrder.removeAll(jobId);
+    if (d.file) { d.file->close(); d.file->remove(); delete d.file; }
+}
+
+void TelegramSession::pumpDownloads()
+{
+    int active = 0;
+    for (int i = 0; i < m_downloadOrder.size(); ++i)
+        if (m_downloads.value(m_downloadOrder.at(i)).active) ++active;
+    for (int i = 0; i < m_downloadOrder.size() && active < MaxActiveDownloads; ++i) {
+        int id = m_downloadOrder.at(i);
+        if (!m_downloads.contains(id)) continue;
+        Download &d = m_downloads[id];
+        if (d.active) continue;
+        if (!m_client->isReady()) return;
+        MtprotoClient *client = clientForDc(d.dcId);
+        bool ready = client == m_client || (m_dcLinks.contains(d.dcId) && m_dcLinks[d.dcId].authorized && client->isReady());
+        if (!ready) continue;              // the link is being built; dcAuthorized() pumps again
+        d.active = true;
+        ++active;
+        requestChunk(d, client);
+    }
+}
+
+void TelegramSession::requestChunk(Download &d, MtprotoClient *client)
+{
+    Request rq;
+    rq.offsetId = d.jobId;
+    sendOn(client, GetFile, TgApi::getFile(d.location, d.offset, ChunkSize), rq);
+}
+
+void TelegramSession::finishDownload(int jobId, const QString &error)
+{
+    if (!m_downloads.contains(jobId)) return;
+    Download d = m_downloads.take(jobId);
+    m_downloadOrder.removeAll(jobId);
+    if (d.file) {
+        d.file->close();
+        if (error.isEmpty() && d.offset > 0) {
+            QFile::remove(d.path);
+            d.file->rename(d.path);
+        } else {
+            d.file->remove();
+        }
+        delete d.file;
+    }
+    if (error.isEmpty() && d.offset > 0) emit downloadFinished(jobId, d.path);
+    else emit downloadFailed(jobId, error.isEmpty() ? tr("the file is empty") : error);
+    pumpDownloads();
+}
+
+void TelegramSession::failTransfersOnDc(int dcId, const QString &error)
+{
+    QList<int> ids = m_downloads.keys();
+    for (int i = 0; i < ids.size(); ++i)
+        if (m_downloads.value(ids.at(i)).dcId == dcId) finishDownload(ids.at(i), error);
+}
+
+void TelegramSession::failAllTransfers(const QString &error)
+{
+    QList<int> ids = m_downloads.keys();
+    for (int i = 0; i < ids.size(); ++i) finishDownload(ids.at(i), error);
+    QList<qint64> ups = m_uploads.keys();
+    for (int i = 0; i < ups.size(); ++i) finishUpload(ups.at(i), error);
+}
+
+qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption)
+{
+    Upload u;
+    u.randomId = qint64(Crypto::randomUInt64());
+    u.peer = m_peers.withHash(peer);
+    u.path = filePath;
+    u.fileName = QFileInfo(filePath).fileName();
+    u.caption = caption;
+    u.asPhoto = asPhoto;
+    u.file = new QFile(filePath, this);
+    if (!u.file->open(QIODevice::ReadOnly) || u.file->size() <= 0) {
+        delete u.file;
+        qint64 id = u.randomId;
+        m_uploads.insert(id, Upload());
+        finishUpload(id, tr("could not read the file"));
+        return id;
+    }
+    u.size = u.file->size();
+    u.big = u.size > BigFileThreshold;
+    u.parts = int((u.size + PartSize - 1) / PartSize);
+    u.fileId = qint64(Crypto::randomUInt64());
+    if (u.parts > 4000) {
+        delete u.file;
+        qint64 id = u.randomId;
+        m_uploads.insert(id, Upload());
+        finishUpload(id, tr("the file is too large"));
+        return id;
+    }
+    m_uploads.insert(u.randomId, u);
+    if (!m_client->isReady()) { finishUpload(u.randomId, tr("Not connected.")); return u.randomId; }
+    sendNextPart(m_uploads[u.randomId]);
+    return u.randomId;
+}
+
+void TelegramSession::sendNextPart(Upload &u)
+{
+    QByteArray bytes = u.file->read(PartSize);
+    Request rq;
+    rq.peer = u.peer;
+    rq.randomId = u.randomId;
+    send(SaveFilePart, TgApi::saveFilePart(u.fileId, u.nextPart, u.parts, u.big, bytes), rq);
+    ++u.nextPart;
+}
+
+void TelegramSession::finishUpload(qint64 randomId, const QString &error)
+{
+    if (!m_uploads.contains(randomId)) return;
+    Upload u = m_uploads.take(randomId);
+    if (u.file) { u.file->close(); delete u.file; }
+    // The peer is empty for a job that never started; the model matches by random id.
+    emit messageFailed(u.peer, randomId, error);
 }

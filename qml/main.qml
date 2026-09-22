@@ -89,14 +89,14 @@ PageStackWindow {
             if (app.connection != "online") return
             step++
             if (step == 2) app.takeScreenshot("chats")
-            else if (step == 3) { if (app.chats.count > 0) window.openChat(app.chats.get(0).peerKey) }
-            else if (step == 5) app.takeScreenshot("chat")
-            else if (step == 6) { app.chat.close(); pageStack.pop() }
-            else if (step == 7) pageStack.push(settingsPage)
-            else if (step == 8) app.takeScreenshot("settings")
-            else if (step == 9) { pageStack.pop(); pageStack.push(aboutPage) }
-            else if (step == 10) app.takeScreenshot("about")
-            else if (step == 11) Qt.quit()
+            else if (step == 3) { var pk = app.autotestPeer; if (pk != "") window.openChat(pk); else if (app.chats.count > 0) window.openChat(app.chats.get(0).peerKey) }
+            else if (step == 8) app.takeScreenshot("chat")
+            else if (step == 9) { app.chat.close(); pageStack.pop() }
+            else if (step == 10) pageStack.push(settingsPage)
+            else if (step == 11) app.takeScreenshot("settings")
+            else if (step == 12) { pageStack.pop(); pageStack.push(aboutPage) }
+            else if (step == 13) app.takeScreenshot("about")
+            else if (step == 14) Qt.quit()
         }
     }
 

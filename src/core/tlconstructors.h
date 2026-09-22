@@ -187,6 +187,28 @@ namespace Tl
     const int DocumentAttributeAudioVoiceFlag = 1 << 10;
     const int DocumentAttributeVideoRoundFlag = 1 << 0;
 
+    // files
+    const quint32 UploadGetFile = 0xbe5335be;
+    const quint32 UploadFile = 0x096a18d5;
+    const quint32 UploadFileCdnRedirect = 0xf18cda44;
+    const quint32 InputPhotoFileLocation = 0x40181ffe;
+    const quint32 InputDocumentFileLocation = 0xbad07584;
+    const quint32 InputPeerPhotoFileLocation = 0x37257e99;
+    const quint32 PhotoSize = 0x75c78e60;
+    const quint32 PhotoCachedSize = 0x021e1ad6;
+    const quint32 PhotoStrippedSize = 0xe0b0bc2e;
+    const quint32 PhotoSizeProgressive = 0xfa3efb95;
+    const quint32 UploadSaveFilePart = 0xb304a621;
+    const quint32 UploadSaveBigFilePart = 0xde7b673d;
+    const quint32 InputFile = 0xf52ff27f;
+    const quint32 InputFileBig = 0xfa4f0bb5;
+    const quint32 InputMediaUploadedPhoto = 0x7d8375da;
+    const quint32 InputMediaUploadedDocument = 0x037c9330;
+    const quint32 MessagesSendMedia = 0x0330e77f;
+    const quint32 AuthExportAuthorization = 0xe5bfffcd;
+    const quint32 AuthExportedAuthorization = 0xb434e2b8;
+    const quint32 AuthImportAuthorization = 0xa57a7dad;
+
     // updates
     const quint32 UpdatesGetState = 0xedd4882a;
     const quint32 UpdatesState = 0xa56c2a3e;

@@ -15,6 +15,7 @@ class TelegramSession;
 class ChatsModel;
 class MessagesModel;
 class Notifier;
+class MediaCache;
 class QNetworkConfigurationManager;
 class QNetworkSession;
 class QTimer;
@@ -52,6 +53,7 @@ class AppController : public QObject
     Q_PROPERTY(QString notice READ notice NOTIFY noticeChanged)
     /// Desktop testing: true when SGM_SHOT_DIR is set; main.qml then walks the pages.
     Q_PROPERTY(bool autotest READ autotest CONSTANT)
+    Q_PROPERTY(QString autotestPeer READ autotestPeer CONSTANT)
     /// The last log lines for the About page.
     Q_PROPERTY(QString logTail READ logTail NOTIFY logChanged)
 public:
@@ -89,6 +91,7 @@ public:
     MessagesModel *chat() const { return m_chat; }
     QString notice() const { return m_notice; }
     bool autotest() const;
+    QString autotestPeer() const;
     QString logTail() const;
     static void appendLog(const QString &line);
 
@@ -107,6 +110,9 @@ public slots:
     void goOffline();
     /// Username, phone number or a name; peerResolved opens the chat.
     void findPeer(const QString &query);
+    /// Opens a file picker and sends the chosen file to the open chat, as a photo or a
+    /// document. Nothing happens if the user cancels.
+    void attachFile(bool asPhoto);
     void openUrl(const QString &url);
     void copyText(const QString &text);
     void clearNotice();
@@ -155,6 +161,7 @@ private:
     ChatsModel *m_chats;
     MessagesModel *m_chat;
     Notifier *m_notifier;
+    MediaCache *m_media;
     QNetworkConfigurationManager *m_netMgr;
     QNetworkSession *m_netSession;
     QTimer *m_reconnect;

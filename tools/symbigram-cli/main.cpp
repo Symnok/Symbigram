@@ -233,7 +233,11 @@ public:
         connect(m_session, SIGNAL(historyFailed(TgPeer,QString)), this, SLOT(onHistoryFailed(TgPeer,QString)));
         connect(m_session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessage(TgMessage)));
         connect(m_session, SIGNAL(messageEdited(TgMessage)), this, SLOT(onEdited(TgMessage)));
-        connect(m_session, SIGNAL(messageSent(TgPeer,qint64,int,int)), this, SLOT(onSent(TgPeer,qint64,int,int)));
+        connect(m_session, SIGNAL(messageSent(TgPeer,qint64,TgMessage)), this, SLOT(onSent(TgPeer,qint64,TgMessage)));
+        connect(m_session, SIGNAL(downloadProgress(int,qint64,qint64)), this, SLOT(onDlProgress(int,qint64,qint64)));
+        connect(m_session, SIGNAL(downloadFinished(int,QString)), this, SLOT(onDlDone(int,QString)));
+        connect(m_session, SIGNAL(downloadFailed(int,QString)), this, SLOT(onDlFailed(int,QString)));
+        connect(m_session, SIGNAL(uploadProgress(qint64,qint64,qint64)), this, SLOT(onUpProgress(qint64,qint64,qint64)));
         connect(m_session, SIGNAL(messageFailed(TgPeer,qint64,QString)), this, SLOT(onSendFailed(TgPeer,qint64,QString)));
         connect(m_session, SIGNAL(typing(TgPeer,qint64)), this, SLOT(onTyping(TgPeer,qint64)));
         connect(m_session, SIGNAL(readOutbox(TgPeer,int)), this, SLOT(onReadOutbox(TgPeer,int)));
@@ -275,12 +279,17 @@ private slots:
     void onHistory(const TgPeer &p, const QList<TgMessage> &msgs, int offsetId, bool more)
     {
         say(QString::fromLatin1("[history] %1: %2 messages (offset %3, more=%4)").arg(m_session->peers().title(p)).arg(msgs.size()).arg(offsetId).arg(more));
+        m_lastHistory = msgs;
         for (int i = msgs.size() - 1; i >= 0; --i) say(QLatin1String("   ") + format(msgs.at(i)));
     }
     void onHistoryFailed(const TgPeer &p, const QString &e) { say(QLatin1String("[history failed] ") + m_session->peers().title(p) + QLatin1String(": ") + e); }
     void onMessage(const TgMessage &m) { say(QLatin1String("[message] ") + m_session->peers().title(m.peer) + QLatin1String(": ") + format(m)); }
     void onEdited(const TgMessage &m) { say(QLatin1String("[edited] ") + format(m)); }
-    void onSent(const TgPeer &p, qint64 rid, int id, int date) { say(QString::fromLatin1("[sent] to %1 random=%2 id=%3 date=%4").arg(m_session->peers().title(p)).arg(rid).arg(id).arg(date)); }
+    void onSent(const TgPeer &p, qint64 rid, const TgMessage &m) { say(QString::fromLatin1("[sent] to %1 random=%2 %3").arg(m_session->peers().title(p)).arg(rid).arg(format(m))); }
+    void onDlProgress(int job, qint64 got, qint64 total) { say(QString::fromLatin1("[download %1] %2 / %3").arg(job).arg(got).arg(total)); }
+    void onDlDone(int job, const QString &path) { say(QString::fromLatin1("[download %1] done: %2").arg(job).arg(path)); }
+    void onDlFailed(int job, const QString &e) { say(QString::fromLatin1("[download %1] failed: %2").arg(job).arg(e)); }
+    void onUpProgress(qint64 rid, qint64 sent, qint64 total) { say(QString::fromLatin1("[upload %1] %2 / %3").arg(rid).arg(sent).arg(total)); }
     void onSendFailed(const TgPeer &p, qint64 rid, const QString &e) { say(QString::fromLatin1("[send failed] to %1 random=%2: %3").arg(m_session->peers().title(p)).arg(rid).arg(e)); }
     void onTyping(const TgPeer &p, qint64 user) { say(QString::fromLatin1("[typing] %1 in %2").arg(m_session->peers().userName(user)).arg(m_session->peers().title(p))); }
     void onReadOutbox(const TgPeer &p, int maxId) { say(QString::fromLatin1("[read by peer] %1 up to %2").arg(m_session->peers().title(p)).arg(maxId)); }
@@ -308,6 +317,7 @@ private:
         QString who = m.out ? QLatin1String("me") : m_session->peers().userName(m.fromId);
         QString text = m.text;
         if (!m.note.isEmpty()) text += QLatin1String(" [") + m.note + QLatin1Char(']');
+        if (m.media.isValid()) text += QString::fromLatin1(" {media id=%1 dc=%2 size=%3 show=%4 big=%5 %6}").arg(m.media.id).arg(m.media.dcId).arg(m.media.fileSize).arg(m.media.sizeType).arg(m.media.bigSizeType).arg(m.media.fileName);
         if (!m.forwardedFrom.isEmpty()) text += QLatin1String(" (fwd from ") + m.forwardedFrom + QLatin1Char(')');
         if (m.replyToId) text += QString::fromLatin1(" (reply to %1)").arg(m.replyToId);
         return QString::fromLatin1("#%1 %2 %3: %4").arg(m.id).arg(QDateTime::fromTime_t(m.date).toString(QLatin1String("dd.MM HH:mm"))).arg(who).arg(text);
@@ -348,6 +358,24 @@ private:
         else if (cmd == QLatin1String("clear") && a.size() >= 2) m_session->deleteHistory(peerAt(a.at(1)));
         else if (cmd == QLatin1String("password") && a.size() >= 2) m_session->checkPassword(QStringList(a.mid(1)).join(QLatin1String(" ")));
         else if (cmd == QLatin1String("logout")) m_session->logOut();
+        else if (cmd == QLatin1String("del") && a.size() >= 3) m_session->deleteMessages(peerAt(a.at(1)), QList<int>() << a.at(2).toInt(), a.value(3) == QLatin1String("all"));
+        else if (cmd == QLatin1String("get") && a.size() >= 2) {
+            // get <message id> [size]: downloads the attachment of a message shown by history
+            for (int i = 0; i < m_lastHistory.size(); ++i)
+                if (m_lastHistory.at(i).id == a.at(1).toInt() && m_lastHistory.at(i).media.isValid()) {
+                    const TgMedia &md = m_lastHistory.at(i).media;
+                    QString size = a.size() >= 3 ? a.at(2) : (md.kind == TgMedia::Photo ? md.sizeType : QString());
+                    QString name = QString::fromLatin1("dl_%1_%2.%3").arg(md.id).arg(size).arg(md.kind == TgMedia::Photo ? QLatin1String("jpg") : QLatin1String("bin"));
+                    say(QString::fromLatin1("[download] job %1 -> %2").arg(m_session->downloadFile(md, size, name)).arg(name));
+                }
+        }
+        else if (cmd == QLatin1String("avatar") && a.size() >= 2) {
+            TgPeer p = peerAt(a.at(1));
+            TgPeerInfo info = m_session->peers().info(p);
+            say(QString::fromLatin1("[avatar] photo id %1 dc %2 job %3").arg(info.photoId).arg(info.photoDcId)
+                .arg(info.photoId ? m_session->downloadPeerPhoto(p, info.photoId, info.photoDcId, QString::fromLatin1("avatar_%1.jpg").arg(p.id)) : 0));
+        }
+        else if (cmd == QLatin1String("sendfile") && a.size() >= 3) m_session->sendFile(peerAt(a.at(1)), a.at(2), a.value(3) == QLatin1String("photo"), QStringList(a.mid(4)).join(QLatin1String(" ")));
         else if (cmd == QLatin1String("offline")) m_session->setOnline(false);
         else if (cmd == QLatin1String("online")) m_session->setOnline(true);
         else if (cmd == QLatin1String("disconnect")) m_session->disconnectFromServer();
@@ -357,6 +385,7 @@ private:
 
     TelegramSession *m_session;
     QTimer *m_cmdTimer;
+    QList<TgMessage> m_lastHistory;
 };
 
 int main(int argc, char *argv[])

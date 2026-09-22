@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 0.1.2
+VERSION = 0.1.4
 
 QT += core gui network declarative
 
@@ -20,6 +20,7 @@ HEADERS += \
     src/app/chatsmodel.h \
     src/app/messagesmodel.h \
     src/app/notifier.h \
+    src/app/mediacache.h \
     src/app/qrimageprovider.h
 
 SOURCES += \
@@ -28,6 +29,7 @@ SOURCES += \
     src/app/chatsmodel.cpp \
     src/app/messagesmodel.cpp \
     src/app/notifier.cpp \
+    src/app/mediacache.cpp \
     src/app/qrimageprovider.cpp
 
 RESOURCES += qml.qrc translations.qrc

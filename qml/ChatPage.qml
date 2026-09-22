@@ -2,8 +2,8 @@
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 //
 // One conversation: the chat's avatar and presence in the header, messages oldest at the
-// top (older pages on request), and the composer. Long-press a bubble to copy, retry or
-// delete.
+// top (older pages on request), and the composer with an attach button. Long-press a bubble
+// to copy, save an attachment, retry or delete. Tapping an image opens the viewer.
 import QtQuick 1.1
 import com.nokia.symbian 1.1
 
@@ -27,14 +27,33 @@ Page {
 
     function reopen() { var k = chat.peerKey; chat.close(); chat.open(k) }
 
+    Menu {
+        id: attachMenu
+        MenuLayout {
+            MenuItem { text: qsTr("Image"); onClicked: app.attachFile(true) }
+            MenuItem { text: qsTr("File"); onClicked: app.attachFile(false) }
+        }
+    }
+
     ContextMenu {
         id: contextMenu
         property int row: -1
         property variant item
         MenuLayout {
             MenuItem {
+                text: qsTr("Save to phone")
+                visible: contextMenu.item ? (contextMenu.item.mediaKind != "" && contextMenu.item.mediaKind != "sticker") : false
+                onClicked: chat.saveMedia(contextMenu.row)
+            }
+            MenuItem {
+                text: qsTr("Open")
+                visible: contextMenu.item ? (contextMenu.item.mediaState == "ready" && contextMenu.item.mediaKind != "photo") : false
+                onClicked: chat.openMedia(contextMenu.row)
+            }
+            MenuItem {
                 text: qsTr("Copy text")
-                onClicked: app.copyText(contextMenu.item.body != "" ? contextMenu.item.body : contextMenu.item.note)
+                visible: contextMenu.item ? contextMenu.item.body != "" : false
+                onClicked: app.copyText(contextMenu.item.body)
             }
             MenuItem {
                 text: qsTr("Retry")
@@ -48,7 +67,7 @@ Page {
             }
             MenuItem {
                 text: qsTr("Delete for everyone")
-                visible: contextMenu.item ? (contextMenu.item.out && !contextMenu.item.pending && !chat.peerIsChannel) : false
+                visible: contextMenu.row >= 0 ? chat.canDeleteForEveryone(contextMenu.row) : false
                 onClicked: chat.deleteMessage(contextMenu.row, true)
             }
         }
@@ -68,7 +87,9 @@ Page {
             height: platformStyle.graphicSizeMedium
             radius: width / 2
             color: chat.color != "" ? chat.color : "#3d5a80"
-            Label { anchors.centerIn: parent; text: chat.initials; color: "white"; font.bold: true }
+            clip: true
+            Label { anchors.centerIn: parent; text: chat.initials; color: "white"; font.bold: true; visible: headerAvatar.status != Image.Ready }
+            Image { id: headerAvatar; anchors.fill: parent; source: chat.avatar; fillMode: Image.PreserveAspectCrop; smooth: true }
         }
         Column {
             anchors { left: avatar.right; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
@@ -115,6 +136,7 @@ Page {
                 contextMenu.item = chat.get(index)
                 contextMenu.open()
             }
+            onOpenImage: viewer.show(path, row)
         }
 
         ScrollDecorator { flickableItem: list }
@@ -156,11 +178,19 @@ Page {
             font.pixelSize: platformStyle.fontSizeSmall
             text: qsTr("channel - only its admins can post")
         }
+        ToolButton {
+            id: attachButton
+            visible: !chat.peerIsChannel
+            anchors { left: parent.left; leftMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            iconSource: "toolbar-add"
+            enabled: app.connection == "online"
+            onClicked: attachMenu.open()
+        }
         TextArea {
             id: composer
             visible: !chat.peerIsChannel
             anchors {
-                left: parent.left; leftMargin: platformStyle.paddingSmall
+                left: attachButton.right; leftMargin: platformStyle.paddingSmall
                 right: sendButton.left; rightMargin: platformStyle.paddingSmall
                 verticalCenter: parent.verticalCenter
             }
@@ -180,6 +210,45 @@ Page {
                 chat.send(composer.text)
                 composer.text = ""
             }
+        }
+    }
+
+    // -- full-screen image viewer --
+    Rectangle {
+        id: viewer
+        anchors.fill: parent
+        color: "black"
+        visible: false
+        z: 100
+        property string path: ""
+        property int row: -1
+        function show(p, r) { path = p; row = r; visible = true }
+        function hide() { visible = false; path = "" }
+
+        Flickable {
+            id: viewerFlick
+            anchors.fill: parent
+            contentWidth: viewerImage.width
+            contentHeight: viewerImage.height
+            clip: true
+            Image {
+                id: viewerImage
+                source: viewer.path
+                width: Math.max(viewer.width, sourceSize.width)
+                height: Math.max(viewer.height, sourceSize.height)
+                fillMode: Image.PreserveAspectFit
+            }
+        }
+        BusyIndicator { anchors.centerIn: parent; running: viewerImage.status == Image.Loading; visible: running }
+        MouseArea { anchors.fill: parent; onClicked: viewer.hide() }
+        Row {
+            anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: platformStyle.paddingLarge }
+            spacing: platformStyle.paddingLarge
+            Button {
+                text: qsTr("Save")
+                onClicked: if (viewer.row >= 0) chat.saveMedia(viewer.row)
+            }
+            Button { text: qsTr("Close"); onClicked: viewer.hide() }
         }
     }
 }

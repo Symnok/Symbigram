@@ -3,6 +3,7 @@
 #include "appcontroller.h"
 #include "chatsmodel.h"
 #include "messagesmodel.h"
+#include "mediacache.h"
 #include "notifier.h"
 #include "telegramsession.h"
 #include "tgapi.h"
@@ -15,6 +16,7 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QEvent>
+#include <QFileDialog>
 #include <QFile>
 #include <QLocale>
 #include <QNetworkConfigurationManager>
@@ -70,8 +72,10 @@ AppController::AppController(QObject *parent)
     m_session->setClientInfo(info);
     m_session->setSessionFile(dataDir() + QLatin1String("/session.dat"));
 
-    m_chats = new ChatsModel(m_session, this);
-    m_chat = new MessagesModel(m_session, this);
+    m_media = new MediaCache(m_session, this);
+    m_media->setDirectory(dataDir() + QLatin1String("/media"));
+    m_chats = new ChatsModel(m_session, m_media, this);
+    m_chat = new MessagesModel(m_session, m_media, this);
     m_notifier = new Notifier(this);
     m_notifier->setEnabled(notifications());
     m_notifier->setVibrate(vibrate());
@@ -370,14 +374,16 @@ void AppController::onMessage(const TgMessage &m)
 {
     if (m.out || m.service) return;
     if (m_session->selfId() && m.fromId == m_session->selfId()) return;
-    bool chatOpen = m_chat->peer() == m.peer && appInForeground();
+    const bool foreground = appInForeground();
+    bool chatOpen = m_chat->peer() == m.peer && foreground;
     if (chatOpen) {
         m_chat->markRead();
         return;
     }
-    if (appInForeground()) return;
     TgDialog d = m_session->dialog(m.peer);
-    if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;
+    const bool muted = d.isMuted(int(QDateTime::currentDateTime().toTime_t()));
+    if (foreground) return;
+    if (muted) return;
     if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return;
     QString who = m_session->peers().title(m.peer);
     if (m.peer.isGroup()) who = m_session->peers().userName(m.fromId) + QLatin1String(" @ ") + who;
@@ -439,6 +445,18 @@ void AppController::onResolveFailed(const QString &error)
     setNotice(error);
 }
 
+void AppController::attachFile(bool asPhoto)
+{
+    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
+    if (m_chat->peerKey().isEmpty()) return;
+    QString filter = asPhoto ? tr("Images (*.jpg *.jpeg *.png *.gif *.bmp)") : tr("All files (*)");
+    QString path = QFileDialog::getOpenFileName(0, asPhoto ? tr("Choose an image") : tr("Choose a file"), QString(), filter);
+    if (path.isEmpty()) return;
+    qint64 randomId = m_session->sendFile(m_chat->peer(), path, asPhoto, QString());
+    m_chat->noteOutgoingMedia(randomId, path, asPhoto);
+    setNotice(asPhoto ? tr("Sending the image...") : tr("Sending the file..."));
+}
+
 void AppController::openUrl(const QString &url)
 {
     QDesktopServices::openUrl(QUrl(url));
@@ -466,6 +484,11 @@ QString AppController::logTail() const
 bool AppController::autotest() const
 {
     return !qgetenv("SGM_SHOT_DIR").isEmpty();
+}
+
+QString AppController::autotestPeer() const
+{
+    return QString::fromLocal8Bit(qgetenv("SGM_SHOT_PEER"));
 }
 
 void AppController::takeScreenshot(const QString &name)

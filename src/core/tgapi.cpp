@@ -77,6 +77,13 @@ void TgPeerCache::absorbUser(const TlObject &u)
     if (name.isEmpty()) name = info.isDeleted ? TgApi::tr("deleted account") : TgApi::tr("user %1").arg(id);
     info.title = name;
     if (u.has("status")) setUserStatusInfo(info, u.obj("status"));
+    if (u.has("photo")) {
+        TlObject photo = u.obj("photo");
+        info.photoId = photo.ctor() == Tl::UserProfilePhoto ? photo.longOr("photo_id") : 0;
+        info.photoDcId = photo.intOr("dc_id");
+    } else if (!min) {
+        info.photoId = 0;
+    }
     m_infos.insert(info.peer.key(), info);
 }
 
@@ -94,6 +101,11 @@ void TgPeerCache::absorbChat(const TlObject &c)
     info.username = c.str("username");
     info.membersCount = c.intOr("participants_count", info.membersCount);
     info.isBroadcast = channel && c.flag("flags", 5) && !c.flag("flags", 8);
+    if (c.has("photo")) {
+        TlObject photo = c.obj("photo");
+        info.photoId = photo.ctor() == Tl::ChatPhoto ? photo.longOr("photo_id") : 0;
+        info.photoDcId = photo.intOr("dc_id");
+    }
     m_infos.insert(peer.key(), info);
 }
 
@@ -312,6 +324,91 @@ QByteArray TgApi::updateNotifySettings(const TgPeer &peer, bool muted)
     return w.toByteArray();
 }
 
+QByteArray TgApi::getFile(const QByteArray &location, qint64 offset, int limit)
+{
+    TlWriter w(location.size() + 24);
+    w.writeConstructor(Tl::UploadGetFile).writeInt(0).writeRaw(location).writeLong(offset).writeInt(limit);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::fileLocation(const TgMedia &media, const QString &sizeType)
+{
+    TlWriter w(64);
+    w.writeConstructor(media.kind == TgMedia::Photo ? Tl::InputPhotoFileLocation : Tl::InputDocumentFileLocation)
+     .writeLong(media.id).writeLong(media.accessHash).writeBytes(media.fileReference).writeString(sizeType);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::peerPhotoLocation(const TgPeer &peer, qint64 photoId)
+{
+    TlWriter w(48);
+    w.writeConstructor(Tl::InputPeerPhotoFileLocation).writeInt(0).writeRaw(inputPeer(peer)).writeLong(photoId);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::saveFilePart(qint64 fileId, int part, int totalParts, bool big, const QByteArray &bytes)
+{
+    TlWriter w(bytes.size() + 32);
+    if (big) w.writeConstructor(Tl::UploadSaveBigFilePart).writeLong(fileId).writeInt(part).writeInt(totalParts).writeBytes(bytes);
+    else w.writeConstructor(Tl::UploadSaveFilePart).writeLong(fileId).writeInt(part).writeBytes(bytes);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
+                                    bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId)
+{
+    TlWriter file(64);
+    if (big) file.writeConstructor(Tl::InputFileBig).writeLong(fileId).writeInt(parts).writeString(fileName);
+    else file.writeConstructor(Tl::InputFile).writeLong(fileId).writeInt(parts).writeString(fileName).writeString(QString());
+
+    TlWriter media(160);
+    if (asPhoto) {
+        media.writeConstructor(Tl::InputMediaUploadedPhoto).writeInt(0).writeRaw(file.toByteArray());
+    } else {
+        media.writeConstructor(Tl::InputMediaUploadedDocument).writeInt(1 << 4)      // force_file
+             .writeRaw(file.toByteArray()).writeString(mimeType)
+             .writeConstructor(Tl::Vector).writeInt(1)
+             .writeConstructor(Tl::DocumentAttributeFilename).writeString(fileName);
+    }
+    TlWriter w(media.length() + 96);
+    w.writeConstructor(Tl::MessagesSendMedia).writeInt(0).writeRaw(inputPeer(peer)).writeRaw(media.toByteArray())
+     .writeString(caption).writeLong(randomId);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::exportAuthorization(int dcId)
+{
+    TlWriter w(8);
+    w.writeConstructor(Tl::AuthExportAuthorization).writeInt(dcId);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::importAuthorization(qint64 id, const QByteArray &bytes)
+{
+    TlWriter w(bytes.size() + 16);
+    w.writeConstructor(Tl::AuthImportAuthorization).writeLong(id).writeBytes(bytes);
+    return w.toByteArray();
+}
+
+QString TgApi::mimeTypeFor(const QString &fileName)
+{
+    QString ext = fileName.section(QLatin1Char('.'), -1).toLower();
+    if (ext == QLatin1String("jpg") || ext == QLatin1String("jpeg")) return QLatin1String("image/jpeg");
+    if (ext == QLatin1String("png")) return QLatin1String("image/png");
+    if (ext == QLatin1String("gif")) return QLatin1String("image/gif");
+    if (ext == QLatin1String("bmp")) return QLatin1String("image/bmp");
+    if (ext == QLatin1String("mp4")) return QLatin1String("video/mp4");
+    if (ext == QLatin1String("3gp")) return QLatin1String("video/3gpp");
+    if (ext == QLatin1String("mp3")) return QLatin1String("audio/mpeg");
+    if (ext == QLatin1String("aac")) return QLatin1String("audio/aac");
+    if (ext == QLatin1String("amr")) return QLatin1String("audio/amr");
+    if (ext == QLatin1String("txt")) return QLatin1String("text/plain");
+    if (ext == QLatin1String("pdf")) return QLatin1String("application/pdf");
+    if (ext == QLatin1String("zip")) return QLatin1String("application/zip");
+    if (ext == QLatin1String("sis") || ext == QLatin1String("sisx")) return QLatin1String("x-epoc/x-sisx-app");
+    return QLatin1String("application/octet-stream");
+}
+
 // -- readers -------------------------------------------------------------------------------------------------
 
 TgQrLoginStep TgApi::readLoginToken(const TlObject &o)
@@ -416,6 +513,118 @@ QString TgApi::describeMedia(const TlObject &media)
     }
 }
 
+namespace
+{
+    /// Picks the photo size to show and the one to save: the largest that fits a bubble
+    /// (up to 400 pixels) for display, the largest of all for saving.
+    void chooseSizes(const QVariantList &sizes, TgMedia &m)
+    {
+        int bestShow = -1, bestBig = -1;
+        for (int i = 0; i < sizes.size(); ++i) {
+            TlObject sz = TlSchema::toObject(sizes.at(i));
+            if (sz.ctor() == Tl::PhotoStrippedSize) { m.strippedThumb = sz.bytes("bytes"); continue; }
+            if (sz.ctor() != Tl::PhotoSize && sz.ctor() != Tl::PhotoSizeProgressive && sz.ctor() != Tl::PhotoCachedSize) continue;
+            int largest = qMax(sz.intOr("w"), sz.intOr("h"));
+            if (largest <= 0) continue;
+            if (largest <= 400 && largest > bestShow) {
+                bestShow = largest;
+                m.sizeType = sz.str("type");
+                m.width = sz.intOr("w");
+                m.height = sz.intOr("h");
+            }
+            if (largest > bestBig) {
+                bestBig = largest;
+                m.bigSizeType = sz.str("type");
+                if (sz.ctor() == Tl::PhotoSize) m.fileSize = sz.intOr("size");
+                else if (sz.ctor() == Tl::PhotoSizeProgressive) {
+                    QVariantList l = sz.vec("sizes");
+                    if (!l.isEmpty()) m.fileSize = l.last().toInt();
+                }
+            }
+        }
+        if (m.sizeType.isEmpty()) m.sizeType = m.bigSizeType;
+    }
+
+    QString smallestThumb(const QVariantList &thumbs)
+    {
+        QString best;
+        int bestArea = 0x7fffffff;
+        for (int i = 0; i < thumbs.size(); ++i) {
+            TlObject sz = TlSchema::toObject(thumbs.at(i));
+            if (sz.ctor() != Tl::PhotoSize && sz.ctor() != Tl::PhotoSizeProgressive) continue;
+            int area = sz.intOr("w") * sz.intOr("h");
+            if (area <= 0 || area >= bestArea) continue;
+            bestArea = area;
+            best = sz.str("type");
+        }
+        return best;
+    }
+}
+
+TgMedia TgApi::readMedia(const TlObject &media)
+{
+    TgMedia m;
+    if (media.ctor() == Tl::MessageMediaPhoto && media.has("photo")) {
+        TlObject photo = media.obj("photo");
+        if (photo.ctor() != Tl::Photo) return m;
+        m.kind = TgMedia::Photo;
+        m.id = photo.longOr("id");
+        m.accessHash = photo.longOr("access_hash");
+        m.fileReference = photo.bytes("file_reference");
+        m.dcId = photo.intOr("dc_id");
+        chooseSizes(photo.vec("sizes"), m);
+        return m;
+    }
+    if (media.ctor() == Tl::MessageMediaDocument && media.has("document")) {
+        TlObject doc = media.obj("document");
+        if (doc.ctor() != Tl::Document) return m;
+        m.kind = TgMedia::Document;
+        m.id = doc.longOr("id");
+        m.accessHash = doc.longOr("access_hash");
+        m.fileReference = doc.bytes("file_reference");
+        m.dcId = doc.intOr("dc_id");
+        m.mimeType = doc.str("mime_type");
+        m.fileSize = doc.longOr("size");
+        if (doc.has("thumbs")) m.thumbSizeType = smallestThumb(doc.vec("thumbs"));
+        QVariantList attrs = doc.vec("attributes");
+        for (int i = 0; i < attrs.size(); ++i) {
+            TlObject a = TlSchema::toObject(attrs.at(i));
+            if (a.ctor() == Tl::DocumentAttributeFilename) m.fileName = a.str("file_name");
+            else if (a.ctor() == Tl::DocumentAttributeSticker) m.kind = TgMedia::Sticker;
+            else if (a.ctor() == Tl::DocumentAttributeAnimated) m.kind = TgMedia::Gif;
+            else if (a.ctor() == Tl::DocumentAttributeImageSize) { m.width = a.intOr("w"); m.height = a.intOr("h"); }
+            else if (a.ctor() == Tl::DocumentAttributeVideo) {
+                if (m.kind == TgMedia::Document) m.kind = TgMedia::Video;
+                m.duration = int(a.doubleOr("duration"));
+                m.width = a.intOr("w");
+                m.height = a.intOr("h");
+            }
+            else if (a.ctor() == Tl::DocumentAttributeAudio) { m.kind = a.flag("flags", 10) ? TgMedia::Voice : TgMedia::Audio; m.duration = a.intOr("duration"); }
+        }
+        if (m.mimeType == QLatin1String("image/webp") || m.mimeType == QLatin1String("application/x-tgsticker")) m.kind = TgMedia::Sticker;
+        if (m.fileName.isEmpty()) {
+            QString ext = m.mimeType.section(QLatin1Char('/'), -1);
+            m.fileName = QString::fromLatin1("file_%1.%2").arg(quint64(m.id), 0, 16).arg(ext.isEmpty() ? QLatin1String("bin") : ext);
+        }
+        return m;
+    }
+    return m;
+}
+
+QList<TgMessage> TgApi::messagesIn(const TlObject &updates)
+{
+    QList<TgMessage> out;
+    if (updates.isNull()) return out;
+    QVariantList list = updates.vec("updates");
+    if (updates.has("update")) list.append(QVariant::fromValue(updates.obj("update")));
+    for (int i = 0; i < list.size(); ++i) {
+        TlObject u = TlSchema::toObject(list.at(i));
+        if ((u.ctor() == Tl::UpdateNewMessage || u.ctor() == Tl::UpdateNewChannelMessage) && u.has("message"))
+            out.append(readMessage(u.obj("message")));
+    }
+    return out;
+}
+
 QString TgApi::describeAction(const TlObject &action, const TgPeerCache &cache)
 {
     switch (action.ctor()) {
@@ -454,7 +663,10 @@ TgMessage TgApi::readMessage(const TlObject &m)
     t.text = m.str("message");
     t.editDate = m.intOr("edit_date");
     t.viaBot = m.has("via_bot_id");
-    if (m.has("media")) t.note = describeMedia(m.obj("media"));
+    if (m.has("media")) {
+        t.note = describeMedia(m.obj("media"));
+        t.media = readMedia(m.obj("media"));
+    }
     if (m.has("fwd_from")) {
         TlObject fwd = m.obj("fwd_from");
         t.forwardedFrom = fwd.str("from_name");

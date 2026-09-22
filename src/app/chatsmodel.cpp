@@ -1,9 +1,11 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "chatsmodel.h"
+#include "mediacache.h"
 #include "telegramsession.h"
 
 #include <QDateTime>
+#include <QUrl>
 #include <QStringList>
 #include <QTimer>
 
@@ -13,8 +15,8 @@ namespace
     int now() { return int(QDateTime::currentDateTime().toTime_t()); }
 }
 
-ChatsModel::ChatsModel(TelegramSession *session, QObject *parent)
-    : QAbstractListModel(parent), m_session(session)
+ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent)
+    : QAbstractListModel(parent), m_session(session), m_media(media)
 {
     QHash<int, QByteArray> roles;
     roles[PeerKeyRole] = "peerKey";
@@ -29,6 +31,7 @@ ChatsModel::ChatsModel(TelegramSession *session, QObject *parent)
     roles[TypingRole] = "typing";
     roles[InitialsRole] = "initials";
     roles[ColorRole] = "color";
+    roles[AvatarRole] = "avatar";
     setRoleNames(roles);
 
     connect(session, SIGNAL(dialogsChanged()), this, SLOT(onDialogsChanged()));
@@ -36,6 +39,7 @@ ChatsModel::ChatsModel(TelegramSession *session, QObject *parent)
     connect(session, SIGNAL(peerChanged(TgPeer)), this, SLOT(onPeerChanged(TgPeer)));
     connect(session, SIGNAL(typing(TgPeer,qint64)), this, SLOT(onTyping(TgPeer,qint64)));
     connect(session, SIGNAL(stateChanged()), this, SIGNAL(countChanged()));
+    connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onAvatarReady(QString,QString)));
 
     m_typingTimer = new QTimer(this);
     m_typingTimer->setInterval(1000);
@@ -115,6 +119,11 @@ QVariant ChatsModel::data(const QModelIndex &index, int role) const
     case TypingRole: return m_typingUntil.value(key, 0) > now();
     case InitialsRole: return initials(m_session->peers().title(d.peer));
     case ColorRole: return colorFor(d.peer);
+    case AvatarRole: {
+        if (info.photoId == 0) return QString();
+        QString path = m_media->peerPhoto(d.peer, info);
+        return path.isEmpty() ? QString() : QUrl::fromLocalFile(path).toString();
+    }
     default: return QVariant();
     }
 }
@@ -175,6 +184,14 @@ void ChatsModel::onTyping(const TgPeer &peer, qint64 userId)
     m_typingWho.insert(peer.key(), userId);
     refreshRow(peer);
     if (!m_typingTimer->isActive()) m_typingTimer->start();
+}
+
+void ChatsModel::onAvatarReady(const QString &key, const QString &path)
+{
+    Q_UNUSED(path);
+    if (!key.startsWith(QLatin1Char('p'))) return;   // a peer photo (media keys start with 'm')
+    // The list is short; a blanket refresh is cheaper than mapping the photo id to a row.
+    if (rowCount() > 0) emit dataChanged(index(0), index(rowCount() - 1));
 }
 
 void ChatsModel::onTypingTimer()

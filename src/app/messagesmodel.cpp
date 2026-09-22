@@ -2,11 +2,17 @@
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "messagesmodel.h"
 #include "chatsmodel.h"
+#include "mediacache.h"
 #include "telegramsession.h"
 
 #include <QDateTime>
+#include <QDesktopServices>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QTime>
 #include <QTimer>
+#include <QUrl>
 
 namespace
 {
@@ -16,8 +22,8 @@ namespace
     int now() { return int(QDateTime::currentDateTime().toTime_t()); }
 }
 
-MessagesModel::MessagesModel(TelegramSession *session, QObject *parent)
-    : QAbstractListModel(parent), m_session(session), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
+MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
+    : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0)
 {
     QHash<int, QByteArray> roles;
@@ -36,14 +42,25 @@ MessagesModel::MessagesModel(TelegramSession *session, QObject *parent)
     roles[ForwardedRole] = "forwarded";
     roles[ReplyRole] = "reply";
     roles[EditedRole] = "edited";
+    roles[MediaKindRole] = "mediaKind";
+    roles[MediaThumbRole] = "mediaThumb";
+    roles[MediaStateRole] = "mediaState";
+    roles[MediaProgressRole] = "mediaProgress";
+    roles[MediaInfoRole] = "mediaInfo";
+    roles[MediaWidthRole] = "mediaWidth";
+    roles[MediaHeightRole] = "mediaHeight";
+    roles[LocalPathRole] = "localPath";
     setRoleNames(roles);
+    connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onMediaReady(QString,QString)));
+    connect(media, SIGNAL(failed(QString,QString)), this, SLOT(onMediaFailed(QString,QString)));
+    connect(media, SIGNAL(progress(QString,int)), this, SLOT(onMediaProgress(QString,int)));
 
     connect(session, SIGNAL(historyLoaded(TgPeer,QList<TgMessage>,int,bool)), this, SLOT(onHistoryLoaded(TgPeer,QList<TgMessage>,int,bool)));
     connect(session, SIGNAL(historyFailed(TgPeer,QString)), this, SLOT(onHistoryFailed(TgPeer,QString)));
     connect(session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessageReceived(TgMessage)));
     connect(session, SIGNAL(messageEdited(TgMessage)), this, SLOT(onMessageEdited(TgMessage)));
     connect(session, SIGNAL(messagesDeleted(TgPeer,QList<int>)), this, SLOT(onMessagesDeleted(TgPeer,QList<int>)));
-    connect(session, SIGNAL(messageSent(TgPeer,qint64,int,int)), this, SLOT(onMessageSent(TgPeer,qint64,int,int)));
+    connect(session, SIGNAL(messageSent(TgPeer,qint64,TgMessage)), this, SLOT(onMessageSent(TgPeer,qint64,TgMessage)));
     connect(session, SIGNAL(messageFailed(TgPeer,qint64,QString)), this, SLOT(onMessageFailed(TgPeer,qint64,QString)));
     connect(session, SIGNAL(typing(TgPeer,qint64)), this, SLOT(onTyping(TgPeer,qint64)));
     connect(session, SIGNAL(peerChanged(TgPeer)), this, SLOT(onPeerChanged(TgPeer)));
@@ -114,8 +131,178 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
         return who + QLatin1String(": ") + text.simplified().left(60);
     }
     case EditedRole: return m.editDate > 0;
+    case MediaKindRole: return mediaKindName(m.media.kind);
+    case MediaThumbRole: return r.thumbPath.isEmpty() ? QString() : QUrl::fromLocalFile(r.thumbPath).toString();
+    case MediaStateRole:
+        if (!m.media.isValid()) return QLatin1String("none");
+        if (r.mediaFailed) return QLatin1String("failed");
+        if (r.mediaLoading) return QLatin1String("loading");
+        if (!r.fullPath.isEmpty()) return QLatin1String("ready");
+        return QLatin1String("idle");
+    case MediaProgressRole: return r.progress;
+    case MediaInfoRole: return mediaInfoText(m.media);
+    case MediaWidthRole: return m.media.width;
+    case MediaHeightRole: return m.media.height;
+    case LocalPathRole: return r.fullPath;
     default: return QVariant();
     }
+}
+
+QString MessagesModel::mediaKindName(TgMedia::Kind k)
+{
+    switch (k) {
+    case TgMedia::Photo: return QLatin1String("photo");
+    case TgMedia::Video: return QLatin1String("video");
+    case TgMedia::Voice: return QLatin1String("voice");
+    case TgMedia::Audio: return QLatin1String("audio");
+    case TgMedia::Sticker: return QLatin1String("sticker");
+    case TgMedia::Gif: return QLatin1String("gif");
+    case TgMedia::Document: return QLatin1String("document");
+    default: return QString();
+    }
+}
+
+QString MessagesModel::mediaInfoText(const TgMedia &m) const
+{
+    QString size;
+    qint64 b = m.fileSize;
+    if (b >= 1048576) size = tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1);
+    else if (b >= 1024) size = tr("%1 KB").arg(int(b / 1024));
+    else if (b > 0) size = tr("%1 B").arg(b);
+    QString dur;
+    if (m.duration > 0) dur = QString::fromLatin1("%1:%2").arg(m.duration / 60).arg(m.duration % 60, 2, 10, QLatin1Char('0'));
+    if (m.kind == TgMedia::Voice || m.kind == TgMedia::Audio) return dur.isEmpty() ? size : dur;
+    if (m.kind == TgMedia::Document) return m.fileName + (size.isEmpty() ? QString() : QLatin1String("  ") + size);
+    if (m.kind == TgMedia::Video || m.kind == TgMedia::Gif) return dur.isEmpty() ? size : dur + QLatin1String("  ") + size;
+    return size;
+}
+
+void MessagesModel::prepareMedia(Row &r)
+{
+    if (!r.m.media.isValid() || !m_media) return;
+    TgMedia &m = r.m.media;
+    if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) {
+        // An instant blurred placeholder, then the small size fetched automatically.
+        QString stripped = m_media->strippedThumbFile(m);
+        if (!stripped.isEmpty()) r.thumbPath = stripped;
+        QString cached = m_media->cachedFile(m, m.sizeType);
+        if (!cached.isEmpty()) { r.thumbPath = cached; r.fullPath = cached; }
+        else { r.awaitKey = m_media->fetch(m, m.sizeType); r.mediaLoading = true; }
+    } else {
+        // Videos/documents carry a thumbnail; show it if there is one, but do not fetch
+        // the (large) file until asked.
+        if (!m.thumbSizeType.isEmpty()) {
+            QString cached = m_media->cachedFile(m, m.thumbSizeType);
+            if (!cached.isEmpty()) r.thumbPath = cached;
+            else m_media->fetch(m, m.thumbSizeType);
+        }
+        QString full = m_media->cachedFile(m, QString());
+        if (!full.isEmpty()) r.fullPath = full;
+    }
+}
+
+int MessagesModel::rowByKey(const QString &key) const
+{
+    for (int i = m_rows.size() - 1; i >= 0; --i) {
+        const TgMedia &m = m_rows.at(i).m.media;
+        if (!m.isValid()) continue;
+        if (m_rows.at(i).awaitKey == key) return i;
+        if (m_media && (m_media->keyFor(m, m.sizeType) == key || m_media->keyFor(m, QString()) == key || m_media->keyFor(m, m.thumbSizeType) == key)) return i;
+    }
+    return -1;
+}
+
+void MessagesModel::downloadMedia(int row)
+{
+    if (row < 0 || row >= m_rows.size() || !m_media) return;
+    Row &r = m_rows[row];
+    TgMedia &m = r.m.media;
+    if (!m.isValid()) return;
+    QString size = (m.kind == TgMedia::Photo) ? m.bigSizeType : QString();
+    QString cached = m_media->cachedFile(m, size);
+    if (!cached.isEmpty()) { r.fullPath = cached; r.mediaLoading = false; r.mediaFailed = false; emit dataChanged(index(row), index(row)); return; }
+    r.awaitKey = m_media->fetch(m, size);
+    r.mediaLoading = true;
+    r.mediaFailed = false;
+    r.progress = 0;
+    emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::saveMedia(int row)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    Row &r = m_rows[row];
+    if (r.fullPath.isEmpty()) { downloadMedia(row); return; }
+    QString base = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+    if (r.m.media.kind != TgMedia::Photo || base.isEmpty())
+        base = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    if (base.isEmpty()) base = QDir::homePath();
+    base += QLatin1String("/Symbigram");
+    QDir().mkpath(base);
+    QString name = r.m.media.fileName.isEmpty() ? QFileInfo(r.fullPath).fileName() : r.m.media.fileName;
+    QString target = base + QLatin1Char('/') + name;
+    for (int n = 1; QFile::exists(target); ++n) {
+        QFileInfo fi(base + QLatin1Char('/') + name);
+        target = QString::fromLatin1("%1/%2 (%3).%4").arg(base, fi.completeBaseName()).arg(n).arg(fi.suffix());
+    }
+    if (QFile::copy(r.fullPath, target)) emit sendFailed(tr("Saved to %1").arg(QDir::toNativeSeparators(target)));
+    else emit sendFailed(tr("Could not save the file."));
+}
+
+void MessagesModel::openMedia(int row)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    if (m_rows.at(row).fullPath.isEmpty()) { downloadMedia(row); return; }
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_rows.at(row).fullPath));
+}
+
+bool MessagesModel::canDeleteForEveryone(int row) const
+{
+    if (row < 0 || row >= m_rows.size()) return false;
+    // One-to-one chats and basic groups let anyone revoke; a channel post needs rights we
+    // do not track, so it is offered only for our own posts there.
+    if (m_peer.kind == TgPeer::User) return true;
+    if (m_peer.kind == TgPeer::Chat) return true;
+    return m_rows.at(row).m.out;
+}
+
+void MessagesModel::onMediaReady(const QString &key, const QString &path)
+{
+    int row = rowByKey(key);
+    if (row < 0) return;
+    Row &r = m_rows[row];
+    const TgMedia &m = r.m.media;
+    bool isThumb = m_media && (m_media->keyFor(m, m.thumbSizeType) == key ||
+                               ((m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) && m_media->keyFor(m, m.sizeType) == key));
+    if (isThumb) {
+        r.thumbPath = path;
+        if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) { r.fullPath = path; r.mediaLoading = false; }
+    } else {
+        r.fullPath = path;
+        r.thumbPath = (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) ? path : r.thumbPath;
+        r.mediaLoading = false;
+    }
+    r.awaitKey.clear();
+    emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::onMediaFailed(const QString &key, const QString &error)
+{
+    Q_UNUSED(error);
+    int row = rowByKey(key);
+    if (row < 0) return;
+    m_rows[row].mediaLoading = false;
+    m_rows[row].mediaFailed = true;
+    m_rows[row].awaitKey.clear();
+    emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::onMediaProgress(const QString &key, int percent)
+{
+    int row = rowByKey(key);
+    if (row < 0) return;
+    m_rows[row].progress = percent;
+    emit dataChanged(index(row), index(row));
 }
 
 QVariantMap MessagesModel::get(int row) const
@@ -163,6 +350,15 @@ bool MessagesModel::peerMuted() const
 
 QString MessagesModel::initials() const { return ChatsModel::initials(title()); }
 QString MessagesModel::color() const { return ChatsModel::colorFor(m_peer); }
+
+QString MessagesModel::avatar() const
+{
+    if (m_peer.isNull() || !m_media) return QString();
+    TgPeerInfo info = m_session->peers().info(m_peer);
+    if (info.photoId == 0) return QString();
+    QString path = m_media->peerPhoto(m_peer, info);
+    return path.isEmpty() ? QString() : QUrl::fromLocalFile(path).toString();
+}
 
 bool MessagesModel::peerTyping() const { return m_peerTypingTimer->isActive(); }
 
@@ -280,6 +476,7 @@ void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &
         if (rowById(messages.at(i).id) >= 0) continue;
         Row r;
         r.m = messages.at(i);
+        prepareMedia(r);
         rows.append(r);
     }
     if (!rows.isEmpty()) {
@@ -332,6 +529,7 @@ void MessagesModel::onMessageReceived(const TgMessage &m)
     }
     Row r;
     r.m = m;
+    prepareMedia(r);
     beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
     m_rows.append(r);
     endInsertRows();
@@ -346,6 +544,7 @@ void MessagesModel::onMessageEdited(const TgMessage &m)
     int row = rowById(m.id);
     if (row < 0) return;
     m_rows[row].m = m;
+    prepareMedia(m_rows[row]);
     emit dataChanged(index(row), index(row));
 }
 
@@ -413,16 +612,64 @@ void MessagesModel::retry(int row)
     sendRow(row);
 }
 
-void MessagesModel::onMessageSent(const TgPeer &peer, qint64 randomId, int msgId, int date)
+void MessagesModel::onMessageSent(const TgPeer &peer, qint64 randomId, const TgMessage &message)
 {
     if (peer != m_peer) return;
     int row = rowByRandomId(randomId);
-    if (row < 0) return;
-    m_rows[row].pending = false;
-    m_rows[row].failed = false;
-    m_rows[row].m.id = msgId;
-    if (date) m_rows[row].m.date = date;
+    if (row < 0) {
+        // A media send started elsewhere (the attach button) with no placeholder row.
+        if (message.id <= 0 || rowById(message.id) >= 0) return;
+        Row r;
+        r.m = message;
+        r.m.peer = m_peer;
+        prepareMedia(r);
+        beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
+        m_rows.append(r);
+        endInsertRows();
+        emit countChanged();
+        emit messageAppended();
+        return;
+    }
+    Row &r = m_rows[row];
+    r.pending = false;
+    r.failed = false;
+    r.m.id = message.id;
+    if (message.date) r.m.date = message.date;
+    // An uploaded attachment now has server media (id/reference); keep the local file as
+    // its own thumbnail so it need not be downloaded again.
+    if (message.media.isValid()) {
+        QString localThumb = r.thumbPath;
+        QString localFull = r.fullPath;
+        r.m.media = message.media;
+        r.m.note = message.note;
+        r.thumbPath = localThumb;
+        r.fullPath = localFull;
+        if (r.thumbPath.isEmpty()) prepareMedia(r);
+    }
     emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto)
+{
+    if (m_peer.isNull()) return;
+    Row r;
+    r.m.peer = m_peer;
+    r.m.out = true;
+    r.m.date = now();
+    r.m.fromId = m_session->selfId();
+    r.randomId = randomId;
+    r.pending = true;
+    // Show the file being sent straight away, from the local copy.
+    r.m.media.kind = asPhoto ? TgMedia::Photo : TgMedia::Document;
+    r.m.media.fileName = QFileInfo(localPath).fileName();
+    if (asPhoto) r.thumbPath = localPath;
+    else r.fullPath = localPath;
+    r.m.note = asPhoto ? tr("photo") : r.m.media.fileName;
+    beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
+    m_rows.append(r);
+    endInsertRows();
+    emit countChanged();
+    emit messageAppended();
 }
 
 void MessagesModel::onMessageFailed(const TgPeer &peer, qint64 randomId, const QString &error)
