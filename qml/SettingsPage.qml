@@ -158,6 +158,30 @@ Page {
                 }
                 onClicked: autoSwitch.checked = !autoSwitch.checked
             }
+            ListItem {
+                id: logItem
+                ListItemText {
+                    anchors { left: logItem.paddingItem.left; right: logSwitch.left; verticalCenter: parent.verticalCenter }
+                    role: "Title"
+                    text: qsTr("Keep a log")
+                    wrapMode: Text.Wrap
+                }
+                Switch {
+                    id: logSwitch
+                    anchors { right: logItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    checked: app.logging
+                    onCheckedChanged: if (checked != app.logging) app.logging = checked
+                }
+                onClicked: logSwitch.checked = !logSwitch.checked
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.")
+            }
             Item { width: 1; height: platformStyle.paddingLarge }
 
             ListItem {

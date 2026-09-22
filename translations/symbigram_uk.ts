@@ -14,8 +14,8 @@
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="45" />
-        <source>Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, groups and channels; attachments are shown as notes, not downloaded.</source>
-        <translation>Вхід лише за QR-кодом (сканується з Telegram, де ви вже увійшли; плюс пароль двоетапної перевірки, якщо він є). Текстові повідомлення, групи та канали; вкладення показуються як позначки, не завантажуються.</translation>
+        <source>Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.</source>
+        <translation>Вхід лише за QR-кодом (сканується з Telegram, де ви вже увійшли; плюс пароль двоетапної перевірки, якщо він є). Текстові повідомлення, фото та файли (перегляд, збереження й надсилання), групи та канали.</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="55" />
@@ -23,7 +23,12 @@
         <translation>Журнал</translation>
     </message>
     <message>
-        <location filename="../qml/AboutPage.qml" line="66" />
+        <location filename="../qml/AboutPage.qml" line="62" />
+        <source>Logging is off. Turn on "Keep a log" in Settings to collect one.</source>
+        <translation>Журнал вимкнено. Увімкніть «Вести журнал» у налаштуваннях, щоб зібрати його.</translation>
+    </message>
+    <message>
+        <location filename="../qml/AboutPage.qml" line="75" />
         <source>Copy log</source>
         <translation>Скопіювати журнал</translation>
     </message>
@@ -31,94 +36,94 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="177" />
-        <location filename="../src/app/appcontroller.cpp" line="434" />
-        <location filename="../src/app/appcontroller.cpp" line="450" />
+        <location filename="../src/app/appcontroller.cpp" line="181" />
+        <location filename="../src/app/appcontroller.cpp" line="446" />
+        <location filename="../src/app/appcontroller.cpp" line="462" />
         <source>Not connected.</source>
         <translation>Немає з'єднання.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="178" />
+        <location filename="../src/app/appcontroller.cpp" line="182" />
         <source>Connecting...</source>
         <translation>Підключення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="178" />
+        <location filename="../src/app/appcontroller.cpp" line="182" />
         <source>Connecting and creating the encryption key...</source>
         <translation>Підключення та створення ключа шифрування...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="180" />
+        <location filename="../src/app/appcontroller.cpp" line="184" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>Перевірка пароля (це займе кілька секунд)...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="181" />
+        <location filename="../src/app/appcontroller.cpp" line="185" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>У цього облікового запису ввімкнено двоетапну перевірку. Введіть пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="182" />
+        <location filename="../src/app/appcontroller.cpp" line="186" />
         <source>Requesting a sign-in code...</source>
         <translation>Запит коду для входу...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="182" />
+        <location filename="../src/app/appcontroller.cpp" line="186" />
         <source>Waiting for the code to be scanned...</source>
         <translation>Очікування сканування коду...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="183" />
+        <location filename="../src/app/appcontroller.cpp" line="187" />
         <source>Signing in...</source>
         <translation>Вхід...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="315" />
+        <location filename="../src/app/appcontroller.cpp" line="327" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>З'єднання втрачено: %1. Перепідключення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="316" />
+        <location filename="../src/app/appcontroller.cpp" line="328" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Не вдалося підключитися: %1. Повтор...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="399" />
+        <location filename="../src/app/appcontroller.cpp" line="411" />
         <source>Enter the password.</source>
         <translation>Введіть пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="452" />
+        <location filename="../src/app/appcontroller.cpp" line="464" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Зображення (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="452" />
+        <location filename="../src/app/appcontroller.cpp" line="464" />
         <source>All files (*)</source>
         <translation>Усі файли (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="453" />
+        <location filename="../src/app/appcontroller.cpp" line="465" />
         <source>Choose an image</source>
         <translation>Виберіть зображення</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="453" />
+        <location filename="../src/app/appcontroller.cpp" line="465" />
         <source>Choose a file</source>
         <translation>Виберіть файл</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="457" />
+        <location filename="../src/app/appcontroller.cpp" line="469" />
         <source>Sending the image...</source>
         <translation>Надсилання зображення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="457" />
+        <location filename="../src/app/appcontroller.cpp" line="469" />
         <source>Sending the file...</source>
         <translation>Надсилання файлу...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="468" />
+        <location filename="../src/app/appcontroller.cpp" line="480" />
         <source>Copied.</source>
         <translation>Скопійовано.</translation>
     </message>
@@ -293,111 +298,116 @@
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="32" />
-        <location filename="../qml/ChatsPage.qml" line="38" />
-        <location filename="../qml/ChatsPage.qml" line="40" />
-        <source>Sign out</source>
-        <translation>Вийти</translation>
-    </message>
-    <message>
         <location filename="../qml/ChatsPage.qml" line="39" />
-        <source>Sign out? The session will be ended on Telegram and removed from this phone.</source>
-        <translation>Вийти? Сеанс буде завершено в Telegram і видалено з цього телефону.</translation>
+        <location filename="../qml/ChatsPage.qml" line="41" />
+        <source>Sign out</source>
+        <translation>Вихід з облікового запису</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="41" />
-        <location filename="../qml/ChatsPage.qml" line="48" />
-        <location filename="../qml/ChatsPage.qml" line="76" />
+        <location filename="../qml/ChatsPage.qml" line="33" />
+        <source>Exit</source>
+        <translation>Вихід із застосунку</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="40" />
+        <source>Sign out? The session will be ended on Telegram and removed from this phone.</source>
+        <translation>Вийти з облікового запису? Сеанс буде завершено в Telegram і видалено з цього телефону.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="42" />
+        <location filename="../qml/ChatsPage.qml" line="49" />
+        <location filename="../qml/ChatsPage.qml" line="77" />
         <source>Cancel</source>
         <translation>Скасувати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="47" />
+        <location filename="../qml/ChatsPage.qml" line="48" />
         <source>New chat</source>
         <translation>Новий чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="48" />
+        <location filename="../qml/ChatsPage.qml" line="49" />
         <source>Find</source>
         <translation>Знайти</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="57" />
+        <location filename="../qml/ChatsPage.qml" line="58" />
         <source>@username, phone number, t.me link, or a contact's name</source>
         <translation>@username, номер телефону, посилання t.me або ім'я контакту</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="63" />
+        <location filename="../qml/ChatsPage.qml" line="64" />
         <source>@username or +phone</source>
         <translation>@username або +телефон</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="73" />
-        <location filename="../qml/ChatsPage.qml" line="89" />
+        <location filename="../qml/ChatsPage.qml" line="74" />
+        <location filename="../qml/ChatsPage.qml" line="90" />
         <source>Clear history</source>
         <translation>Очистити історію</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="74" />
+        <location filename="../qml/ChatsPage.qml" line="75" />
         <source>Delete all messages of "%1" on Telegram (for you)?</source>
         <translation>Видалити всі повідомлення чату «%1» у Telegram (у себе)?</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="75" />
+        <location filename="../qml/ChatsPage.qml" line="76" />
         <source>Delete</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="85" />
+        <location filename="../qml/ChatsPage.qml" line="86" />
         <source>Unmute</source>
         <translation>Увімкнути сповіщення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="85" />
+        <location filename="../qml/ChatsPage.qml" line="86" />
         <source>Mute</source>
         <translation>Вимкнути сповіщення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="114" />
+        <location filename="../qml/ChatsPage.qml" line="115" />
         <source>online</source>
         <translation>у мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="115" />
+        <location filename="../qml/ChatsPage.qml" line="116" />
         <source>connecting...</source>
         <translation>підключення...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="115" />
+        <location filename="../qml/ChatsPage.qml" line="116" />
         <source>offline</source>
         <translation>не в мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="141" />
+        <location filename="../qml/ChatsPage.qml" line="142" />
         <source>loading...</source>
         <translation>завантаження...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="141" />
+        <location filename="../qml/ChatsPage.qml" line="142" />
         <source>Older chats</source>
         <translation>Старіші чати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="269" />
+        <location filename="../qml/ChatsPage.qml" line="270" />
         <source>Loading chats...</source>
         <translation>Завантаження чатів...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="269" />
+        <location filename="../qml/ChatsPage.qml" line="270" />
         <source>No chats yet. Tap + to find someone.</source>
         <translation>Чатів поки немає. Натисніть +, щоб знайти співрозмовника.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="270" />
+        <location filename="../qml/ChatsPage.qml" line="271" />
         <source>Connecting...</source>
         <translation>Підключення...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="270" />
+        <location filename="../qml/ChatsPage.qml" line="271" />
         <source>Offline. Use the menu to connect.</source>
         <translation>Не в мережі. Підключіться через меню.</translation>
     </message>
@@ -694,7 +704,7 @@
     <name>SettingsPage</name>
     <message>
         <location filename="../qml/SettingsPage.qml" line="15" />
-        <location filename="../qml/SettingsPage.qml" line="168" />
+        <location filename="../qml/SettingsPage.qml" line="192" />
         <source>App language</source>
         <translation>Мова програми</translation>
     </message>
@@ -741,7 +751,17 @@
         <translation>Підключатися під час запуску</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="189" />
+        <location filename="../qml/SettingsPage.qml" line="166" />
+        <source>Keep a log</source>
+        <translation>Вести журнал</translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="183" />
+        <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
+        <translation>Типово вимкнено. Вмикайте лише для збору діагностичного журналу (видно на сторінці «Про програму»), коли щось іде не так.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="213" />
         <source>Takes effect after the app is restarted.</source>
         <translation>Набуде чинності після перезапуску програми.</translation>
     </message>

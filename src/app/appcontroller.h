@@ -46,6 +46,7 @@ class AppController : public QObject
     Q_PROPERTY(bool popups READ popups WRITE setPopups NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
+    Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
     Q_PROPERTY(QString myName READ myName NOTIFY selfChanged)
     Q_PROPERTY(QString mySubtitle READ mySubtitle NOTIFY selfChanged)
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
@@ -85,6 +86,8 @@ public:
     void setGroupNotifications(bool on);
     bool autoConnect() const;
     void setAutoConnect(bool on);
+    bool logging() const;
+    void setLogging(bool on);
     QString myName() const;
     QString mySubtitle() const;
     ChatsModel *chats() const { return m_chats; }

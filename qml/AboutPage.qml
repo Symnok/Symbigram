@@ -42,7 +42,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, groups and channels; attachments are shown as notes, not downloaded.")
+                text: qsTr("Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.")
             }
             Label {
                 width: parent.width
@@ -55,15 +55,25 @@ Page {
             Label { text: qsTr("Log"); font.bold: true }
             Label {
                 width: parent.width
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                visible: !app.logging
+                text: qsTr("Logging is off. Turn on \"Keep a log\" in Settings to collect one.")
+            }
+            Label {
+                width: parent.width
                 wrapMode: Text.WrapAnywhere
                 font.pixelSize: platformStyle.fontSizeSmall * 0.85
                 font.family: "monospace"
                 color: platformStyle.colorNormalMid
+                visible: app.logging
                 text: app.logTail
             }
             Button {
                 width: parent.width
                 text: qsTr("Copy log")
+                visible: app.logging
                 onClicked: app.copyText(app.logTail)
             }
         }

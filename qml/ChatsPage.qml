@@ -30,6 +30,7 @@ Page {
             MenuItem { text: qsTr("Settings"); onClicked: pageStack.push(settingsPage) }
             MenuItem { text: qsTr("About"); onClicked: pageStack.push(aboutPage) }
             MenuItem { text: qsTr("Sign out"); onClicked: signOutDialog.open() }
+            MenuItem { text: qsTr("Exit"); onClicked: Qt.quit() }
         }
     }
 

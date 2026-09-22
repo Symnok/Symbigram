@@ -41,11 +41,14 @@ namespace
     const char *const KeyVibrate = "ui/vibrate";
     const char *const KeyPopups = "ui/popups";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
+    const char *const KeyLogging = "ui/logging";
     const int ReconnectMinMs = 5000;
     const int ReconnectMaxMs = 60000;
 
     QStringList &logLines() { static QStringList lines; return lines; }
     AppController *logOwner = 0;
+    // Whether the About-page log ring is collected at all (a setting; see setLogging).
+    bool loggingEnabled = false;
 }
 
 AppController::AppController(QObject *parent)
@@ -102,6 +105,7 @@ AppController::AppController(QObject *parent)
 
     qApp->installEventFilter(this);
     logOwner = this;
+    loggingEnabled = logging();
 }
 
 AppController::~AppController()
@@ -205,6 +209,14 @@ bool AppController::groupNotifications() const { return m_settings.value(QLatin1
 void AppController::setGroupNotifications(bool on) { m_settings.setValue(QLatin1String(KeyGroupNotifications), on); emit settingsChanged(); }
 bool AppController::autoConnect() const { return m_settings.value(QLatin1String(KeyAutoConnect), true).toBool(); }
 void AppController::setAutoConnect(bool on) { m_settings.setValue(QLatin1String(KeyAutoConnect), on); emit settingsChanged(); }
+bool AppController::logging() const { return m_settings.value(QLatin1String(KeyLogging), false).toBool(); }
+void AppController::setLogging(bool on)
+{
+    m_settings.setValue(QLatin1String(KeyLogging), on);
+    loggingEnabled = on;
+    if (!on) { logLines().clear(); emit logChanged(); }   // stop collecting and empty the ring
+    emit settingsChanged();
+}
 QString AppController::myName() const { return m_session->selfName(); }
 
 QString AppController::mySubtitle() const
@@ -362,7 +374,7 @@ void AppController::onLoginChanged()
 
 void AppController::onSessionLog(const QString &line)
 {
-    qDebug() << "tg:" << line;
+    if (loggingEnabled) qDebug() << "tg:" << line;
 }
 
 bool AppController::appInForeground() const
@@ -470,6 +482,7 @@ void AppController::copyText(const QString &text)
 
 void AppController::appendLog(const QString &line)
 {
+    if (!loggingEnabled) return;
     QStringList &lines = logLines();
     lines.append(QDateTime::currentDateTime().toString(QLatin1String("HH:mm:ss ")) + line);
     while (lines.size() > 40) lines.removeFirst();
