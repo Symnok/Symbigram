@@ -128,6 +128,8 @@ public:
     /// Uploads a file and sends it, as a photo or as a document; returns the random id
     /// that uploadProgress and messageSent/messageFailed will carry.
     qint64 sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption);
+    /// Sends an already-recorded Ogg/Opus file as a voice message.
+    qint64 sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform);
 
 signals:
     void stateChanged();
@@ -269,7 +271,7 @@ private:
     };
     struct Upload
     {
-        Upload() : randomId(0), file(0), fileId(0), parts(0), nextPart(0), size(0), big(false), asPhoto(false) {}
+        Upload() : randomId(0), file(0), fileId(0), parts(0), nextPart(0), size(0), big(false), asPhoto(false), voice(false), durationSec(0) {}
         qint64 randomId;
         TgPeer peer;
         QString path, fileName, caption;
@@ -278,6 +280,9 @@ private:
         int parts, nextPart;
         qint64 size;
         bool big, asPhoto;
+        bool voice;
+        int durationSec;
+        QByteArray waveform;
     };
     struct DcLink
     {

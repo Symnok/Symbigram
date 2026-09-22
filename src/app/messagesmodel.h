@@ -10,6 +10,7 @@
 #include "tgtypes.h"
 
 class MediaCache;
+class VoicePlayer;
 
 #include <QAbstractListModel>
 #include <QList>
@@ -66,7 +67,8 @@ public:
         MediaHeightRole,
         LocalPathRole,      // the full downloaded file, once it exists
         SecretBurnRole,     // true if this message self-destructs
-        SecretRemainingRole // seconds left before it self-destructs (-1 = none)
+        SecretRemainingRole,// seconds left before it self-destructs (-1 = none)
+        VoicePlayingRole    // true while this voice message is playing
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -116,6 +118,8 @@ public:
     Q_INVOKABLE void saveMedia(int row);
     /// Opens the downloaded attachment with the phone's handler for its type.
     Q_INVOKABLE void openMedia(int row);
+    /// Play or pause a voice message (downloads it first if needed).
+    Q_INVOKABLE void playVoice(int row);
     Q_INVOKABLE bool canDeleteForEveryone(int row) const;
     /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
     void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto);
@@ -152,6 +156,7 @@ private slots:
     void onMediaReady(const QString &key, const QString &path);
     void onMediaFailed(const QString &key, const QString &error);
     void onMediaProgress(const QString &key, int percent);
+    void onVoiceStopped();
 
 private:
     struct Row
@@ -172,6 +177,7 @@ private:
     };
     void prepareMedia(Row &r);
     void openSecret(int id);
+    void startVoice(int row);
     bool anyBurning() const;   // any visible message counting down?
     /// The user-visible folder saved files go to (drive-aware on Symbian).
     static QString downloadDir(bool photo);
@@ -187,6 +193,9 @@ private:
 
     TelegramSession *m_session;
     MediaCache *m_media;
+    VoicePlayer *m_voice;
+    int m_voiceRow;        // the row currently playing, or -1
+    int m_pendingPlayRow;  // a voice row to play as soon as its download finishes
     TgPeer m_peer;
     int m_secretId;
     QString m_downloadFolder;   // where "Save" copies files (chosen in Settings)          // non-zero when the open chat is a secret (end-to-end) chat

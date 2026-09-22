@@ -4,6 +4,7 @@
 #include "chatsmodel.h"
 #include "messagesmodel.h"
 #include "mediacache.h"
+#include "voicerecorder.h"
 #include "notifier.h"
 #include "telegramsession.h"
 #include "tgapi.h"
@@ -88,6 +89,11 @@ AppController::AppController(QObject *parent)
     m_chat = new MessagesModel(m_session, m_media, this);
     applyDownloadFolder();
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
+
+    m_recorder = new VoiceRecorder(this);
+    connect(m_recorder, SIGNAL(started()), this, SIGNAL(recordingChanged()));
+    connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
+    connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
     m_notifier = new Notifier(this);
     m_notifier->setEnabled(notifications());
     m_notifier->setVibrate(vibrate());
@@ -321,7 +327,50 @@ void AppController::applyDownloadFolder()
     QString custom = m_settings.value(QLatin1String(KeyDownloadCustom)).toString();
     QString chosen = custom.isEmpty() ? folderForDrive(letters.at(downloadDriveIndex())) : custom;
     QDir().mkpath(chosen);
+    m_downloadPath = chosen;
     if (m_chat) m_chat->setDownloadFolder(chosen);
+}
+
+// -- voice recording -------------------------------------------------------------------------------
+
+bool AppController::recording() const { return m_recorder && m_recorder->recording(); }
+int AppController::recordingMs() const { return m_recorder ? m_recorder->elapsedMs() : 0; }
+
+void AppController::startRecording()
+{
+    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
+    if (m_chat->peerKey().isEmpty() || m_chat->peerIsChannel() || m_chat->isSecret()) {
+        setNotice(tr("Cannot record a voice message here."));
+        return;
+    }
+    m_recorder->start(m_downloadPath);
+    emit recordingChanged();
+}
+
+void AppController::stopRecording()
+{
+    m_recorder->stop();
+    emit recordingChanged();
+}
+
+void AppController::cancelRecording()
+{
+    m_recorder->cancel();
+    emit recordingChanged();
+}
+
+void AppController::onRecorded(const QString &oggPath, int durationSec, const QByteArray &waveform)
+{
+    if (m_chat->peerKey().isEmpty()) { emit recordingChanged(); return; }
+    m_session->sendVoice(m_chat->peer(), oggPath, durationSec, waveform);
+    setNotice(tr("Sending the voice message..."));
+    emit recordingChanged();
+}
+
+void AppController::onRecordFailed(const QString &error)
+{
+    setNotice(error);
+    emit recordingChanged();
 }
 
 // -- SOCKS5 proxy ----------------------------------------------------------------------------------
@@ -353,6 +402,11 @@ void AppController::setProxyEnabled(bool on)
 void AppController::applyProxy()
 {
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
+
+    m_recorder = new VoiceRecorder(this);
+    connect(m_recorder, SIGNAL(started()), this, SIGNAL(recordingChanged()));
+    connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
+    connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
     // Reconnect so the change takes effect on a live connection.
     bool wasConnected = m_session->state() != TelegramSession::Disconnected;
     if (wasConnected) m_session->disconnectFromServer();

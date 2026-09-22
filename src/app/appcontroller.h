@@ -18,6 +18,7 @@ class MessagesModel;
 class Notifier;
 class MediaCache;
 class QNetworkConfigurationManager;
+class VoiceRecorder;
 class QNetworkSession;
 class QTimer;
 class QDeclarativeView;
@@ -62,6 +63,7 @@ class AppController : public QObject
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
     Q_PROPERTY(MessagesModel *chat READ chat CONSTANT)
     Q_PROPERTY(QString notice READ notice NOTIFY noticeChanged)
+    Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     /// Desktop testing: true when SGM_SHOT_DIR is set; main.qml then walks the pages.
     Q_PROPERTY(bool autotest READ autotest CONSTANT)
     Q_PROPERTY(QString autotestPeer READ autotestPeer CONSTANT)
@@ -138,6 +140,12 @@ public slots:
     /// Opens a file picker and sends the chosen file to the open chat, as a photo or a
     /// document. Nothing happens if the user cancels.
     void attachFile(bool asPhoto);
+    /// Voice messages: start/stop capture; stop encodes and sends to the open chat.
+    void startRecording();
+    void stopRecording();
+    void cancelRecording();
+    bool recording() const;
+    Q_INVOKABLE int recordingMs() const;
     /// Starts an end-to-end secret chat with the person of an existing 1:1 chat.
     void startSecretChat(const QString &peerKey);
     /// Opens a native folder picker so the user can choose any download folder.
@@ -159,6 +167,7 @@ signals:
     void settingsChanged();
     void selfChanged();
     void noticeChanged();
+    void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
     void logChanged();
@@ -178,6 +187,8 @@ private slots:
     void onReconnectTimer();
     void onSessionLog(const QString &line);
     void onNotice(const QString &text);
+    void onRecorded(const QString &oggPath, int durationSec, const QByteArray &waveform);
+    void onRecordFailed(const QString &error);
     void onSecretRequested(int id, qint64 adminId);
     void onSecretReady(int id);
     void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl);
@@ -201,6 +212,8 @@ private:
     MessagesModel *m_chat;
     Notifier *m_notifier;
     MediaCache *m_media;
+    VoiceRecorder *m_recorder;
+    QString m_downloadPath;   // the chosen public folder (recordings, WAV)
     QNetworkConfigurationManager *m_netMgr;
     QNetworkSession *m_netSession;
     QTimer *m_reconnect;

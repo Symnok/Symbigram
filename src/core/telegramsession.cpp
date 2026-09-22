@@ -988,8 +988,12 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
                 Request rq;
                 rq.peer = u.peer;
                 rq.randomId = u.randomId;
-                send(SendMedia, TgApi::sendUploadedMedia(u.peer, u.fileId, u.parts, u.big, u.fileName, u.asPhoto,
-                                                         TgApi::mimeTypeFor(u.fileName), u.caption, u.randomId), rq);
+                if (u.voice)
+                    send(SendMedia, TgApi::sendUploadedVoice(u.peer, u.fileId, u.parts, u.big, u.fileName,
+                                                             u.durationSec, u.waveform, u.randomId), rq);
+                else
+                    send(SendMedia, TgApi::sendUploadedMedia(u.peer, u.fileId, u.parts, u.big, u.fileName, u.asPhoto,
+                                                             TgApi::mimeTypeFor(u.fileName), u.caption, u.randomId), rq);
             } else {
                 sendNextPart(u);
             }
@@ -1678,6 +1682,34 @@ qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bo
         finishUpload(id, tr("the file is too large"));
         return id;
     }
+    m_uploads.insert(u.randomId, u);
+    if (!m_client->isReady()) { finishUpload(u.randomId, tr("Not connected.")); return u.randomId; }
+    sendNextPart(m_uploads[u.randomId]);
+    return u.randomId;
+}
+
+qint64 TelegramSession::sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform)
+{
+    Upload u;
+    u.randomId = qint64(Crypto::randomUInt64());
+    u.peer = m_peers.withHash(peer);
+    u.path = oggPath;
+    u.fileName = QLatin1String("voice.ogg");
+    u.voice = true;
+    u.durationSec = durationSec;
+    u.waveform = waveform;
+    u.file = new QFile(oggPath, this);
+    if (!u.file->open(QIODevice::ReadOnly) || u.file->size() <= 0) {
+        delete u.file;
+        qint64 id = u.randomId;
+        m_uploads.insert(id, Upload());
+        finishUpload(id, tr("could not read the recording"));
+        return id;
+    }
+    u.size = u.file->size();
+    u.big = u.size > BigFileThreshold;
+    u.parts = int((u.size + PartSize - 1) / PartSize);
+    u.fileId = qint64(Crypto::randomUInt64());
     m_uploads.insert(u.randomId, u);
     if (!m_client->isReady()) { finishUpload(u.randomId, tr("Not connected.")); return u.randomId; }
     sendNextPart(m_uploads[u.randomId]);

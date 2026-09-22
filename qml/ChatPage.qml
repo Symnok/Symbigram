@@ -311,7 +311,7 @@ Page {
         }
         ToolButton {
             id: attachButton
-            visible: !chat.peerIsChannel && !chat.isSecret
+            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording
             anchors { left: parent.left; leftMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             iconSource: "toolbar-add"
             enabled: app.connection == "online"
@@ -319,7 +319,7 @@ Page {
         }
         TextArea {
             id: composer
-            visible: !chat.peerIsChannel
+            visible: !chat.peerIsChannel && !app.recording
             anchors {
                 left: attachButton.visible ? attachButton.right : parent.left
                 leftMargin: platformStyle.paddingSmall
@@ -334,7 +334,7 @@ Page {
         }
         Button {
             id: sendButton
-            visible: !chat.peerIsChannel
+            visible: !chat.peerIsChannel && !app.recording && composer.text.length > 0
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: Math.max(80, implicitWidth)
             text: qsTr("Send")
@@ -343,6 +343,61 @@ Page {
                 chat.send(composer.text)
                 composer.text = ""
             }
+        }
+        // a round record button when there is nothing typed
+        Rectangle {
+            id: micButton
+            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && composer.text.length == 0
+            anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            width: 56; height: 56; radius: 28
+            color: micMouse.pressed ? "#3d5a80" : "#2f4a66"
+            enabled: app.connection == "online"
+            opacity: enabled ? 1 : 0.4
+            Rectangle { anchors.centerIn: parent; width: 16; height: 16; radius: 8; color: "#e04b4b" }
+            MouseArea { id: micMouse; anchors.fill: parent; enabled: app.connection == "online"; onClicked: app.startRecording() }
+        }
+        // while recording: a pulsing dot, the elapsed time, cancel and send
+        Item {
+            id: recordingBar
+            visible: app.recording
+            anchors.fill: parent
+            Rectangle {
+                id: recDot
+                anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+                width: 16; height: 16; radius: 8; color: "#e04b4b"
+                SequentialAnimation on opacity {
+                    running: app.recording; loops: Animation.Infinite
+                    NumberAnimation { to: 0.25; duration: 550 }
+                    NumberAnimation { to: 1.0; duration: 550 }
+                }
+            }
+            Label {
+                anchors { left: recDot.right; leftMargin: platformStyle.paddingMedium; verticalCenter: parent.verticalCenter }
+                text: page.recText
+                color: "white"
+                font.pixelSize: platformStyle.fontSizeLarge
+            }
+            Button {
+                id: recSend
+                anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+                text: qsTr("Send")
+                onClicked: app.stopRecording()
+            }
+            Button {
+                anchors { right: recSend.left; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+                text: qsTr("Cancel")
+                onClicked: app.cancelRecording()
+            }
+        }
+    }
+
+    property string recText: "0:00"
+    Timer {
+        interval: 250; repeat: true; running: app.recording
+        onTriggered: {
+            var ms = app.recordingMs()
+            var t = Math.floor(ms / 1000)
+            page.recText = Math.floor(t / 60) + ":" + (t % 60 < 10 ? "0" : "") + (t % 60)
         }
     }
 

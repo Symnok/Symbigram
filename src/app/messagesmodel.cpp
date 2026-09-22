@@ -3,6 +3,7 @@
 #include "messagesmodel.h"
 #include "chatsmodel.h"
 #include "mediacache.h"
+#include "voiceplayer.h"
 #include "telegramsession.h"
 
 #include <QDateTime>
@@ -24,7 +25,7 @@ namespace
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
-      m_typingSent(false), m_peerTypingUser(0), m_secretId(0)
+      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -52,6 +53,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[LocalPathRole] = "localPath";
     roles[SecretBurnRole] = "secretBurn";
     roles[SecretRemainingRole] = "secretRemaining";
+    roles[VoicePlayingRole] = "voicePlaying";
     setRoleNames(roles);
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onMediaReady(QString,QString)));
     connect(media, SIGNAL(failed(QString,QString)), this, SLOT(onMediaFailed(QString,QString)));
@@ -85,6 +87,11 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     m_burnTimer = new QTimer(this);
     m_burnTimer->setInterval(1000);
     connect(m_burnTimer, SIGNAL(timeout()), this, SLOT(onBurnTick()));
+
+    m_voice = new VoicePlayer(this);
+    connect(m_voice, SIGNAL(stopped()), this, SLOT(onVoiceStopped()));
+    connect(m_voice, SIGNAL(failed(QString)), this, SLOT(onVoiceStopped()));
+    connect(m_voice, SIGNAL(failed(QString)), this, SIGNAL(sendFailed(QString)));
 }
 
 int MessagesModel::rowCount(const QModelIndex &parent) const
@@ -155,6 +162,7 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     case LocalPathRole: return r.fullPath;
     case SecretBurnRole: return r.ttl > 0;
     case SecretRemainingRole: return r.expiresAt > 0 ? qMax(0, r.expiresAt - now()) : -1;
+    case VoicePlayingRole: return index.row() == m_voiceRow && m_voice->playing();
     default: return QVariant();
     }
 }
@@ -286,6 +294,35 @@ void MessagesModel::saveMedia(int row)
     }
 }
 
+void MessagesModel::playVoice(int row)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    Row &r = m_rows[row];
+    if (r.m.media.kind != TgMedia::Voice && r.m.media.kind != TgMedia::Audio) return;
+    if (m_voiceRow == row && m_voice->playing()) { m_voice->stop(); return; }   // tap again to stop
+    m_voice->stop();
+    if (r.fullPath.isEmpty()) { m_pendingPlayRow = row; downloadMedia(row); return; }
+    startVoice(row);
+}
+
+void MessagesModel::startVoice(int row)
+{
+    m_pendingPlayRow = -1;
+    if (row < 0 || row >= m_rows.size()) return;
+    if (!m_voice->play(m_rows.at(row).fullPath, m_downloadFolder)) return;
+    int prev = m_voiceRow;
+    m_voiceRow = row;
+    if (prev >= 0 && prev < m_rows.size()) emit dataChanged(index(prev), index(prev));
+    emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::onVoiceStopped()
+{
+    int prev = m_voiceRow;
+    m_voiceRow = -1;
+    if (prev >= 0 && prev < m_rows.size()) emit dataChanged(index(prev), index(prev));
+}
+
 void MessagesModel::openMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
@@ -321,6 +358,7 @@ void MessagesModel::onMediaReady(const QString &key, const QString &path)
     }
     r.awaitKey.clear();
     emit dataChanged(index(row), index(row));
+    if (row == m_pendingPlayRow && !r.fullPath.isEmpty()) { m_pendingPlayRow = -1; startVoice(row); }
 }
 
 void MessagesModel::onMediaFailed(const QString &key, const QString &error)
@@ -522,6 +560,8 @@ void MessagesModel::close()
     m_typingTimer->stop();
     m_peerTypingTimer->stop();
     m_burnTimer->stop();
+    m_voice->stop();
+    m_pendingPlayRow = -1;
     beginResetModel();
     m_peer = TgPeer();
     m_secretId = 0;

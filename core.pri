@@ -37,6 +37,8 @@ HEADERS += \
     $$PWD/src/core/qrcode.h \
     $$PWD/src/core/secretchat.h \
     $$PWD/src/core/secretapi.h \
+    $$PWD/src/core/ogg.h \
+    $$PWD/src/core/opusvoice.h \
     $$PWD/src/core/telegramsession.h \
     $$PWD/src/core/tgcredentials.h
 
@@ -62,6 +64,11 @@ SOURCES += \
     $$PWD/src/core/qrcode.cpp \
     $$PWD/src/core/secretchat.cpp \
     $$PWD/src/core/secretapi.cpp \
+    $$PWD/src/core/ogg.cpp \
+    $$PWD/src/core/opusvoice.cpp \
     $$PWD/src/core/telegramsession.cpp
 
 win32:LIBS += -ladvapi32
+
+# Vendored Opus codec (voice messages).
+include($$PWD/opus.pri)

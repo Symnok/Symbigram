@@ -17,6 +17,8 @@
 #include "dh.h"
 #include "inflate.h"
 #include "qrcode.h"
+#include "ogg.h"
+#include "opusvoice.h"
 #include "secretapi.h"
 #include "secretchat.h"
 #include "srp.h"
@@ -27,6 +29,10 @@
 #include "tlobject.h"
 #include "tlreader.h"
 #include "tlwriter.h"
+
+#include <opus.h>
+#include <math.h>
+#include <QVector>
 
 #include <QCoreApplication>
 #include <QDateTime>
@@ -213,6 +219,71 @@ static int selfTest()
         check(SecretApi::read(SecretApi::notifyLayer(1, 73)).kind == SecretContent::NotifyLayer
               && SecretApi::read(SecretApi::notifyLayer(1, 73)).layer == 73, "notifyLayer service message");
         Q_UNUSED(c4);
+    }
+
+    say(QLatin1String("opus voice"));
+    {
+        int err = 0;
+        OpusEncoder *enc = opus_encoder_create(48000, 1, OPUS_APPLICATION_VOIP, &err);
+        check(enc && err == OPUS_OK, "create opus encoder");
+        int lookahead = 0;
+        if (enc) opus_encoder_ctl(enc, OPUS_GET_LOOKAHEAD(&lookahead));
+
+        OggWriter w(12345);
+        QByteArray head("OpusHead");
+        head.append(char(1)).append(char(1));                                 // version 1, 1 channel
+        head.append(char(lookahead & 0xff)).append(char((lookahead >> 8) & 0xff));
+        head.append(char(0x80)).append(char(0xbb)).append(char(0)).append(char(0)); // input rate 48000
+        head.append(char(0)).append(char(0)).append(char(0));                 // output gain 0, mapping family 0
+        w.addPacket(head, 0, true, false);
+        QByteArray tags("OpusTags");
+        tags.append(char(4)).append(char(0)).append(char(0)).append(char(0)).append("Symb"); // vendor
+        tags.append(char(0)).append(char(0)).append(char(0)).append(char(0));                 // 0 comments
+        w.addPacket(tags, 0, true, false);
+
+        const int frame = 960;   // 20 ms at 48 kHz
+        const int nframes = 50;  // ~1 second
+        qint64 granule = 0;
+        QVector<opus_int16> pcmIn(frame);
+        unsigned char pkt[4000];
+        for (int f = 0; f < nframes; ++f) {
+            for (int i = 0; i < frame; ++i) {
+                double t = double(f * frame + i) / 48000.0;
+                pcmIn[i] = opus_int16(8000.0 * sin(2.0 * 3.14159265358979 * 440.0 * t));
+            }
+            int nb = enc ? opus_encode(enc, pcmIn.data(), frame, pkt, sizeof(pkt)) : -1;
+            granule += frame;
+            if (nb > 0) w.addPacket(QByteArray(reinterpret_cast<char *>(pkt), nb), granule, false, f == nframes - 1);
+        }
+        if (enc) opus_encoder_destroy(enc);
+        QByteArray ogg = w.result();
+        check(ogg.size() > 200 && ogg.startsWith("OggS"), "muxed an ogg/opus stream");
+
+        QString e;
+        OpusVoice::Pcm pcm = OpusVoice::decode(ogg, 48000, &e);
+        check(pcm.channels == 1 && pcm.sampleRate == 48000 && pcm.frames() > 40000, "decoded ~1s of voice pcm");
+        qint64 energy = 0;
+        const opus_int16 *sp = reinterpret_cast<const opus_int16 *>(pcm.data.constData());
+        for (int i = 0; i < pcm.frames(); ++i) energy += qAbs(int(sp[i]));
+        check(pcm.frames() > 0 && energy / (pcm.frames() ? pcm.frames() : 1) > 1000, "decoded tone has audible amplitude");
+
+        OpusVoice::Pcm pcm16 = OpusVoice::decode(ogg, 16000, 0);
+        check(pcm16.sampleRate == 16000 && pcm16.frames() > 13000, "decoded at 16 kHz");
+
+        // Encode PCM ourselves (the record path), then decode it back.
+        QByteArray raw;
+        for (int i = 0; i < 16000; ++i) {            // 1 s of 16 kHz mono tone
+            qint16 v = qint16(6000.0 * sin(2.0 * 3.14159265358979 * 330.0 * i / 16000.0));
+            raw.append(char(v & 0xff)).append(char((v >> 8) & 0xff));
+        }
+        OpusVoice::Encoded en = OpusVoice::encode(raw, 16000, 1, 0);
+        check(!en.isEmpty() && en.ogg.startsWith("OggS") && en.durationMs > 900 && en.durationMs < 1100, "encoded 1s of pcm to ogg/opus");
+        check(en.waveform.size() == (100 * 5 + 7) / 8, "waveform is 100 packed 5-bit samples");
+        OpusVoice::Pcm back = OpusVoice::decode(en.ogg, 16000, 0);
+        qint64 en2 = 0;
+        const qint16 *bp = reinterpret_cast<const qint16 *>(back.data.constData());
+        for (int i = 0; i < back.frames(); ++i) en2 += qAbs(int(bp[i]));
+        check(back.frames() > 13000 && back.frames() ? (en2 / back.frames() > 800) : false, "round-trip encode->decode keeps the tone");
     }
 
     say(failures ? QString::fromLatin1("%1 FAILURE(S)").arg(failures) : QLatin1String("all passed"));
@@ -460,6 +531,16 @@ private:
                 .arg(info.photoId ? m_session->downloadPeerPhoto(p, info.photoId, info.photoDcId, QString::fromLatin1("avatar_%1.jpg").arg(p.id)) : 0));
         }
         else if (cmd == QLatin1String("sendfile") && a.size() >= 3) m_session->sendFile(peerAt(a.at(1)), a.at(2), a.value(3) == QLatin1String("photo"), QStringList(a.mid(4)).join(QLatin1String(" ")));
+        else if (cmd == QLatin1String("sendvoice") && a.size() >= 2) {
+            int secs = a.value(2, QLatin1String("2")).toInt(); if (secs < 1) secs = 2;
+            QByteArray raw;
+            for (int i = 0; i < 16000 * secs; ++i) { qint16 v = qint16(7000.0 * sin(2.0 * 3.14159265 * 300.0 * i / 16000.0)); raw.append(char(v & 0xff)).append(char((v >> 8) & 0xff)); }
+            OpusVoice::Encoded en = OpusVoice::encode(raw, 16000, 1, 0);
+            QFile vf(QLatin1String("voice_test.ogg"));
+            if (vf.open(QIODevice::WriteOnly | QIODevice::Truncate)) { vf.write(en.ogg); vf.close(); }
+            m_session->sendVoice(peerAt(a.at(1)), QLatin1String("voice_test.ogg"), en.durationMs / 1000, en.waveform);
+            say(QString::fromLatin1("[voice] sending %1s (%2 bytes ogg, waveform %3)").arg(secs).arg(en.ogg.size()).arg(en.waveform.size()));
+        }
         else if (cmd == QLatin1String("offline")) m_session->setOnline(false);
         else if (cmd == QLatin1String("online")) m_session->setOnline(true);
         else if (cmd == QLatin1String("disconnect")) m_session->disconnectFromServer();

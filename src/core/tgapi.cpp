@@ -382,6 +382,28 @@ QByteArray TgApi::saveFilePart(qint64 fileId, int part, int totalParts, bool big
     return w.toByteArray();
 }
 
+QByteArray TgApi::sendUploadedVoice(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
+                                    int durationSec, const QByteArray &waveform, qint64 randomId)
+{
+    TlWriter file(64);
+    if (big) file.writeConstructor(Tl::InputFileBig).writeLong(fileId).writeInt(parts).writeString(fileName);
+    else file.writeConstructor(Tl::InputFile).writeLong(fileId).writeInt(parts).writeString(fileName).writeString(QString());
+
+    // documentAttributeAudio with the voice flag (10) and the waveform (flag 2).
+    TlWriter attr(waveform.size() + 32);
+    attr.writeConstructor(Tl::DocumentAttributeAudio).writeInt((1 << 10) | (1 << 2)).writeInt(durationSec).writeBytes(waveform);
+
+    TlWriter media(attr.length() + 64);
+    media.writeConstructor(Tl::InputMediaUploadedDocument).writeInt(0)
+         .writeRaw(file.toByteArray()).writeString(QLatin1String("audio/ogg"))
+         .writeConstructor(Tl::Vector).writeInt(1).writeRaw(attr.toByteArray());
+
+    TlWriter w(media.length() + 96);
+    w.writeConstructor(Tl::MessagesSendMedia).writeInt(0).writeRaw(inputPeer(peer)).writeRaw(media.toByteArray())
+     .writeString(QString()).writeLong(randomId);
+    return w.toByteArray();
+}
+
 QByteArray TgApi::sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
                                     bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId)
 {

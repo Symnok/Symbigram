@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 0.1.16
+VERSION = 0.1.25
 
 QT += core gui network declarative
 
@@ -21,7 +21,9 @@ HEADERS += \
     src/app/messagesmodel.h \
     src/app/notifier.h \
     src/app/mediacache.h \
-    src/app/qrimageprovider.h
+    src/app/qrimageprovider.h \
+    src/app/voiceplayer.h \
+    src/app/voicerecorder.h
 
 SOURCES += \
     src/main.cpp \
@@ -30,7 +32,9 @@ SOURCES += \
     src/app/messagesmodel.cpp \
     src/app/notifier.cpp \
     src/app/mediacache.cpp \
-    src/app/qrimageprovider.cpp
+    src/app/qrimageprovider.cpp \
+    src/app/voiceplayer.cpp \
+    src/app/voicerecorder.cpp
 
 RESOURCES += qml.qrc translations.qrc
 
@@ -49,7 +53,7 @@ symbian {
     # notifier so that tapping a popup brings this app forward.
     TARGET.UID3 = 0xE4B1C2D3
     DEFINES += SGM_UID3=0xE4B1C2D3
-    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData
+    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData UserEnvironment
     # The TL schema table, the DH arithmetic and a few chats' worth of messages: a roomy heap.
     TARGET.EPOCHEAPSIZE = 0x020000 0x4000000
     TARGET.EPOCSTACKSIZE = 0x14000
@@ -58,6 +62,7 @@ symbian {
     # Notifier: discreet popups (avkon), the "new messages" global query + status-bar
     # envelope (aknnotify), vibration (hwrm), bringing the app forward (apgrfx, ws32).
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
+    LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
 
     # Qt Quick Components for Symbian (built into Belle; Anna gets them through the Smart
