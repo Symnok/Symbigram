@@ -14,6 +14,13 @@ Item {
     signal openImage(string path, int row)
 
     property int maxBubbleWidth: width * 0.82
+    // "29s" under a minute, "M:SS" above; blank when no self-destruct timer.
+    function burnText(s) {
+        if (s < 0) return ""
+        if (s < 60) return s + "s"
+        var m = Math.floor(s / 60), ss = s % 60
+        return m + ":" + (ss < 10 ? "0" + ss : ss)
+    }
     property bool isPhoto: model.mediaKind == "photo" || model.mediaKind == "sticker" || model.mediaKind == "gif"
     property bool hasFileRow: model.mediaKind != "" && !isPhoto
 
@@ -217,6 +224,20 @@ Item {
                 id: timeRow
                 anchors { right: parent.right; bottom: parent.bottom; margins: platformStyle.paddingSmall }
                 spacing: platformStyle.paddingSmall
+                Rectangle {
+                    // a small "burning" dot next to the self-destruct countdown
+                    visible: model.secretBurn === true && model.secretRemaining >= 0
+                    width: 8; height: 8; radius: 4
+                    color: "#ffb14e"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Label {
+                    visible: model.secretBurn === true && model.secretRemaining >= 0
+                    text: root.burnText(model.secretRemaining)
+                    font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                    font.bold: true
+                    color: "#ffb14e"
+                }
                 Label {
                     text: (model.edited ? qsTr("edited") + ", " : "") + model.timeText
                     font.pixelSize: platformStyle.fontSizeSmall * 0.85

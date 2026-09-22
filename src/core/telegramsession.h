@@ -110,7 +110,9 @@ public:
     qint64 sendSecretText(int id, const QString &text);
     void setSecretTtl(int id, int seconds);
     /// The in-memory message buffer of a secret chat (device-local, lost on restart).
-    QList<TgMessage> secretHistory(int id) const { return m_secretHistory.value(id); }
+    QList<TgSecretMsg> secretHistory(int id) const { return m_secretHistory.value(id); }
+    /// Called when a self-destructing message is first shown, to start its countdown.
+    void startSecretExpiry(int id, qint64 randomId);
     QByteArray secretKeyHash(int id) const;
 
     // -- files --
@@ -164,7 +166,8 @@ signals:
     void secretChatRequested(int id, qint64 userId);
     void secretChatReady(int id);
     void secretChatDiscarded(int id);
-    void secretMessageReceived(int id, qint64 randomId, const QString &text, int date, bool out);
+    void secretMessageReceived(int id, qint64 randomId, const QString &text, int date, bool out, int ttl);
+    void secretMessageExpired(int id, qint64 randomId);
     void secretMessageSent(int id, qint64 randomId, int date);
     void secretMessageFailed(int id, qint64 randomId, const QString &error);
 
@@ -179,6 +182,7 @@ private slots:
     void onQrPoll();
     void onSrpDone();
     void onSaveTimer();
+    void onSecretExpiryTick();
     void onLogOutTimeout();
     void onDcConnected();
     void onDcDisconnected(const QString &reason);
@@ -240,7 +244,8 @@ private:
     void handleEncryptedChat(const TlObject &chat);
     void handleEncryptedMessage(const TlObject &message, int date);
     void sendSecretService(SecretChat *chat, const QByteArray &body);
-    void appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
+    void appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl);
+    void ensureSecretExpiryTimer();
     void loadSecrets();
     void saveSecrets();
     QString secretFilePath() const;
@@ -349,8 +354,9 @@ private:
     bool m_dhReady;
     QList<TgPeer> m_secretRequestQueue;   // peers waiting for the DH config to request
     QList<int> m_secretAcceptQueue;       // chat ids waiting for the DH config to accept
-    QHash<int, QList<TgMessage> > m_secretHistory;   // secret messages, in memory only
+    QHash<int, QList<TgSecretMsg> > m_secretHistory;  // secret messages, in memory only
     QHash<int, QSet<qint64> > m_secretSeen;          // random ids already delivered (redelivery dedup)
+    QTimer *m_secretExpiryTimer;                     // sweeps self-destructing messages once a second
 };
 
 #endif // TELEGRAMSESSION_H

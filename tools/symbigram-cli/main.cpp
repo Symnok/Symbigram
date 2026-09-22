@@ -296,9 +296,10 @@ public:
         connect(m_session, SIGNAL(secretChatRequested(int,qint64)), this, SLOT(onSecretRequested(int,qint64)));
         connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
         connect(m_session, SIGNAL(secretChatDiscarded(int)), this, SLOT(onSecretDiscarded(int)));
-        connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
+        connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool,int)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool,int)));
         connect(m_session, SIGNAL(secretMessageSent(int,qint64,int)), this, SLOT(onSecretSent(int,qint64,int)));
         connect(m_session, SIGNAL(secretMessageFailed(int,qint64,QString)), this, SLOT(onSecretFailed(int,qint64,QString)));
+        connect(m_session, SIGNAL(secretMessageExpired(int,qint64)), this, SLOT(onSecretExpired(int,qint64)));
         connect(m_session, SIGNAL(notice(QString)), this, SLOT(onNotice(QString)));
         connect(m_session, SIGNAL(log(QString)), this, SLOT(onLog(QString)));
 
@@ -354,9 +355,10 @@ private slots:
     void onSecretRequested(int id, qint64 userId) { say(QString::fromLatin1("[secret] incoming request, chat %1 from user %2 - 'acceptsecret %1' to accept").arg(id).arg(userId)); }
     void onSecretReady(int id) { say(QString::fromLatin1("[secret] chat %1 is ready (key hash %2)").arg(id).arg(QString::fromLatin1(m_session->secretChat(id).keyHash.left(8).toHex()))); }
     void onSecretDiscarded(int id) { say(QString::fromLatin1("[secret] chat %1 discarded").arg(id)); }
-    void onSecretMessage(int id, qint64 rid, const QString &text, int date, bool out) { say(QString::fromLatin1("[secret %1] %2 %3: %4").arg(id).arg(QDateTime::fromTime_t(date).toString(QLatin1String("HH:mm:ss"))).arg(out ? QLatin1String("me") : QLatin1String("them")).arg(text)); Q_UNUSED(rid); }
+    void onSecretMessage(int id, qint64 rid, const QString &text, int date, bool out, int ttl) { Q_UNUSED(ttl); say(QString::fromLatin1("[secret %1] %2 %3: %4").arg(id).arg(QDateTime::fromTime_t(date).toString(QLatin1String("HH:mm:ss"))).arg(out ? QLatin1String("me") : QLatin1String("them")).arg(text)); Q_UNUSED(rid); }
     void onSecretSent(int id, qint64 rid, int date) { say(QString::fromLatin1("[secret %1] sent (random %2, date %3)").arg(id).arg(rid).arg(date)); }
     void onSecretFailed(int id, qint64 rid, const QString &e) { say(QString::fromLatin1("[secret %1] send failed: %2").arg(id).arg(e)); Q_UNUSED(rid); }
+    void onSecretExpired(int id, qint64 rid) { say(QString::fromLatin1("[secret %1] message %2 self-destructed").arg(id).arg(rid)); }
     void onNotice(const QString &n) { say(QLatin1String("[notice] ") + n); }
     void onLog(const QString &l) { say(QLatin1String("  . ") + l); }
 

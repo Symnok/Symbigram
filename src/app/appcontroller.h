@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QString>
+#include <QStringList>
 
 class TelegramSession;
 class ChatsModel;
@@ -47,6 +48,10 @@ class AppController : public QObject
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
     Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
+    Q_PROPERTY(QStringList downloadDrives READ downloadDrives NOTIFY settingsChanged)
+    Q_PROPERTY(int downloadDriveIndex READ downloadDriveIndex WRITE setDownloadDriveIndex NOTIFY settingsChanged)
+    Q_PROPERTY(QString downloadFolder READ downloadFolder NOTIFY settingsChanged)
+    Q_PROPERTY(bool downloadCustom READ downloadCustom NOTIFY settingsChanged)
     Q_PROPERTY(QString myName READ myName NOTIFY selfChanged)
     Q_PROPERTY(QString mySubtitle READ mySubtitle NOTIFY selfChanged)
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
@@ -89,6 +94,11 @@ public:
     void setAutoConnect(bool on);
     bool logging() const;
     void setLogging(bool on);
+    QStringList downloadDrives() const;            // friendly labels of the present drives
+    int downloadDriveIndex() const;                // index into downloadDrives()
+    void setDownloadDriveIndex(int index);
+    QString downloadFolder() const;                // the resolved path (custom, or <drive>/.../Symbigram)
+    bool downloadCustom() const;                   // true if a folder was picked instead of a drive
     QString myName() const;
     QString mySubtitle() const;
     ChatsModel *chats() const { return m_chats; }
@@ -120,6 +130,8 @@ public slots:
     void attachFile(bool asPhoto);
     /// Starts an end-to-end secret chat with the person of an existing 1:1 chat.
     void startSecretChat(const QString &peerKey);
+    /// Opens a native folder picker so the user can choose any download folder.
+    void chooseDownloadFolder();
     void openUrl(const QString &url);
     void copyText(const QString &text);
     void clearNotice();
@@ -155,7 +167,7 @@ private slots:
     void onNotice(const QString &text);
     void onSecretRequested(int id, qint64 adminId);
     void onSecretReady(int id);
-    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
+    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl);
 
 private:
     void setState(const QString &s);
@@ -165,6 +177,9 @@ private:
     void connectSession();
     bool appInForeground() const;
     static QString dataDir();
+    static QStringList presentDriveLetters();      // among C:, E:, F: which exist
+    static QString folderForDrive(const QString &drive);
+    void applyDownloadFolder();                    // create it + hand it to the chat model
 
     QSettings m_settings;
     TelegramSession *m_session;

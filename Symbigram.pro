@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 0.1.11
+VERSION = 0.1.14
 
 QT += core gui network declarative
 

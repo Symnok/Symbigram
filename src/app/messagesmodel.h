@@ -64,7 +64,9 @@ public:
         MediaInfoRole,      // "1.2 MB", "0:12", "video 0:30" - the caption line for non-photos
         MediaWidthRole,
         MediaHeightRole,
-        LocalPathRole       // the full downloaded file, once it exists
+        LocalPathRole,      // the full downloaded file, once it exists
+        SecretBurnRole,     // true if this message self-destructs
+        SecretRemainingRole // seconds left before it self-destructs (-1 = none)
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -117,6 +119,8 @@ public:
     Q_INVOKABLE bool canDeleteForEveryone(int row) const;
     /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
     void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto);
+    /// AppController sets this to the user-chosen drive folder; empty = platform default.
+    void setDownloadFolder(const QString &dir) { m_downloadFolder = dir; }
 
 signals:
     void chatChanged();
@@ -126,6 +130,7 @@ signals:
     void messageAppended();
     void olderPrepended(int count);
     void sendFailed(const QString &error);
+    void mediaSaved(const QString &path);   // a file was copied out; path is where
 
 private slots:
     void onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
@@ -140,7 +145,9 @@ private slots:
     void onPeerTypingIdle();
     void onPeerChanged(const TgPeer &peer);
     void onReadOutbox(const TgPeer &peer, int maxId);
-    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out);
+    void onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl);
+    void onSecretExpired(int id, qint64 randomId);
+    void onBurnTick();
     void onSecretChatsChanged();
     void onMediaReady(const QString &key, const QString &path);
     void onMediaFailed(const QString &key, const QString &error);
@@ -149,7 +156,7 @@ private slots:
 private:
     struct Row
     {
-        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), progress(0) {}
+        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), progress(0), ttl(0), expiresAt(0) {}
         TgMessage m;
         qint64 randomId;      // outgoing: for matching the send result
         bool pending;
@@ -160,9 +167,14 @@ private:
         bool mediaLoading;
         bool mediaFailed;
         int progress;
+        int ttl;              // secret self-destruct seconds (0 = none)
+        int expiresAt;        // unix time it self-destructs (0 = not started)
     };
     void prepareMedia(Row &r);
     void openSecret(int id);
+    bool anyBurning() const;   // any visible message counting down?
+    /// The user-visible folder saved files go to (drive-aware on Symbian).
+    static QString downloadDir(bool photo);
     int rowByKey(const QString &key) const;
     static QString mediaKindName(TgMedia::Kind k);
     QString mediaInfoText(const TgMedia &m) const;
@@ -176,7 +188,8 @@ private:
     TelegramSession *m_session;
     MediaCache *m_media;
     TgPeer m_peer;
-    int m_secretId;          // non-zero when the open chat is a secret (end-to-end) chat
+    int m_secretId;
+    QString m_downloadFolder;   // where "Save" copies files (chosen in Settings)          // non-zero when the open chat is a secret (end-to-end) chat
     QList<Row> m_rows;
     bool m_loading;
     bool m_hasOlder;
@@ -184,6 +197,7 @@ private:
     int m_readOutboxMaxId;
     QTimer *m_typingTimer;
     QTimer *m_peerTypingTimer;
+    QTimer *m_burnTimer;                    // ticks the self-destruct countdowns while a secret chat is open
     bool m_typingSent;
     QTime m_typingSentAt;
     qint64 m_peerTypingUser;

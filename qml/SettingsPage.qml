@@ -40,6 +40,30 @@ Page {
         onAccepted: if (selectedIndex >= 0) app.language = model.get(selectedIndex).code
     }
 
+    SelectionDialog {
+        id: downloadsDialog
+        titleText: qsTr("Save downloads to")
+        // the present drives, then a "Choose folder..." entry that opens the native picker
+        model: app.downloadDrives.concat([qsTr("Choose folder...")])
+        delegate: Item {
+            width: parent ? parent.width : 300
+            height: (typeof privateStyle != "undefined") ? privateStyle.menuItemHeight : 56
+            Rectangle { anchors.fill: parent; color: dlMouse.pressed ? "#3d5a80" : "transparent" }
+            Label {
+                anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+                text: modelData + (index == app.downloadDriveIndex && !app.downloadCustom ? "   *" : "")
+                color: index == app.downloadDrives.length ? "#8fd1ff" : "white"
+                elide: Text.ElideRight
+            }
+            MouseArea { id: dlMouse; anchors.fill: parent; onClicked: { downloadsDialog.selectedIndex = index; downloadsDialog.accept() } }
+        }
+        onAccepted: {
+            if (selectedIndex < 0) return
+            if (selectedIndex == app.downloadDrives.length) app.chooseDownloadFolder()
+            else app.downloadDriveIndex = selectedIndex
+        }
+    }
+
     function languageName() {
         for (var i = 0; i < languageDialog.model.count; ++i)
             if (languageDialog.model.get(i).code == app.language)
@@ -158,6 +182,32 @@ Page {
                 }
                 onClicked: autoSwitch.checked = !autoSwitch.checked
             }
+            ListItem {
+                id: downloadsItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: downloadsItem.paddingItem.left; right: downloadsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Save downloads to") }
+                    Label {
+                        width: parent.width
+                        text: app.downloadFolder
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideMiddle
+                    }
+                }
+                onClicked: { downloadsDialog.selectedIndex = app.downloadDriveIndex; downloadsDialog.open() }
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("Saved photos and files go here. Pick a drive, or \"Choose folder...\" for any folder.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
+
             ListItem {
                 id: logItem
                 ListItemText {

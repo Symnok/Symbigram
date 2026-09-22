@@ -47,6 +47,19 @@ Page {
 
     function reopen() { var k = chat.peerKey; chat.close(); chat.open(k) }
 
+    Connections {
+        target: chat
+        onMediaSaved: { savedDialog.path = path; savedDialog.open() }
+    }
+
+    QueryDialog {
+        id: savedDialog
+        property string path: ""
+        titleText: qsTr("Saved")
+        message: qsTr("File saved to: %1").arg(path)
+        acceptButtonText: qsTr("OK")
+    }
+
     QueryDialog {
         id: discardDialog
         titleText: qsTr("Delete secret chat")

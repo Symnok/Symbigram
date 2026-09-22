@@ -52,6 +52,10 @@ TelegramSession::TelegramSession(QObject *parent)
     m_saveTimer = new QTimer(this);
     m_saveTimer->setInterval(SaveIntervalMs);
     connect(m_saveTimer, SIGNAL(timeout()), this, SLOT(onSaveTimer()));
+
+    m_secretExpiryTimer = new QTimer(this);
+    m_secretExpiryTimer->setInterval(1000);
+    connect(m_secretExpiryTimer, SIGNAL(timeout()), this, SLOT(onSecretExpiryTick()));
 }
 
 TelegramSession::~TelegramSession()
@@ -164,6 +168,7 @@ void TelegramSession::forgetSession(const QString &reason)
     m_secretChats.clear();
     m_secretHistory.clear();
     m_secretSeen.clear();
+    m_secretExpiryTimer->stop();
     m_dhReady = false;
     if (!m_sessionFile.isEmpty()) QFile::remove(secretFilePath());
     m_peers.clear();
@@ -1730,7 +1735,7 @@ QByteArray TelegramSession::secretKeyHash(int id) const
     return c ? c->keyHash() : QByteArray();
 }
 
-void TelegramSession::appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+void TelegramSession::appendSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl)
 {
     // Telegram redelivers unacknowledged encrypted messages, so drop a random id we have
     // already seen in this chat (our own echo is seen first, then the server delivery).
@@ -1739,13 +1744,55 @@ void TelegramSession::appendSecretMessage(int id, qint64 randomId, const QString
         if (seen.contains(randomId)) return;
         seen.insert(randomId);
     }
-    TgMessage m;
+    TgSecretMsg m;
+    m.randomId = randomId;
     m.text = text;
     m.date = date;
     m.out = out;
     m.fromId = out ? m_selfId : 0;
+    m.ttl = ttl;
+    // Our own outgoing message starts self-destructing as soon as it is sent; an incoming
+    // one starts when it is shown (the model calls startSecretExpiry then).
+    if (ttl > 0 && out) { m.expiresAt = unixNow() + ttl; ensureSecretExpiryTimer(); }
     m_secretHistory[id].append(m);
-    emit secretMessageReceived(id, randomId, text, date, out);
+    emit secretMessageReceived(id, randomId, text, date, out, ttl);
+}
+
+void TelegramSession::startSecretExpiry(int id, qint64 randomId)
+{
+    QList<TgSecretMsg> &buf = m_secretHistory[id];
+    for (int i = 0; i < buf.size(); ++i)
+        if (buf.at(i).randomId == randomId && buf.at(i).ttl > 0 && buf.at(i).expiresAt == 0) {
+            buf[i].expiresAt = unixNow() + buf.at(i).ttl;
+            ensureSecretExpiryTimer();
+            return;
+        }
+}
+
+void TelegramSession::ensureSecretExpiryTimer()
+{
+    if (!m_secretExpiryTimer->isActive()) m_secretExpiryTimer->start();
+}
+
+void TelegramSession::onSecretExpiryTick()
+{
+    int now = unixNow();
+    bool anyPending = false;
+    for (QHash<int, QList<TgSecretMsg> >::iterator it = m_secretHistory.begin(); it != m_secretHistory.end(); ++it) {
+        QList<TgSecretMsg> &buf = it.value();
+        for (int i = buf.size() - 1; i >= 0; --i) {
+            if (buf.at(i).expiresAt <= 0) continue;
+            if (now >= buf.at(i).expiresAt) {
+                qint64 rid = buf.at(i).randomId;
+                int id = it.key();
+                buf.removeAt(i);
+                emit secretMessageExpired(id, rid);
+            } else {
+                anyPending = true;
+            }
+        }
+    }
+    if (!anyPending) m_secretExpiryTimer->stop();
 }
 
 void TelegramSession::requestSecretChat(const TgPeer &user)
@@ -1810,7 +1857,7 @@ qint64 TelegramSession::sendSecretText(int id, const QString &text)
     send(SendEncrypted, TgApi::sendEncrypted(id, chat->accessHash(), rid, data), rq);
     saveSecrets();
     // Optimistic local echo, matched to the ack by random id.
-    appendSecretMessage(id, rid, text, unixNow(), true);
+    appendSecretMessage(id, rid, text, unixNow(), true, chat->ttl());
     return rid;
 }
 
@@ -1892,7 +1939,7 @@ void TelegramSession::handleEncryptedMessage(const TlObject &message, int date)
         int when = message.intOr("date", date);
         switch (c.kind) {
         case SecretContent::Text:
-            appendSecretMessage(id, c.randomId, c.text, when, false);
+            appendSecretMessage(id, c.randomId, c.text, when, false, c.ttl);
             break;
         case SecretContent::SetTtl:
             chat->setTtl(c.ttl);

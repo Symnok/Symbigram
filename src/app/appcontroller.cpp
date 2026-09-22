@@ -42,6 +42,8 @@ namespace
     const char *const KeyPopups = "ui/popups";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyLogging = "ui/logging";
+    const char *const KeyDownloadDrive = "downloads/drive";
+    const char *const KeyDownloadCustom = "downloads/folder";
     const int ReconnectMinMs = 5000;
     const int ReconnectMaxMs = 60000;
 
@@ -79,6 +81,7 @@ AppController::AppController(QObject *parent)
     m_media->setDirectory(dataDir() + QLatin1String("/media"));
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
+    applyDownloadFolder();
     m_notifier = new Notifier(this);
     m_notifier->setEnabled(notifications());
     m_notifier->setVibrate(vibrate());
@@ -96,7 +99,7 @@ AppController::AppController(QObject *parent)
     connect(m_session, SIGNAL(peerResolved(TgPeer)), this, SLOT(onPeerResolved(TgPeer)));
     connect(m_session, SIGNAL(secretChatRequested(int,qint64)), this, SLOT(onSecretRequested(int,qint64)));
     connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
-    connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
+    connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool,int)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool,int)));
     connect(m_session, SIGNAL(resolveFailed(QString)), this, SLOT(onResolveFailed(QString)));
     connect(m_session, SIGNAL(notice(QString)), this, SLOT(onNotice(QString)));
     connect(m_session, SIGNAL(log(QString)), this, SLOT(onSessionLog(QString)));
@@ -219,6 +222,100 @@ void AppController::setLogging(bool on)
     loggingEnabled = on;
     if (!on) { logLines().clear(); emit logChanged(); }   // stop collecting and empty the ring
     emit settingsChanged();
+}
+
+// -- download folder (Settings: which drive receives saved files) ----------------------------------
+
+QStringList AppController::presentDriveLetters()
+{
+    QStringList out;
+    const char *const cands[] = { "C:", "E:", "F:" };
+    for (int i = 0; i < 3; ++i) {
+        QString d = QLatin1String(cands[i]);
+        if (QDir(d + QLatin1String("/")).exists()) out << d;
+    }
+    if (out.isEmpty()) out << QLatin1String("C:");
+    return out;
+}
+
+QString AppController::folderForDrive(const QString &drive)
+{
+    // C: keeps files in the user area (C:\Data); a card/mass drive uses its root.
+    if (drive == QLatin1String("C:")) return QLatin1String("C:/Data/Symbigram");
+    return drive + QLatin1String("/Symbigram");
+}
+
+QStringList AppController::downloadDrives() const
+{
+    QStringList letters = presentDriveLetters();
+    QStringList labels;
+    for (int i = 0; i < letters.size(); ++i) {
+        QString d = letters.at(i);
+        QString name = d == QLatin1String("C:") ? tr("Phone memory")
+                     : d == QLatin1String("E:") ? tr("Mass memory")
+                     : tr("Memory card");
+        labels << QString::fromLatin1("%1 (%2)").arg(name, d);
+    }
+    return labels;
+}
+
+int AppController::downloadDriveIndex() const
+{
+    QStringList letters = presentDriveLetters();
+    QString sel = m_settings.value(QLatin1String(KeyDownloadDrive)).toString();
+    int i = letters.indexOf(sel);
+    if (i >= 0) return i;
+    // Default: prefer a card / mass memory (last present non-C:), else phone memory.
+    for (int j = letters.size() - 1; j >= 0; --j) if (letters.at(j) != QLatin1String("C:")) return j;
+    return 0;
+}
+
+void AppController::setDownloadDriveIndex(int index)
+{
+    QStringList letters = presentDriveLetters();
+    if (index < 0 || index >= letters.size()) return;
+    m_settings.setValue(QLatin1String(KeyDownloadDrive), letters.at(index));
+    m_settings.remove(QLatin1String(KeyDownloadCustom));   // a drive choice overrides a picked folder
+    applyDownloadFolder();
+    emit settingsChanged();
+}
+
+QString AppController::downloadFolder() const
+{
+    QString custom = m_settings.value(QLatin1String(KeyDownloadCustom)).toString();
+    if (!custom.isEmpty()) return QDir::toNativeSeparators(custom);
+    QStringList letters = presentDriveLetters();
+    int i = downloadDriveIndex();
+    return QDir::toNativeSeparators(folderForDrive(letters.at(i)));
+}
+
+bool AppController::downloadCustom() const
+{
+    return !m_settings.value(QLatin1String(KeyDownloadCustom)).toString().isEmpty();
+}
+
+void AppController::chooseDownloadFolder()
+{
+    QString start = m_settings.value(QLatin1String(KeyDownloadCustom)).toString();
+    if (start.isEmpty()) { QStringList l = presentDriveLetters(); start = folderForDrive(l.at(downloadDriveIndex())); }
+    QDir().mkpath(start);
+    QString dir = QFileDialog::getExistingDirectory(0, tr("Choose download folder"), start);
+    if (dir.isEmpty()) return;                       // cancelled
+    m_settings.setValue(QLatin1String(KeyDownloadCustom), QDir::fromNativeSeparators(dir));
+    applyDownloadFolder();
+    emit settingsChanged();
+}
+
+void AppController::applyDownloadFolder()
+{
+    // Make sure a Symbigram folder exists on every present drive, and point the chat model
+    // at the chosen one.
+    QStringList letters = presentDriveLetters();
+    for (int i = 0; i < letters.size(); ++i) QDir().mkpath(folderForDrive(letters.at(i)));
+    QString custom = m_settings.value(QLatin1String(KeyDownloadCustom)).toString();
+    QString chosen = custom.isEmpty() ? folderForDrive(letters.at(downloadDriveIndex())) : custom;
+    QDir().mkpath(chosen);
+    if (m_chat) m_chat->setDownloadFolder(chosen);
 }
 QString AppController::myName() const { return m_session->selfName(); }
 
@@ -483,9 +580,9 @@ void AppController::onSecretReady(int id)
     setNotice(tr("Secret chat is ready."));
 }
 
-void AppController::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+void AppController::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl)
 {
-    Q_UNUSED(randomId); Q_UNUSED(date);
+    Q_UNUSED(randomId); Q_UNUSED(date); Q_UNUSED(ttl);
     if (out) return;
     const QString key = QLatin1String("secret:") + QString::number(id);
     const bool foreground = appInForeground();

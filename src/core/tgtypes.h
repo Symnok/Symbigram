@@ -139,6 +139,20 @@ struct TgSecretChat
     QString key() const { return QLatin1String("secret:") + QString::number(id); }
 };
 
+// A message inside a secret chat (device-local, in memory only). Carries the self-destruct
+// timer so the UI can count down and drop it when it expires.
+struct TgSecretMsg
+{
+    TgSecretMsg() : randomId(0), date(0), out(false), fromId(0), ttl(0), expiresAt(0) {}
+    qint64 randomId;
+    QString text;
+    int date;
+    bool out;
+    qint64 fromId;
+    int ttl;          // self-destruct seconds carried by the message (0 = no timer)
+    int expiresAt;    // unix time it self-destructs; 0 = timer not started yet
+};
+
 /// The server's update sequence position.
 struct TgUpdateState
 {

@@ -50,6 +50,8 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[MediaWidthRole] = "mediaWidth";
     roles[MediaHeightRole] = "mediaHeight";
     roles[LocalPathRole] = "localPath";
+    roles[SecretBurnRole] = "secretBurn";
+    roles[SecretRemainingRole] = "secretRemaining";
     setRoleNames(roles);
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onMediaReady(QString,QString)));
     connect(media, SIGNAL(failed(QString,QString)), this, SLOT(onMediaFailed(QString,QString)));
@@ -67,7 +69,8 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     connect(session, SIGNAL(dialogChanged(TgPeer)), this, SLOT(onPeerChanged(TgPeer)));
     connect(session, SIGNAL(readOutbox(TgPeer,int)), this, SLOT(onReadOutbox(TgPeer,int)));
     connect(session, SIGNAL(stateChanged()), this, SIGNAL(peerChanged()));
-    connect(session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool)));
+    connect(session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool,int)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool,int)));
+    connect(session, SIGNAL(secretMessageExpired(int,qint64)), this, SLOT(onSecretExpired(int,qint64)));
     connect(session, SIGNAL(secretChatsChanged()), this, SLOT(onSecretChatsChanged()));
 
     m_typingTimer = new QTimer(this);
@@ -78,6 +81,10 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     m_peerTypingTimer->setSingleShot(true);
     m_peerTypingTimer->setInterval(PeerTypingMs);
     connect(m_peerTypingTimer, SIGNAL(timeout()), this, SLOT(onPeerTypingIdle()));
+
+    m_burnTimer = new QTimer(this);
+    m_burnTimer->setInterval(1000);
+    connect(m_burnTimer, SIGNAL(timeout()), this, SLOT(onBurnTick()));
 }
 
 int MessagesModel::rowCount(const QModelIndex &parent) const
@@ -146,6 +153,8 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     case MediaWidthRole: return m.media.width;
     case MediaHeightRole: return m.media.height;
     case LocalPathRole: return r.fullPath;
+    case SecretBurnRole: return r.ttl > 0;
+    case SecretRemainingRole: return r.expiresAt > 0 ? qMax(0, r.expiresAt - now()) : -1;
     default: return QVariant();
     }
 }
@@ -230,16 +239,37 @@ void MessagesModel::downloadMedia(int row)
     emit dataChanged(index(row), index(row));
 }
 
+QString MessagesModel::downloadDir(bool photo)
+{
+#ifdef Q_OS_SYMBIAN
+    // QDesktopServices on Symbian can hand back the app's private cage (invisible to the
+    // file manager and Gallery), so choose an explicit, user-visible drive instead. Prefer
+    // mass memory / a memory card (E:/F:), then phone memory (C:\Data). Photos go to an
+    // Images folder so the Gallery picks them up.
+    QString drive;
+    const char *const cands[] = { "E:", "F:", "C:" };
+    for (int i = 0; i < 3; ++i) {
+        QString d = QLatin1String(cands[i]);
+        if (QDir(d + QLatin1String("/")).exists()) { drive = d; break; }
+    }
+    if (drive.isEmpty()) drive = QLatin1String("C:");
+    QString root = (drive == QLatin1String("C:")) ? QLatin1String("C:/Data") : drive;
+    return photo ? (root + QLatin1String("/Images/Symbigram")) : (root + QLatin1String("/Symbigram"));
+#else
+    QString base = photo ? QDesktopServices::storageLocation(QDesktopServices::PicturesLocation)
+                         : QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    if (base.isEmpty()) base = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    if (base.isEmpty()) base = QDir::homePath();
+    return base + QLatin1String("/Symbigram");
+#endif
+}
+
 void MessagesModel::saveMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
     Row &r = m_rows[row];
     if (r.fullPath.isEmpty()) { downloadMedia(row); return; }
-    QString base = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
-    if (r.m.media.kind != TgMedia::Photo || base.isEmpty())
-        base = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-    if (base.isEmpty()) base = QDir::homePath();
-    base += QLatin1String("/Symbigram");
+    QString base = m_downloadFolder.isEmpty() ? downloadDir(r.m.media.kind == TgMedia::Photo) : m_downloadFolder;
     QDir().mkpath(base);
     QString name = r.m.media.fileName.isEmpty() ? QFileInfo(r.fullPath).fileName() : r.m.media.fileName;
     QString target = base + QLatin1Char('/') + name;
@@ -247,8 +277,13 @@ void MessagesModel::saveMedia(int row)
         QFileInfo fi(base + QLatin1Char('/') + name);
         target = QString::fromLatin1("%1/%2 (%3).%4").arg(base, fi.completeBaseName()).arg(n).arg(fi.suffix());
     }
-    if (QFile::copy(r.fullPath, target)) emit sendFailed(tr("Saved to %1").arg(QDir::toNativeSeparators(target)));
-    else emit sendFailed(tr("Could not save the file."));
+    if (QFile::copy(r.fullPath, target)) {
+        QString shown = QDir::toNativeSeparators(target);
+        qDebug("tg: saved attachment to %s", qPrintable(shown));
+        emit mediaSaved(shown);
+    } else {
+        emit sendFailed(tr("Could not save the file to %1").arg(QDir::toNativeSeparators(base)));
+    }
 }
 
 void MessagesModel::openMedia(int row)
@@ -456,9 +491,21 @@ void MessagesModel::openSecret(int id)
     TgPeer u; u.kind = TgPeer::User; u.id = sc.peerUserId;
     m_peer = m_session->peers().withHash(u);
     m_rows.clear();
-    QList<TgMessage> hist = m_session->secretHistory(id);
-    for (int i = 0; i < hist.size(); ++i) { Row r; r.m = hist.at(i); m_rows.append(r); }
+    QList<TgSecretMsg> hist = m_session->secretHistory(id);
+    for (int i = 0; i < hist.size(); ++i) {
+        const TgSecretMsg &sm = hist.at(i);
+        Row r;
+        r.m.text = sm.text; r.m.out = sm.out; r.m.date = sm.date; r.m.fromId = sm.fromId;
+        r.randomId = sm.randomId; r.ttl = sm.ttl; r.expiresAt = sm.expiresAt;
+        // An incoming self-destructing message whose timer has not started is now on screen.
+        if (r.ttl > 0 && !r.m.out && r.expiresAt == 0) {
+            r.expiresAt = now() + r.ttl;
+            m_session->startSecretExpiry(id, r.randomId);
+        }
+        m_rows.append(r);
+    }
     endResetModel();
+    if (anyBurning()) m_burnTimer->start();
     m_error.clear();
     m_loading = false;
     m_hasOlder = false;
@@ -474,6 +521,7 @@ void MessagesModel::close()
     if (m_typingSent) { m_session->setTyping(m_peer, false); m_typingSent = false; }
     m_typingTimer->stop();
     m_peerTypingTimer->stop();
+    m_burnTimer->stop();
     beginResetModel();
     m_peer = TgPeer();
     m_secretId = 0;
@@ -797,20 +845,61 @@ void MessagesModel::setSecretTtl(int seconds)
     if (m_secretId) m_session->setSecretTtl(m_secretId, seconds);
 }
 
-void MessagesModel::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out)
+void MessagesModel::onSecretMessage(int id, qint64 randomId, const QString &text, int date, bool out, int ttl)
 {
-    Q_UNUSED(randomId);
     if (id != m_secretId) return;
     Row r;
     r.m.text = text;
     r.m.out = out;
     r.m.date = date;
     r.m.fromId = out ? m_session->selfId() : m_peer.id;
+    r.randomId = randomId;
+    r.ttl = ttl;
+    if (ttl > 0) {
+        // Outgoing already started on send (session set it); an incoming one starts now that
+        // it is on screen (the open chat).
+        r.expiresAt = now() + ttl;
+        if (!out) m_session->startSecretExpiry(id, randomId);
+        m_burnTimer->start();
+    }
     beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
     m_rows.append(r);
     endInsertRows();
     emit countChanged();
     emit messageAppended();
+}
+
+void MessagesModel::onSecretExpired(int id, qint64 randomId)
+{
+    if (id != m_secretId) return;
+    for (int i = 0; i < m_rows.size(); ++i) {
+        if (m_rows.at(i).randomId == randomId && m_rows.at(i).ttl > 0) {
+            beginRemoveRows(QModelIndex(), i, i);
+            m_rows.removeAt(i);
+            endRemoveRows();
+            emit countChanged();
+            break;
+        }
+    }
+    if (!anyBurning()) m_burnTimer->stop();
+}
+
+void MessagesModel::onBurnTick()
+{
+    bool any = false;
+    for (int i = 0; i < m_rows.size(); ++i) {
+        if (m_rows.at(i).expiresAt > 0) {
+            any = true;
+            emit dataChanged(index(i), index(i));
+        }
+    }
+    if (!any) m_burnTimer->stop();
+}
+
+bool MessagesModel::anyBurning() const
+{
+    for (int i = 0; i < m_rows.size(); ++i) if (m_rows.at(i).expiresAt > 0) return true;
+    return false;
 }
 
 void MessagesModel::onSecretChatsChanged()
