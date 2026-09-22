@@ -14,6 +14,27 @@ QString TgPeer::key() const
     return QLatin1String(k) + QLatin1Char(':') + QString::number(id);
 }
 
+bool TgFolder::contains(const TgDialog &d, const TgPeerInfo &info, int now) const
+{
+    QString key = d.peer.key();
+    // Named chats win over categories in both directions.
+    if (exclude.contains(key)) return false;
+    if (pinned.contains(key)) return true;
+    if (include.contains(key)) return true;
+    if (listedOnly) return false;                 // a shared folder is only what it names
+    if (excludeArchived && d.archived) return false;
+    if (excludeMuted && d.isMuted(now)) return false;
+    if (excludeRead && d.unreadCount == 0) return false;
+    // Category membership. Supergroups and channels are both "channel" on the wire and
+    // cannot be told apart without the megagroup flag, so a folder asking for either takes
+    // both rather than dropping chats the user sees elsewhere.
+    if (d.peer.kind == TgPeer::Chat) return groups;
+    if (d.peer.kind == TgPeer::Channel) return broadcasts || groups;
+    if (info.isBot) return bots;
+    if (info.isContact) return contacts;
+    return nonContacts;
+}
+
 TgPeer TgPeer::fromKey(const QString &key)
 {
     TgPeer p;
@@ -210,15 +231,22 @@ QByteArray TgApi::usersGetUser(const TgPeer &user)
     return w.toByteArray();
 }
 
-QByteArray TgApi::getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit)
+QByteArray TgApi::getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit, int folderId)
 {
-    // folder_id 0 is always sent: leaving it out asks for every folder at once and puts
-    // the archived chats back among the ordinary ones.
+    // folder_id is always sent (bit 1): 0 is the main list (excludes the Archive), 1 is the
+    // Archive. Leaving it out asks for every folder at once and mixes the archived chats in.
     TlWriter w(64);
-    w.writeConstructor(Tl::MessagesGetDialogs).writeInt(1 << 1).writeInt(0)
+    w.writeConstructor(Tl::MessagesGetDialogs).writeInt(1 << 1).writeInt(folderId)
      .writeInt(offsetDate).writeInt(offsetId)
      .writeRaw(offsetPeer.isNull() ? inputPeerEmpty() : inputPeer(offsetPeer))
      .writeInt(limit).writeLong(0);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::getDialogFilters()
+{
+    TlWriter w(4);
+    w.writeConstructor(Tl::MessagesGetDialogFilters);
     return w.toByteArray();
 }
 
@@ -705,7 +733,7 @@ TgMessage TgApi::readShortMessage(const TlObject &u, qint64 selfId)
     return m;
 }
 
-TgDialogPage TgApi::readDialogs(const TlObject &response, TgPeerCache &cache)
+TgDialogPage TgApi::readDialogs(const TlObject &response, TgPeerCache &cache, bool archived)
 {
     TgDialogPage page;
     cache.absorb(response);
@@ -730,6 +758,7 @@ TgDialogPage TgApi::readDialogs(const TlObject &response, TgPeerCache &cache)
         entry.readInboxMaxId = d.intOr("read_inbox_max_id");
         entry.readOutboxMaxId = d.intOr("read_outbox_max_id");
         entry.pinned = d.flag("flags", 2);
+        entry.archived = archived;
         if (d.has("notify_settings")) entry.mutedUntil = d.obj("notify_settings").intOr("mute_until");
         TlObject last = lastMessages.value(entry.peer.key());
         if (!last.isNull()) {
@@ -774,6 +803,67 @@ int TgApi::sentMessageId(const TlObject &updates)
         if (id) return id;
     }
     return 0;
+}
+
+QString TgApi::inputPeerKey(const TlObject &p, qint64 selfId)
+{
+    switch (p.ctor()) {
+    case Tl::InputPeerSelf: return TgPeer(TgPeer::User, selfId).key();
+    case Tl::InputPeerUser: case Tl::InputPeerUserFromMessage: return TgPeer(TgPeer::User, p.longOr("user_id")).key();
+    case Tl::InputPeerChat: return TgPeer(TgPeer::Chat, p.longOr("chat_id")).key();
+    case Tl::InputPeerChannel: case Tl::InputPeerChannelFromMessage: return TgPeer(TgPeer::Channel, p.longOr("channel_id")).key();
+    default: return QString();
+    }
+}
+
+QString TgApi::folderPeerKey(const TlObject &fp, int &folderId)
+{
+    folderId = fp.intOr("folder_id");
+    return fp.has("peer") ? readPeer(fp.obj("peer")).key() : QString();
+}
+
+namespace
+{
+    void collectKeys(const TlObject &filter, const char *field, QList<QString> &out, qint64 selfId)
+    {
+        QVariantList v = filter.vec(field);
+        for (int i = 0; i < v.size(); ++i) {
+            QString k = TgApi::inputPeerKey(TlSchema::toObject(v.at(i)), selfId);
+            if (!k.isEmpty()) out.append(k);
+        }
+    }
+}
+
+QList<TgFolder> TgApi::readFolders(const TlObject &response, qint64 selfId)
+{
+    QList<TgFolder> folders;
+    QVariantList filters = response.vec("filters");
+    for (int i = 0; i < filters.size(); ++i) {
+        TlObject f = TlSchema::toObject(filters.at(i));
+        // dialogFilterDefault is the main list itself, not a folder to list alongside.
+        if (f.ctor() != Tl::DialogFilter && f.ctor() != Tl::DialogFilterChatlist) continue;
+        TgFolder folder;
+        folder.id = f.intOr("id");
+        folder.listedOnly = f.ctor() == Tl::DialogFilterChatlist;
+        if (f.has("title")) {
+            TlObject t = f.obj("title");
+            folder.title = t.str("text");
+        }
+        if (folder.title.isEmpty()) folder.title = tr("Folder");
+        folder.contacts = f.flag("flags", 0);
+        folder.nonContacts = f.flag("flags", 1);
+        folder.groups = f.flag("flags", 2);
+        folder.broadcasts = f.flag("flags", 3);
+        folder.bots = f.flag("flags", 4);
+        folder.excludeMuted = f.flag("flags", 11);
+        folder.excludeRead = f.flag("flags", 12);
+        folder.excludeArchived = f.flag("flags", 13);
+        collectKeys(f, "pinned_peers", folder.pinned, selfId);
+        collectKeys(f, "include_peers", folder.include, selfId);
+        collectKeys(f, "exclude_peers", folder.exclude, selfId);
+        folders.append(folder);
+    }
+    return folders;
 }
 
 // -- lookups -----------------------------------------------------------------------------------------------------

@@ -81,7 +81,8 @@ public:
     static QByteArray authLogOut();
     static QByteArray usersGetSelf();
     static QByteArray usersGetUser(const TgPeer &user);
-    static QByteArray getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit);
+    static QByteArray getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit, int folderId = 0);
+    static QByteArray getDialogFilters();
     static QByteArray getHistory(const TgPeer &peer, int offsetId, int limit);
     static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0);
     static QByteArray readHistory(const TgPeer &peer, int maxId);
@@ -113,7 +114,13 @@ public:
     static TgMessage readMessage(const TlObject &m);
     /// updateShortMessage / updateShortChatMessage, which inline the message.
     static TgMessage readShortMessage(const TlObject &u, qint64 selfId);
-    static TgDialogPage readDialogs(const TlObject &response, TgPeerCache &cache);
+    static TgDialogPage readDialogs(const TlObject &response, TgPeerCache &cache, bool archived = false);
+    /// The custom folders from a messages.dialogFilters response.
+    static QList<TgFolder> readFolders(const TlObject &response, qint64 selfId);
+    /// The peer key of an InputPeer (user:/chat:/channel:), or empty for one we cannot key.
+    static QString inputPeerKey(const TlObject &inputPeer, qint64 selfId);
+    /// A folderPeer's peer key + its folder id (from updateFolderPeers).
+    static QString folderPeerKey(const TlObject &folderPeer, int &folderId);
     static TgHistoryPage readHistory(const TlObject &response, TgPeerCache &cache);
     static TgPeer readPeer(const TlObject &peer);
     static QString describeMedia(const TlObject &media);

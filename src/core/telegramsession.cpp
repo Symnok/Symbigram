@@ -31,7 +31,8 @@ int TelegramSession::unixNow() { return int(QDateTime::currentDateTime().toTime_
 TelegramSession::TelegramSession(QObject *parent)
     : QObject(parent), m_moved(0), m_srp(0), m_state(Disconnected), m_dcId(TelegramServers::DefaultDc), m_signedIn(false),
       m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false), m_selfId(0),
-      m_dialogsHaveMore(false), m_dialogsLoading(false), m_differencePending(false), m_online(false), m_nextJobId(1)
+      m_archiveHasMore(false), m_archiveLoaded(false), m_dialogsHaveMore(false), m_dialogsLoading(false),
+      m_differencePending(false), m_online(false), m_nextJobId(1)
 {
     m_client = new MtprotoClient(this);
     connect(m_client, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -150,6 +151,10 @@ void TelegramSession::forgetSession(const QString &reason)
     m_updateState = TgUpdateState();
     m_selfId = 0;
     m_dialogs.clear();
+    m_archived.clear();
+    m_archivedPeers.clear();
+    m_folders.clear();
+    m_archiveLoaded = false;
     m_peers.clear();
     m_qrUrl.clear();
     m_qrToken.clear();
@@ -439,6 +444,8 @@ void TelegramSession::startSync()
     if (m_updateState.isValid()) getDifference();
     else send(GetState, TgApi::updatesGetState());
     refreshDialogs();
+    loadFolders();
+    loadArchive();
     if (m_online) send(UpdateStatus, TgApi::updateStatus(true));
 }
 
@@ -452,7 +459,7 @@ void TelegramSession::getDifference()
 void TelegramSession::refreshDialogs()
 {
     if (m_dialogsLoading) return;
-    requestDialogs(0, 0, TgPeer(), false);
+    requestDialogs(0, 0, TgPeer(), false, 0);
 }
 
 void TelegramSession::loadMoreDialogs()
@@ -461,16 +468,88 @@ void TelegramSession::loadMoreDialogs()
     // The next page starts after the oldest unpinned entry; the server orders by the date
     // of the last message and identifies the position by date, id and peer together.
     const TgDialog &last = m_dialogs.last();
-    requestDialogs(last.topMessageDate, last.topMessageId, last.peer, true);
+    requestDialogs(last.topMessageDate, last.topMessageId, last.peer, true, 0);
 }
 
-void TelegramSession::requestDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, bool more)
+void TelegramSession::requestDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, bool more, int folderId)
 {
     if (!m_client->isReady()) return;
-    m_dialogsLoading = true;
     Request r;
     r.more = more;
-    send(GetDialogs, TgApi::getDialogs(offsetDate, offsetId, offsetPeer, DialogPageSize), r);
+    r.folderId = folderId;
+    if (folderId == 0) {
+        m_dialogsLoading = true;
+        send(GetDialogs, TgApi::getDialogs(offsetDate, offsetId, offsetPeer, DialogPageSize, 0), r);
+    } else {
+        send(GetArchive, TgApi::getDialogs(offsetDate, offsetId, offsetPeer, DialogPageSize, folderId), r);
+    }
+}
+
+void TelegramSession::loadFolders()
+{
+    if (m_client->isReady()) send(GetFolders, TgApi::getDialogFilters());
+}
+
+void TelegramSession::loadArchive()
+{
+    requestDialogs(0, 0, TgPeer(), false, 1);
+}
+
+void TelegramSession::loadMoreArchive()
+{
+    if (!m_archiveHasMore || m_archived.isEmpty()) return;
+    const TgDialog &last = m_archived.last();
+    requestDialogs(last.topMessageDate, last.topMessageId, last.peer, true, 1);
+}
+
+void TelegramSession::applyArchive(const TgDialogPage &page, bool more)
+{
+    if (!more) m_archived = page.dialogs;
+    else
+        for (int i = 0; i < page.dialogs.size(); ++i)
+            if (dialogIndexIn(m_archived, page.dialogs.at(i).peer) < 0) m_archived.append(page.dialogs.at(i));
+    m_archiveHasMore = page.hasMore;
+    m_archiveLoaded = true;
+    // Remember which peers are archived - used to keep their messages out of the main list
+    // and to suppress their notifications.
+    for (int i = 0; i < page.dialogs.size(); ++i) {
+        QString key = page.dialogs.at(i).peer.key();
+        m_archivedPeers.insert(key);
+        int mi = dialogIndex(page.dialogs.at(i).peer);
+        if (mi >= 0) { m_dialogs.removeAt(mi); }
+    }
+    emit archiveChanged();
+    emit dialogsChanged();
+}
+
+void TelegramSession::setArchived(const TgPeer &peer, bool archived)
+{
+    QString key = peer.key();
+    if (archived == m_archivedPeers.contains(key)) {
+        // still make sure it sits in the right list
+    }
+    if (archived) {
+        m_archivedPeers.insert(key);
+        int mi = dialogIndex(peer);
+        if (mi >= 0) {
+            TgDialog d = m_dialogs.takeAt(mi);
+            d.archived = true;
+            if (dialogIndexIn(m_archived, peer) < 0) m_archived.append(d);
+            emit dialogsChanged();
+            emit archiveChanged();
+        }
+    } else {
+        m_archivedPeers.remove(key);
+        int ai = dialogIndexIn(m_archived, peer);
+        if (ai >= 0) {
+            TgDialog d = m_archived.takeAt(ai);
+            d.archived = false;
+            if (dialogIndex(peer) < 0) m_dialogs.append(d);
+            sortDialogs();
+            emit dialogsChanged();
+            emit archiveChanged();
+        }
+    }
 }
 
 void TelegramSession::applyDialogs(const TgDialogPage &page, bool more)
@@ -721,8 +800,20 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
         case GetDialogs: {
             m_dialogsLoading = false;
             TlObject o = TlSchema::readObject(r);
-            if (o.ctor() != Tl::MessagesDialogsNotModified) applyDialogs(TgApi::readDialogs(o, m_peers), req.more);
+            if (o.ctor() != Tl::MessagesDialogsNotModified) applyDialogs(TgApi::readDialogs(o, m_peers, false), req.more);
             if (m_state == Syncing) setState(Online);
+            break;
+        }
+        case GetArchive: {
+            TlObject o = TlSchema::readObject(r);
+            if (o.ctor() != Tl::MessagesDialogsNotModified) applyArchive(TgApi::readDialogs(o, m_peers, true), req.more);
+            break;
+        }
+        case GetFolders: {
+            TlObject o = TlSchema::readObject(r);
+            m_peers.absorb(o);
+            m_folders = TgApi::readFolders(o, m_selfId);
+            emit foldersChanged();
             break;
         }
         case GetHistory: {
@@ -1000,6 +1091,8 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
             emit resolveFailed(tr("Nobody found."));
         else emit resolveFailed(type);
         break;
+    case GetArchive:
+    case GetFolders:
     case GetState:
     case GetSelf:
     case ReadHistory:
@@ -1194,6 +1287,23 @@ void TelegramSession::applyUpdate(const TlObject &u)
     case Tl::UpdateLoginToken:
         if (m_state == LoggingIn && !m_passwordNeeded && !m_moved) exportToken();
         break;
+    case Tl::UpdateFolderPeers: {
+        // Chats moved into or out of the Archive (folder 1) on this or another device.
+        QVariantList fps = u.vec("folder_peers");
+        for (int i = 0; i < fps.size(); ++i) {
+            int folderId = 0;
+            QString key = TgApi::folderPeerKey(TlSchema::toObject(fps.at(i)), folderId);
+            if (key.isEmpty()) continue;
+            setArchived(TgPeer::fromKey(key), folderId == 1);
+        }
+        break;
+    }
+    case Tl::UpdateDialogFilter:
+    case Tl::UpdateDialogFilters:
+    case Tl::UpdateDialogFilterOrder:
+        // A folder was added, changed, removed or reordered: re-read the set.
+        loadFolders();
+        break;
     case Tl::UpdateChannelTooLong:
         // A channel this client cannot catch up incrementally; the list refresh shows the
         // newest state.
@@ -1207,14 +1317,19 @@ void TelegramSession::applyUpdate(const TlObject &u)
 
 void TelegramSession::touchDialog(const TgMessage &m)
 {
-    int di = dialogIndex(m.peer);
+    // A message to an archived chat stays in the Archive list; it does not resurface on the
+    // main screen (Telegram keeps archived chats archived until the user acts).
+    bool archived = m_archivedPeers.contains(m.peer.key());
+    QList<TgDialog> &list = archived ? m_archived : m_dialogs;
+    int di = dialogIndexIn(list, m.peer);
     if (di < 0) {
         TgDialog d;
         d.peer = m_peers.withHash(m.peer);
-        m_dialogs.append(d);
-        di = m_dialogs.size() - 1;
+        d.archived = archived;
+        list.append(d);
+        di = list.size() - 1;
     }
-    TgDialog &d = m_dialogs[di];
+    TgDialog &d = list[di];
     if (m.id > d.topMessageId) {
         d.topMessageId = m.id;
         d.topMessageDate = m.date;
@@ -1223,8 +1338,8 @@ void TelegramSession::touchDialog(const TgMessage &m)
         d.lastFromId = m.fromId;
         if (!m.out && m.id > d.readInboxMaxId) d.unreadCount++;
     }
-    sortDialogs();
-    emit dialogsChanged();
+    if (archived) { emit archiveChanged(); }
+    else { sortDialogs(); emit dialogsChanged(); }
 }
 
 void TelegramSession::fillSender(TgMessage &m) const

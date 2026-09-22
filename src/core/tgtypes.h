@@ -92,7 +92,7 @@ struct TgMessage
 /// A chat in the dialog list.
 struct TgDialog
 {
-    TgDialog() : topMessageId(0), topMessageDate(0), unreadCount(0), readInboxMaxId(0), readOutboxMaxId(0), mutedUntil(0), pinned(false), lastOut(false), lastFromId(0) {}
+    TgDialog() : topMessageId(0), topMessageDate(0), unreadCount(0), readInboxMaxId(0), readOutboxMaxId(0), mutedUntil(0), pinned(false), archived(false), lastOut(false), lastFromId(0) {}
     TgPeer peer;
     int topMessageId;
     int topMessageDate;
@@ -101,10 +101,28 @@ struct TgDialog
     int readOutboxMaxId;
     int mutedUntil;        // 0 = not muted; Telegram expresses "muted" as a time in the future
     bool pinned;
+    bool archived;
     QString lastText;      // preview of the newest message
     bool lastOut;
     qint64 lastFromId;
     bool isMuted(int now) const { return mutedUntil > now; }
+};
+
+/// One of the user's chat folders (a Telegram "dialog filter"): a rule that selects chats,
+/// not a container they are moved into. The Archive is NOT one of these - it is a real
+/// separate list addressed by folder id 1.
+struct TgFolder
+{
+    TgFolder() : id(0), listedOnly(false), contacts(false), nonContacts(false), groups(false),
+                 broadcasts(false), bots(false), excludeMuted(false), excludeRead(false), excludeArchived(false) {}
+    int id;
+    QString title;
+    bool listedOnly;      // a shared folder: only the chats it names, no category rules
+    bool contacts, nonContacts, groups, broadcasts, bots;
+    bool excludeMuted, excludeRead, excludeArchived;
+    QList<QString> include, exclude, pinned;   // peer keys named individually
+    /// Whether a (non-archived) chat belongs in this folder.
+    bool contains(const TgDialog &d, const TgPeerInfo &info, int now) const;
 };
 
 /// The server's update sequence position.
@@ -120,5 +138,7 @@ Q_DECLARE_METATYPE(TgMessage)
 Q_DECLARE_METATYPE(TgDialog)
 Q_DECLARE_METATYPE(QList<TgMessage>)
 Q_DECLARE_METATYPE(QList<TgDialog>)
+Q_DECLARE_METATYPE(TgFolder)
+Q_DECLARE_METATYPE(QList<TgFolder>)
 
 #endif // TGTYPES_H

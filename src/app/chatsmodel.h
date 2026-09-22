@@ -11,6 +11,7 @@
 #include <QAbstractListModel>
 #include <QHash>
 #include <QString>
+#include <QStringList>
 #include <QVariantMap>
 
 class TelegramSession;
@@ -24,6 +25,12 @@ class ChatsModel : public QAbstractListModel
     Q_PROPERTY(bool hasMore READ hasMore NOTIFY countChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY countChanged)
     Q_PROPERTY(int unreadTotal READ unreadTotal NOTIFY countChanged)
+    // Folder selection (small screens: a picker, not tabs). 0 = All chats, then the custom
+    // folders, then Archive as the last entry.
+    Q_PROPERTY(QStringList folderNames READ folderNames NOTIFY foldersChanged)
+    Q_PROPERTY(int folder READ folder NOTIFY folderChanged)
+    Q_PROPERTY(QString folderName READ folderName NOTIFY folderChanged)
+    Q_PROPERTY(bool archiveSelected READ archiveSelected NOTIFY folderChanged)
 public:
     enum Roles {
         PeerKeyRole = Qt::UserRole + 1,
@@ -53,6 +60,11 @@ public:
     Q_INVOKABLE int indexOf(const QString &peerKey) const;
     Q_INVOKABLE void loadMore();
     Q_INVOKABLE void refresh();
+    QStringList folderNames() const;
+    int folder() const { return m_folderList; }
+    QString folderName() const;
+    bool archiveSelected() const;
+    Q_INVOKABLE void selectFolder(int listIndex);
     Q_INVOKABLE void setMuted(const QString &peerKey, bool muted);
     Q_INVOKABLE void clearHistory(const QString &peerKey);
 
@@ -64,6 +76,8 @@ public:
 
 signals:
     void countChanged();
+    void foldersChanged();
+    void folderChanged();
 
 private slots:
     void onDialogsChanged();
@@ -72,11 +86,19 @@ private slots:
     void onTyping(const TgPeer &peer, qint64 userId);
     void onTypingTimer();
     void onAvatarReady(const QString &key, const QString &path);
+    void onArchiveChanged();
+    void onFoldersChanged();
 
 private:
     void refreshRow(const TgPeer &peer);
+    void rebuild();
+    const QList<TgDialog> &sourceList() const;
 
     TelegramSession *m_session;
+    // -1 = All chats, -2 = Archive, 0..N-1 = index into session->folders().
+    int m_folderSel;
+    int m_folderList;              // index into folderNames() (0 = All, last = Archive)
+    QList<TgDialog> m_view;        // the dialogs currently shown, after folder filtering
     MediaCache *m_media;
     QHash<QString, int> m_typingUntil;      // peer key -> unix time the "typing" hint ends
     QHash<QString, qint64> m_typingWho;

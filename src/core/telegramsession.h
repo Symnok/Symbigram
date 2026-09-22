@@ -18,6 +18,7 @@
 
 #include <QHash>
 #include <QList>
+#include <QSet>
 #include <QObject>
 #include <QString>
 
@@ -64,6 +65,12 @@ public:
     TgPeerCache &peers() { return m_peers; }
     const TgPeerCache &peers() const { return m_peers; }
     const QList<TgDialog> &dialogs() const { return m_dialogs; }
+    const QList<TgDialog> &archivedDialogs() const { return m_archived; }
+    const QList<TgFolder> &folders() const { return m_folders; }
+    bool archiveHasMore() const { return m_archiveHasMore; }
+    bool isArchived(const TgPeer &peer) const { return m_archivedPeers.contains(peer.key()); }
+    void loadArchive();
+    void loadMoreArchive();
     bool dialogsHaveMore() const { return m_dialogsHaveMore; }
     bool dialogsLoading() const { return m_dialogsLoading; }
     TgDialog dialog(const TgPeer &peer) const;
@@ -73,6 +80,7 @@ public:
 
     void refreshDialogs();
     void loadMoreDialogs();
+    void loadFolders();
     /// Recent messages of a chat; offsetId 0 = the newest, otherwise older than that id.
     void loadHistory(const TgPeer &peer, int offsetId, int count);
     /// Returns the random id that messageSent/messageFailed will carry.
@@ -113,6 +121,8 @@ signals:
     void signedOut(const QString &reason);
     void selfChanged();
     void dialogsChanged();
+    void archiveChanged();
+    void foldersChanged();
     void dialogChanged(const TgPeer &peer);
     void historyLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
     void historyFailed(const TgPeer &peer, const QString &error);
@@ -156,16 +166,18 @@ private:
         GetSelf, GetState, GetDifference, GetDialogs, GetHistory, SendMessage,
         ReadHistory, SetTyping, UpdateStatus, ResolveUsername, ResolvePhone, ContactsSearch,
         DeleteHistory, DeleteMessages, UpdateNotifySettings, GetUser,
-        GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization
+        GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization,
+        GetArchive, GetFolders
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
         int offsetId;
         bool more;              // GetDialogs: appending a page rather than replacing
+        int folderId;           // GetDialogs/GetArchive: which folder
         QString query;
     };
 
@@ -180,8 +192,10 @@ private:
     void adoptMoved();
     void finishLogin();
     void startSync();
-    void requestDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, bool more);
+    void requestDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, bool more, int folderId);
     void applyDialogs(const TgDialogPage &page, bool more);
+    void applyArchive(const TgDialogPage &page, bool more);
+    void setArchived(const TgPeer &peer, bool archived);
     void applyUpdate(const TlObject &u);
     void applyMessage(const TgMessage &m, bool fromDifference);
     bool checkPts(const TlObject &u);
@@ -272,6 +286,11 @@ private:
     TgPeerCache m_peers;
     qint64 m_selfId;
     QList<TgDialog> m_dialogs;
+    QList<TgDialog> m_archived;
+    QSet<QString> m_archivedPeers;
+    QList<TgFolder> m_folders;
+    bool m_archiveHasMore;
+    bool m_archiveLoaded;
     bool m_dialogsHaveMore;
     bool m_dialogsLoading;
     bool m_differencePending;

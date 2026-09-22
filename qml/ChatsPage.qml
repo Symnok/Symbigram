@@ -23,6 +23,7 @@ Page {
     Menu {
         id: menu
         MenuLayout {
+            MenuItem { text: qsTr("Folders"); onClicked: folderDialog.open() }
             MenuItem {
                 text: app.connection == "offline" ? qsTr("Connect") : qsTr("Disconnect")
                 onClicked: app.connection == "offline" ? app.reconnect() : app.goOffline()
@@ -32,6 +33,31 @@ Page {
             MenuItem { text: qsTr("Sign out"); onClicked: signOutDialog.open() }
             MenuItem { text: qsTr("Exit"); onClicked: Qt.quit() }
         }
+    }
+
+    SelectionDialog {
+        id: folderDialog
+        titleText: qsTr("Folders")
+        model: ListModel { id: folderModel }
+        delegate: Item {
+            width: parent ? parent.width : 300
+            height: (typeof privateStyle != "undefined") ? privateStyle.menuItemHeight : 56
+            Rectangle { anchors.fill: parent; color: fMouse.pressed ? "#3d5a80" : "transparent" }
+            Label {
+                anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+                text: model.name + (index == app.chats.folder ? "   *" : "")
+                color: "white"
+                elide: Text.ElideRight
+            }
+            MouseArea { id: fMouse; anchors.fill: parent; onClicked: { folderDialog.selectedIndex = index; folderDialog.accept() } }
+        }
+        onAccepted: if (selectedIndex >= 0) app.chats.selectFolder(selectedIndex)
+        function reload() {
+            folderModel.clear()
+            var names = app.chats.folderNames
+            for (var i = 0; i < names.length; ++i) folderModel.append({ "name": names[i] })
+        }
+        onStatusChanged: if (status == DialogStatus.Opening) reload()
     }
 
     QueryDialog {
@@ -107,13 +133,20 @@ Page {
         }
         Column {
             anchors { left: logo.right; leftMargin: platformStyle.paddingLarge; right: busy.left; verticalCenter: parent.verticalCenter }
-            Label { width: parent.width; text: app.myName != "" ? app.myName : "Symbigram"; elide: Text.ElideRight; font.bold: true }
+            Label {
+                width: parent.width
+                text: app.chats.folder == 0 ? (app.myName != "" ? app.myName : "Symbigram") : app.chats.folderName
+                elide: Text.ElideRight
+                font.bold: true
+            }
             Label {
                 width: parent.width
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: app.connection == "online" ? "#8fd18f" : platformStyle.colorNormalMid
-                text: app.connection == "online" ? (app.mySubtitle != "" ? app.mySubtitle : qsTr("online"))
-                    : (app.connection == "connecting" ? qsTr("connecting...") : qsTr("offline"))
+                text: app.chats.folder != 0
+                      ? (app.connection == "online" ? qsTr("tap to switch folder") : (app.connection == "connecting" ? qsTr("connecting...") : qsTr("offline")))
+                      : (app.connection == "online" ? (app.mySubtitle != "" ? app.mySubtitle : qsTr("online"))
+                        : (app.connection == "connecting" ? qsTr("connecting...") : qsTr("offline")))
                 elide: Text.ElideRight
             }
         }
@@ -124,12 +157,37 @@ Page {
             visible: running
             width: visible ? platformStyle.graphicSizeSmall : 0
         }
+        MouseArea { anchors.fill: parent; onClicked: folderDialog.open() }
+    }
+
+    // -- folder bar: an always-visible way back to the main list when inside a folder/Archive --
+    Rectangle {
+        id: folderBar
+        visible: app.chats.folder != 0
+        anchors { top: heading.bottom; left: parent.left; right: parent.right }
+        height: visible ? platformStyle.graphicSizeMedium + platformStyle.paddingSmall : 0
+        color: "#243546"
+        Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: "#3d5a80" }
+        Row {
+            anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+            spacing: platformStyle.paddingSmall
+            Label { text: "‹"; color: "#8fd1ff"; font.pixelSize: platformStyle.fontSizeLarge; anchors.verticalCenter: parent.verticalCenter }
+            Label { text: qsTr("All chats"); color: "#8fd1ff"; anchors.verticalCenter: parent.verticalCenter }
+        }
+        Label {
+            anchors { right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+            text: app.chats.folderName
+            color: "white"
+            font.bold: true
+            elide: Text.ElideRight
+        }
+        MouseArea { anchors.fill: parent; onClicked: app.chats.selectFolder(0) }
     }
 
     // -- list --
     ListView {
         id: list
-        anchors { top: heading.bottom; left: parent.left; right: parent.right; bottom: parent.bottom }
+        anchors { top: folderBar.bottom; left: parent.left; right: parent.right; bottom: parent.bottom }
         model: app.chats
         clip: true
         cacheBuffer: 600
@@ -267,7 +325,10 @@ Page {
         wrapMode: Text.Wrap
         color: platformStyle.colorNormalMid
         visible: list.count == 0
-        text: app.connection == "online" ? (app.chats.loading ? qsTr("Loading chats...") : qsTr("No chats yet. Tap + to find someone."))
-              : (app.connection == "connecting" ? qsTr("Connecting...") : qsTr("Offline. Use the menu to connect."))
+        text: app.connection != "online" ? (app.connection == "connecting" ? qsTr("Connecting...") : qsTr("Offline. Use the menu to connect."))
+              : (app.chats.loading ? qsTr("Loading chats...")
+              : (app.chats.archiveSelected ? qsTr("The archive is empty.")
+              : (app.chats.folder != 0 ? qsTr("No chats in this folder.")
+              : qsTr("No chats yet. Tap + to find someone."))))
     }
 }

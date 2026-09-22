@@ -348,6 +348,20 @@ private:
             }
         }
         else if (cmd == QLatin1String("more")) m_session->loadMoreDialogs();
+        else if (cmd == QLatin1String("folders")) {
+            const QList<TgFolder> &f = m_session->folders();
+            say(QString::fromLatin1("[folders] %1 custom folders").arg(f.size()));
+            for (int i = 0; i < f.size(); ++i)
+                say(QString::fromLatin1("  %1. %2  include=%3 pinned=%4 exclude=%5 cats(c%6 nc%7 g%8 b%9 bot%10) exArch=%11")
+                    .arg(i).arg(f.at(i).title).arg(f.at(i).include.size()).arg(f.at(i).pinned.size()).arg(f.at(i).exclude.size())
+                    .arg(f.at(i).contacts).arg(f.at(i).nonContacts).arg(f.at(i).groups).arg(f.at(i).broadcasts).arg(f.at(i).bots).arg(f.at(i).excludeArchived));
+        }
+        else if (cmd == QLatin1String("archive")) {
+            const QList<TgDialog> &a = m_session->archivedDialogs();
+            say(QString::fromLatin1("[archive] %1 chats%2").arg(a.size()).arg(m_session->archiveHasMore() ? QLatin1String(" (more)") : QString()));
+            for (int i = 0; i < a.size(); ++i)
+                say(QString::fromLatin1("  %1. %2  unread=%3").arg(i).arg(m_session->peers().title(a.at(i).peer)).arg(a.at(i).unreadCount));
+        }
         else if (cmd == QLatin1String("refresh")) m_session->refreshDialogs();
         else if (cmd == QLatin1String("history") && a.size() >= 2) m_session->loadHistory(peerAt(a.at(1)), a.size() >= 4 ? a.at(3).toInt() : 0, a.size() >= 3 ? a.at(2).toInt() : 20);
         else if (cmd == QLatin1String("send") && a.size() >= 3) m_session->sendText(peerAt(a.at(1)), QStringList(a.mid(2)).join(QLatin1String(" ")));

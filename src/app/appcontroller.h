@@ -55,6 +55,7 @@ class AppController : public QObject
     /// Desktop testing: true when SGM_SHOT_DIR is set; main.qml then walks the pages.
     Q_PROPERTY(bool autotest READ autotest CONSTANT)
     Q_PROPERTY(QString autotestPeer READ autotestPeer CONSTANT)
+    Q_PROPERTY(bool autotestFolder READ autotestFolder CONSTANT)
     /// The last log lines for the About page.
     Q_PROPERTY(QString logTail READ logTail NOTIFY logChanged)
 public:
@@ -95,6 +96,7 @@ public:
     QString notice() const { return m_notice; }
     bool autotest() const;
     QString autotestPeer() const;
+    bool autotestFolder() const;
     QString logTail() const;
     static void appendLog(const QString &line);
 

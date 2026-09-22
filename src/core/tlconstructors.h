@@ -242,6 +242,19 @@ namespace Tl
     const quint32 UpdateReadChannelOutbox = 0xb75f99a9;
     const quint32 UpdateNotifySettings = 0xbec268ef;
     const quint32 UpdateChannelTooLong = 0x108d941f;
+    const quint32 MessagesGetDialogFilters = 0xefd48c89;
+    const quint32 MessagesDialogFilters = 0x2ad93719;
+    const quint32 DialogFilter = 0xaa472651;
+    const quint32 DialogFilterChatlist = 0x96537bd7;
+    const quint32 DialogFilterDefault = 0x363293ae;
+    const quint32 UpdateDialogFilter = 0x26ffde7d;
+    const quint32 UpdateDialogFilters = 0x3504914f;
+    const quint32 UpdateDialogFilterOrder = 0xa5d72105;
+    const quint32 UpdateFolderPeers = 0x19360dc0;
+    const quint32 FolderPeer = 0xe9baa668;
+    const quint32 InputPeerUserFromMessage = 0xa87b0a1c;
+    const quint32 InputPeerChannelFromMessage = 0xbd2a0840;
+    const quint32 TextWithEntities = 0x751f3146;
     const quint32 UpdateDialogUnreadMark = 0xb658f23e;
 }
 

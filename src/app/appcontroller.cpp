@@ -392,11 +392,15 @@ void AppController::onMessage(const TgMessage &m)
         m_chat->markRead();
         return;
     }
-    TgDialog d = m_session->dialog(m.peer);
-    const bool muted = d.isMuted(int(QDateTime::currentDateTime().toTime_t()));
     if (foreground) return;
-    if (muted) return;
-    if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return;
+    // Notify only when the global switch is on AND this chat is not muted (a logical AND):
+    // the global setting overrides, and a per-chat mute (read from Telegram's notify
+    // settings) or the Archive each silences it on their own.
+    if (!notifications()) return;                 // global notifications off
+    if (m_session->isArchived(m.peer)) return;    // archived chats never notify
+    TgDialog d = m_session->dialog(m.peer);
+    if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;   // this chat is muted on Telegram
+    if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return; // group/channel notifications off
     QString who = m_session->peers().title(m.peer);
     if (m.peer.isGroup()) who = m_session->peers().userName(m.fromId) + QLatin1String(" @ ") + who;
     QString text = m.text.isEmpty() ? m.note : m.text;
@@ -502,6 +506,11 @@ bool AppController::autotest() const
 QString AppController::autotestPeer() const
 {
     return QString::fromLocal8Bit(qgetenv("SGM_SHOT_PEER"));
+}
+
+bool AppController::autotestFolder() const
+{
+    return !qgetenv("SGM_SHOT_FOLDER").isEmpty();
 }
 
 void AppController::takeScreenshot(const QString &name)

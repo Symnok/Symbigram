@@ -89,6 +89,11 @@ PageStackWindow {
             if (app.connection != "online") return
             step++
             if (step == 2) app.takeScreenshot("chats")
+            else if (app.autotestFolder) {
+                if (step == 3 && app.chats.folderNames.length > 2) app.chats.selectFolder(1)
+                else if (step == 4) { app.takeScreenshot("folder"); app.chats.selectFolder(0) }
+                else if (step == 5) { app.takeScreenshot("folder-back"); Qt.quit() }
+            }
             else if (step == 3) { var pk = app.autotestPeer; if (pk != "") window.openChat(pk); else if (app.chats.count > 0) window.openChat(app.chats.get(0).peerKey) }
             else if (step == 8) app.takeScreenshot("chat")
             else if (step == 9) { app.chat.close(); pageStack.pop() }

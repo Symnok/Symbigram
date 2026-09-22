@@ -16,7 +16,7 @@ namespace
 }
 
 ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent)
-    : QAbstractListModel(parent), m_session(session), m_media(media)
+    : QAbstractListModel(parent), m_session(session), m_media(media), m_folderSel(-1), m_folderList(0)
 {
     QHash<int, QByteArray> roles;
     roles[PeerKeyRole] = "peerKey";
@@ -40,18 +40,26 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
     connect(session, SIGNAL(typing(TgPeer,qint64)), this, SLOT(onTyping(TgPeer,qint64)));
     connect(session, SIGNAL(stateChanged()), this, SIGNAL(countChanged()));
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onAvatarReady(QString,QString)));
+    connect(session, SIGNAL(archiveChanged()), this, SLOT(onArchiveChanged()));
+    connect(session, SIGNAL(foldersChanged()), this, SLOT(onFoldersChanged()));
 
     m_typingTimer = new QTimer(this);
     m_typingTimer->setInterval(1000);
     connect(m_typingTimer, SIGNAL(timeout()), this, SLOT(onTypingTimer()));
+    rebuild();
 }
 
 int ChatsModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_session->dialogs().size();
+    return parent.isValid() ? 0 : m_view.size();
 }
 
-bool ChatsModel::hasMore() const { return m_session->dialogsHaveMore(); }
+bool ChatsModel::hasMore() const
+{
+    // The Archive paginates on the server; a custom folder filters the (paginated) main
+    // list, so loading more of the main list brings more to filter.
+    return m_folderSel == -2 ? m_session->archiveHasMore() : m_session->dialogsHaveMore();
+}
 bool ChatsModel::loading() const { return m_session->dialogsLoading(); }
 
 int ChatsModel::unreadTotal() const
@@ -60,6 +68,58 @@ int ChatsModel::unreadTotal() const
     const QList<TgDialog> &d = m_session->dialogs();
     for (int i = 0; i < d.size(); ++i) n += d.at(i).unreadCount;
     return n;
+}
+
+const QList<TgDialog> &ChatsModel::sourceList() const
+{
+    return m_folderSel == -2 ? m_session->archivedDialogs() : m_session->dialogs();
+}
+
+void ChatsModel::rebuild()
+{
+    beginResetModel();
+    m_view.clear();
+    const QList<TgDialog> &src = sourceList();
+    if (m_folderSel >= 0 && m_folderSel < m_session->folders().size()) {
+        const TgFolder &f = m_session->folders().at(m_folderSel);
+        int nowSec = now();
+        for (int i = 0; i < src.size(); ++i)
+            if (f.contains(src.at(i), m_session->peers().info(src.at(i).peer), nowSec)) m_view.append(src.at(i));
+    } else {
+        m_view = src;
+    }
+    endResetModel();
+    emit countChanged();
+}
+
+QStringList ChatsModel::folderNames() const
+{
+    QStringList names;
+    names << tr("All chats");
+    const QList<TgFolder> &f = m_session->folders();
+    for (int i = 0; i < f.size(); ++i) names << f.at(i).title;
+    names << tr("Archive");
+    return names;
+}
+
+QString ChatsModel::folderName() const
+{
+    QStringList n = folderNames();
+    return (m_folderList >= 0 && m_folderList < n.size()) ? n.at(m_folderList) : tr("All chats");
+}
+
+bool ChatsModel::archiveSelected() const { return m_folderSel == -2; }
+
+void ChatsModel::selectFolder(int listIndex)
+{
+    QStringList n = folderNames();
+    if (listIndex < 0 || listIndex >= n.size()) return;
+    m_folderList = listIndex;
+    if (listIndex == 0) m_folderSel = -1;                       // All chats
+    else if (listIndex == n.size() - 1) { m_folderSel = -2; m_session->loadArchive(); }   // Archive
+    else m_folderSel = listIndex - 1;                          // a custom folder
+    rebuild();
+    emit folderChanged();
 }
 
 QString ChatsModel::initials(const QString &title)
@@ -90,9 +150,8 @@ QString ChatsModel::timeText(int unixTime)
 
 QVariant ChatsModel::data(const QModelIndex &index, int role) const
 {
-    const QList<TgDialog> &dialogs = m_session->dialogs();
-    if (!index.isValid() || index.row() >= dialogs.size()) return QVariant();
-    const TgDialog &d = dialogs.at(index.row());
+    if (!index.isValid() || index.row() >= m_view.size()) return QVariant();
+    const TgDialog &d = m_view.at(index.row());
     const TgPeerInfo info = m_session->peers().info(d.peer);
     const QString key = d.peer.key();
     switch (role) {
@@ -141,24 +200,39 @@ QVariantMap ChatsModel::get(int row) const
 
 int ChatsModel::indexOf(const QString &peerKey) const
 {
-    const QList<TgDialog> &dialogs = m_session->dialogs();
-    for (int i = 0; i < dialogs.size(); ++i)
-        if (dialogs.at(i).peer.key() == peerKey) return i;
+    for (int i = 0; i < m_view.size(); ++i)
+        if (m_view.at(i).peer.key() == peerKey) return i;
     return -1;
 }
 
-void ChatsModel::loadMore() { m_session->loadMoreDialogs(); emit countChanged(); }
-void ChatsModel::refresh() { m_session->refreshDialogs(); emit countChanged(); }
+void ChatsModel::loadMore()
+{
+    if (m_folderSel == -2) m_session->loadMoreArchive();
+    else m_session->loadMoreDialogs();
+    emit countChanged();
+}
+void ChatsModel::refresh() { m_session->refreshDialogs(); m_session->loadFolders(); if (m_folderSel == -2) m_session->loadArchive(); emit countChanged(); }
 void ChatsModel::setMuted(const QString &peerKey, bool muted) { m_session->setMuted(TgPeer::fromKey(peerKey), muted); }
 void ChatsModel::clearHistory(const QString &peerKey) { m_session->deleteHistory(TgPeer::fromKey(peerKey)); }
 
 void ChatsModel::onDialogsChanged()
 {
-    // Order and membership may both have changed: a full reset is the honest answer, and
-    // the list is short enough that the view redraws in a moment.
-    beginResetModel();
-    endResetModel();
-    emit countChanged();
+    if (m_folderSel == -2) return;      // the main list changed; the Archive view is unaffected
+    rebuild();
+}
+
+void ChatsModel::onArchiveChanged()
+{
+    if (m_folderSel == -2) rebuild();
+    emit foldersChanged();              // the Archive entry may appear/disappear (count hint)
+}
+
+void ChatsModel::onFoldersChanged()
+{
+    emit foldersChanged();
+    // If the selected custom folder vanished, fall back to All chats.
+    if (m_folderSel >= 0 && m_folderSel >= m_session->folders().size()) selectFolder(0);
+    else rebuild();
 }
 
 void ChatsModel::refreshRow(const TgPeer &peer)
@@ -169,7 +243,18 @@ void ChatsModel::refreshRow(const TgPeer &peer)
 
 void ChatsModel::onDialogChanged(const TgPeer &peer)
 {
-    refreshRow(peer);
+    int i = indexOf(peer.key());
+    if (i >= 0) {
+        // Keep the cached view row in step (unread/mute/preview live in the dialog).
+        const QList<TgDialog> &src = sourceList();
+        int si = -1;
+        for (int j = 0; j < src.size(); ++j) if (src.at(j).peer == peer) { si = j; break; }
+        if (si >= 0) m_view[i] = src.at(si);
+        emit dataChanged(index(i), index(i));
+    } else {
+        // It may now match (or no longer match) the current folder.
+        rebuild();
+    }
     emit countChanged();
 }
 
