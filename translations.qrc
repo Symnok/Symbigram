@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>translations/symbigram_ru.qm</file>
+        <file>translations/symbigram_uk.qm</file>
+    </qresource>
+</RCC>
