@@ -339,7 +339,10 @@ void MessagesModel::onMediaReady(const QString &key, const QString &path)
     if (row < 0) return;
     Row &r = m_rows[row];
     const TgMedia &m = r.m.media;
-    bool isThumb = m_media && (m_media->keyFor(m, m.thumbSizeType) == key ||
+    // A document/video with no thumbnail has thumbSizeType == "", and keyFor(m, "") is the SAME
+    // as the full-file key - so guard the thumb test with a non-empty thumb size, or a finished
+    // full download would be misread as a thumbnail and never mark the row ready.
+    bool isThumb = m_media && ((!m.thumbSizeType.isEmpty() && m_media->keyFor(m, m.thumbSizeType) == key) ||
                                ((m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) && m_media->keyFor(m, m.sizeType) == key));
     if (isThumb) {
         r.thumbPath = path;
