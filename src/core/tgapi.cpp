@@ -327,10 +327,43 @@ QByteArray TgApi::contactsGetContacts()
     return w.toByteArray();
 }
 
-QByteArray TgApi::deleteHistory(const TgPeer &peer, bool justClear)
+QByteArray TgApi::deleteHistory(const TgPeer &peer, bool justClear, bool revoke)
 {
     TlWriter w(32);
-    w.writeConstructor(Tl::MessagesDeleteHistory).writeInt(justClear ? 1 : 0).writeRaw(inputPeer(peer)).writeInt(0);
+    int flags = (justClear ? 1 : 0) | (revoke ? 2 : 0);
+    w.writeConstructor(Tl::MessagesDeleteHistory).writeInt(flags).writeRaw(inputPeer(peer)).writeInt(0);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::deleteChatUser(qint64 chatId, bool revoke)
+{
+    TlWriter w(24);
+    w.writeConstructor(Tl::MessagesDeleteChatUser).writeInt(revoke ? 1 : 0).writeLong(chatId)
+     .writeConstructor(Tl::InputUserSelf);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::leaveChannel(const TgPeer &channel)
+{
+    TlWriter w(24);
+    w.writeConstructor(Tl::ChannelsLeaveChannel).writeRaw(inputChannel(channel));
+    return w.toByteArray();
+}
+
+QByteArray TgApi::editPeerFolders(const TgPeer &peer, int folderId)
+{
+    TlWriter fp(32);
+    fp.writeConstructor(Tl::InputFolderPeer).writeRaw(inputPeer(peer)).writeInt(folderId);
+    TlWriter w(48);
+    w.writeConstructor(Tl::FoldersEditPeerFolders).writeConstructor(Tl::Vector).writeInt(1).writeRaw(fp.toByteArray());
+    return w.toByteArray();
+}
+
+QByteArray TgApi::updateDialogFilter(const QByteArray &filter, int id)
+{
+    TlWriter w(filter.size() + 16);
+    // flags.0 set: the filter is present (an absent filter would delete it).
+    w.writeConstructor(Tl::MessagesUpdateDialogFilter).writeInt(1).writeInt(id).writeRaw(filter);
     return w.toByteArray();
 }
 
@@ -946,6 +979,9 @@ QList<TgFolder> TgApi::readFolders(const TlObject &response, qint64 selfId)
         folder.excludeMuted = f.flag("flags", 11);
         folder.excludeRead = f.flag("flags", 12);
         folder.excludeArchived = f.flag("flags", 13);
+        folder.emoticon = f.str("emoticon");
+        folder.hasColor = f.has("color");
+        folder.color = f.intOr("color", -1);
         collectKeys(f, "pinned_peers", folder.pinned, selfId);
         collectKeys(f, "include_peers", folder.include, selfId);
         collectKeys(f, "exclude_peers", folder.exclude, selfId);

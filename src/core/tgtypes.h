@@ -114,13 +114,17 @@ struct TgDialog
 struct TgFolder
 {
     TgFolder() : id(0), listedOnly(false), contacts(false), nonContacts(false), groups(false),
-                 broadcasts(false), bots(false), excludeMuted(false), excludeRead(false), excludeArchived(false) {}
+                 broadcasts(false), bots(false), excludeMuted(false), excludeRead(false), excludeArchived(false),
+                 color(-1), hasColor(false) {}
     int id;
     QString title;
     bool listedOnly;      // a shared folder: only the chats it names, no category rules
     bool contacts, nonContacts, groups, broadcasts, bots;
     bool excludeMuted, excludeRead, excludeArchived;
     QList<QString> include, exclude, pinned;   // peer keys named individually
+    QString emoticon;
+    int color;
+    bool hasColor;
     /// Whether a (non-archived) chat belongs in this folder.
     bool contains(const TgDialog &d, const TgPeerInfo &info, int now) const;
 };

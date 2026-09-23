@@ -95,6 +95,14 @@ public:
     /// Username, phone number, t.me link, or a name to search among contacts.
     void resolve(const QString &query);
     void deleteHistory(const TgPeer &peer);
+    /// Removes the whole chat (not just its messages). forEveryone revokes / leaves.
+    void deleteChat(const TgPeer &peer, bool forEveryone);
+    /// Moves a chat into the Archive (archived=true) or back to the main list.
+    void archiveChat(const TgPeer &peer, bool archived);
+    /// Adds/removes a chat from a custom folder (filterId), or removes from all when filterId<=0.
+    void moveToFolder(const TgPeer &peer, int filterId, bool remove);
+    /// "Move" a chat so it sits in exactly destFilterId (removed from all other custom folders); -1 = no folder.
+    void setChatFolder(const TgPeer &peer, int destFilterId);
     void deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke);
     void setMuted(const TgPeer &peer, bool muted);
     /// Adds a resolved peer to the dialog list (locally) so a chat can be opened with it.
@@ -200,11 +208,12 @@ private:
         DeleteHistory, DeleteMessages, UpdateNotifySettings, GetUser,
         GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization,
         GetArchive, GetFolders,
-        GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption
+        GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
+        ArchivePeer, DeleteChat, MoveFolder
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
@@ -212,6 +221,7 @@ private:
         bool more;              // GetDialogs: appending a page rather than replacing
         int folderId;           // GetDialogs/GetArchive: which folder
         int secretChatId;       // secret-chat requests
+        bool revoke;            // DeleteChat: delete for everyone / leave-and-revoke
         SecretChat *secret;     // RequestEncryption: the in-progress chat awaiting its id
         QString query;
     };
@@ -231,6 +241,9 @@ private:
     void applyDialogs(const TgDialogPage &page, bool more);
     void applyArchive(const TgDialogPage &page, bool more);
     void setArchived(const TgPeer &peer, bool archived);
+    void removeDialogLocal(const TgPeer &peer);
+    void applyUpdatesResult(const TlObject &o);
+    QByteArray buildFolderFilter(const TgFolder &f, const TgPeer &addPeer, const TgPeer &removePeer) const;
     void applyUpdate(const TlObject &u);
     void applyMessage(const TgMessage &m, bool fromDifference);
     bool checkPts(const TlObject &u);

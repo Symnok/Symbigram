@@ -94,7 +94,11 @@ public:
     static QByteArray resolvePhone(const QString &phone);
     static QByteArray contactsSearch(const QString &query, int limit);
     static QByteArray contactsGetContacts();
-    static QByteArray deleteHistory(const TgPeer &peer, bool justClear);
+    static QByteArray deleteHistory(const TgPeer &peer, bool justClear, bool revoke = false);
+    static QByteArray deleteChatUser(qint64 chatId, bool revoke);          // leave a basic group
+    static QByteArray leaveChannel(const TgPeer &channel);
+    static QByteArray editPeerFolders(const TgPeer &peer, int folderId);   // 1 = archive, 0 = main
+    static QByteArray updateDialogFilter(const QByteArray &filter, int id);
     static QByteArray deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke);
     static QByteArray updateNotifySettings(const TgPeer &peer, bool muted);
     /// upload.getFile for a location built by fileLocation()/peerPhotoLocation().

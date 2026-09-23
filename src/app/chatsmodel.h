@@ -28,6 +28,7 @@ class ChatsModel : public QAbstractListModel
     // Folder selection (small screens: a picker, not tabs). 0 = All chats, then the custom
     // folders, then Archive as the last entry.
     Q_PROPERTY(QStringList folderNames READ folderNames NOTIFY foldersChanged)
+    Q_PROPERTY(int customFolderCount READ customFolderCount NOTIFY foldersChanged)
     Q_PROPERTY(int folder READ folder NOTIFY folderChanged)
     Q_PROPERTY(QString folderName READ folderName NOTIFY folderChanged)
     Q_PROPERTY(bool archiveSelected READ archiveSelected NOTIFY folderChanged)
@@ -63,6 +64,7 @@ public:
     Q_INVOKABLE void loadMore();
     Q_INVOKABLE void refresh();
     QStringList folderNames() const;
+    int customFolderCount() const;
     int folder() const { return m_folderList; }
     QString folderName() const;
     bool archiveSelected() const;
@@ -70,6 +72,15 @@ public:
     Q_INVOKABLE void setMuted(const QString &peerKey, bool muted);
     Q_INVOKABLE void clearHistory(const QString &peerKey);
     Q_INVOKABLE void discardSecret(const QString &peerKey);
+    Q_INVOKABLE void deleteChat(const QString &peerKey, bool forEveryone);
+    Q_INVOKABLE void archiveChat(const QString &peerKey, bool archived);
+    Q_INVOKABLE void moveToFolder(const QString &peerKey, int filterId, bool remove);
+    /// "Move" a chat into exactly one folder (removed from all others); destFilterId -1 = no folder.
+    Q_INVOKABLE void setChatFolder(const QString &peerKey, int destFilterId);
+    /// Custom folders as [{ "id": int, "title": string }, ...] for the "move to folder" dialog.
+    Q_INVOKABLE QVariantList customFolders() const;
+    /// The folder ids this chat is currently a member of (its include lists).
+    Q_INVOKABLE QVariantList foldersOf(const QString &peerKey) const;
 
     /// Initials and a stable colour for the avatar circle.
     static QString initials(const QString &title);

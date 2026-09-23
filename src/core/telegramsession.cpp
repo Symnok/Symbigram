@@ -2,6 +2,7 @@
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "telegramsession.h"
 #include "secretapi.h"
+#include "tlwriter.h"
 #include "bigint.h"
 #include "crypto.h"
 #include "dh.h"
@@ -720,6 +721,131 @@ void TelegramSession::deleteHistory(const TgPeer &peer)
     send(DeleteHistory, TgApi::deleteHistory(r.peer, true), r);
 }
 
+void TelegramSession::removeDialogLocal(const TgPeer &peer)
+{
+    int mi = dialogIndex(peer);
+    if (mi >= 0) m_dialogs.removeAt(mi);
+    int ai = dialogIndexIn(m_archived, peer);
+    if (ai >= 0) m_archived.removeAt(ai);
+    m_archivedPeers.remove(peer.key());
+    emit dialogsChanged();
+    emit archiveChanged();
+    emit dialogChanged(peer);
+}
+
+void TelegramSession::deleteChat(const TgPeer &peer, bool forEveryone)
+{
+    TgPeer p = m_peers.withHash(peer);
+    Request r;
+    r.peer = p;
+    r.revoke = forEveryone;
+    QByteArray body;
+    if (p.kind == TgPeer::Channel) body = TgApi::leaveChannel(p);
+    else if (p.kind == TgPeer::Chat) body = TgApi::deleteChatUser(p.id, forEveryone);
+    else body = TgApi::deleteHistory(p, false, forEveryone);
+    send(DeleteChat, body, r);
+    removeDialogLocal(p);          // optimistic: it is gone from the UI at once
+}
+
+void TelegramSession::archiveChat(const TgPeer &peer, bool archived)
+{
+    TgPeer p = m_peers.withHash(peer);
+    setArchived(p, archived);      // optimistic local move between the two lists
+    Request r;
+    r.peer = p;
+    send(ArchivePeer, TgApi::editPeerFolders(p, archived ? 1 : 0), r);
+}
+
+void TelegramSession::moveToFolder(const TgPeer &peer, int filterId, bool remove)
+{
+    TgPeer p = m_peers.withHash(peer);
+    int fi = -1;
+    for (int i = 0; i < m_folders.size(); ++i) if (m_folders.at(i).id == filterId) { fi = i; break; }
+    if (fi < 0) { emit notice(tr("That folder no longer exists.")); return; }
+    QByteArray filter = remove ? buildFolderFilter(m_folders.at(fi), TgPeer(), p)
+                               : buildFolderFilter(m_folders.at(fi), p, TgPeer());
+    // Update the cached folder now, so the view reflects it and - crucially - a second move
+    // before the server round-trip rebuilds from fresh data instead of clobbering this one.
+    const QString key = p.key();
+    if (remove) m_folders[fi].include.removeAll(key);
+    else { m_folders[fi].exclude.removeAll(key); if (!m_folders[fi].include.contains(key)) m_folders[fi].include.append(key); }
+    emit foldersChanged();
+    Request r;
+    r.peer = p;
+    send(MoveFolder, TgApi::updateDialogFilter(filter, filterId), r);
+}
+
+void TelegramSession::setChatFolder(const TgPeer &peer, int destFilterId)
+{
+    // "Move" semantics: the chat ends up in exactly the destination folder. Remove it from every
+    // other custom folder it currently sits in, then add it to the destination (destFilterId < 0
+    // means "All chats" - no custom folder). Each folder is its own dialogFilter, sent separately.
+    TgPeer p = m_peers.withHash(peer);
+    const QString key = p.key();
+    for (int i = 0; i < m_folders.size(); ++i) {
+        if (m_folders.at(i).id == destFilterId) continue;
+        if (!m_folders.at(i).include.contains(key)) continue;
+        QByteArray filter = buildFolderFilter(m_folders.at(i), TgPeer(), p);
+        m_folders[i].include.removeAll(key);          // update cache before the round-trip
+        Request r; r.peer = p;
+        send(MoveFolder, TgApi::updateDialogFilter(filter, m_folders.at(i).id), r);
+    }
+    if (destFilterId >= 0) {
+        int fi = -1;
+        for (int i = 0; i < m_folders.size(); ++i) if (m_folders.at(i).id == destFilterId) { fi = i; break; }
+        if (fi < 0) { emit notice(tr("That folder no longer exists.")); emit foldersChanged(); return; }
+        if (!m_folders.at(fi).include.contains(key)) {
+            QByteArray filter = buildFolderFilter(m_folders.at(fi), p, TgPeer());
+            m_folders[fi].exclude.removeAll(key);
+            m_folders[fi].include.append(key);
+            Request r; r.peer = p;
+            send(MoveFolder, TgApi::updateDialogFilter(filter, m_folders.at(fi).id), r);
+        }
+    }
+    emit foldersChanged();
+}
+
+QByteArray TelegramSession::buildFolderFilter(const TgFolder &f, const TgPeer &addPeer, const TgPeer &removePeer) const
+{
+    int flags = 0;
+    if (f.contacts) flags |= 1 << 0;
+    if (f.nonContacts) flags |= 1 << 1;
+    if (f.groups) flags |= 1 << 2;
+    if (f.broadcasts) flags |= 1 << 3;
+    if (f.bots) flags |= 1 << 4;
+    if (f.excludeMuted) flags |= 1 << 11;
+    if (f.excludeRead) flags |= 1 << 12;
+    if (f.excludeArchived) flags |= 1 << 13;
+    if (!f.emoticon.isEmpty()) flags |= 1 << 25;
+    if (f.hasColor) flags |= 1 << 27;
+
+    QList<QString> inc = f.include, exc = f.exclude;
+    const QString addKey = addPeer.isNull() ? QString() : addPeer.key();
+    const QString remKey = removePeer.isNull() ? QString() : removePeer.key();
+    if (!remKey.isEmpty()) inc.removeAll(remKey);
+    if (!addKey.isEmpty()) { exc.removeAll(addKey); if (!inc.contains(addKey)) inc.append(addKey); }
+
+    TlWriter w(256);
+    w.writeConstructor(Tl::DialogFilter).writeInt(flags).writeInt(f.id);
+    w.writeConstructor(Tl::TextWithEntities).writeString(f.title).writeConstructor(Tl::Vector).writeInt(0);
+    if (!f.emoticon.isEmpty()) w.writeString(f.emoticon);
+    if (f.hasColor) w.writeInt(f.color);
+    const QList<QString> *lists[3] = { &f.pinned, &inc, &exc };
+    for (int L = 0; L < 3; ++L) {
+        const QList<QString> &keys = *lists[L];
+        w.writeConstructor(Tl::Vector).writeInt(keys.size());
+        for (int i = 0; i < keys.size(); ++i) w.writeRaw(TgApi::inputPeer(m_peers.withHash(TgPeer::fromKey(keys.at(i)))));
+    }
+    return w.toByteArray();
+}
+
+void TelegramSession::applyUpdatesResult(const TlObject &o)
+{
+    m_peers.absorb(o);
+    QVariantList list = o.vec("updates");
+    for (int i = 0; i < list.size(); ++i) applyUpdate(TlSchema::toObject(list.at(i)));
+}
+
 void TelegramSession::deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke)
 {
     Request r;
@@ -905,6 +1031,23 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
         }
         case DiscardEncryption:
             break;
+        case ArchivePeer:
+            applyUpdatesResult(TlSchema::readObject(r));
+            break;
+        case MoveFolder:
+            TlSchema::readObject(r);
+            loadFolders();          // reconcile the cached filters with the server's truth
+            break;
+        case DeleteChat: {
+            TlObject o = TlSchema::readObject(r);
+            if (o.has("pts")) {                    // messages.affectedHistory (deleting a 1:1 chat)
+                checkPts(o);
+                if (o.intOr("offset") > 0) send(DeleteChat, TgApi::deleteHistory(req.peer, false, req.revoke), req);
+            } else {
+                applyUpdatesResult(o);             // Updates (leaving a group or channel)
+            }
+            break;
+        }
         case GetHistory: {
             TlObject o = TlSchema::readObject(r);
             TgHistoryPage page = TgApi::readHistory(o, m_peers);
@@ -1210,6 +1353,17 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     case DeleteMessages:
     case UpdateNotifySettings:
     case GetUser:
+    case ArchivePeer:
+    case DeleteChat:
+        break;
+    case MoveFolder:
+        // Telegram won't let a folder with no category filters end up with an empty chat list,
+        // so the very last chat can't be removed from such a folder. Explain rather than dump the code.
+        if (type == QLatin1String("FILTER_INCLUDE_EMPTY"))
+            emit notice(tr("That folder must keep at least one chat, so the chat stays in it too."));
+        else
+            emit notice(tr("Could not change the folder: %1").arg(type));
+        loadFolders();      // re-sync the cached filters with the server after a rejected change
         break;
     }
 }

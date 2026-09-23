@@ -137,6 +137,11 @@ namespace Tl
     const quint32 MessagesDeleteMessages = 0xe58e95d2;
     const quint32 ChannelsDeleteMessages = 0x84c1fd4e;
     const quint32 MessagesDeleteHistory = 0xb08f922a;
+    const quint32 MessagesDeleteChatUser = 0xa2185cab;
+    const quint32 ChannelsLeaveChannel = 0xf836aa95;
+    const quint32 FoldersEditPeerFolders = 0x6847d0ab;
+    const quint32 InputFolderPeer = 0xfbd2c296;
+    const quint32 MessagesUpdateDialogFilter = 0x1ad4a04a;
     const quint32 MessagesSetTyping = 0x58943ee2;
     const quint32 SendMessageTypingAction = 0x16bf744e;
     const quint32 SendMessageCancelAction = 0xfd5ec8f5;

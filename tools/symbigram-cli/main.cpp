@@ -461,6 +461,7 @@ private:
     TgPeer peerAt(const QString &arg) const
     {
         if (arg == QLatin1String("self")) return TgPeer(TgPeer::User, m_session->selfId());
+        if (!arg.isEmpty() && arg.at(0).isLetter()) return TgPeer::fromKey(arg);   // a peer key like u123/c123
         int n = arg.toInt();
         if (n < 0 || n >= m_session->dialogs().size()) return TgPeer();
         return m_session->dialogs().at(n).peer;
@@ -486,10 +487,15 @@ private:
         else if (cmd == QLatin1String("folders")) {
             const QList<TgFolder> &f = m_session->folders();
             say(QString::fromLatin1("[folders] %1 custom folders").arg(f.size()));
-            for (int i = 0; i < f.size(); ++i)
-                say(QString::fromLatin1("  %1. %2  include=%3 pinned=%4 exclude=%5 cats(c%6 nc%7 g%8 b%9 bot%10) exArch=%11")
-                    .arg(i).arg(f.at(i).title).arg(f.at(i).include.size()).arg(f.at(i).pinned.size()).arg(f.at(i).exclude.size())
-                    .arg(f.at(i).contacts).arg(f.at(i).nonContacts).arg(f.at(i).groups).arg(f.at(i).broadcasts).arg(f.at(i).bots).arg(f.at(i).excludeArchived));
+            for (int i = 0; i < f.size(); ++i) {
+                const TgFolder &fo = f.at(i);
+                say(QString::fromLatin1("  id=%1 \"%2\" cats(c%3 nc%4 g%5 b%6 bot%7) exMuted=%8 exRead=%9 exArch=%10 emoji=%11 color=%12")
+                    .arg(fo.id).arg(fo.title).arg(fo.contacts).arg(fo.nonContacts).arg(fo.groups).arg(fo.broadcasts).arg(fo.bots)
+                    .arg(fo.excludeMuted).arg(fo.excludeRead).arg(fo.excludeArchived).arg(fo.emoticon).arg(fo.hasColor ? fo.color : -1));
+                say(QString::fromLatin1("     include=[%1] exclude=[%2] pinned=[%3]")
+                    .arg(QStringList(fo.include).join(QLatin1String(","))).arg(QStringList(fo.exclude).join(QLatin1String(",")))
+                    .arg(QStringList(fo.pinned).join(QLatin1String(","))));
+            }
         }
         else if (cmd == QLatin1String("archive")) {
             const QList<TgDialog> &a = m_session->archivedDialogs();
@@ -513,6 +519,11 @@ private:
         else if (cmd == QLatin1String("secretsend") && a.size() >= 3) m_session->sendSecretText(a.at(1).toInt(), QStringList(a.mid(2)).join(QLatin1String(" ")));
         else if (cmd == QLatin1String("secretttl") && a.size() >= 3) m_session->setSecretTtl(a.at(1).toInt(), a.at(2).toInt());
         else if (cmd == QLatin1String("discardsecret") && a.size() >= 2) m_session->discardSecretChat(a.at(1).toInt());
+        else if (cmd == QLatin1String("archivechat") && a.size() >= 2) m_session->archiveChat(peerAt(a.at(1)), true);
+        else if (cmd == QLatin1String("unarchivechat") && a.size() >= 2) m_session->archiveChat(peerAt(a.at(1)), false);
+        else if (cmd == QLatin1String("deletechat") && a.size() >= 2) m_session->deleteChat(peerAt(a.at(1)), a.value(2) == QLatin1String("all"));
+        else if (cmd == QLatin1String("movefolder") && a.size() >= 3) m_session->moveToFolder(peerAt(a.at(1)), a.at(2).toInt(), a.value(3) == QLatin1String("remove"));
+        else if (cmd == QLatin1String("setfolder") && a.size() >= 3) m_session->setChatFolder(peerAt(a.at(1)), a.at(2).toInt());   // move to exactly this folder (-1 = none)
         else if (cmd == QLatin1String("del") && a.size() >= 3) m_session->deleteMessages(peerAt(a.at(1)), QList<int>() << a.at(2).toInt(), a.value(3) == QLatin1String("all"));
         else if (cmd == QLatin1String("get") && a.size() >= 2) {
             // get <message id> [size]: downloads the attachment of a message shown by history

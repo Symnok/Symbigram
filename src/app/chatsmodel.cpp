@@ -269,6 +269,35 @@ void ChatsModel::refresh() { m_session->refreshDialogs(); m_session->loadFolders
 void ChatsModel::setMuted(const QString &peerKey, bool muted) { m_session->setMuted(TgPeer::fromKey(peerKey), muted); }
 void ChatsModel::clearHistory(const QString &peerKey) { m_session->deleteHistory(TgPeer::fromKey(peerKey)); }
 void ChatsModel::discardSecret(const QString &peerKey) { if (peerKey.startsWith(QLatin1String("secret:"))) m_session->discardSecretChat(peerKey.mid(7).toInt()); }
+void ChatsModel::deleteChat(const QString &peerKey, bool forEveryone) { m_session->deleteChat(TgPeer::fromKey(peerKey), forEveryone); }
+void ChatsModel::archiveChat(const QString &peerKey, bool archived) { m_session->archiveChat(TgPeer::fromKey(peerKey), archived); }
+void ChatsModel::moveToFolder(const QString &peerKey, int filterId, bool remove) { m_session->moveToFolder(TgPeer::fromKey(peerKey), filterId, remove); }
+
+void ChatsModel::setChatFolder(const QString &peerKey, int destFilterId) { m_session->setChatFolder(TgPeer::fromKey(peerKey), destFilterId); }
+
+int ChatsModel::customFolderCount() const { return m_session->folders().size(); }
+
+QVariantList ChatsModel::customFolders() const
+{
+    QVariantList out;
+    const QList<TgFolder> &f = m_session->folders();
+    for (int i = 0; i < f.size(); ++i) {
+        QVariantMap m;
+        m.insert(QLatin1String("id"), f.at(i).id);
+        m.insert(QLatin1String("title"), f.at(i).title);
+        out.append(m);
+    }
+    return out;
+}
+
+QVariantList ChatsModel::foldersOf(const QString &peerKey) const
+{
+    QVariantList out;
+    const QList<TgFolder> &f = m_session->folders();
+    for (int i = 0; i < f.size(); ++i)
+        if (f.at(i).include.contains(peerKey)) out.append(f.at(i).id);
+    return out;
+}
 
 void ChatsModel::onDialogsChanged()
 {

@@ -56,6 +56,7 @@ Page {
             folderModel.clear()
             var names = app.chats.folderNames
             for (var i = 0; i < names.length; ++i) folderModel.append({ "name": names[i] })
+            selectedIndex = app.chats.folder   // open positioned on the current folder
         }
         onStatusChanged: if (status == DialogStatus.Opening) reload()
     }
@@ -107,21 +108,94 @@ Page {
     ContextMenu {
         id: contextMenu
         property variant item
+        property bool isSecret: item ? item.secret === true : false
         MenuLayout {
             MenuItem {
                 text: contextMenu.item && contextMenu.item.muted ? qsTr("Unmute") : qsTr("Mute")
-                visible: contextMenu.item ? contextMenu.item.secret !== true : true
+                visible: !contextMenu.isSecret
                 onClicked: app.chats.setMuted(contextMenu.item.peerKey, !contextMenu.item.muted)
             }
             MenuItem {
+                text: app.chats.archiveSelected ? qsTr("Unarchive chat") : qsTr("Archive chat")
+                visible: !contextMenu.isSecret
+                onClicked: app.chats.archiveChat(contextMenu.item.peerKey, !app.chats.archiveSelected)
+            }
+            MenuItem {
+                text: qsTr("Move to folder")
+                visible: !contextMenu.isSecret && app.chats.customFolderCount > 0
+                onClicked: { folderMoveDialog.peerKey = contextMenu.item.peerKey; folderMoveDialog.reload(); folderMoveDialog.open() }
+            }
+            MenuItem {
                 text: qsTr("Clear history")
-                visible: contextMenu.item ? contextMenu.item.secret !== true : true
+                visible: !contextMenu.isSecret
                 onClicked: { clearDialog.peerKey = contextMenu.item.peerKey; clearDialog.title = contextMenu.item.title; clearDialog.open() }
             }
             MenuItem {
+                text: qsTr("Delete chat")
+                visible: !contextMenu.isSecret
+                onClicked: { deleteChatDialog.peerKey = contextMenu.item.peerKey; deleteChatDialog.title = contextMenu.item.title; deleteChatDialog.open() }
+            }
+            MenuItem {
                 text: qsTr("Delete secret chat")
-                visible: contextMenu.item ? contextMenu.item.secret === true : false
+                visible: contextMenu.isSecret
                 onClicked: { secretDeleteDialog.peerKey = contextMenu.item.peerKey; secretDeleteDialog.title = contextMenu.item.title; secretDeleteDialog.open() }
+            }
+        }
+    }
+
+    CommonDialog {
+        id: deleteChatDialog
+        property string peerKey
+        property string title
+        titleText: qsTr("Delete chat")
+        buttonTexts: [qsTr("Myself"), qsTr("All"), qsTr("Cancel")]
+        content: Item {
+            width: parent.width
+            height: dcLabel.height + 2 * platformStyle.paddingLarge
+            Label {
+                id: dcLabel
+                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: platformStyle.paddingLarge }
+                wrapMode: Text.Wrap
+                color: platformStyle.colorNormalLight
+                text: qsTr("Delete the chat \"%1\"? \"All\" also removes it for the other side.").arg(deleteChatDialog.title)
+            }
+        }
+        onButtonClicked: {
+            if (index == 0) app.chats.deleteChat(deleteChatDialog.peerKey, false)
+            else if (index == 1) app.chats.deleteChat(deleteChatDialog.peerKey, true)
+        }
+    }
+
+    SelectionDialog {
+        id: folderMoveDialog
+        property string peerKey
+        titleText: qsTr("Move to folder")
+        model: ListModel { id: folderMoveModel }
+        delegate: Item {
+            width: parent ? parent.width : 300
+            height: (typeof privateStyle != "undefined") ? privateStyle.menuItemHeight : 56
+            Rectangle { anchors.fill: parent; color: fmMouse.pressed ? "#3d5a80" : "transparent" }
+            Label {
+                anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+                text: model.name + (model.member ? "   *" : "")
+                color: "white"; elide: Text.ElideRight
+            }
+            MouseArea { id: fmMouse; anchors.fill: parent; onClicked: { folderMoveDialog.selectedIndex = index; folderMoveDialog.accept() } }
+        }
+        onAccepted: {
+            if (selectedIndex < 0) return
+            var f = folderMoveModel.get(selectedIndex)
+            if (f.member) return                                 // already the only folder it's in
+            app.chats.setChatFolder(peerKey, f.fid)              // move here, out of every other folder
+        }
+        function reload() {
+            folderMoveModel.clear()
+            var mine = app.chats.foldersOf(peerKey)
+            folderMoveModel.append({ "name": qsTr("All chats (no folder)"), "fid": -1, "member": mine.length === 0 })
+            var folders = app.chats.customFolders()
+            for (var i = 0; i < folders.length; ++i) {
+                var isMember = mine.indexOf(folders[i].id) >= 0
+                folderMoveModel.append({ "name": folders[i].title, "fid": folders[i].id, "member": isMember })
             }
         }
     }
