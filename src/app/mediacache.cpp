@@ -22,11 +22,14 @@ void MediaCache::setDirectory(const QString &dir)
     QDir().mkpath(m_dir);
 }
 
+// Every file in the cache directory, whatever its type, name, or hidden/system flag.
+static const QDir::Filters CacheFileFilter = QDir::Files | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot;
+
 qint64 MediaCache::cacheBytes() const
 {
     if (m_dir.isEmpty()) return 0;
     qint64 total = 0;
-    QFileInfoList files = QDir(m_dir).entryInfoList(QDir::Files);
+    QFileInfoList files = QDir(m_dir).entryInfoList(CacheFileFilter);
     for (int i = 0; i < files.size(); ++i) total += files.at(i).size();
     return total;
 }
@@ -34,10 +37,11 @@ qint64 MediaCache::cacheBytes() const
 qint64 MediaCache::clearCache()
 {
     if (m_dir.isEmpty()) return 0;
-    // Keep files a download is still writing to, so clearing mid-download can't corrupt them.
+    // Keep files a download is still writing to, so clearing mid-download can't corrupt them;
+    // otherwise remove EVERY file in the cache directory, of any type or name.
     QList<QString> keep = m_jobPath.values();
     qint64 freed = 0;
-    QFileInfoList files = QDir(m_dir).entryInfoList(QDir::Files);
+    QFileInfoList files = QDir(m_dir).entryInfoList(CacheFileFilter);
     for (int i = 0; i < files.size(); ++i) {
         const QString path = files.at(i).absoluteFilePath();
         if (keep.contains(path)) continue;
