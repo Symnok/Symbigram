@@ -25,7 +25,7 @@ namespace
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
-      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1)
+      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_replyToId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -137,15 +137,8 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
         if (m.forwardedFrom.contains(QLatin1Char(':'))) return m_session->peers().title(TgPeer::fromKey(m.forwardedFrom));
         return m.forwardedFrom;
     }
-    case ReplyRole: {
-        if (!m.replyToId) return QString();
-        int row = rowById(m.replyToId);
-        if (row < 0) return tr("reply");
-        const TgMessage &to = m_rows.at(row).m;
-        QString who = to.out ? tr("You") : m_session->peers().userName(to.fromId);
-        QString text = to.text.isEmpty() ? to.note : to.text;
-        return who + QLatin1String(": ") + text.simplified().left(60);
-    }
+    case ReplyRole:
+        return m.replyToId ? replySnippet(m.replyToId) : QString();
     case EditedRole: return m.editDate > 0;
     case MediaKindRole: return mediaKindName(m.media.kind);
     case MediaThumbRole: return r.thumbPath.isEmpty() ? QString() : QUrl::fromLocalFile(r.thumbPath).toString();
@@ -568,6 +561,7 @@ void MessagesModel::close()
     m_rows.clear();
     endResetModel();
     m_loading = false;
+    if (m_replyToId) { m_replyToId = 0; emit replyChanged(); }
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
@@ -705,13 +699,46 @@ void MessagesModel::send(const QString &text)
     r.m.out = true;
     r.m.date = now();
     r.m.fromId = m_session->selfId();
+    r.m.replyToId = m_replyToId;      // carried into sendRow and shown as the reply preview
     r.pending = true;
     beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
     m_rows.append(r);
     endInsertRows();
+    if (m_replyToId) { m_replyToId = 0; emit replyChanged(); }
     emit countChanged();
     emit messageAppended();
     sendRow(m_rows.size() - 1);
+}
+
+void MessagesModel::startReply(int row)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    int id = m_rows.at(row).m.id;
+    if (id <= 0) return;              // a pending/unsent message has no server id to reply to yet
+    m_replyToId = id;
+    emit replyChanged();
+}
+
+void MessagesModel::cancelReply()
+{
+    if (!m_replyToId) return;
+    m_replyToId = 0;
+    emit replyChanged();
+}
+
+QString MessagesModel::replyToText() const
+{
+    return m_replyToId ? replySnippet(m_replyToId) : QString();
+}
+
+QString MessagesModel::replySnippet(int msgId) const
+{
+    int row = rowById(msgId);
+    if (row < 0) return tr("reply");
+    const TgMessage &to = m_rows.at(row).m;
+    QString who = to.out ? tr("You") : m_session->peers().userName(to.fromId);
+    QString text = to.text.isEmpty() ? to.note : to.text;
+    return who + QLatin1String(": ") + text.simplified().left(60);
 }
 
 void MessagesModel::sendRow(int row)
@@ -723,7 +750,7 @@ void MessagesModel::sendRow(int row)
         emit sendFailed(tr("Not connected."));
         return;
     }
-    m_rows[row].randomId = m_session->sendText(m_peer, m_rows.at(row).m.text);
+    m_rows[row].randomId = m_session->sendText(m_peer, m_rows.at(row).m.text, m_rows.at(row).m.replyToId);
     m_rows[row].pending = true;
     m_rows[row].failed = false;
     emit dataChanged(index(row), index(row));

@@ -123,6 +123,11 @@ Page {
         property variant item
         MenuLayout {
             MenuItem {
+                text: qsTr("Reply")
+                visible: contextMenu.item ? (!contextMenu.item.pending && !contextMenu.item.service && !chat.isSecret && !chat.peerIsChannel) : false
+                onClicked: { chat.startReply(contextMenu.row); composer.forceActiveFocus(); composer.openSoftwareInputPanel() }
+            }
+            MenuItem {
                 text: qsTr("Save to phone")
                 visible: contextMenu.item ? (contextMenu.item.mediaKind != "" && contextMenu.item.mediaKind != "sticker") : false
                 onClicked: chat.saveMedia(contextMenu.row)
@@ -238,7 +243,7 @@ Page {
     // -- messages --
     ListView {
         id: list
-        anchors { top: secretBar.bottom; left: parent.left; right: parent.right; bottom: composerRow.top }
+        anchors { top: secretBar.bottom; left: parent.left; right: parent.right; bottom: replyBar.top }
         model: chat
         clip: true
         spacing: platformStyle.paddingSmall
@@ -293,6 +298,33 @@ Page {
         color: platformStyle.colorNormalMid
         visible: list.count == 0 && !chat.loading
         text: chat.error != "" ? qsTr("Could not load the messages: %1").arg(chat.error) : qsTr("No messages yet.")
+    }
+
+    // -- reply bar (above the composer while a reply is being composed) --
+    Item {
+        id: replyBar
+        anchors { left: parent.left; right: parent.right; bottom: composerRow.top }
+        height: chat.replyToId > 0 ? replyContent.height + 2 * platformStyle.paddingSmall : 0
+        visible: chat.replyToId > 0
+        clip: true
+        Rectangle { anchors.fill: parent; color: "#1c2a3a" }
+        Rectangle { anchors { left: parent.left; top: parent.top; bottom: parent.bottom } width: 3; color: "#5b8fd0" }
+        Row {
+            id: replyContent
+            anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: cancelReply.left; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            spacing: platformStyle.paddingSmall
+            Column {
+                width: parent.width
+                Label { text: qsTr("Replying to"); color: "#5b8fd0"; font.pixelSize: platformStyle.fontSizeSmall }
+                Label { width: parent.width; text: chat.replyToText; color: "white"; font.pixelSize: platformStyle.fontSizeSmall; elide: Text.ElideRight }
+            }
+        }
+        ToolButton {
+            id: cancelReply
+            anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            iconSource: "toolbar-close"
+            onClicked: chat.cancelReply()
+        }
     }
 
     // -- composer --

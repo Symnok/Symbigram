@@ -41,6 +41,8 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(bool isSecret READ isSecret NOTIFY chatChanged)
     Q_PROPERTY(int secretState READ secretState NOTIFY peerChanged)      // 0 by-me, 1 to-me, 2 ready
     Q_PROPERTY(int secretTtl READ secretTtl NOTIFY peerChanged)
+    Q_PROPERTY(int replyToId READ replyToId NOTIFY replyChanged)         // message being replied to (0 = none)
+    Q_PROPERTY(QString replyToText READ replyToText NOTIFY replyChanged) // preview for the reply bar
 public:
     enum Roles {
         MsgIdRole = Qt::UserRole + 1,
@@ -97,6 +99,11 @@ public:
     Q_INVOKABLE void open(const QString &peerKey);
     Q_INVOKABLE void close();
     Q_INVOKABLE void send(const QString &text);
+    /// Compose a reply to the message in this row; cancelReply() clears the target.
+    Q_INVOKABLE void startReply(int row);
+    Q_INVOKABLE void cancelReply();
+    int replyToId() const { return m_replyToId; }
+    QString replyToText() const;
     Q_INVOKABLE void retry(int row);
     Q_INVOKABLE void loadOlder();
     Q_INVOKABLE void markRead();
@@ -135,6 +142,7 @@ signals:
     void olderPrepended(int count);
     void sendFailed(const QString &error);
     void mediaSaved(const QString &path);   // a file was copied out; path is where
+    void replyChanged();
 
 private slots:
     void onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
@@ -186,6 +194,7 @@ private:
     QString mediaInfoText(const TgMedia &m) const;
     int rowById(int id) const;
     int rowByRandomId(qint64 randomId) const;
+    QString replySnippet(int msgId) const;   // "Name: text" preview of the replied-to message
     void sendRow(int row);
     static QString timeText(int unixTime);
     static QString dateText(int unixTime);
@@ -210,6 +219,7 @@ private:
     bool m_typingSent;
     QTime m_typingSentAt;
     qint64 m_peerTypingUser;
+    int m_replyToId;                        // message id the composer will reply to (0 = none)
 };
 
 #endif // MESSAGESMODEL_H
