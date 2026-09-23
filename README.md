@@ -7,9 +7,9 @@ Qt 4.7.4 / Qt Quick 1.1, the same shell as JasmineKICQ, SimpleVKM-Symbian and Si
 It speaks MTProto 2.0 straight to Telegram's datacenters - no bridge, no proxy, no server of
 its own. The authorisation key is generated on the phone by Diffie-Hellman and never leaves it.
 
-What it does: sign-in by QR code only (scan from a signed-in Telegram, plus the two-step
-verification password when the account has one; the token migration to the account's
-datacenter is handled), the chat list with unread counts, mute marks and pinned chats,
+What it does: sign-in by QR code (scan from a signed-in Telegram) or by phone number and the
+code Telegram sends, plus the two-step verification password when the account has one; the
+token / phone migration to the account's datacenter is handled. The chat list with unread counts, mute marks and pinned chats,
 message history with older pages, sending text with delivery and read marks, replies and
 forwards shown as such, groups and channels (with sender names), typing notifications both
 ways, presence ("last seen"), finding people by @username, phone number or name, mute /
@@ -73,3 +73,8 @@ Translations: `lupdate -extensions qml,cpp,h -no-obsolete src qml -ts translatio
   the handshake (once per datacenter) and the SRP proof run in worker threads.
 - Telegram's servers are reached over plain TCP on port 443 (MTProto is its own encryption);
   where they are blocked, so is this client.
+
+## Development
+
+This code was written with the assistance of [Claude Code](https://claude.com/claude-code),
+Anthropic's agentic coding tool.
