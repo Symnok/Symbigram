@@ -67,6 +67,7 @@ class AppController : public QObject
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
     Q_PROPERTY(MessagesModel *chat READ chat CONSTANT)
     Q_PROPERTY(QString notice READ notice NOTIFY noticeChanged)
+    Q_PROPERTY(QString cacheSize READ cacheSize NOTIFY cacheChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     /// Desktop testing: true when SGM_SHOT_DIR is set; main.qml then walks the pages.
     Q_PROPERTY(bool autotest READ autotest CONSTANT)
@@ -124,6 +125,7 @@ public:
     ChatsModel *chats() const { return m_chats; }
     MessagesModel *chat() const { return m_chat; }
     QString notice() const { return m_notice; }
+    QString cacheSize() const;                     // human-readable size of the media cache
     bool autotest() const;
     QString autotestPeer() const;
     bool autotestFolder() const;
@@ -139,6 +141,7 @@ public:
     bool eventFilter(QObject *watched, QEvent *event);
 
 public slots:
+    void clearCache();                             // empties the media cache; notice() reports the result
     void checkPassword(const QString &password);
     // Phone-number login (an alternative to the QR code).
     void usePhoneLogin();                         // switch the login page to the phone form
@@ -182,6 +185,7 @@ signals:
     void settingsChanged();
     void selfChanged();
     void noticeChanged();
+    void cacheChanged();
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);

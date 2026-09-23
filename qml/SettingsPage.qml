@@ -10,6 +10,15 @@ Page {
         ToolButton { iconSource: "toolbar-back"; onClicked: pageStack.pop() }
     }
 
+    QueryDialog {
+        id: clearCacheDialog
+        titleText: qsTr("Clear cache")
+        message: qsTr("Delete the %1 of downloaded media held on the phone? It will be fetched again when needed.").arg(app.cacheSize)
+        acceptButtonText: qsTr("Clear")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: app.clearCache()
+    }
+
     SelectionDialog {
         id: languageDialog
         titleText: qsTr("App language")
@@ -275,6 +284,31 @@ Page {
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
                 text: qsTr("Saved photos and files go here. Pick a drive, or \"Choose folder...\" for any folder.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
+
+            ListItem {
+                id: cacheItem
+                Column {
+                    anchors { left: cacheItem.paddingItem.left; right: cacheItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Clear cache") }
+                    Label {
+                        width: parent.width
+                        text: qsTr("Downloaded media held on the phone: %1").arg(app.cacheSize)
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideMiddle
+                    }
+                }
+                onClicked: clearCacheDialog.open()
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("The app's private store of downloaded photos, avatars and files (separate from the folder above). Clearing it just re-downloads on demand.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

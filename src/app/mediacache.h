@@ -46,6 +46,11 @@ public:
     bool isFetching(const QString &key) const { return m_jobs.values().contains(key); }
     int progressPercent(const QString &key) const { return m_progress.value(key, 0); }
 
+    /// Total size, in bytes, of everything in the cache directory.
+    qint64 cacheBytes() const;
+    /// Deletes cached files (skipping any download still in flight); returns bytes freed.
+    qint64 clearCache();
+
 signals:
     void ready(const QString &key, const QString &path);
     void failed(const QString &key, const QString &error);

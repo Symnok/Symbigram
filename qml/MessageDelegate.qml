@@ -170,7 +170,7 @@ Item {
                             anchors.centerIn: parent
                             color: "white"
                             font.pixelSize: platformStyle.fontSizeSmall
-                            text: (model.mediaKind == "voice" || model.mediaKind == "audio")
+                            text: model.mediaKind == "voice"
                                 ? (model.voicePlaying ? "■" : "▶")
                                 : (model.mediaState == "ready" ? "✓"
                                 : (model.mediaState == "loading" ? model.mediaProgress + "%"
@@ -179,7 +179,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                if (model.mediaKind == "voice" || model.mediaKind == "audio") chat.playVoice(index)
+                                if (model.mediaKind == "voice") chat.playVoice(index)
                                 else if (model.mediaState == "ready") chat.openMedia(index)
                                 else if (model.mediaState != "loading") chat.downloadMedia(index)
                             }
@@ -196,7 +196,7 @@ Item {
                             elide: Text.ElideMiddle
                         }
                         Label {
-                            text: (model.mediaKind == "voice" || model.mediaKind == "audio")
+                            text: model.mediaKind == "voice"
                                 ? (model.voicePlaying ? qsTr("playing... tap to stop")
                                    : (model.mediaState == "loading" ? qsTr("loading %1%").arg(model.mediaProgress) : qsTr("tap to play")))
                                 : (model.mediaState == "ready" ? qsTr("tap to open") : (model.mediaState == "loading" ? qsTr("downloading %1%").arg(model.mediaProgress) : (model.mediaKind == "video" ? model.mediaInfo : qsTr("tap to download"))))

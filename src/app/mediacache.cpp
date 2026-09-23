@@ -5,6 +5,8 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QFileInfoList>
 
 MediaCache::MediaCache(TelegramSession *session, QObject *parent)
     : QObject(parent), m_session(session)
@@ -18,6 +20,31 @@ void MediaCache::setDirectory(const QString &dir)
 {
     m_dir = dir;
     QDir().mkpath(m_dir);
+}
+
+qint64 MediaCache::cacheBytes() const
+{
+    if (m_dir.isEmpty()) return 0;
+    qint64 total = 0;
+    QFileInfoList files = QDir(m_dir).entryInfoList(QDir::Files);
+    for (int i = 0; i < files.size(); ++i) total += files.at(i).size();
+    return total;
+}
+
+qint64 MediaCache::clearCache()
+{
+    if (m_dir.isEmpty()) return 0;
+    // Keep files a download is still writing to, so clearing mid-download can't corrupt them.
+    QList<QString> keep = m_jobPath.values();
+    qint64 freed = 0;
+    QFileInfoList files = QDir(m_dir).entryInfoList(QDir::Files);
+    for (int i = 0; i < files.size(); ++i) {
+        const QString path = files.at(i).absoluteFilePath();
+        if (keep.contains(path)) continue;
+        qint64 sz = files.at(i).size();
+        if (QFile::remove(path)) freed += sz;
+    }
+    return freed;
 }
 
 QString MediaCache::extensionFor(const TgMedia &media)

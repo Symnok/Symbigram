@@ -760,6 +760,7 @@ TgMedia TgApi::readMedia(const TlObject &media)
         m.mimeType = doc.str("mime_type");
         m.fileSize = doc.longOr("size");
         if (doc.has("thumbs")) m.thumbSizeType = smallestThumb(doc.vec("thumbs"));
+        QString audioTitle, audioPerformer;
         QVariantList attrs = doc.vec("attributes");
         for (int i = 0; i < attrs.size(); ++i) {
             TlObject a = TlSchema::toObject(attrs.at(i));
@@ -773,11 +774,30 @@ TgMedia TgApi::readMedia(const TlObject &media)
                 m.width = a.intOr("w");
                 m.height = a.intOr("h");
             }
-            else if (a.ctor() == Tl::DocumentAttributeAudio) { m.kind = a.flag("flags", 10) ? TgMedia::Voice : TgMedia::Audio; m.duration = a.intOr("duration"); }
+            else if (a.ctor() == Tl::DocumentAttributeAudio) {
+                m.kind = a.flag("flags", 10) ? TgMedia::Voice : TgMedia::Audio;
+                m.duration = a.intOr("duration");
+                audioTitle = a.str("title");
+                audioPerformer = a.str("performer");
+            }
         }
         if (m.mimeType == QLatin1String("image/webp") || m.mimeType == QLatin1String("application/x-tgsticker")) m.kind = TgMedia::Sticker;
-        if (m.fileName.isEmpty()) {
-            QString ext = m.mimeType.section(QLatin1Char('/'), -1);
+        // Name music (audio) from its tags the way Telegram's clients do: "<title>_<performer>.<ext>"
+        // (performer = the "Contributing Artists" tag). Tags win over any file-name attribute for
+        // audio; other files keep their file name, falling back to a generic name when there is none.
+        if (m.kind == TgMedia::Audio && !(audioTitle.isEmpty() && audioPerformer.isEmpty())) {
+            QString ext = m.fileName.section(QLatin1Char('.'), -1).toLower();          // prefer the real extension
+            if (ext.isEmpty() || ext.size() > 5) {
+                ext = m.mimeType.section(QLatin1Char('/'), -1).toLower();
+                if (ext == QLatin1String("mpeg") || ext == QLatin1String("mpeg3") || m.mimeType == QLatin1String("audio/mpeg")) ext = QLatin1String("mp3");
+                else if (ext == QLatin1String("mp4") || ext == QLatin1String("x-m4a") || m.mimeType == QLatin1String("audio/mp4") || m.mimeType == QLatin1String("audio/x-m4a")) ext = QLatin1String("m4a");
+            }
+            if (ext.isEmpty()) ext = QLatin1String("mp3");
+            QString base = audioTitle.isEmpty() ? audioPerformer
+                         : (audioPerformer.isEmpty() ? audioTitle : audioTitle + QLatin1Char('_') + audioPerformer);
+            m.fileName = base + QLatin1Char('.') + ext;
+        } else if (m.fileName.isEmpty()) {
+            QString ext = m.mimeType.section(QLatin1Char('/'), -1).toLower();
             m.fileName = QString::fromLatin1("file_%1.%2").arg(quint64(m.id), 0, 16).arg(ext.isEmpty() ? QLatin1String("bin") : ext);
         }
         return m;

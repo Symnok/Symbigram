@@ -189,6 +189,11 @@ private:
     bool anyBurning() const;   // any visible message counting down?
     /// The user-visible folder saved files go to (drive-aware on Symbian).
     static QString downloadDir(bool photo);
+    /// Copies a downloaded attachment out to a public, real-named file (external apps - e.g. the
+    /// built-in audio player - can't read the app's private cache). unique=true never overwrites
+    /// (adds " (n)"); unique=false reuses an identical existing copy. Returns the path, or empty.
+    QString exportToPublic(int row, bool unique);
+    static QString sanitizeName(const QString &name);
     int rowByKey(const QString &key) const;
     static QString mediaKindName(TgMedia::Kind k);
     QString mediaInfoText(const TgMedia &m) const;

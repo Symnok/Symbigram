@@ -184,6 +184,24 @@ void AppController::setNotice(const QString &n)
 void AppController::clearNotice() { setNotice(QString()); }
 void AppController::onNotice(const QString &text) { setNotice(text); }
 
+QString AppController::cacheSize() const
+{
+    qint64 b = m_media ? m_media->cacheBytes() : 0;
+    if (b >= 1048576) return tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1);
+    if (b >= 1024) return tr("%1 KB").arg(int(b / 1024));
+    return tr("%1 B").arg(b);
+}
+
+void AppController::clearCache()
+{
+    if (!m_media) return;
+    qint64 freed = m_media->clearCache();
+    QString human = freed >= 1048576 ? tr("%1 MB").arg(double(freed) / 1048576.0, 0, 'f', 1)
+                  : (freed >= 1024 ? tr("%1 KB").arg(int(freed / 1024)) : tr("%1 B").arg(freed));
+    setNotice(tr("Cache cleared (%1 freed).").arg(human));
+    emit cacheChanged();
+}
+
 QString AppController::connection() const
 {
     switch (m_session->state()) {

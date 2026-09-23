@@ -183,7 +183,8 @@ QString MessagesModel::mediaInfoText(const TgMedia &m) const
     else if (b > 0) size = tr("%1 B").arg(b);
     QString dur;
     if (m.duration > 0) dur = QString::fromLatin1("%1:%2").arg(m.duration / 60).arg(m.duration % 60, 2, 10, QLatin1Char('0'));
-    if (m.kind == TgMedia::Voice || m.kind == TgMedia::Audio) return dur.isEmpty() ? size : dur;
+    if (m.kind == TgMedia::Voice) return dur.isEmpty() ? size : dur;
+    if (m.kind == TgMedia::Audio) return m.fileName + (dur.isEmpty() ? QString() : QLatin1String("  ") + dur);
     if (m.kind == TgMedia::Document) return m.fileName + (size.isEmpty() ? QString() : QLatin1String("  ") + size);
     if (m.kind == TgMedia::Video || m.kind == TgMedia::Gif) return dur.isEmpty() ? size : dur + QLatin1String("  ") + size;
     return size;
@@ -265,20 +266,49 @@ QString MessagesModel::downloadDir(bool photo)
 #endif
 }
 
+QString MessagesModel::sanitizeName(const QString &name)
+{
+    // Strip characters a FAT/Symbian filesystem rejects, keep the rest (incl. the extension).
+    QString out;
+    for (int i = 0; i < name.size(); ++i) {
+        QChar c = name.at(i);
+        if (c == QLatin1Char('\\') || c == QLatin1Char('/') || c == QLatin1Char(':') || c == QLatin1Char('*') ||
+            c == QLatin1Char('?') || c == QLatin1Char('"') || c == QLatin1Char('<') || c == QLatin1Char('>') ||
+            c == QLatin1Char('|')) out.append(QLatin1Char('_'));
+        else out.append(c);
+    }
+    out = out.trimmed();
+    return out.isEmpty() ? QLatin1String("file") : out;
+}
+
+QString MessagesModel::exportToPublic(int row, bool unique)
+{
+    if (row < 0 || row >= m_rows.size()) return QString();
+    const Row &r = m_rows.at(row);
+    if (r.fullPath.isEmpty()) return QString();
+    QString base = m_downloadFolder.isEmpty() ? downloadDir(r.m.media.kind == TgMedia::Photo) : m_downloadFolder;
+    QDir().mkpath(base);
+    QString name = sanitizeName(r.m.media.fileName.isEmpty() ? QFileInfo(r.fullPath).fileName() : r.m.media.fileName);
+    QString target = base + QLatin1Char('/') + name;
+    if (!unique) {
+        // Reuse a copy that is already there (same size) so repeated opens don't pile up files.
+        if (QFile::exists(target) && QFileInfo(target).size() == QFileInfo(r.fullPath).size()) return target;
+    } else {
+        for (int n = 1; QFile::exists(target); ++n) {
+            QFileInfo fi(base + QLatin1Char('/') + name);
+            target = QString::fromLatin1("%1/%2 (%3).%4").arg(base, fi.completeBaseName()).arg(n).arg(fi.suffix());
+        }
+    }
+    return QFile::copy(r.fullPath, target) ? target : QString();
+}
+
 void MessagesModel::saveMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
-    Row &r = m_rows[row];
-    if (r.fullPath.isEmpty()) { downloadMedia(row); return; }
-    QString base = m_downloadFolder.isEmpty() ? downloadDir(r.m.media.kind == TgMedia::Photo) : m_downloadFolder;
-    QDir().mkpath(base);
-    QString name = r.m.media.fileName.isEmpty() ? QFileInfo(r.fullPath).fileName() : r.m.media.fileName;
-    QString target = base + QLatin1Char('/') + name;
-    for (int n = 1; QFile::exists(target); ++n) {
-        QFileInfo fi(base + QLatin1Char('/') + name);
-        target = QString::fromLatin1("%1/%2 (%3).%4").arg(base, fi.completeBaseName()).arg(n).arg(fi.suffix());
-    }
-    if (QFile::copy(r.fullPath, target)) {
+    if (m_rows.at(row).fullPath.isEmpty()) { downloadMedia(row); return; }
+    QString base = m_downloadFolder.isEmpty() ? downloadDir(m_rows.at(row).m.media.kind == TgMedia::Photo) : m_downloadFolder;
+    QString target = exportToPublic(row, true);
+    if (!target.isEmpty()) {
         QString shown = QDir::toNativeSeparators(target);
         qDebug("tg: saved attachment to %s", qPrintable(shown));
         emit mediaSaved(shown);
@@ -320,7 +350,15 @@ void MessagesModel::openMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
     if (m_rows.at(row).fullPath.isEmpty()) { downloadMedia(row); return; }
-    QDesktopServices::openUrl(QUrl::fromLocalFile(m_rows.at(row).fullPath));
+#ifdef Q_OS_SYMBIAN
+    // The download cache is the app's private folder, which the phone's audio player and other
+    // handlers cannot read. Open a real-named copy in the public download folder instead.
+    QString path = exportToPublic(row, false);
+    if (path.isEmpty()) { emit sendFailed(tr("Could not open the file.")); return; }
+#else
+    QString path = m_rows.at(row).fullPath;
+#endif
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
 bool MessagesModel::canDeleteForEveryone(int row) const
