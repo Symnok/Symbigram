@@ -78,3 +78,5 @@ Translations: `lupdate -extensions qml,cpp,h -no-obsolete src qml -ts translatio
 
 This code was written with the assistance of [Claude Code](https://claude.com/claude-code),
 Anthropic's agentic coding tool.
+
+Telegram channel and discussion group: https://t.me/symbigram_news_channel
