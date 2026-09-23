@@ -205,6 +205,31 @@ QByteArray TgApi::importLoginToken(const QByteArray &token)
     return w.toByteArray();
 }
 
+QByteArray TgApi::authSendCode(const QString &phone, int apiId, const QString &apiHash)
+{
+    // codeSettings with flags=0: a plain SMS/app code, no flash-call or firebase tricks.
+    TlWriter w(96);
+    w.writeConstructor(Tl::AuthSendCode).writeString(phone).writeInt(apiId).writeString(apiHash)
+     .writeConstructor(Tl::CodeSettings).writeInt(0);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::authSignIn(const QString &phone, const QString &phoneCodeHash, const QString &code)
+{
+    // flags bit 0 = phone_code is present (we always send the typed code).
+    TlWriter w(96);
+    w.writeConstructor(Tl::AuthSignIn).writeInt(1).writeString(phone).writeString(phoneCodeHash).writeString(code);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::authResendCode(const QString &phone, const QString &phoneCodeHash)
+{
+    // flags=0: no reason string.
+    TlWriter w(64);
+    w.writeConstructor(Tl::AuthResendCode).writeInt(0).writeString(phone).writeString(phoneCodeHash);
+    return w.toByteArray();
+}
+
 QByteArray TgApi::accountGetPassword() { TlWriter w(4); w.writeConstructor(Tl::AccountGetPassword); return w.toByteArray(); }
 
 QByteArray TgApi::authCheckPassword(qint64 srpId, const QByteArray &a, const QByteArray &m1)

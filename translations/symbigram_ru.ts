@@ -36,166 +36,192 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="199" />
-        <location filename="../src/app/appcontroller.cpp" line="341" />
-        <location filename="../src/app/appcontroller.cpp" line="645" />
-        <location filename="../src/app/appcontroller.cpp" line="700" />
+        <location filename="../src/app/appcontroller.cpp" line="200" />
+        <location filename="../src/app/appcontroller.cpp" line="354" />
+        <location filename="../src/app/appcontroller.cpp" line="713" />
+        <location filename="../src/app/appcontroller.cpp" line="768" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="200" />
+        <location filename="../src/app/appcontroller.cpp" line="201" />
         <source>Connecting...</source>
         <translation>Подключение...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="200" />
+        <location filename="../src/app/appcontroller.cpp" line="201" />
         <source>Connecting and creating the encryption key...</source>
         <translation>Подключение и создание ключа шифрования...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="202" />
+        <location filename="../src/app/appcontroller.cpp" line="203" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>Проверка пароля (это займёт несколько секунд)...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="203" />
+        <location filename="../src/app/appcontroller.cpp" line="204" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>У этого аккаунта включена двухэтапная проверка. Введите пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="204" />
+        <location filename="../src/app/appcontroller.cpp" line="209" />
         <source>Requesting a sign-in code...</source>
         <translation>Запрос кода для входа...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="204" />
+        <location filename="../src/app/appcontroller.cpp" line="209" />
         <source>Waiting for the code to be scanned...</source>
         <translation>Ожидание сканирования кода...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="205" />
+        <location filename="../src/app/appcontroller.cpp" line="206" />
+        <location filename="../src/app/appcontroller.cpp" line="210" />
         <source>Signing in...</source>
         <translation>Вход...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="266" />
+        <location filename="../src/app/appcontroller.cpp" line="206" />
+        <source>Enter the code Telegram sent to %1.</source>
+        <translation>Введите код, который Telegram отправил на %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="207" />
+        <source>Requesting a code...</source>
+        <translation>Запрос кода...</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="207" />
+        <source>Enter your phone number, with the country code, to get a code.</source>
+        <translation>Введите номер телефона с кодом страны, чтобы получить код.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="279" />
         <source>Phone memory</source>
         <translation>Память телефона</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="267" />
+        <location filename="../src/app/appcontroller.cpp" line="280" />
         <source>Mass memory</source>
         <translation>Массовая память</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="268" />
+        <location filename="../src/app/appcontroller.cpp" line="281" />
         <source>Memory card</source>
         <translation>Карта памяти</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="314" />
+        <location filename="../src/app/appcontroller.cpp" line="327" />
         <source>Choose download folder</source>
         <translation>Выберите папку загрузок</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="343" />
+        <location filename="../src/app/appcontroller.cpp" line="356" />
         <source>Cannot record a voice message here.</source>
         <translation>Здесь нельзя записать голосовое сообщение.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="366" />
+        <location filename="../src/app/appcontroller.cpp" line="379" />
         <source>Sending the voice message...</source>
         <translation>Отправка голосового сообщения...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="522" />
+        <location filename="../src/app/appcontroller.cpp" line="535" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>Соединение потеряно: %1. Переподключение...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="523" />
+        <location filename="../src/app/appcontroller.cpp" line="536" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Не удалось подключиться: %1. Повтор...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="610" />
+        <location filename="../src/app/appcontroller.cpp" line="626" />
         <source>Enter the password.</source>
         <translation>Введите пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="657" />
+        <location filename="../src/app/appcontroller.cpp" line="651" />
+        <source>Enter your phone number.</source>
+        <translation>Введите номер телефона.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="661" />
+        <source>Enter the code.</source>
+        <translation>Введите код.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="725" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Секретные чаты можно начинать только с человеком.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="659" />
+        <location filename="../src/app/appcontroller.cpp" line="727" />
         <source>Starting a secret chat...</source>
         <translation>Создание секретного чата...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="666" />
+        <location filename="../src/app/appcontroller.cpp" line="734" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Кто-то хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="667" />
+        <location filename="../src/app/appcontroller.cpp" line="735" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="669" />
-        <location filename="../src/app/appcontroller.cpp" line="689" />
+        <location filename="../src/app/appcontroller.cpp" line="737" />
+        <location filename="../src/app/appcontroller.cpp" line="757" />
         <source>Secret chat</source>
         <translation>Секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="669" />
+        <location filename="../src/app/appcontroller.cpp" line="737" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 хочет начать секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="675" />
+        <location filename="../src/app/appcontroller.cpp" line="743" />
         <source>Secret chat is ready.</source>
         <translation>Секретный чат готов.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="689" />
+        <location filename="../src/app/appcontroller.cpp" line="757" />
         <source>Encrypted message</source>
         <translation>Зашифрованное сообщение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="702" />
+        <location filename="../src/app/appcontroller.cpp" line="770" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Изображения (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="702" />
+        <location filename="../src/app/appcontroller.cpp" line="770" />
         <source>All files (*)</source>
         <translation>Все файлы (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="703" />
+        <location filename="../src/app/appcontroller.cpp" line="771" />
         <source>Choose an image</source>
         <translation>Выберите изображение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="703" />
+        <location filename="../src/app/appcontroller.cpp" line="771" />
         <source>Choose a file</source>
         <translation>Выберите файл</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="707" />
+        <location filename="../src/app/appcontroller.cpp" line="775" />
         <source>Sending the image...</source>
         <translation>Отправка изображения...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="707" />
+        <location filename="../src/app/appcontroller.cpp" line="775" />
         <source>Sending the file...</source>
         <translation>Отправка файла...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="718" />
+        <location filename="../src/app/appcontroller.cpp" line="786" />
         <source>Copied.</source>
         <translation>Скопировано.</translation>
     </message>
@@ -732,133 +758,200 @@
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/LoginPage.qml" line="94" />
+        <location filename="../qml/LoginPage.qml" line="99" />
         <source>Telegram for Symbian</source>
         <translation>Telegram для Symbian</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="26" />
-        <location filename="../qml/LoginPage.qml" line="33" />
+        <location filename="../qml/LoginPage.qml" line="31" />
+        <location filename="../qml/LoginPage.qml" line="38" />
         <source>SOCKS5 proxy</source>
         <translation>SOCKS5-прокси</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="27" />
+        <source>Sign in with QR code</source>
+        <translation>Войти по QR-коду</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="27" />
+        <location filename="../qml/LoginPage.qml" line="168" />
+        <source>Sign in with phone number</source>
+        <translation>Войти по номеру телефона</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="32" />
         <source>Reconnect</source>
         <translation>Переподключиться</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="34" />
+        <location filename="../qml/LoginPage.qml" line="39" />
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="34" />
+        <location filename="../qml/LoginPage.qml" line="39" />
         <source>Enable</source>
         <translation>Включить</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="34" />
+        <location filename="../qml/LoginPage.qml" line="39" />
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="34" />
+        <location filename="../qml/LoginPage.qml" line="39" />
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="39" />
+        <location filename="../qml/LoginPage.qml" line="44" />
         <source>Server</source>
         <translation>Сервер</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="40" />
+        <location filename="../qml/LoginPage.qml" line="45" />
         <source>host or IP</source>
         <translation>хост или IP</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="41" />
+        <location filename="../qml/LoginPage.qml" line="46" />
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="43" />
+        <location filename="../qml/LoginPage.qml" line="48" />
         <source>Username (optional)</source>
         <translation>Имя пользователя (необязательно)</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="45" />
+        <location filename="../qml/LoginPage.qml" line="50" />
         <source>Password (optional)</source>
         <translation>Пароль (необязательно)</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="135" />
+        <location filename="../qml/LoginPage.qml" line="140" />
         <source>No connection through the proxy. Check the proxy or tap Reconnect.</source>
         <translation>Нет соединения через прокси. Проверьте прокси или нажмите «Переподключиться».</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="136" />
+        <location filename="../qml/LoginPage.qml" line="141" />
         <source>No connection. Tap Reconnect, or set up a proxy if Telegram is blocked.</source>
         <translation>Нет соединения. Нажмите «Переподключиться» или настройте прокси, если Telegram заблокирован.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="140" />
+        <location filename="../qml/LoginPage.qml" line="145" />
         <source>Proxy: %1</source>
         <translation>Прокси: %1</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="140" />
+        <location filename="../qml/LoginPage.qml" line="145" />
         <source>on</source>
         <translation>вкл</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="140" />
+        <location filename="../qml/LoginPage.qml" line="145" />
         <source>Set up proxy</source>
         <translation>Настроить прокси</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="151" />
+        <location filename="../qml/LoginPage.qml" line="156" />
         <source>The code renews in %1 s</source>
         <translation>Код обновится через %1 с</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="158" />
+        <location filename="../qml/LoginPage.qml" line="163" />
         <source>Open Telegram on a phone or PC where you are signed in: Settings &gt; Devices &gt; Link Desktop Device, and scan this code.</source>
         <translation>Откройте Telegram на телефоне или ПК, где вы уже вошли: Настройки &gt; Устройства &gt; Подключить устройство, и отсканируйте этот код.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="166" />
+        <location filename="../qml/LoginPage.qml" line="177" />
+        <source>Phone number</source>
+        <translation>Номер телефона</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="181" />
+        <source>+1 555 123 4567</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="192" />
+        <source>Include the country code. Telegram will send a login code to this number.</source>
+        <translation>Укажите код страны. Telegram пришлёт на этот номер код для входа.</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="196" />
+        <source>requesting...</source>
+        <translation>запрос...</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="196" />
+        <source>send code</source>
+        <translation>отправить код</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="202" />
+        <source>Use QR code instead</source>
+        <translation>Использовать QR-код</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="215" />
+        <source>Enter the code sent to %1</source>
+        <translation>Введите код, отправленный на %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="221" />
+        <source>code</source>
+        <translation>код</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="229" />
+        <source>signing in...</source>
+        <translation>вход...</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="238" />
+        <source>Resend code</source>
+        <translation>Отправить код снова</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="244" />
+        <source>Change number</source>
+        <translation>Изменить номер</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="256" />
         <source>Two-step verification password</source>
         <translation>Пароль двухэтапной проверки</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="172" />
+        <location filename="../qml/LoginPage.qml" line="262" />
         <source>hint: %1</source>
         <translation>подсказка: %1</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="172" />
+        <location filename="../qml/LoginPage.qml" line="262" />
         <source>password</source>
         <translation>пароль</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="177" />
+        <location filename="../qml/LoginPage.qml" line="267" />
         <source>show password</source>
         <translation>показать пароль</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="180" />
+        <location filename="../qml/LoginPage.qml" line="270" />
         <source>checking...</source>
         <translation>проверка...</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="180" />
+        <location filename="../qml/LoginPage.qml" line="229" />
+        <location filename="../qml/LoginPage.qml" line="270" />
         <source>sign in</source>
         <translation>войти</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="210" />
+        <location filename="../qml/LoginPage.qml" line="300" />
         <source>Symbigram talks MTProto 2.0 straight to Telegram's servers: the encryption key is made on this phone and never leaves it. The session shows up under Devices in Telegram, where it can be ended at any time.</source>
         <translation>Symbigram говорит с серверами Telegram напрямую по MTProto 2.0: ключ шифрования создаётся на этом телефоне и никогда его не покидает. Сеанс виден в разделе «Устройства» в Telegram, где его можно завершить в любой момент.</translation>
     </message>
@@ -1284,148 +1377,202 @@
 <context>
     <name>TelegramSession</name>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="154" />
-        <location filename="../src/core/telegramsession.cpp" line="248" />
-        <location filename="../src/core/telegramsession.cpp" line="458" />
-        <location filename="../src/core/telegramsession.cpp" line="464" />
-        <location filename="../src/core/telegramsession.cpp" line="900" />
-        <location filename="../src/core/telegramsession.cpp" line="1282" />
+        <location filename="../src/core/telegramsession.cpp" line="155" />
+        <location filename="../src/core/telegramsession.cpp" line="253" />
+        <location filename="../src/core/telegramsession.cpp" line="526" />
+        <location filename="../src/core/telegramsession.cpp" line="532" />
+        <location filename="../src/core/telegramsession.cpp" line="987" />
+        <location filename="../src/core/telegramsession.cpp" line="1403" />
         <source>Signed out.</source>
         <translation>Выход выполнен.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="408" />
+        <location filename="../src/core/telegramsession.cpp" line="472" />
         <source>Enter the password.</source>
         <translation>Введите пароль.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="704" />
+        <location filename="../src/core/telegramsession.cpp" line="772" />
         <source>Enter a username, a phone number or a name.</source>
         <translation>Введите имя пользователя, номер телефона или имя.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="219" />
-        <location filename="../src/core/telegramsession.cpp" line="705" />
-        <location filename="../src/core/telegramsession.cpp" line="1840" />
-        <location filename="../src/core/telegramsession.cpp" line="1868" />
+        <location filename="../src/core/telegramsession.cpp" line="224" />
+        <location filename="../src/core/telegramsession.cpp" line="773" />
+        <location filename="../src/core/telegramsession.cpp" line="1961" />
+        <location filename="../src/core/telegramsession.cpp" line="1989" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="764" />
-        <location filename="../src/core/telegramsession.cpp" line="796" />
+        <location filename="../src/core/telegramsession.cpp" line="325" />
+        <source>Enter a valid phone number, with the country code.</source>
+        <translation>Введите корректный номер телефона с кодом страны.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="341" />
+        <location filename="../src/core/telegramsession.cpp" line="1393" />
+        <source>Enter the code.</source>
+        <translation>Введите код.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="832" />
+        <location filename="../src/core/telegramsession.cpp" line="864" />
         <source>That folder no longer exists.</source>
         <translation>Этой папки больше нет.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="882" />
+        <location filename="../src/core/telegramsession.cpp" line="950" />
         <source>This account has no password set.</source>
         <translation>У этого аккаунта нет пароля.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="883" />
+        <location filename="../src/core/telegramsession.cpp" line="951" />
         <source>Unsupported password method.</source>
         <translation>Неподдерживаемый способ проверки пароля.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1126" />
+        <location filename="../src/core/telegramsession.cpp" line="980" />
+        <location filename="../src/core/telegramsession.cpp" line="1395" />
+        <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
+        <translation>К этому номеру не привязан аккаунт Telegram. Регистрация здесь не поддерживается.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1213" />
         <source>the server rejected a part of the file</source>
         <translation>сервер отклонил часть файла</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1149" />
+        <location filename="../src/core/telegramsession.cpp" line="1236" />
         <source>the file is served from a CDN, which is not supported</source>
         <translation>файл раздаётся через CDN, что не поддерживается</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1150" />
+        <location filename="../src/core/telegramsession.cpp" line="1237" />
         <source>unexpected reply</source>
         <translation>неожиданный ответ</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1153" />
+        <location filename="../src/core/telegramsession.cpp" line="1240" />
         <source>could not write the file</source>
         <translation>не удалось записать файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1179" />
-        <location filename="../src/core/telegramsession.cpp" line="1188" />
-        <location filename="../src/core/telegramsession.cpp" line="1327" />
+        <location filename="../src/core/telegramsession.cpp" line="1266" />
+        <location filename="../src/core/telegramsession.cpp" line="1275" />
+        <location filename="../src/core/telegramsession.cpp" line="1448" />
         <source>Nobody found.</source>
         <translation>Никого не найдено.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1238" />
+        <location filename="../src/core/telegramsession.cpp" line="1325" />
         <source>The session was ended (%1). Please sign in again.</source>
         <translation>Сеанс завершён (%1). Войдите снова.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1275" />
+        <location filename="../src/core/telegramsession.cpp" line="1362" />
         <source>Wrong password.</source>
         <translation>Неверный пароль.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1276" />
+        <location filename="../src/core/telegramsession.cpp" line="1363" />
+        <location filename="../src/core/telegramsession.cpp" line="1372" />
+        <location filename="../src/core/telegramsession.cpp" line="1397" />
         <source>Too many attempts. Wait %1 seconds.</source>
         <translation>Слишком много попыток. Подождите %1 с.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1287" />
+        <location filename="../src/core/telegramsession.cpp" line="1373" />
+        <source>That phone number is not valid.</source>
+        <translation>Этот номер телефона недействителен.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1374" />
+        <source>That phone number is banned from Telegram.</source>
+        <translation>Этот номер заблокирован в Telegram.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1375" />
+        <source>Too many codes requested for this number. Try again later.</source>
+        <translation>Слишком много запросов кода для этого номера. Повторите позже.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1376" />
+        <source>Too many attempts. Try again later.</source>
+        <translation>Слишком много попыток. Повторите позже.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1377" />
+        <source>This build's Telegram API key was rejected.</source>
+        <translation>Ключ API Telegram этой сборки отклонён.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1389" />
+        <source>Wrong code. Check it and try again.</source>
+        <translation>Неверный код. Проверьте и попробуйте снова.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1391" />
+        <source>The code expired. Request a new one.</source>
+        <translation>Код истёк. Запросите новый.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1408" />
         <source>Could not load the chat list: %1</source>
         <translation>Не удалось загрузить список чатов: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1338" />
+        <location filename="../src/core/telegramsession.cpp" line="1459" />
         <source>Could not start the secret chat: %1</source>
         <translation>Не удалось начать секретный чат: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1341" />
+        <location filename="../src/core/telegramsession.cpp" line="1462" />
         <source>Could not accept the secret chat: %1</source>
         <translation>Не удалось принять секретный чат: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1363" />
+        <location filename="../src/core/telegramsession.cpp" line="1484" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
         <translation>В папке должен остаться хотя бы один чат, поэтому чат останется и в ней.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1365" />
+        <location filename="../src/core/telegramsession.cpp" line="1486" />
         <source>Could not change the folder: %1</source>
         <translation>Не удалось изменить папку: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1721" />
+        <location filename="../src/core/telegramsession.cpp" line="1842" />
         <source>could not create the file</source>
         <translation>не удалось создать файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1792" />
+        <location filename="../src/core/telegramsession.cpp" line="1913" />
         <source>the file is empty</source>
         <translation>файл пуст</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1825" />
+        <location filename="../src/core/telegramsession.cpp" line="1946" />
         <source>could not read the file</source>
         <translation>не удалось прочитать файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1836" />
+        <location filename="../src/core/telegramsession.cpp" line="1957" />
         <source>the file is too large</source>
         <translation>файл слишком большой</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1860" />
+        <location filename="../src/core/telegramsession.cpp" line="1981" />
         <source>could not read the recording</source>
         <translation>не удалось прочитать запись</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2001" />
+        <location filename="../src/core/telegramsession.cpp" line="2122" />
         <source>Secret chats can only be opened with a person.</source>
         <translation>Секретные чаты можно открывать только с человеком.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2051" />
+        <location filename="../src/core/telegramsession.cpp" line="2172" />
         <source>The secret chat is not ready.</source>
         <translation>Секретный чат не готов.</translation>
     </message>
@@ -1451,203 +1598,203 @@
         <translation>удалённый аккаунт</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="611" />
-        <location filename="../src/core/tgapi.cpp" line="652" />
+        <location filename="../src/core/tgapi.cpp" line="636" />
+        <location filename="../src/core/tgapi.cpp" line="677" />
         <source>video</source>
         <translation>видео</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="611" />
+        <location filename="../src/core/tgapi.cpp" line="636" />
         <source>photo</source>
         <translation>фото</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="616" />
+        <location filename="../src/core/tgapi.cpp" line="641" />
         <source>location %1, %2</source>
         <translation>геопозиция %1, %2</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="617" />
+        <location filename="../src/core/tgapi.cpp" line="642" />
         <source>location</source>
         <translation>геопозиция</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="619" />
+        <location filename="../src/core/tgapi.cpp" line="644" />
         <source>location: %1</source>
         <translation>место: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="620" />
+        <location filename="../src/core/tgapi.cpp" line="645" />
         <source>contact: %1 %2 %3</source>
         <translation>контакт: %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="625" />
+        <location filename="../src/core/tgapi.cpp" line="650" />
         <source>poll: %1</source>
         <translation>опрос: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="627" />
+        <location filename="../src/core/tgapi.cpp" line="652" />
         <source>dice: %1</source>
         <translation>кубик: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="628" />
+        <location filename="../src/core/tgapi.cpp" line="653" />
         <source>game</source>
         <translation>игра</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="629" />
+        <location filename="../src/core/tgapi.cpp" line="654" />
         <source>invoice</source>
         <translation>счёт</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="630" />
+        <location filename="../src/core/tgapi.cpp" line="655" />
         <source>story</source>
         <translation>история</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="633" />
+        <location filename="../src/core/tgapi.cpp" line="658" />
         <source>file</source>
         <translation>файл</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="648" />
+        <location filename="../src/core/tgapi.cpp" line="673" />
         <source>sticker</source>
         <translation>стикер</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="648" />
+        <location filename="../src/core/tgapi.cpp" line="673" />
         <source>sticker %1</source>
         <translation>стикер %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="649" />
+        <location filename="../src/core/tgapi.cpp" line="674" />
         <source>voice message %1</source>
         <translation>голосовое сообщение %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="649" />
+        <location filename="../src/core/tgapi.cpp" line="674" />
         <source>voice message</source>
         <translation>голосовое сообщение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="650" />
+        <location filename="../src/core/tgapi.cpp" line="675" />
         <source>video message %1</source>
         <translation>видеосообщение %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="650" />
+        <location filename="../src/core/tgapi.cpp" line="675" />
         <source>video message</source>
         <translation>видеосообщение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="651" />
+        <location filename="../src/core/tgapi.cpp" line="676" />
         <source>GIF</source>
         <translation>GIF</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="652" />
+        <location filename="../src/core/tgapi.cpp" line="677" />
         <source>video %1</source>
         <translation>видео %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="653" />
+        <location filename="../src/core/tgapi.cpp" line="678" />
         <source>audio %1</source>
         <translation>аудио %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="653" />
+        <location filename="../src/core/tgapi.cpp" line="678" />
         <source>audio</source>
         <translation>аудио</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="654" />
+        <location filename="../src/core/tgapi.cpp" line="679" />
         <source>image</source>
         <translation>изображение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="656" />
+        <location filename="../src/core/tgapi.cpp" line="681" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="657" />
+        <location filename="../src/core/tgapi.cpp" line="682" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="657" />
+        <location filename="../src/core/tgapi.cpp" line="682" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="658" />
+        <location filename="../src/core/tgapi.cpp" line="683" />
         <source>file: %1 (%2)</source>
         <translation>файл: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="660" />
+        <location filename="../src/core/tgapi.cpp" line="685" />
         <source>unsupported attachment</source>
         <translation>неподдерживаемое вложение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="661" />
+        <location filename="../src/core/tgapi.cpp" line="686" />
         <source>attachment</source>
         <translation>вложение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="780" />
+        <location filename="../src/core/tgapi.cpp" line="805" />
         <source>created the group "%1"</source>
         <translation>создал(а) группу «%1»</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="781" />
+        <location filename="../src/core/tgapi.cpp" line="806" />
         <source>created the channel "%1"</source>
         <translation>создал(а) канал «%1»</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="786" />
+        <location filename="../src/core/tgapi.cpp" line="811" />
         <source>added %1</source>
         <translation>добавил(а) %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="788" />
+        <location filename="../src/core/tgapi.cpp" line="813" />
         <source>removed %1</source>
         <translation>удалил(а) %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="789" />
+        <location filename="../src/core/tgapi.cpp" line="814" />
         <source>joined by invite link</source>
         <translation>вступил(а) по ссылке-приглашению</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="790" />
+        <location filename="../src/core/tgapi.cpp" line="815" />
         <source>pinned a message</source>
         <translation>закрепил(а) сообщение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="791" />
+        <location filename="../src/core/tgapi.cpp" line="816" />
         <source>joined Telegram</source>
         <translation>присоединился(-ась) к Telegram</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="792" />
+        <location filename="../src/core/tgapi.cpp" line="817" />
         <source>cleared the history</source>
         <translation>очистил(а) историю</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="793" />
+        <location filename="../src/core/tgapi.cpp" line="818" />
         <source>service message</source>
         <translation>служебное сообщение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="801" />
+        <location filename="../src/core/tgapi.cpp" line="826" />
         <source>empty message</source>
         <translation>пустое сообщение</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="973" />
+        <location filename="../src/core/tgapi.cpp" line="998" />
         <source>Folder</source>
         <translation>Папка</translation>
     </message>

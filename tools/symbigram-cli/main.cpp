@@ -24,6 +24,7 @@
 #include "srp.h"
 #include "telegramservers.h"
 #include "telegramsession.h"
+#include "tgapi.h"
 #include "tgcredentials.h"
 #include "tlconstructors.h"
 #include "tlobject.h"
@@ -512,6 +513,14 @@ private:
         else if (cmd == QLatin1String("mute") && a.size() >= 3) m_session->setMuted(peerAt(a.at(1)), a.at(2) == QLatin1String("on"));
         else if (cmd == QLatin1String("clear") && a.size() >= 2) m_session->deleteHistory(peerAt(a.at(1)));
         else if (cmd == QLatin1String("password") && a.size() >= 2) m_session->checkPassword(QStringList(a.mid(1)).join(QLatin1String(" ")));
+        else if (cmd == QLatin1String("sendcode") && a.size() >= 2) m_session->startPhoneLogin(a.at(1));   // requests a real SMS/app code
+        else if (cmd == QLatin1String("signin") && a.size() >= 2) m_session->submitCode(a.at(1));
+        else if (cmd == QLatin1String("resendcode")) m_session->resendCode();
+        else if (cmd == QLatin1String("codehex") && a.size() >= 2) {
+            // Offline: print the TL bytes of auth.sendCode / auth.signIn so the encoding can be verified without a live call.
+            say(QLatin1String("sendCode: ") + QString::fromLatin1(TgApi::authSendCode(TgApi::normalisePhone(a.at(1)), 1234, QLatin1String("abc")).toHex()));
+            say(QLatin1String("signIn:   ") + QString::fromLatin1(TgApi::authSignIn(TgApi::normalisePhone(a.at(1)), QLatin1String("HASH"), a.value(2, QLatin1String("12345"))).toHex()));
+        }
         else if (cmd == QLatin1String("logout")) m_session->logOut();
         else if (cmd == QLatin1String("secret") && a.size() >= 2) { TgPeer p = peerAt(a.at(1)); if (p.kind == TgPeer::User) m_session->requestSecretChat(p); else say(QLatin1String("secret chats need a user; open the dialog first")); }
         else if (cmd == QLatin1String("secrets")) { QList<TgSecretChat> sc = m_session->secretChats(); say(QString::fromLatin1("[secrets] %1").arg(sc.size())); for (int i = 0; i < sc.size(); ++i) say(QString::fromLatin1("  chat %1 user %2 state %3 creator %4 ttl %5").arg(sc.at(i).id).arg(sc.at(i).peerUserId).arg(sc.at(i).state).arg(sc.at(i).isCreator).arg(sc.at(i).ttl)); }

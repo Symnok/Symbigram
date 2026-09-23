@@ -76,6 +76,10 @@ public:
     static QByteArray helpGetNearestDc();
     static QByteArray exportLoginToken(int apiId, const QString &apiHash);
     static QByteArray importLoginToken(const QByteArray &token);
+    // Phone-number login: request a code by SMS/app, then sign in with it.
+    static QByteArray authSendCode(const QString &phone, int apiId, const QString &apiHash);
+    static QByteArray authSignIn(const QString &phone, const QString &phoneCodeHash, const QString &code);
+    static QByteArray authResendCode(const QString &phone, const QString &phoneCodeHash);
     static QByteArray accountGetPassword();
     static QByteArray authCheckPassword(qint64 srpId, const QByteArray &a, const QByteArray &m1);
     static QByteArray authLogOut();

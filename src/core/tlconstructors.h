@@ -68,6 +68,7 @@ namespace Tl
     const quint32 AuthLoginTokenSuccess = 0x390d5c5e;
     const quint32 UpdateLoginToken = 0x564fe691;
     const quint32 AuthAuthorization = 0x2ea2c0d4;
+    const quint32 AuthAuthorizationSignUpRequired = 0x44747e9a;
     const quint32 AuthLogOut = 0x3e72ba19;
     const quint32 AuthLoggedOut = 0xc3a2835f;
 

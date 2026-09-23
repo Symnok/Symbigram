@@ -41,6 +41,10 @@ class AppController : public QObject
     Q_PROPERTY(bool passwordNeeded READ passwordNeeded NOTIFY loginChanged)
     Q_PROPERTY(QString passwordHint READ passwordHint NOTIFY loginChanged)
     Q_PROPERTY(bool checkingPassword READ checkingPassword NOTIFY loginChanged)
+    Q_PROPERTY(QString loginMethod READ loginMethod NOTIFY loginChanged)
+    Q_PROPERTY(bool codeNeeded READ codeNeeded NOTIFY loginChanged)
+    Q_PROPERTY(QString loginPhone READ loginPhone NOTIFY loginChanged)
+    Q_PROPERTY(bool codeBusy READ codeBusy NOTIFY loginChanged)
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY settingsChanged)
     Q_PROPERTY(bool notifications READ notifications WRITE setNotifications NOTIFY settingsChanged)
@@ -86,6 +90,10 @@ public:
     bool passwordNeeded() const;
     QString passwordHint() const;
     bool checkingPassword() const { return m_checkingPassword; }
+    QString loginMethod() const { return m_loginMethod; }     // "qr" or "phone"
+    bool codeNeeded() const;
+    QString loginPhone() const;
+    bool codeBusy() const { return m_codeBusy; }
     QString version() const;
     QString language() const;
     void setLanguage(const QString &lang);
@@ -132,6 +140,13 @@ public:
 
 public slots:
     void checkPassword(const QString &password);
+    // Phone-number login (an alternative to the QR code).
+    void usePhoneLogin();                         // switch the login page to the phone form
+    void useQrLogin();                            // switch back to the QR code
+    void sendLoginCode(const QString &phone);     // request the SMS/app code
+    void submitLoginCode(const QString &code);    // sign in with the typed code
+    void resendLoginCode();                       // ask Telegram to send the code again
+    void changeLoginNumber();                     // go back to the phone-number field
     void signOut();
     void reconnect();
     void goOffline();
@@ -226,6 +241,8 @@ private:
     bool m_everOnline;
     int m_reconnectDelay;
     bool m_checkingPassword;
+    QString m_loginMethod;    // "qr" (default) or "phone"
+    bool m_codeBusy;          // a send-code / sign-in request is in flight
     bool m_foreground;
 };
 

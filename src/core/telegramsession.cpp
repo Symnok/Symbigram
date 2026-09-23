@@ -34,7 +34,8 @@ int TelegramSession::unixNow() { return int(QDateTime::currentDateTime().toTime_
 
 TelegramSession::TelegramSession(QObject *parent)
     : QObject(parent), m_moved(0), m_srp(0), m_state(Disconnected), m_dcId(TelegramServers::DefaultDc), m_signedIn(false),
-      m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false), m_selfId(0),
+      m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false),
+      m_codeNeeded(false), m_codeLength(0), m_selfId(0),
       m_archiveHasMore(false), m_archiveLoaded(false), m_dialogsHaveMore(false), m_dialogsLoading(false),
       m_differencePending(false), m_online(false), m_nextJobId(1),
       m_dhG(0), m_dhVersion(0), m_dhReady(false)
@@ -176,6 +177,10 @@ void TelegramSession::forgetSession(const QString &reason)
     m_qrUrl.clear();
     m_qrToken.clear();
     m_passwordNeeded = false;
+    m_loginPhone.clear();
+    m_phoneCodeHash.clear();
+    m_codeNeeded = false;
+    m_codeLength = 0;
     m_stateDirty = false;
     m_loggingOut = false;
     if (!m_sessionFile.isEmpty()) QFile::remove(m_sessionFile);
@@ -295,12 +300,71 @@ void TelegramSession::startLogin()
 {
     m_passwordNeeded = false;
     setState(LoggingIn);
-    exportToken();
+    // A phone-number login in progress (e.g. resumed after a datacenter migrate) asks for the
+    // code again on the datacenter we landed on; otherwise fall back to the QR code.
+    if (!m_loginPhone.isEmpty()) sendPhoneCode();
+    else exportToken();
 }
 
 void TelegramSession::exportToken()
 {
     send(ExportToken, TgApi::exportLoginToken(m_info.apiId, m_info.apiHash));
+}
+
+void TelegramSession::sendPhoneCode()
+{
+    m_codeNeeded = false;
+    m_phoneCodeHash.clear();
+    send(SendCode, TgApi::authSendCode(m_loginPhone, m_info.apiId, m_info.apiHash));
+}
+
+void TelegramSession::startPhoneLogin(const QString &phone)
+{
+    if (m_state != LoggingIn) return;
+    QString digits = TgApi::normalisePhone(phone);
+    if (digits.size() < 5) { emit loginError(tr("Enter a valid phone number, with the country code.")); return; }
+    m_qrPoll->stop();
+    if (m_moved) { m_moved->deleteLater(); m_moved = 0; }   // drop any QR migration in flight
+    m_loginPhone = digits;
+    m_codeNeeded = false;
+    m_codeLength = 0;
+    m_phoneCodeHash.clear();
+    m_qrUrl.clear();
+    emit qrChanged();
+    sendPhoneCode();
+}
+
+void TelegramSession::submitCode(const QString &code)
+{
+    if (!m_codeNeeded || m_loginPhone.isEmpty() || m_phoneCodeHash.isEmpty()) return;
+    QString c = code.trimmed();
+    if (c.isEmpty()) { emit loginError(tr("Enter the code.")); return; }
+    send(SignIn, TgApi::authSignIn(m_loginPhone, m_phoneCodeHash, c));
+}
+
+void TelegramSession::resendCode()
+{
+    if (m_loginPhone.isEmpty() || m_phoneCodeHash.isEmpty()) return;
+    send(ResendCode, TgApi::authResendCode(m_loginPhone, m_phoneCodeHash));
+}
+
+void TelegramSession::backToPhoneEntry()
+{
+    m_codeNeeded = false;
+    m_codeLength = 0;
+    m_phoneCodeHash.clear();
+    emit codeNeededChanged();
+}
+
+void TelegramSession::cancelPhoneLogin()
+{
+    if (m_loginPhone.isEmpty()) return;
+    m_loginPhone.clear();
+    m_phoneCodeHash.clear();
+    m_codeNeeded = false;
+    m_codeLength = 0;
+    emit codeNeededChanged();
+    if (m_state == LoggingIn && !m_passwordNeeded) exportToken();   // back to the QR code
 }
 
 void TelegramSession::onQrPoll()
@@ -439,6 +503,10 @@ void TelegramSession::finishLogin()
     m_qrPoll->stop();
     m_signedIn = true;
     m_passwordNeeded = false;
+    m_loginPhone.clear();
+    m_phoneCodeHash.clear();
+    m_codeNeeded = false;
+    m_codeLength = 0;
     m_qrUrl.clear();
     m_qrToken.clear();
     m_updateState = TgUpdateState();
@@ -896,6 +964,25 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             r.expect(Tl::AuthAuthorization, "auth.authorization");
             finishLogin();
             break;
+        case SendCode:
+        case ResendCode: {
+            TlObject o = TlSchema::readObject(r);
+            if (o.ctor() == Tl::AuthSentCodeSuccess) { finishLogin(); break; }   // already authorised
+            m_phoneCodeHash = o.str("phone_code_hash");
+            m_codeLength = o.has("type") ? o.obj("type").intOr("length") : 0;
+            m_codeNeeded = true;
+            emit codeNeededChanged();
+            break;
+        }
+        case SignIn: {
+            TlObject o = TlSchema::readObject(r);
+            if (o.ctor() == Tl::AuthAuthorizationSignUpRequired) {
+                emit loginError(tr("No Telegram account uses this number. Sign-up isn't supported here."));
+                break;
+            }
+            finishLogin();      // auth.authorization
+            break;
+        }
         case LogOut:
             forgetSession(tr("Signed out."));
             break;
@@ -1277,6 +1364,40 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         else emit loginError(type);
         m_srpParams = SrpParams();
         send(GetPassword, TgApi::accountGetPassword());
+        break;
+    case SendCode:
+    case ResendCode:
+        // PHONE_MIGRATE_* is handled above (reconnects and resends). Everything else is fatal
+        // for this attempt: report it and leave the user on the phone-number field.
+        if (type.startsWith(QLatin1String("FLOOD_WAIT_"))) emit loginError(tr("Too many attempts. Wait %1 seconds.").arg(type.mid(11)));
+        else if (type.contains(QLatin1String("PHONE_NUMBER_INVALID"))) emit loginError(tr("That phone number is not valid."));
+        else if (type.contains(QLatin1String("PHONE_NUMBER_BANNED"))) emit loginError(tr("That phone number is banned from Telegram."));
+        else if (type.contains(QLatin1String("PHONE_NUMBER_FLOOD"))) emit loginError(tr("Too many codes requested for this number. Try again later."));
+        else if (type.contains(QLatin1String("PHONE_PASSWORD_FLOOD"))) emit loginError(tr("Too many attempts. Try again later."));
+        else if (type.contains(QLatin1String("API_ID_INVALID"))) emit loginError(tr("This build's Telegram API key was rejected."));
+        else emit loginError(type);
+        break;
+    case SignIn:
+        if (type.contains(QLatin1String("SESSION_PASSWORD_NEEDED"))) {
+            // The account has two-step verification: hand over to the password step (SRP).
+            m_codeNeeded = false;
+            emit codeNeededChanged();
+            m_passwordNeeded = true;
+            send(GetPassword, TgApi::accountGetPassword());
+            emit passwordNeededChanged();
+        } else if (type.contains(QLatin1String("PHONE_CODE_INVALID"))) {
+            emit loginError(tr("Wrong code. Check it and try again."));
+        } else if (type.contains(QLatin1String("PHONE_CODE_EXPIRED"))) {
+            emit loginError(tr("The code expired. Request a new one."));
+        } else if (type.contains(QLatin1String("PHONE_CODE_EMPTY"))) {
+            emit loginError(tr("Enter the code."));
+        } else if (type.contains(QLatin1String("PHONE_NUMBER_UNOCCUPIED"))) {
+            emit loginError(tr("No Telegram account uses this number. Sign-up isn't supported here."));
+        } else if (type.startsWith(QLatin1String("FLOOD_WAIT_"))) {
+            emit loginError(tr("Too many attempts. Wait %1 seconds.").arg(type.mid(11)));
+        } else {
+            emit loginError(type);
+        }
         break;
     case LogOut:
         forgetSession(tr("Signed out."));

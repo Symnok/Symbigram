@@ -1,9 +1,9 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 //
-// Signing in: the QR code another Telegram scans (Settings > Devices > Link Desktop
-// Device), refreshed as tokens expire, and the two-step verification password when the
-// account has one. There is no other way in - no phone number, no SMS code.
+// Signing in: either the QR code another Telegram scans (Settings > Devices > Link
+// Desktop Device), refreshed as tokens expire, or a phone number with the code Telegram
+// sends by SMS/app. Both end at the two-step verification password when the account has one.
 import QtQuick 1.1
 import com.nokia.symbian 1.1
 
@@ -23,6 +23,11 @@ Page {
     Menu {
         id: loginMenu
         MenuLayout {
+            MenuItem {
+                text: app.loginMethod == "phone" ? qsTr("Sign in with QR code") : qsTr("Sign in with phone number")
+                visible: !app.passwordNeeded
+                onClicked: app.loginMethod == "phone" ? app.useQrLogin() : app.usePhoneLogin()
+            }
             MenuItem { text: qsTr("SOCKS5 proxy"); onClicked: { proxyDialog.load(); proxyDialog.open() } }
             MenuItem { text: qsTr("Reconnect"); onClicked: app.reconnect() }
         }
@@ -105,7 +110,7 @@ Page {
                 height: 300
                 radius: 6
                 color: "white"
-                visible: !app.passwordNeeded
+                visible: app.loginMethod == "qr" && !app.passwordNeeded
                 Image {
                     id: qrImage
                     anchors.centerIn: parent
@@ -154,8 +159,93 @@ Page {
                 width: parent.width
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
-                visible: !app.passwordNeeded
+                visible: app.loginMethod == "qr" && !app.passwordNeeded
                 text: qsTr("Open Telegram on a phone or PC where you are signed in: Settings > Devices > Link Desktop Device, and scan this code.")
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: app.loginMethod == "qr" && !app.passwordNeeded
+                text: qsTr("Sign in with phone number")
+                onClicked: app.usePhoneLogin()
+            }
+
+            // -- the phone number --
+            Column {
+                width: parent.width
+                spacing: platformStyle.paddingMedium
+                visible: app.loginMethod == "phone" && !app.codeNeeded && !app.passwordNeeded
+                Label { text: qsTr("Phone number"); font.pixelSize: platformStyle.fontSizeSmall }
+                TextField {
+                    id: phoneField
+                    width: parent.width
+                    placeholderText: qsTr("+1 555 123 4567")
+                    inputMethodHints: Qt.ImhDialableCharactersOnly
+                    enabled: !app.codeBusy
+                    Keys.onReturnPressed: page.sendCode()
+                    Keys.onEnterPressed: page.sendCode()
+                }
+                Label {
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    color: platformStyle.colorNormalMid
+                    font.pixelSize: platformStyle.fontSizeSmall
+                    text: qsTr("Include the country code. Telegram will send a login code to this number.")
+                }
+                Button {
+                    width: parent.width
+                    text: app.codeBusy ? qsTr("requesting...") : qsTr("send code")
+                    enabled: !app.codeBusy && phoneField.text.length >= 5
+                    onClicked: page.sendCode()
+                }
+                Button {
+                    width: parent.width
+                    text: qsTr("Use QR code instead")
+                    onClicked: app.useQrLogin()
+                }
+            }
+
+            // -- the code --
+            Column {
+                width: parent.width
+                spacing: platformStyle.paddingMedium
+                visible: app.loginMethod == "phone" && app.codeNeeded && !app.passwordNeeded
+                Label {
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    text: qsTr("Enter the code sent to %1").arg(app.loginPhone)
+                    font.pixelSize: platformStyle.fontSizeSmall
+                }
+                TextField {
+                    id: codeField
+                    width: parent.width
+                    placeholderText: qsTr("code")
+                    inputMethodHints: Qt.ImhDigitsOnly
+                    enabled: !app.codeBusy
+                    Keys.onReturnPressed: page.submitCode()
+                    Keys.onEnterPressed: page.submitCode()
+                }
+                Button {
+                    width: parent.width
+                    text: app.codeBusy ? qsTr("signing in...") : qsTr("sign in")
+                    enabled: !app.codeBusy && codeField.text.length > 0
+                    onClicked: page.submitCode()
+                }
+                Row {
+                    width: parent.width
+                    spacing: platformStyle.paddingMedium
+                    Button {
+                        width: (parent.width - parent.spacing) / 2
+                        text: qsTr("Resend code")
+                        enabled: !app.codeBusy
+                        onClicked: app.resendLoginCode()
+                    }
+                    Button {
+                        width: (parent.width - parent.spacing) / 2
+                        text: qsTr("Change number")
+                        enabled: !app.codeBusy
+                        onClicked: { codeField.text = ""; app.changeLoginNumber() }
+                    }
+                }
             }
 
             // -- the password --
@@ -215,5 +305,13 @@ Page {
     function submit() {
         passwordField.closeSoftwareInputPanel()
         app.checkPassword(passwordField.text)
+    }
+    function sendCode() {
+        phoneField.closeSoftwareInputPanel()
+        app.sendLoginCode(phoneField.text)
+    }
+    function submitCode() {
+        codeField.closeSoftwareInputPanel()
+        app.submitLoginCode(codeField.text)
     }
 }

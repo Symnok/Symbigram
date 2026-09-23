@@ -64,7 +64,7 @@ AppController::AppController(QObject *parent)
       m_settings(QLatin1String("Symbigram"), QLatin1String("Symbigram")),
       m_netMgr(0), m_netSession(0), m_view(0),
       m_state(QLatin1String("starting")), m_busy(false), m_wantOnline(false), m_everOnline(false),
-      m_reconnectDelay(ReconnectMinMs), m_checkingPassword(false), m_foreground(true)
+      m_reconnectDelay(ReconnectMinMs), m_checkingPassword(false), m_loginMethod(QLatin1String("qr")), m_codeBusy(false), m_foreground(true)
 {
     m_session = new TelegramSession(this);
     ClientInfo info;
@@ -106,6 +106,7 @@ AppController::AppController(QObject *parent)
     connect(m_session, SIGNAL(loginError(QString)), this, SLOT(onLoginError(QString)));
     connect(m_session, SIGNAL(qrChanged()), this, SLOT(onLoginChanged()));
     connect(m_session, SIGNAL(passwordNeededChanged()), this, SLOT(onLoginChanged()));
+    connect(m_session, SIGNAL(codeNeededChanged()), this, SLOT(onLoginChanged()));
     connect(m_session, SIGNAL(selfChanged()), this, SIGNAL(selfChanged()));
     connect(m_session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessage(TgMessage)));
     connect(m_session, SIGNAL(peerResolved(TgPeer)), this, SLOT(onPeerResolved(TgPeer)));
@@ -201,9 +202,21 @@ QString AppController::loginStatus() const
     case TelegramSession::LoggingIn:
         if (m_checkingPassword) return tr("Checking the password (this takes a few seconds)...");
         if (m_session->passwordNeeded()) return tr("This account has two-step verification. Enter the password.");
+        if (m_loginMethod == QLatin1String("phone")) {
+            if (m_session->codeNeeded()) return m_codeBusy ? tr("Signing in...") : tr("Enter the code Telegram sent to %1.").arg(loginPhone());
+            return m_codeBusy ? tr("Requesting a code...") : tr("Enter your phone number, with the country code, to get a code.");
+        }
         return m_session->qrUrl().isEmpty() ? tr("Requesting a sign-in code...") : tr("Waiting for the code to be scanned...");
     default: return tr("Signing in...");
     }
+}
+
+bool AppController::codeNeeded() const { return m_session->codeNeeded(); }
+
+QString AppController::loginPhone() const
+{
+    QString digits = m_session->loginPhone();
+    return digits.isEmpty() ? QString() : QLatin1Char('+') + digits;
 }
 
 QString AppController::qrToken() const
@@ -558,12 +571,15 @@ void AppController::onLoginError(const QString &error)
 {
     m_loginError = error;
     m_checkingPassword = false;
+    m_codeBusy = false;
     emit loginChanged();
 }
 
 void AppController::onLoginChanged()
 {
     if (m_session->passwordNeeded() == false) m_checkingPassword = false;
+    // The code arrived (or the password step took over): the request is no longer in flight.
+    if (m_session->codeNeeded() || m_session->passwordNeeded()) m_codeBusy = false;
     emit loginChanged();
 }
 
@@ -612,6 +628,58 @@ void AppController::checkPassword(const QString &password)
     m_checkingPassword = true;
     emit loginChanged();
     m_session->checkPassword(password);
+}
+
+void AppController::usePhoneLogin()
+{
+    m_loginMethod = QLatin1String("phone");
+    m_loginError.clear();
+    emit loginChanged();
+}
+
+void AppController::useQrLogin()
+{
+    m_loginMethod = QLatin1String("qr");
+    m_loginError.clear();
+    m_codeBusy = false;
+    m_session->cancelPhoneLogin();          // stop the phone flow, resume the QR code
+    emit loginChanged();
+}
+
+void AppController::sendLoginCode(const QString &phone)
+{
+    if (phone.trimmed().isEmpty()) { m_loginError = tr("Enter your phone number."); emit loginChanged(); return; }
+    m_loginMethod = QLatin1String("phone");
+    m_loginError.clear();
+    m_codeBusy = true;
+    emit loginChanged();
+    m_session->startPhoneLogin(phone);
+}
+
+void AppController::submitLoginCode(const QString &code)
+{
+    if (code.trimmed().isEmpty()) { m_loginError = tr("Enter the code."); emit loginChanged(); return; }
+    m_loginError.clear();
+    m_codeBusy = true;
+    emit loginChanged();
+    m_session->submitCode(code);
+}
+
+void AppController::resendLoginCode()
+{
+    m_loginError.clear();
+    m_codeBusy = true;
+    emit loginChanged();
+    m_session->resendCode();
+}
+
+void AppController::changeLoginNumber()
+{
+    m_loginMethod = QLatin1String("phone");
+    m_loginError.clear();
+    m_codeBusy = false;
+    m_session->backToPhoneEntry();
+    emit loginChanged();
 }
 
 void AppController::signOut()

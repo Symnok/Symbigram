@@ -62,6 +62,15 @@ public:
     bool passwordNeeded() const { return m_passwordNeeded; }
     QString passwordHint() const { return m_passwordHint; }
     void checkPassword(const QString &password);
+    // Phone-number login (alternative to the QR code, for an existing account).
+    void startPhoneLogin(const QString &phone);   ///< request an SMS/app code for this number
+    void submitCode(const QString &code);         ///< sign in with the received code
+    void resendCode();                            ///< ask for the code again
+    void backToPhoneEntry();                      ///< drop the code step, back to the number field
+    void cancelPhoneLogin();                      ///< abandon phone login, go back to the QR code
+    bool codeNeeded() const { return m_codeNeeded; }
+    QString loginPhone() const { return m_loginPhone; }
+    int codeLength() const { return m_codeLength; }
     /// Ends the authorisation on the server and forgets it here.
     void logOut();
 
@@ -145,6 +154,7 @@ signals:
     void disconnected(const QString &reason);
     void qrChanged();
     void passwordNeededChanged();
+    void codeNeededChanged();
     void loginError(const QString &error);
     void signedIn();
     /// The authorisation is gone (signed out here, or revoked elsewhere).
@@ -209,7 +219,8 @@ private:
         GetFile, SaveFilePart, SendMedia, ExportAuthorization, ImportAuthorization,
         GetArchive, GetFolders,
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
-        ArchivePeer, DeleteChat, MoveFolder
+        ArchivePeer, DeleteChat, MoveFolder,
+        SendCode, SignIn, ResendCode
     };
     struct Request
     {
@@ -233,6 +244,7 @@ private:
     void forgetSession(const QString &reason);
     void startLogin();
     void exportToken();
+    void sendPhoneCode();
     void handleLoginStep(const TgQrLoginStep &step, bool fromMovedDc);
     void adoptMoved();
     void finishLogin();
@@ -345,6 +357,11 @@ private:
     int m_movedDc;
     QByteArray m_movedToken;
     bool m_loggingOut;
+    // phone-number login
+    QString m_loginPhone;      // digits of the number being signed in; empty = QR login
+    QString m_phoneCodeHash;   // from auth.sentCode, needed by auth.signIn
+    bool m_codeNeeded;         // waiting for the user to type the code
+    int m_codeLength;          // expected code length (0 if unknown)
 
     // data
     TgPeerCache m_peers;
