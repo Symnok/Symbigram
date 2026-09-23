@@ -45,12 +45,22 @@ private slots:
 
 private:
     void fail(const QString &reason);
+    // Manual SOCKS5 (RFC 1928/1929): Qt's own proxy layer does not do username/password
+    // auth on Symbian, so the handshake is driven here over a plain socket to the proxy.
+    void sendSocksGreeting();
+    void sendSocksAuth();
+    void sendSocksConnect();
+    void processSocks();
     QTcpSocket *m_socket;
     QTimer *m_connectTimer;
     QByteArray m_inbuf;
     bool m_tagSent;
     bool m_open;
     QNetworkProxy m_proxy;
+    bool m_useProxy;
+    int m_socks;              // SOCKS5 handshake phase (see the .cpp)
+    QString m_targetHost;     // the datacenter we ultimately want, reached through the proxy
+    int m_targetPort;
 };
 
 #endif // MTPROTOTRANSPORT_H
