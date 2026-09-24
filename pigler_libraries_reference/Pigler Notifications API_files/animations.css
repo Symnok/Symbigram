@@ -1,0 +1,19 @@
+/*/анимации/*/
+  
+@keyframes flashing-border {
+    0%{
+      border-color: white;
+    }
+    50%{
+      border-color: transparent;
+    }
+    100%{
+      border-color: white;
+    }
+  }
+  
+  @keyframes textprint {
+    from{
+      width: 0;
+    }
+  }

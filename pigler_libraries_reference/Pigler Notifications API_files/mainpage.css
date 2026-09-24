@@ -1,0 +1,131 @@
+/*/текст, оно же лого/*/
+
+#text-wrapper {
+    box-sizing: border-box;
+    /*background: black;*/
+    display: flex;
+    justify-content: center;
+    padding-top: 15vh;
+    padding-bottom: 15vh;
+    transform-style: inherit;
+}
+  
+  
+.title {
+    width: 11ch;
+    color: white;
+    font-size: 42pt;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 4px solid white;
+    animation: flashing-border 0.75s step-end infinite,
+    textprint 1.5s steps(11)
+    ;
+}
+  
+.titlea { /* тайтл без анимации */
+    width: 11ch;
+    color: white;
+    font-size: 42pt;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 4px solid white;
+    animation: flashing-border 0.75s step-end infinite;
+}
+
+  
+/*/мейнпейдж/*/
+  
+main {
+	background: #212121;
+}
+  
+.mainpage {
+  padding: 0;
+  background-color: #212121;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1000px;
+	padding-bottom: auto;
+}
+
+footer * {
+	margin: 0;
+}
+
+div, pre {
+	margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+}
+
+img {
+	margin: 5px;
+}
+
+body {
+	height: 100%;
+}
+
+.b {
+	height: 100%;
+}
+
+.info {
+    margin-top: 15px;
+    padding-bottom: 96px;
+}
+
+.info p {
+    padding: 10px; 
+}
+
+.pagelink {
+	margin-left: 4px;
+	margin-right: 4px;
+	margin: 12px;
+	padding: 2px;
+	text-align: left;
+	background: #303030;
+}
+
+.post {
+	margin-left: 2px;
+	margin-right: 4px;
+	margin: 12px;
+	padding: 4px;
+	text-align: left;
+	background: #303030;
+	border-left: 2px solid grey;
+}
+
+.postimg {
+	max-height: 180px;
+	max-width: 240px;
+}
+
+.linksm {
+	margin-left: 16px;
+	text-align: left;
+	padding: 2px;
+}
+
+.linksm div {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.e {
+    text-align: left;
+    margin-left: 48px;
+}
+
+.e li {
+	padding-left: 1ex;
+}
+
+.w a {
+	color: white;
+}

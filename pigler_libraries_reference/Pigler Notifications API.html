@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!-- saved from url=(0025)https://nnproject.cc/pna/ -->
+<html lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pigler Notifications API</title>
+		<link rel="preload" href="https://nnproject.cc/img/image.jpg" as="image">
+		<link rel="stylesheet" href="./Pigler Notifications API_files/main.css">
+		<link rel="stylesheet" href="./Pigler Notifications API_files/mainpage.css">
+		<link rel="stylesheet" href="./Pigler Notifications API_files/animations.css">
+		</head>
+	<body>
+		<div class="header">
+			<div id="text-wrapper">
+				<a href="https://nnproject.cc/"><h1 class="titlea">/nnproject/</h1></a>
+			</div>
+		</div>
+		<div class="mainpage">
+			<div class="navbar">
+<a href="https://nnproject.cc/" class="navlink">[go to main page]</a>
+			</div>    
+			<article class="info">
+				<h2>Pigler Notifications API</h2>
+				<p>
+					</p><div><img style="height: 360px;" src="./Pigler Notifications API_files/screenshot.png"></div>
+					<small>(Usage example)</small>
+				<p></p>
+				<div>
+					<div style="text-align: left; margin-left: 48px;">
+						Open-source alternative to djbozkosz's Notification Center API that is compatible with all devices based on Symbian Belle and higher,<br>
+						created to provide a simple and convenient API for application developers to manage notifications in the status panel.<br>
+						<!--
+						Аналог Notification Center который совместим со всеми устройствами на базе Symbian Belle и выше, созданный с целью предоставить простое и удобное API разработчикам приложений для управления уведомлениями в status panel на Symbian Belle
+						-->
+						<br>
+						Currently used in:<br>
+						Kutegram, Discord J2ME, MPGram
+					</div>
+					<div>
+						<br>
+						<a href="https://github.com/piglerorg/pigler" style="color: lightblue">GitHub</a>
+					</div>
+					<br>
+					<h4>Installation</h4>
+					<div style="text-align: left; margin-left: 48px;">
+						Pigler Notifications API:<br>
+						Install Pigler.sis and reboot the phone<br><br>
+						Pigler Java Extension API:<br>
+						Activate Open4All patch, then install PiglerJavaAPI.sis, reinstall any .jar app and reboot<br>
+					</div>
+					<br><br>
+				</div>
+				<div>
+					<br>
+					<h4>Latest releases</h4>
+					<div style="text-align: left; margin-left: 48px;">
+						<a href="https://nnproject.cc/dl/Pigler.sis" style="color: lightblue">Pigler Notifications API (1.4)</a><br>
+<i><small>Last update: 10.08.2024</small></i><br>
+						<a href="https://nnproject.cc/dl/PiglerJavaAPI.sis" style="color: lightblue">Pigler Java Extension API (1.4.2)</a><br>
+<i><small>Last update: 24.09.2026</small></i>
+					</div>
+					<br><br>
+				</div>
+				<p>
+				</p><h4>For developers</h4>
+				<div style="text-align: left; margin-left: 48px;">
+					<div>
+						<h4>Documentation</h4>
+						<a href="https://nnproject.cc/pna/doxygen/index.html" style="color: lightblue">Symbian C++ &amp; Qt API</a><br>
+						<a href="https://nnproject.cc/pna/javadoc/index.html" style="color: lightblue">Java API</a><br>
+						<br>
+					</div>
+					<div>
+						<h4>Examples</h4>
+						<a href="https://github.com/piglerorg/pigler/tree/master/qt-tester">QT tester sources</a><br>
+						<a href="https://github.com/piglerorg/pigler/tree/master/java-tester">Java tester sources</a><br>
+						<a href="https://github.com/kutegram/quick/blob/master/src/platformutils.cpp">Kutegram source</a><br>
+						<div>
+						Symbian C++ example:<br><br>
+						<pre style="color: lightgray;">#include &lt;PiglerAPI.h&gt;
+
+LOCAL_C void Test() {
+    PiglerAPI *api = new PiglerAPI();
+    _LIT(KAppName, "Example");
+    if(api-&gt;Init(KAppName) == KErrNone) {
+        _LIT(KText, "My test notification\nHello world!");
+        api-&gt;SetNotification(0, KText);
+    }
+    api-&gt;Close();
+}
+						</pre>
+						</div>
+					<div>
+						<h4>Usage notice</h4>
+						Creating more than 1-2 notification items for application is not recommended.<br>
+						<br>
+						Limit of items count is platform dependent, <a href="https://github.com/piglerorg/pigler/blob/master/plugin/inc/PiglerPlugin.h#L10">See here.</a><br>
+						On Belle: 10 per app, 100 globally.<br>
+						On Anna: 2 per app, 3 globally.<br>
+						<br>
+						When limit of created notifications is exceeded,<br>
+						creation of new items will result KErrAlreadyExists (-11) error.<br>
+						It also may be KErrOverflow (-9) error.<br>
+						<br>
+						Items should have 2 lines of text separated by '\n' character.<br>
+						It is not relevant to Java and Qt, since there are 2 parameters for title and text.<br>
+						On Anna there is only 1 line.<br>
+						Additionaly, there is utility method <a href="https://nnproject.cc/pna/javadoc/org/pigler/api/PiglerAPI.html#isSingleLine--">PiglerAPI.isSingleLine()</a> in Java for this.<br>
+						<br>
+						Before using function that has API level higher than 2, check its availability<br>
+						Use <a href="https://nnproject.cc/pna/doxygen/class_pigler_a_p_i.html#a3ad580f2183e5cf7185b2eff70729036">PiglerAPI::GetAPIVersion</a> in C++ and <a href="https://nnproject.cc/pna/javadoc/org/pigler/api/PiglerAPI.html#getAPIVersion--">PiglerAPI.getAPIVersion()</a> in Java<br>
+						<br>
+						Unhandled functions will return KErrNotSupported (-5).<br>
+						<br>
+						In C++, icon bitmap must have size of 68x68 with format TDisplayMode::EColor16MA<br>
+						Since API level 4, due to Anna support, size of bitmap became platform-dependent,<br>
+						And must be set according to <a href="https://nnproject.cc/pna/doxygen/class_pigler_a_p_i.html#a1dade41069803cf8257d9c3a94f6d930">PiglerAPI::GetBitmapSize</a> return value.<br>
+						Implementation may return 0 if icons are not supported.<br>
+						<br>
+						In Java and Qt, icon is fitted and scaled automatically, recommended size is 52x52 without margins.<br>
+						<br>
+						To check if Pigler Java API package is installed,<br>
+						check for "org.pigler.api.version" system property value.<br>
+						Example values are: "1.4", "1.2-kemulator".<br>
+						<br>
+						Currently supported platforms:<br>
+						Symbian Belle (Refresh, FP1, FP2)<br>
+						Symbian Anna<br>
+						KEmulator nnmod &gt;= 2.14.4 (Java only)<br>
+						<br>
+						Symbian Anna support is still experimental.<br>
+						<br>
+						Do not create more than one API connection at time.<br>
+						<br>
+					</div>
+					</div>
+					<div>
+						<h4>Headers</h4>
+						<a href="https://github.com/piglerorg/pigler/blob/master/sym-library/inc/PiglerAPI.h">PiglerAPI.h</a><br>
+						<a href="https://github.com/piglerorg/pigler/blob/master/qt-library/inc/QPiglerAPI.h">QPiglerAPI.h</a><br>
+						<br>
+					</div>
+					<div>
+						<h4>Static libraries (API level 4)</h4>
+						armv5\urel:<br>
+						<a href="https://nnproject.cc/pna/lib/urel/piglerapi_sym.lib" style="color: lightblue">piglerapi_sym.lib</a><br>
+						<a href="https://nnproject.cc/pna/lib/urel/piglerapi_qt.lib" style="color: lightblue">piglerapi_qt.lib</a><br>
+<i><small>Last update: 10.08.2024</small></i><br>
+						<br>armv5\udeb:<br>
+						<a href="https://nnproject.cc/pna/lib/udeb/piglerapi_sym.lib" style="color: lightblue">piglerapi_sym.lib</a><br>
+						<a href="https://nnproject.cc/pna/lib/udeb/piglerapi_qt.lib" style="color: lightblue">piglerapi_qt.lib</a><br>
+						<!--
+						<br>java:<br>
+						<a href="lib/javapiglerapi.jar" style="color: lightblue">Java library</a><br>
+						-->
+<i><small>Last update: 10.08.2024</small></i><br>
+						<br>
+					</div>
+					<div>
+						<h4>Java library (1.4, API level 4)</h4>
+						<a href="https://nnproject.cc/pna/lib/javapiglerapi.jar" style="color: lightblue">javapiglerapi.jar</a><br>
+<i><small>Last update: 10.08.2024</small></i><br>
+						<br>
+					</div>
+					<div>
+						<h4>Building</h4>
+						<a href="https://github.com/piglerorg/pigler/blob/master/README.md">API server (plugin) &amp; Static libraries building</a><br>
+						<br>
+					</div>
+				</div>
+<p></p>
+<div class="e"><small>
+<b>People:</b><br>
+shinovon: java, symbianc++ part, reversing<br>
+curoviyxru: c++, qt part, idea<br>
+</small></div>
+</article>
+<div class="f">
+<small><b>2024, nnproject</b></small>
+<p>Website made by <a style="color: darkgrey;">rehdzi</a> &amp; <a>shinovon</a></p>
+<div class="links">
+<a href="https://t.me/nnmidlets">[tg channel]</a> <a href="https://t.me/nnmidletschat">[tg chat]</a> <a href="https://boosty.to/nnproject">[boosty]</a>
+</div>
+</div>
+</div>
+
+
+</body></html>
