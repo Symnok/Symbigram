@@ -6,6 +6,7 @@
 #include "mediacache.h"
 #include "voicerecorder.h"
 #include "notifier.h"
+#include "piglernotifier.h"
 #include "telegramsession.h"
 #include "tgapi.h"
 #include "tgcredentials.h"
@@ -99,6 +100,16 @@ AppController::AppController(QObject *parent)
     m_notifier->setVibrate(vibrate());
     m_notifier->setPopups(popups());
 
+    // Optional status-bar ("envelope") notifications on Belle via Pigler. init() quietly fails
+    // (and everything stays as-is) when Pigler is not installed, or on S^3/Anna.
+    m_pigler = new PiglerNotifier(this);
+#ifdef SGM_UID3
+    m_pigler->init(QLatin1String("Symbigram"), SGM_UID3);
+#else
+    m_pigler->init(QLatin1String("Symbigram"), 0);
+#endif
+    connect(m_pigler, SIGNAL(tapped(QString)), this, SIGNAL(openChatRequested(QString)));
+
     connect(m_session, SIGNAL(stateChanged()), this, SLOT(onSessionState()));
     connect(m_session, SIGNAL(disconnected(QString)), this, SLOT(onSessionDisconnected(QString)));
     connect(m_session, SIGNAL(signedIn()), this, SLOT(onSignedIn()));
@@ -151,6 +162,7 @@ bool AppController::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::ApplicationActivate) {
         m_foreground = true;
         if (m_notifier->pendingCount() > 0) m_notifier->setPendingCount(0);
+        m_pigler->clearAll();          // coming to the foreground clears the status-bar entries
         m_session->setOnline(true);
     } else if (event->type() == QEvent::ApplicationDeactivate) {
         m_foreground = false;
@@ -574,6 +586,7 @@ void AppController::onSignedIn()
 void AppController::onSignedOut(const QString &reason)
 {
     m_chat->close();
+    m_pigler->clearAll();
     setBusy(false);
     m_checkingPassword = false;
     m_loginError = reason;
@@ -635,6 +648,7 @@ void AppController::onMessage(const TgMessage &m)
     QString text = m.text.isEmpty() ? m.note : m.text;
     m_notifier->notify(who, text);
     m_notifier->setPendingCount(m_notifier->pendingCount() + 1);
+    m_pigler->showMessage(m.peer.key(), who, text);   // persistent status-bar entry on Belle (no-op otherwise)
 }
 
 // -- actions ---------------------------------------------------------------------------------------------

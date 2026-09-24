@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.20
+VERSION = 1.0.21
 
 QT += core gui network declarative
 
@@ -23,7 +23,8 @@ HEADERS += \
     src/app/mediacache.h \
     src/app/qrimageprovider.h \
     src/app/voiceplayer.h \
-    src/app/voicerecorder.h
+    src/app/voicerecorder.h \
+    src/app/piglernotifier.h
 
 SOURCES += \
     src/main.cpp \
@@ -34,7 +35,8 @@ SOURCES += \
     src/app/mediacache.cpp \
     src/app/qrimageprovider.cpp \
     src/app/voiceplayer.cpp \
-    src/app/voicerecorder.cpp
+    src/app/voicerecorder.cpp \
+    src/app/piglernotifier.cpp
 
 RESOURCES += qml.qrc translations.qrc
 
@@ -64,6 +66,17 @@ symbian {
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
     LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
+
+    # Pigler Notifications API client (third_party/pigler) - Belle status-bar notifications.
+    # Compiled from source (an IPC client to a separately-installed Pigler server); needs only
+    # standard libraries, so the app is unaffected when Pigler is not installed.
+    INCLUDEPATH += third_party/pigler
+    LIBS += -lrandom
+    HEADERS += third_party/pigler/QPiglerAPI.h
+    SOURCES += \
+        third_party/pigler/QPiglerAPI.cpp \
+        third_party/pigler/PiglerAPI.cpp \
+        third_party/pigler/PiglerTapServer.cpp
 
     # Qt Quick Components for Symbian (built into Belle; Anna gets them through the Smart
     # Installer package, Symbigram_installer.sis).

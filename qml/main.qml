@@ -68,6 +68,11 @@ PageStackWindow {
             if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
             window.openChat(peerKey)
         }
+        onOpenChatRequested: {
+            if (app.state != "ready") return
+            if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
+            window.openChat(peerKey)
+        }
     }
 
     Component.onCompleted: route()

@@ -16,6 +16,7 @@ class TelegramSession;
 class ChatsModel;
 class MessagesModel;
 class Notifier;
+class PiglerNotifier;
 class MediaCache;
 class QNetworkConfigurationManager;
 class VoiceRecorder;
@@ -189,6 +190,7 @@ signals:
     void selfChanged();
     void noticeChanged();
     void cacheChanged();
+    void openChatRequested(const QString &peerKey);   // a status-bar notification was tapped
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
@@ -233,6 +235,7 @@ private:
     ChatsModel *m_chats;
     MessagesModel *m_chat;
     Notifier *m_notifier;
+    PiglerNotifier *m_pigler;   // Belle status-bar notifications (optional; no-op if unavailable)
     MediaCache *m_media;
     VoiceRecorder *m_recorder;
     QString m_downloadPath;   // the chosen public folder (recordings, WAV)
