@@ -43,6 +43,8 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(int secretTtl READ secretTtl NOTIFY peerChanged)
     Q_PROPERTY(int replyToId READ replyToId NOTIFY replyChanged)         // message being replied to (0 = none)
     Q_PROPERTY(QString replyToText READ replyToText NOTIFY replyChanged) // preview for the reply bar
+    Q_PROPERTY(int audioRow READ audioRow NOTIFY audioChanged)           // row buffering for the player (-1 = none)
+    Q_PROPERTY(int audioBuffer READ audioBuffer NOTIFY audioChanged)     // percent buffered before hand-off
 public:
     enum Roles {
         MsgIdRole = Qt::UserRole + 1,
@@ -127,6 +129,11 @@ public:
     Q_INVOKABLE void openMedia(int row);
     /// Play or pause a voice message (downloads it first if needed).
     Q_INVOKABLE void playVoice(int row);
+    /// Play an MP3/M4A in the phone's Media Player, starting it while the file is still
+    /// downloading (streams to a public file, hands off once enough is buffered).
+    Q_INVOKABLE void streamAudio(int row);
+    int audioRow() const { return m_audioRow; }
+    int audioBuffer() const { return m_audioBuffer; }
     Q_INVOKABLE bool canDeleteForEveryone(int row) const;
     /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
     void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto);
@@ -143,8 +150,12 @@ signals:
     void sendFailed(const QString &error);
     void mediaSaved(const QString &path);   // a file was copied out; path is where
     void replyChanged();
+    void audioChanged();
 
 private slots:
+    void onAudioStreamProgress(int jobId, qint64 received, qint64 total);
+    void onAudioStreamFinished(int jobId, const QString &path);
+    void onAudioStreamFailed(int jobId, const QString &error);
     void onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
     void onHistoryFailed(const TgPeer &peer, const QString &error);
     void onMessageReceived(const TgMessage &m);
@@ -210,6 +221,13 @@ private:
     VoicePlayer *m_voice;
     int m_voiceRow;        // the row currently playing, or -1
     int m_pendingPlayRow;  // a voice row to play as soon as its download finishes
+    int m_audioRow;        // row being streamed to the media player, or -1
+    int m_audioBuffer;     // percent buffered before the hand-off
+    int m_audioJobId;      // the streaming download job
+    bool m_audioOpened;    // the media player has already been launched for it
+    qint64 m_audioHeadStart;   // bytes to buffer before hand-off (whole file for M4A: moov-at-end)
+    QString m_audioPublicPath;
+    QString audioStreamPath(const TgMedia &m) const;   // public file the media player can read
     TgPeer m_peer;
     int m_secretId;
     QString m_downloadFolder;   // where "Save" copies files (chosen in Settings)          // non-zero when the open chat is a secret (end-to-end) chat

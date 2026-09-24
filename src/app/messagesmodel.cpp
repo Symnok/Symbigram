@@ -25,7 +25,8 @@ namespace
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
-      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_replyToId(0)
+      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1),
+      m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -87,6 +88,10 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     m_burnTimer = new QTimer(this);
     m_burnTimer->setInterval(1000);
     connect(m_burnTimer, SIGNAL(timeout()), this, SLOT(onBurnTick()));
+
+    connect(session, SIGNAL(downloadProgress(int,qint64,qint64)), this, SLOT(onAudioStreamProgress(int,qint64,qint64)));
+    connect(session, SIGNAL(downloadFinished(int,QString)), this, SLOT(onAudioStreamFinished(int,QString)));
+    connect(session, SIGNAL(downloadFailed(int,QString)), this, SLOT(onAudioStreamFailed(int,QString)));
 
     m_voice = new VoicePlayer(this);
     connect(m_voice, SIGNAL(stopped()), this, SLOT(onVoiceStopped()));
@@ -359,6 +364,82 @@ void MessagesModel::openMedia(int row)
     QString path = m_rows.at(row).fullPath;
 #endif
     QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
+QString MessagesModel::audioStreamPath(const TgMedia &m) const
+{
+    // A PUBLIC file (the media-player process can't read our private cache) with the real
+    // extension, one per track so a replay reuses it.
+    QString dir = downloadDir(false) + QLatin1String("/.audio");
+    QDir().mkpath(dir);
+    QString ext = m.fileName.section(QLatin1Char('.'), -1).toLower();
+    if (ext.isEmpty() || ext.size() > 5) ext = QLatin1String("mp3");
+    return dir + QLatin1Char('/') + QString::number(quint64(m.id), 16) + QLatin1Char('.') + ext;
+}
+
+void MessagesModel::streamAudio(int row)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    const TgMedia &m = m_rows.at(row).m.media;
+    if (m.kind != TgMedia::Audio || !m.isValid()) return;
+    m_voice->stop();
+    QString path = audioStreamPath(m);
+    // Already fully streamed once? Just open it.
+    if (m.fileSize > 0 && QFileInfo(path).size() == m.fileSize) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::toNativeSeparators(path)));
+        return;
+    }
+    if (m_audioJobId) m_session->cancelDownload(m_audioJobId);   // drop a previous stream
+    // MP3 streams from the start (header up front); M4A usually has its index at the END of the
+    // file, so the player can only start it once the whole file has arrived - buffer it fully.
+    QString ext = m.fileName.section(QLatin1Char('.'), -1).toLower();
+    bool isMp3 = ext == QLatin1String("mp3") || m.mimeType == QLatin1String("audio/mpeg") || m.mimeType == QLatin1String("audio/mp3");
+    m_audioHeadStart = isMp3 ? qint64(512 * 1024) : (m.fileSize > 0 ? m.fileSize : (qint64(1) << 62));
+    m_audioRow = row;
+    m_audioBuffer = 0;
+    m_audioOpened = false;
+    m_audioPublicPath = path;
+    m_audioJobId = m_session->streamFile(m, path);
+    emit audioChanged();
+    if (m_audioRow >= 0 && m_audioRow < m_rows.size()) emit dataChanged(index(m_audioRow), index(m_audioRow));
+}
+
+void MessagesModel::onAudioStreamProgress(int jobId, qint64 received, qint64 total)
+{
+    if (jobId != m_audioJobId) return;
+    m_audioBuffer = total > 0 ? int(received * 100 / total) : 0;
+    emit audioChanged();
+    if (m_audioRow >= 0 && m_audioRow < m_rows.size()) emit dataChanged(index(m_audioRow), index(m_audioRow));
+    // Hand the growing file to the Media Player once there is a head start (or it is complete).
+    if (!m_audioOpened && (received >= m_audioHeadStart || (total > 0 && received >= total))) {
+        m_audioOpened = true;
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::toNativeSeparators(m_audioPublicPath)));
+    }
+}
+
+void MessagesModel::onAudioStreamFinished(int jobId, const QString &)
+{
+    if (jobId != m_audioJobId) return;
+    if (!m_audioOpened) {
+        m_audioOpened = true;
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::toNativeSeparators(m_audioPublicPath)));
+    }
+    m_audioJobId = 0;
+    int r = m_audioRow;
+    m_audioRow = -1;
+    emit audioChanged();
+    if (r >= 0 && r < m_rows.size()) emit dataChanged(index(r), index(r));
+}
+
+void MessagesModel::onAudioStreamFailed(int jobId, const QString &error)
+{
+    if (jobId != m_audioJobId) return;
+    m_audioJobId = 0;
+    int r = m_audioRow;
+    m_audioRow = -1;
+    emit audioChanged();
+    if (r >= 0 && r < m_rows.size()) emit dataChanged(index(r), index(r));
+    if (!m_audioOpened) emit sendFailed(tr("Could not play this audio: %1").arg(error));
 }
 
 bool MessagesModel::canDeleteForEveryone(int row) const

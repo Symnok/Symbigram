@@ -1239,6 +1239,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             if (!bytes.isEmpty()) {
                 if (d.file->write(bytes) != bytes.size()) { finishDownload(d.jobId, tr("could not write the file")); break; }
                 d.offset += bytes.size();
+                if (d.stream) d.file->flush();   // let a media player reading the file see the new bytes
                 emit downloadProgress(d.jobId, d.offset, d.total);
             }
             // A short read means the end, whatever the declared size said.
@@ -1824,7 +1825,7 @@ void TelegramSession::dcAuthorized(int dcId)
     pumpDownloads();
 }
 
-int TelegramSession::addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total)
+int TelegramSession::addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total, bool stream)
 {
     Download d;
     d.jobId = m_nextJobId++;
@@ -1832,8 +1833,11 @@ int TelegramSession::addDownload(int dcId, const QByteArray &location, const QSt
     d.location = location;
     d.path = targetPath;
     d.total = total;
+    d.stream = stream;
     QDir().mkpath(QFileInfo(targetPath).absolutePath());
-    d.file = new QFile(targetPath + QLatin1String(".part"), this);
+    // A streaming download writes straight to the final path (flushed per chunk) so a media player
+    // can open and read the growing file; a normal one uses a .part file renamed at the end.
+    d.file = new QFile(stream ? targetPath : (targetPath + QLatin1String(".part")), this);
     if (!d.file->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         delete d.file;
         d.file = 0;
@@ -1852,6 +1856,11 @@ int TelegramSession::downloadFile(const TgMedia &media, const QString &sizeType,
 {
     qint64 total = sizeType.isEmpty() || sizeType == media.bigSizeType ? media.fileSize : 0;
     return addDownload(media.dcId, TgApi::fileLocation(media, sizeType), targetPath, total);
+}
+
+int TelegramSession::streamFile(const TgMedia &media, const QString &targetPath)
+{
+    return addDownload(media.dcId, TgApi::fileLocation(media, QString()), targetPath, media.fileSize, true);
 }
 
 int TelegramSession::downloadPeerPhoto(const TgPeer &peer, qint64 photoId, int dcId, const QString &targetPath)
@@ -1902,9 +1911,8 @@ void TelegramSession::finishDownload(int jobId, const QString &error)
     if (d.file) {
         d.file->close();
         if (error.isEmpty() && d.offset > 0) {
-            QFile::remove(d.path);
-            d.file->rename(d.path);
-        } else {
+            if (!d.stream) { QFile::remove(d.path); d.file->rename(d.path); }   // stream already wrote d.path
+        } else if (!d.stream) {
             d.file->remove();
         }
         delete d.file;

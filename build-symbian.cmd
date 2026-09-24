@@ -31,15 +31,13 @@ if errorlevel 1 exit /b 1
 call sbs -c arm.v5.urel.gcce4_4_1
 if errorlevel 1 exit /b 1
 
-rem Both packages wrap the same binary: the self-signed one for Belle, and the Smart
-rem Installer one for Anna, which fetches Qt Quick Components before installing the app.
+rem Only the self-signed package for Belle. It also installs and runs on Anna, so the Smart
+rem Installer wrapper (Symbigram_installer.pkg) is NOT built - it failed on Anna because the
+rem online Qt Quick Components resource it fetches no longer exists.
 call createpackage.bat Symbigram_template.pkg release-armv5
 if errorlevel 1 exit /b 1
-call createpackage.bat Symbigram_installer.pkg release-armv5
-if errorlevel 1 exit /b 1
 
-rem The only packages left behind carry the version in their names; the unversioned and
+rem The only package left behind carries the version in its name; the unversioned and
 rem unsigned intermediates go.
 if exist Symbigram.sis ( move /y Symbigram.sis Symbigram_%VER%.sis >nul & echo built Symbigram_%VER%.sis )
-if exist Symbigram_installer.sis ( move /y Symbigram_installer.sis Symbigram_installer_%VER%.sis >nul & echo built Symbigram_installer_%VER%.sis )
 del /q Symbigram_unsigned.sis Symbigram_installer_unsigned.sis 2>nul

@@ -139,6 +139,9 @@ public:
     /// Fetches an attachment (a photo size, or a document with an empty sizeType) into
     /// targetPath; the job id identifies the downloadProgress/Finished/Failed signals.
     int downloadFile(const TgMedia &media, const QString &sizeType, const QString &targetPath);
+    /// Like downloadFile but writes straight to targetPath and flushes per chunk, so a media
+    /// player can open and play the file while it is still downloading (progressive playback).
+    int streamFile(const TgMedia &media, const QString &targetPath);
     /// A profile / chat picture (the small one).
     int downloadPeerPhoto(const TgPeer &peer, qint64 photoId, int dcId, const QString &targetPath);
     void cancelDownload(int jobId);
@@ -284,7 +287,7 @@ private:
     // -- files --
     struct Download
     {
-        Download() : jobId(0), dcId(0), offset(0), total(0), file(0), active(false), migrations(0) {}
+        Download() : jobId(0), dcId(0), offset(0), total(0), file(0), active(false), migrations(0), stream(false) {}
         int jobId;
         int dcId;
         QByteArray location;
@@ -293,6 +296,7 @@ private:
         QFile *file;
         bool active;
         int migrations;
+        bool stream;            // writes straight to the final path + flush, for progressive playback
     };
     struct Upload
     {
@@ -319,7 +323,7 @@ private:
     };
     quint64 sendOn(MtprotoClient *client, Kind kind, const QByteArray &body, const Request &req);
     MtprotoClient *clientForDc(int dcId);
-    int addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total);
+    int addDownload(int dcId, const QByteArray &location, const QString &targetPath, qint64 total, bool stream = false);
     void pumpDownloads();
     void requestChunk(Download &d, MtprotoClient *client);
     void finishDownload(int jobId, const QString &error);
