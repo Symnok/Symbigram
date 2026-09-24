@@ -157,7 +157,10 @@ public slots:
     void findPeer(const QString &query);
     /// Opens a file picker and sends the chosen file to the open chat, as a photo or a
     /// document. Nothing happens if the user cancels.
-    void attachFile(bool asPhoto);
+    /// Two-step attach so a caption can be added after the file is chosen: pickAttachment opens
+    /// the file picker and returns the path (empty if cancelled); sendAttachment sends it.
+    QString pickAttachment(bool asPhoto);
+    void sendAttachment(const QString &path, bool asPhoto, const QString &caption);
     /// Voice messages: start/stop capture; stop encodes and sends to the open chat.
     void startRecording();
     void stopRecording();

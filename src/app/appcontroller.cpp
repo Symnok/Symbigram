@@ -781,15 +781,19 @@ void AppController::onResolveFailed(const QString &error)
     setNotice(error);
 }
 
-void AppController::attachFile(bool asPhoto)
+QString AppController::pickAttachment(bool asPhoto)
 {
-    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
-    if (m_chat->peerKey().isEmpty()) return;
+    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return QString(); }
+    if (m_chat->peerKey().isEmpty()) return QString();
     QString filter = asPhoto ? tr("Images (*.jpg *.jpeg *.png *.gif *.bmp)") : tr("All files (*)");
-    QString path = QFileDialog::getOpenFileName(0, asPhoto ? tr("Choose an image") : tr("Choose a file"), QString(), filter);
-    if (path.isEmpty()) return;
-    qint64 randomId = m_session->sendFile(m_chat->peer(), path, asPhoto, QString());
-    m_chat->noteOutgoingMedia(randomId, path, asPhoto);
+    return QFileDialog::getOpenFileName(0, asPhoto ? tr("Choose an image") : tr("Choose a file"), QString(), filter);
+}
+
+void AppController::sendAttachment(const QString &path, bool asPhoto, const QString &caption)
+{
+    if (path.isEmpty() || m_chat->peerKey().isEmpty()) return;
+    qint64 randomId = m_session->sendFile(m_chat->peer(), path, asPhoto, caption.trimmed());
+    m_chat->noteOutgoingMedia(randomId, path, asPhoto, caption.trimmed());
     setNotice(asPhoto ? tr("Sending the image...") : tr("Sending the file..."));
 }
 

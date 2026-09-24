@@ -26,7 +26,7 @@ namespace
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1),
-      m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0)
+      m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -684,6 +684,7 @@ void MessagesModel::close()
     endResetModel();
     m_loading = false;
     if (m_replyToId) { m_replyToId = 0; emit replyChanged(); }
+    if (m_editId) { m_editId = 0; emit editChanged(); }
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
@@ -853,6 +854,39 @@ QString MessagesModel::replyToText() const
     return m_replyToId ? replySnippet(m_replyToId) : QString();
 }
 
+bool MessagesModel::canEdit(int row) const
+{
+    if (row < 0 || row >= m_rows.size() || m_secretId) return false;   // secret chats can't edit
+    const Row &r = m_rows.at(row);
+    return r.m.out && !r.pending && !r.failed && !r.m.service && r.m.id > 0;
+}
+
+void MessagesModel::startEdit(int row)
+{
+    if (!canEdit(row)) return;
+    cancelReply();                      // editing and replying are mutually exclusive
+    m_editId = m_rows.at(row).m.id;
+    emit editChanged();
+}
+
+void MessagesModel::cancelEdit()
+{
+    if (!m_editId) return;
+    m_editId = 0;
+    emit editChanged();
+}
+
+void MessagesModel::commitEdit(const QString &text)
+{
+    if (!m_editId || m_peer.isNull()) return;
+    QString t = text.trimmed();
+    int id = m_editId;
+    m_editId = 0;
+    emit editChanged();
+    if (t.isEmpty()) return;            // empty edit: just leave the message as it was
+    m_session->editMessage(m_peer, id, t);
+}
+
 QString MessagesModel::replySnippet(int msgId) const
 {
     int row = rowById(msgId);
@@ -922,7 +956,7 @@ void MessagesModel::onMessageSent(const TgPeer &peer, qint64 randomId, const TgM
     emit dataChanged(index(row), index(row));
 }
 
-void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto)
+void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto, const QString &caption)
 {
     if (m_peer.isNull()) return;
     Row r;
@@ -930,6 +964,7 @@ void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath,
     r.m.out = true;
     r.m.date = now();
     r.m.fromId = m_session->selfId();
+    r.m.text = caption;              // show the caption straight away, under the attachment
     r.randomId = randomId;
     r.pending = true;
     // Show the file being sent straight away, from the local copy.

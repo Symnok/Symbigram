@@ -292,6 +292,14 @@ QByteArray TgApi::sendMessage(const TgPeer &peer, const QString &text, qint64 ra
     return w.toByteArray();
 }
 
+QByteArray TgApi::editMessage(const TgPeer &peer, int msgId, const QString &text)
+{
+    // flags bit 11 = the message text is present (we only ever change the text/caption).
+    TlWriter w(text.size() * 3 + 64);
+    w.writeConstructor(Tl::MessagesEditMessage).writeInt(1 << 11).writeRaw(inputPeer(peer)).writeInt(msgId).writeString(text);
+    return w.toByteArray();
+}
+
 QByteArray TgApi::readHistory(const TgPeer &peer, int maxId)
 {
     TlWriter w(32);

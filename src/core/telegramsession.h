@@ -98,6 +98,8 @@ public:
     void loadHistory(const TgPeer &peer, int offsetId, int count);
     /// Returns the random id that messageSent/messageFailed will carry.
     qint64 sendText(const TgPeer &peer, const QString &text, int replyToId = 0);
+    /// Edits one of our own messages' text/caption; the change arrives via the update stream.
+    void editMessage(const TgPeer &peer, int msgId, const QString &text);
     void markRead(const TgPeer &peer, int maxId);
     void setTyping(const TgPeer &peer, bool typing);
     void setOnline(bool online);
@@ -223,7 +225,7 @@ private:
         GetArchive, GetFolders,
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
-        SendCode, SignIn, ResendCode
+        SendCode, SignIn, ResendCode, EditMessage
     };
     struct Request
     {

@@ -15,6 +15,24 @@ Item {
 
     property int maxBubbleWidth: width * 0.82
     // "29s" under a minute, "M:SS" above; blank when no self-destruct timer.
+    // The first URL in the text (for tapping), with a scheme added for www. links.
+    function firstLink(t) {
+        var m = t.match(/(https?:\/\/|www\.)[^\s]+/)
+        if (!m) return ""
+        var u = m[0]
+        return u.indexOf("http") === 0 ? u : "http://" + u
+    }
+
+    // Escape HTML, turn URLs (http(s):// or www.) into tappable links, keep line breaks.
+    function linkify(t) {
+        var s = t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        s = s.replace(/((https?:\/\/|www\.)[^\s<]+)/g, function(m) {
+            var href = m.indexOf("http") === 0 ? m : "http://" + m
+            return '<a href="' + href + '"><font color="#8fd1ff">' + m + '</font></a>'
+        })
+        return s.replace(/\n/g, "<br/>")
+    }
+
     function burnText(s) {
         if (s < 0) return ""
         if (s < 60) return s + "s"
@@ -214,10 +232,20 @@ Item {
                 Label {
                     id: bodyLabel
                     width: parent.width
-                    text: model.body
+                    text: root.linkify(model.body)
                     visible: model.body != ""
                     wrapMode: Text.Wrap
                     color: "white"
+                    textFormat: Text.StyledText
+                    onLinkActivated: Qt.openUrlExternally(link)
+                    // Qt Quick 1.1 Text doesn't reliably grab link taps under the bubble's mouse
+                    // area, so a tap on body text with a URL opens it; long-press still menus.
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: root.firstLink(model.body) != ""
+                        onClicked: { var u = root.firstLink(model.body); if (u != "") Qt.openUrlExternally(u) }
+                        onPressAndHold: root.pressAndHold()
+                    }
                 }
                 Label {
                     id: noteLabel

@@ -131,6 +131,7 @@ namespace Tl
     const quint32 MessageEmpty = 0x90a6ca84;
     const quint32 MessageService = 0x7a800e0a;
     const quint32 MessagesSendMessage = 0xfef48f62;
+    const quint32 MessagesEditMessage = 0xdfd14005;
     const quint32 InputReplyToMessage = 0x3bd4b7c2;
     const quint32 MessagesReadHistory = 0x0e306d3a;
     const quint32 ChannelsReadHistory = 0xcc104937;

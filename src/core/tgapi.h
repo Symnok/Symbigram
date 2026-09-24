@@ -89,6 +89,7 @@ public:
     static QByteArray getDialogFilters();
     static QByteArray getHistory(const TgPeer &peer, int offsetId, int limit);
     static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0);
+    static QByteArray editMessage(const TgPeer &peer, int msgId, const QString &text);
     static QByteArray readHistory(const TgPeer &peer, int maxId);
     static QByteArray setTyping(const TgPeer &peer, bool typing);
     static QByteArray updateStatus(bool online);

@@ -112,8 +112,45 @@ Page {
     Menu {
         id: attachMenu
         MenuLayout {
-            MenuItem { text: qsTr("Image"); onClicked: app.attachFile(true) }
-            MenuItem { text: qsTr("File"); onClicked: app.attachFile(false) }
+            MenuItem { text: qsTr("Image"); onClicked: captionDialog.pick(true) }
+            MenuItem { text: qsTr("File"); onClicked: captionDialog.pick(false) }
+        }
+    }
+
+    // After a file is chosen: add/edit a caption (prefilled with whatever is in the composer),
+    // then send. This lets you attach first and caption afterwards.
+    CommonDialog {
+        id: captionDialog
+        property string path: ""
+        property bool asPhoto: true
+        titleText: asPhoto ? qsTr("Send image") : qsTr("Send file")
+        buttonTexts: [qsTr("Send"), qsTr("Cancel")]
+        function pick(photo) {
+            var p = app.pickAttachment(photo)
+            if (p == "") return
+            path = p
+            asPhoto = photo
+            captionField.text = composer.text
+            open()
+        }
+        content: Column {
+            width: parent.width
+            spacing: platformStyle.paddingMedium
+            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
+            Label {
+                width: parent.width
+                text: captionDialog.path.split(/[\\/]/).pop()
+                color: "white"; elide: Text.ElideMiddle
+            }
+            Label { text: qsTr("Caption (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField {
+                id: captionField
+                width: parent.width
+                placeholderText: qsTr("add a caption")
+            }
+        }
+        onButtonClicked: {
+            if (index == 0) { app.sendAttachment(captionDialog.path, captionDialog.asPhoto, captionField.text); composer.text = "" }
         }
     }
 
@@ -126,6 +163,16 @@ Page {
                 text: qsTr("Reply")
                 visible: contextMenu.item ? (!contextMenu.item.pending && !contextMenu.item.service && !chat.isSecret && !chat.peerIsChannel) : false
                 onClicked: { chat.startReply(contextMenu.row); composer.forceActiveFocus(); composer.openSoftwareInputPanel() }
+            }
+            MenuItem {
+                text: qsTr("Edit")
+                visible: contextMenu.row >= 0 ? chat.canEdit(contextMenu.row) : false
+                onClicked: {
+                    chat.startEdit(contextMenu.row)
+                    composer.text = contextMenu.item.body
+                    composer.forceActiveFocus()
+                    composer.openSoftwareInputPanel()
+                }
             }
             MenuItem {
                 text: qsTr("Save to phone")
@@ -300,12 +347,13 @@ Page {
         text: chat.error != "" ? qsTr("Could not load the messages: %1").arg(chat.error) : qsTr("No messages yet.")
     }
 
-    // -- reply bar (above the composer while a reply is being composed) --
+    // -- reply / edit bar (above the composer) --
     Item {
         id: replyBar
+        property bool active: chat.replyToId > 0 || chat.editing
         anchors { left: parent.left; right: parent.right; bottom: composerRow.top }
-        height: chat.replyToId > 0 ? replyContent.height + 2 * platformStyle.paddingSmall : 0
-        visible: chat.replyToId > 0
+        height: active ? replyContent.height + 2 * platformStyle.paddingSmall : 0
+        visible: active
         clip: true
         Rectangle { anchors.fill: parent; color: "#1c2a3a" }
         Rectangle { anchors { left: parent.left; top: parent.top; bottom: parent.bottom } width: 3; color: "#5b8fd0" }
@@ -315,15 +363,16 @@ Page {
             spacing: platformStyle.paddingSmall
             Column {
                 width: parent.width
-                Label { text: qsTr("Replying to"); color: "#5b8fd0"; font.pixelSize: platformStyle.fontSizeSmall }
-                Label { width: parent.width; text: chat.replyToText; color: "white"; font.pixelSize: platformStyle.fontSizeSmall; elide: Text.ElideRight }
+                Label { text: chat.editing ? qsTr("Editing message") : qsTr("Replying to"); color: "#5b8fd0"; font.pixelSize: platformStyle.fontSizeSmall }
+                Label { width: parent.width; text: chat.editing ? qsTr("edit the text, then tap Save") : chat.replyToText; color: "white"; font.pixelSize: platformStyle.fontSizeSmall; elide: Text.ElideRight }
             }
         }
-        ToolButton {
+        Button {
             id: cancelReply
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
-            iconSource: "toolbar-close"
-            onClicked: chat.cancelReply()
+            width: 56
+            text: "✕"    // ✕
+            onClicked: { if (chat.editing) { chat.cancelEdit(); composer.text = "" } else chat.cancelReply() }
         }
     }
 
@@ -369,10 +418,11 @@ Page {
             visible: !chat.peerIsChannel && !app.recording && composer.text.length > 0
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: Math.max(80, implicitWidth)
-            text: qsTr("Send")
+            text: chat.editing ? qsTr("Save") : qsTr("Send")
             enabled: composer.text.length > 0 && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
             onClicked: {
-                chat.send(composer.text)
+                if (chat.editing) chat.commitEdit(composer.text)
+                else chat.send(composer.text)
                 composer.text = ""
             }
         }

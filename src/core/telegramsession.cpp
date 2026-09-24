@@ -737,6 +737,13 @@ qint64 TelegramSession::sendText(const TgPeer &peer, const QString &text, int re
     return r.randomId;
 }
 
+void TelegramSession::editMessage(const TgPeer &peer, int msgId, const QString &text)
+{
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    send(EditMessage, TgApi::editMessage(r.peer, msgId, text), r);
+}
+
 void TelegramSession::markRead(const TgPeer &peer, int maxId)
 {
     if (!m_client->isReady()) return;
@@ -1119,7 +1126,8 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
         case DiscardEncryption:
             break;
         case ArchivePeer:
-            applyUpdatesResult(TlSchema::readObject(r));
+        case EditMessage:
+            applyUpdatesResult(TlSchema::readObject(r));   // Updates carrying updateEditMessage
             break;
         case MoveFolder:
             TlSchema::readObject(r);
@@ -1477,6 +1485,10 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     case GetUser:
     case ArchivePeer:
     case DeleteChat:
+        break;
+    case EditMessage:
+        if (type.contains(QLatin1String("MESSAGE_NOT_MODIFIED"))) break;   // no change - ignore
+        emit notice(tr("Could not edit the message: %1").arg(type));
         break;
     case MoveFolder:
         // Telegram won't let a folder with no category filters end up with an empty chat list,

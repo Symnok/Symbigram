@@ -43,6 +43,7 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(int secretTtl READ secretTtl NOTIFY peerChanged)
     Q_PROPERTY(int replyToId READ replyToId NOTIFY replyChanged)         // message being replied to (0 = none)
     Q_PROPERTY(QString replyToText READ replyToText NOTIFY replyChanged) // preview for the reply bar
+    Q_PROPERTY(bool editing READ editing NOTIFY editChanged)             // an own message is being edited
     Q_PROPERTY(int audioRow READ audioRow NOTIFY audioChanged)           // row buffering for the player (-1 = none)
     Q_PROPERTY(int audioBuffer READ audioBuffer NOTIFY audioChanged)     // percent buffered before hand-off
 public:
@@ -106,6 +107,12 @@ public:
     Q_INVOKABLE void cancelReply();
     int replyToId() const { return m_replyToId; }
     QString replyToText() const;
+    /// Editing one of our own messages: startEdit prefills, commitEdit sends the change.
+    Q_INVOKABLE bool canEdit(int row) const;
+    Q_INVOKABLE void startEdit(int row);
+    Q_INVOKABLE void cancelEdit();
+    Q_INVOKABLE void commitEdit(const QString &text);
+    bool editing() const { return m_editId != 0; }
     Q_INVOKABLE void retry(int row);
     Q_INVOKABLE void loadOlder();
     Q_INVOKABLE void markRead();
@@ -136,7 +143,7 @@ public:
     int audioBuffer() const { return m_audioBuffer; }
     Q_INVOKABLE bool canDeleteForEveryone(int row) const;
     /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
-    void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto);
+    void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto, const QString &caption = QString());
     /// AppController sets this to the user-chosen drive folder; empty = platform default.
     void setDownloadFolder(const QString &dir) { m_downloadFolder = dir; }
 
@@ -150,6 +157,7 @@ signals:
     void sendFailed(const QString &error);
     void mediaSaved(const QString &path);   // a file was copied out; path is where
     void replyChanged();
+    void editChanged();
     void audioChanged();
 
 private slots:
@@ -243,6 +251,7 @@ private:
     QTime m_typingSentAt;
     qint64 m_peerTypingUser;
     int m_replyToId;                        // message id the composer will reply to (0 = none)
+    int m_editId;                           // message id being edited (0 = not editing)
 };
 
 #endif // MESSAGESMODEL_H
