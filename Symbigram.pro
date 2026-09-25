@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.22
+VERSION = 1.0.25
 
 QT += core gui network declarative
 
@@ -46,7 +46,9 @@ DEFINES += APP_VERSION=$$VERSION
 
 TRANSLATIONS += \
     translations/symbigram_ru.ts \
-    translations/symbigram_uk.ts
+    translations/symbigram_uk.ts \
+    translations/symbigram_vi.ts \
+    translations/symbigram_he.ts
 
 OTHER_FILES += qml/*.qml README.md credentials.cfg.template
 

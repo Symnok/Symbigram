@@ -27,6 +27,8 @@ Page {
             ListElement { name: "English"; code: "en" }
             ListElement { name: "Русский"; code: "ru" }
             ListElement { name: "Українська"; code: "uk" }
+            ListElement { name: "Tiếng Việt"; code: "vi" }
+            ListElement { name: "עברית"; code: "he" }
         }
         // The stock delegate shows modelData (a string list); this model has roles, and the
         // phone theme's dialog text is hard to read - so: our own rows, white on the dialog.
