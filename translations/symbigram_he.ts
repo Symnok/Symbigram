@@ -1,252 +1,252 @@
 <?xml version='1.0' encoding='utf-8'?>
-<TS version="2.0" language="ru">
+<TS version="2.0" language="he">
 <context>
     <name>AboutPage</name>
     <message>
         <location filename="../qml/AboutPage.qml" line="31" />
         <source>version %1</source>
-        <translation>версия %1</translation>
+        <translation>גרסה %1</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="38" />
         <source>A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.</source>
-        <translation>Telegram-клиент для Symbian Anna/Belle, перенесённый с Lumigram/LumigramPlus для Windows Phone 8.1. Говорит с Telegram напрямую по MTProto 2.0 — без моста и прокси; ключ шифрования создаётся на телефоне.</translation>
+        <translation>לקוח טלגרם ל-Symbian Anna/Belle, מבוסס על Lumigram/LumigramPlus ל-Windows Phone 8.1. הוא מדבר MTProto 2.0 ישירות מול טלגרם — ללא גשר וללא פרוקסי; מפתח ההצפנה נוצר בטלפון.</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="45" />
         <source>Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.</source>
-        <translation>Вход только по QR-коду (сканируется из Telegram, где вы уже вошли; плюс пароль двухэтапной проверки, если он есть). Текстовые сообщения, фото и файлы (просмотр, сохранение и отправка), группы и каналы.</translation>
+        <translation>הכניסה היא בעזרת קוד QR בלבד (סריקה מטלגרם שכבר מחוברים בו, בתוספת סיסמת האימות הדו-שלבי אם הוגדרה). הודעות טקסט, תמונות וקבצים (צפייה, שמירה ושליחה), קבוצות וערוצים.</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="55" />
         <source>Log</source>
-        <translation>Журнал</translation>
+        <translation>יומן</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="62" />
         <source>Logging is off. Turn on "Keep a log" in Settings to collect one.</source>
-        <translation>Журнал выключен. Включите «Вести журнал» в настройках, чтобы собрать его.</translation>
+        <translation>רישום היומן כבוי. הפעילו «שמירת יומן» בהגדרות כדי לאסוף אותו.</translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="75" />
         <source>Copy log</source>
-        <translation>Скопировать журнал</translation>
+        <translation>העתקת היומן</translation>
     </message>
 </context>
 <context>
     <name>AppController</name>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="202" />
+        <location filename="../src/app/appcontroller.cpp" line="211" />
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="203" />
+        <location filename="../src/app/appcontroller.cpp" line="212" />
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="204" />
+        <location filename="../src/app/appcontroller.cpp" line="212" />
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="213" />
+        <source>Cache cleared (%1 freed).</source>
+        <translation>המטמון נוקה (%1 פונו).</translation>
+    </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="230" />
         <location filename="../src/app/appcontroller.cpp" line="384" />
         <location filename="../src/app/appcontroller.cpp" line="745" />
         <location filename="../src/app/appcontroller.cpp" line="800" />
         <source>Not connected.</source>
-        <translation>Нет соединения.</translation>
+        <translation>לא מחובר.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="231" />
         <source>Connecting...</source>
-        <translation>Подключение...</translation>
+        <translation>מתחבר...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="231" />
         <source>Connecting and creating the encryption key...</source>
-        <translation>Подключение и создание ключа шифрования...</translation>
+        <translation>מתחבר ויוצר את מפתח ההצפנה...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="233" />
         <source>Checking the password (this takes a few seconds)...</source>
-        <translation>Проверка пароля (это займёт несколько секунд)...</translation>
+        <translation>בודק את הסיסמה (זה אורך כמה שניות)...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="234" />
         <source>This account has two-step verification. Enter the password.</source>
-        <translation>У этого аккаунта включена двухэтапная проверка. Введите пароль.</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="239" />
-        <source>Requesting a sign-in code...</source>
-        <translation>Запрос кода для входа...</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="239" />
-        <source>Waiting for the code to be scanned...</source>
-        <translation>Ожидание сканирования кода...</translation>
+        <translation>לחשבון זה יש אימות דו-שלבי. הזינו את הסיסמה.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="236" />
         <location filename="../src/app/appcontroller.cpp" line="240" />
         <source>Signing in...</source>
-        <translation>Вход...</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="202" />
-        <location filename="../src/app/appcontroller.cpp" line="211" />
-        <source>%1 MB</source>
-        <translation>%1 МБ</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="203" />
-        <location filename="../src/app/appcontroller.cpp" line="212" />
-        <source>%1 KB</source>
-        <translation>%1 КБ</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="204" />
-        <location filename="../src/app/appcontroller.cpp" line="212" />
-        <source>%1 B</source>
-        <translation>%1 Б</translation>
-    </message>
-    <message>
-        <location filename="../src/app/appcontroller.cpp" line="213" />
-        <source>Cache cleared (%1 freed).</source>
-        <translation>Кэш очищен (освобождено %1).</translation>
+        <translation>מתחבר...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="236" />
         <source>Enter the code Telegram sent to %1.</source>
-        <translation>Введите код, который Telegram отправил на %1.</translation>
+        <translation>הזינו את הקוד שטלגרם שלח אל %1.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="237" />
         <source>Requesting a code...</source>
-        <translation>Запрос кода...</translation>
+        <translation>מבקש קוד...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="237" />
         <source>Enter your phone number, with the country code, to get a code.</source>
-        <translation>Введите номер телефона с кодом страны, чтобы получить код.</translation>
+        <translation>הזינו את מספר הטלפון שלכם, עם קידומת המדינה, כדי לקבל קוד.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="239" />
+        <source>Requesting a sign-in code...</source>
+        <translation>מבקש קוד כניסה...</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="239" />
+        <source>Waiting for the code to be scanned...</source>
+        <translation>ממתין לסריקת הקוד...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="309" />
         <source>Phone memory</source>
-        <translation>Память телефона</translation>
+        <translation>זיכרון הטלפון</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="310" />
         <source>Mass memory</source>
-        <translation>Массовая память</translation>
+        <translation>אחסון המוני</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="311" />
         <source>Memory card</source>
-        <translation>Карта памяти</translation>
+        <translation>כרטיס זיכרון</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="357" />
         <source>Choose download folder</source>
-        <translation>Выберите папку загрузок</translation>
+        <translation>בחירת תיקיית הורדות</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="386" />
         <source>Cannot record a voice message here.</source>
-        <translation>Здесь нельзя записать голосовое сообщение.</translation>
+        <translation>לא ניתן להקליט כאן הודעה קולית.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="409" />
         <source>Sending the voice message...</source>
-        <translation>Отправка голосового сообщения...</translation>
+        <translation>שולח את ההודעה הקולית...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="565" />
         <source>Connection lost: %1. Reconnecting...</source>
-        <translation>Соединение потеряно: %1. Переподключение...</translation>
+        <translation>החיבור אבד: %1. מתחבר מחדש...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="566" />
         <source>Connection failed: %1. Retrying...</source>
-        <translation>Не удалось подключиться: %1. Повтор...</translation>
+        <translation>החיבור נכשל: %1. מנסה שוב...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="658" />
         <source>Enter the password.</source>
-        <translation>Введите пароль.</translation>
+        <translation>הזינו את הסיסמה.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="683" />
         <source>Enter your phone number.</source>
-        <translation>Введите номер телефона.</translation>
+        <translation>הזינו את מספר הטלפון שלכם.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="693" />
         <source>Enter the code.</source>
-        <translation>Введите код.</translation>
+        <translation>הזינו את הקוד.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="757" />
         <source>Secret chats can only be started with a person.</source>
-        <translation>Секретные чаты можно начинать только с человеком.</translation>
+        <translation>ניתן להתחיל צ'אטים סודיים רק עם אדם.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="759" />
         <source>Starting a secret chat...</source>
-        <translation>Создание секретного чата...</translation>
+        <translation>מתחיל צ'אט סודי...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="766" />
         <source>Someone wants to start a secret chat.</source>
-        <translation>Кто-то хочет начать секретный чат.</translation>
+        <translation>מישהו רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="767" />
         <source>%1 wants to start a secret chat.</source>
-        <translation>%1 хочет начать секретный чат.</translation>
+        <translation>%1 רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="769" />
         <location filename="../src/app/appcontroller.cpp" line="789" />
         <source>Secret chat</source>
-        <translation>Секретный чат</translation>
+        <translation>צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="769" />
         <source>%1 wants to start a secret chat</source>
-        <translation>%1 хочет начать секретный чат</translation>
+        <translation>%1 רוצה להתחיל צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="775" />
         <source>Secret chat is ready.</source>
-        <translation>Секретный чат готов.</translation>
+        <translation>הצ'אט הסודי מוכן.</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="789" />
         <source>Encrypted message</source>
-        <translation>Зашифрованное сообщение</translation>
+        <translation>הודעה מוצפנת</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="802" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
-        <translation>Изображения (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
+        <translation>תמונות (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="802" />
         <source>All files (*)</source>
-        <translation>Все файлы (*)</translation>
+        <translation>כל הקבצים (*)</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="803" />
         <source>Choose an image</source>
-        <translation>Выберите изображение</translation>
+        <translation>בחירת תמונה</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="803" />
         <source>Choose a file</source>
-        <translation>Выберите файл</translation>
+        <translation>בחירת קובץ</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="811" />
         <source>Sending the image...</source>
-        <translation>Отправка изображения...</translation>
+        <translation>שולח את התמונה...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="811" />
         <source>Sending the file...</source>
-        <translation>Отправка файла...</translation>
+        <translation>שולח את הקובץ...</translation>
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="822" />
         <source>Copied.</source>
-        <translation>Скопировано.</translation>
+        <translation>הועתק.</translation>
     </message>
 </context>
 <context>
@@ -254,59 +254,59 @@
     <message>
         <location filename="../qml/ChatPage.qml" line="22" />
         <source>Load older messages</source>
-        <translation>Загрузить более старые сообщения</translation>
+        <translation>טעינת הודעות ישנות יותר</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="22" />
         <source>Reload</source>
-        <translation>Обновить</translation>
+        <translation>רענון</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="23" />
         <source>Unmute</source>
-        <translation>Включить уведомления</translation>
+        <translation>ביטול השתקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="23" />
         <source>Mute</source>
-        <translation>Отключить уведомления</translation>
+        <translation>השתקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="24" />
         <source>Mark as read</source>
-        <translation>Отметить прочитанным</translation>
+        <translation>סימון כנקרא</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="26" />
         <source>Start secret chat</source>
-        <translation>Начать секретный чат</translation>
+        <translation>התחלת צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="31" />
         <source>Verify encryption key</source>
-        <translation>Проверить ключ шифрования</translation>
+        <translation>אימות מפתח ההצפנה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="36" />
         <location filename="../qml/ChatPage.qml" line="75" />
         <source>Self-destruct timer</source>
-        <translation>Таймер самоуничтожения</translation>
+        <translation>טיימר השמדה עצמית</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="41" />
         <location filename="../qml/ChatPage.qml" line="65" />
         <source>Delete secret chat</source>
-        <translation>Удалить секретный чат</translation>
+        <translation>מחיקת צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="58" />
         <source>Saved</source>
-        <translation>Сохранено</translation>
+        <translation>נשמר</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="59" />
         <source>File saved to: %1</source>
-        <translation>Файл сохранён: %1</translation>
+        <translation>הקובץ נשמר ב-%1</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="60" />
@@ -316,238 +316,238 @@
     <message>
         <location filename="../qml/ChatPage.qml" line="66" />
         <source>End this secret chat? Its messages, which live only on this device, will be removed here.</source>
-        <translation>Завершить этот секретный чат? Его сообщения, которые хранятся только на этом устройстве, будут удалены здесь.</translation>
+        <translation>לסיים צ'אט סודי זה? הודעותיו, השמורות רק במכשיר זה, יוסרו כאן.</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="67" />
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>מחיקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="68" />
         <location filename="../qml/ChatPage.qml" line="127" />
         <location filename="../qml/ChatPage.qml" line="470" />
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>Off</source>
-        <translation>Выкл.</translation>
+        <translation>כבוי</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>5 seconds</source>
-        <translation>5 секунд</translation>
+        <translation>5 שניות</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>30 seconds</source>
-        <translation>30 секунд</translation>
+        <translation>30 שניות</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>1 minute</source>
-        <translation>1 минута</translation>
+        <translation>דקה אחת</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>1 hour</source>
-        <translation>1 час</translation>
+        <translation>שעה אחת</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>1 day</source>
-        <translation>1 день</translation>
+        <translation>יום אחד</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="77" />
         <source>1 week</source>
-        <translation>1 неделя</translation>
+        <translation>שבוע אחד</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="84" />
         <source>Encryption key</source>
-        <translation>Ключ шифрования</translation>
+        <translation>מפתח הצפנה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="85" />
+        <location filename="../qml/ChatPage.qml" line="521" />
+        <source>Close</source>
+        <translation>סגירה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="98" />
         <source>If this key matches on both phones, no one is intercepting the chat. Compare it with %1 in person or over a trusted channel.</source>
-        <translation>Если этот ключ совпадает на обоих телефонах, чат никто не перехватывает. Сравните его с %1 лично или по надёжному каналу.</translation>
+        <translation>אם מפתח זה תואם בשני הטלפונים, אף אחד אינו מיירט את הצ'אט. השוו אותו עם %1 באופן אישי או דרך ערוץ מהימן.</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="115" />
         <source>Image</source>
-        <translation>Изображение</translation>
+        <translation>תמונה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="116" />
         <source>File</source>
-        <translation>Файл</translation>
+        <translation>קובץ</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="126" />
         <source>Send image</source>
-        <translation>Отправить изображение</translation>
+        <translation>שליחת תמונה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="126" />
         <source>Send file</source>
-        <translation>Отправить файл</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="145" />
-        <source>Caption (optional)</source>
-        <translation>Подпись (необязательно)</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="149" />
-        <source>add a caption</source>
-        <translation>добавьте подпись</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="163" />
-        <source>Reply</source>
-        <translation>Ответить</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="168" />
-        <source>Edit</source>
-        <translation>Изменить</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="178" />
-        <source>Save to phone</source>
-        <translation>Сохранить в телефон</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="183" />
-        <source>Open</source>
-        <translation>Открыть</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="188" />
-        <source>Copy text</source>
-        <translation>Скопировать текст</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="193" />
-        <source>Retry</source>
-        <translation>Повторить</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="198" />
-        <source>Delete for me</source>
-        <translation>Удалить у меня</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="203" />
-        <source>Delete for everyone</source>
-        <translation>Удалить у всех</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="248" />
-        <source>connecting...</source>
-        <translation>подключение...</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="248" />
-        <source>offline</source>
-        <translation>не в сети</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="250" />
-        <source>online</source>
-        <translation>в сети</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="273" />
-        <source>%1 wants to start an end-to-end encrypted chat.</source>
-        <translation>%1 хочет начать сквозной зашифрованный чат.</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="274" />
-        <source>Waiting for the other side to come online and accept...</source>
-        <translation>Ожидание, пока собеседник выйдет в сеть и примет запрос...</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="279" />
-        <source>Accept</source>
-        <translation>Принять</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="280" />
-        <source>Decline</source>
-        <translation>Отклонить</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="283" />
-        <source>Cancel request</source>
-        <translation>Отменить запрос</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="305" />
-        <source>Older messages</source>
-        <translation>Более старые сообщения</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="347" />
-        <source>Could not load the messages: %1</source>
-        <translation>Не удалось загрузить сообщения: %1</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="347" />
-        <source>No messages yet.</source>
-        <translation>Сообщений пока нет.</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="366" />
-        <source>Replying to</source>
-        <translation>Ответ на</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="366" />
-        <source>Editing message</source>
-        <translation>Изменение сообщения</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="367" />
-        <source>edit the text, then tap Save</source>
-        <translation>измените текст и нажмите «Сохранить»</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="391" />
-        <source>channel - only its admins can post</source>
-        <translation>канал — писать могут только его администраторы</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="410" />
-        <source>message</source>
-        <translation>сообщение</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="410" />
-        <source>encrypted message</source>
-        <translation>зашифрованное сообщение</translation>
+        <translation>שליחת קובץ</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="127" />
         <location filename="../qml/ChatPage.qml" line="421" />
         <location filename="../qml/ChatPage.qml" line="465" />
         <source>Send</source>
-        <translation>Отправить</translation>
+        <translation>שליחה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="145" />
+        <source>Caption (optional)</source>
+        <translation>כיתוב (רשות)</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="149" />
+        <source>add a caption</source>
+        <translation>הוספת כיתוב</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="163" />
+        <source>Reply</source>
+        <translation>תגובה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="168" />
+        <source>Edit</source>
+        <translation>עריכה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="178" />
+        <source>Save to phone</source>
+        <translation>שמירה בטלפון</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="183" />
+        <source>Open</source>
+        <translation>פתיחה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="188" />
+        <source>Copy text</source>
+        <translation>העתקת הטקסט</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="193" />
+        <source>Retry</source>
+        <translation>ניסיון חוזר</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="198" />
+        <source>Delete for me</source>
+        <translation>מחיקה אצלי</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="203" />
+        <source>Delete for everyone</source>
+        <translation>מחיקה אצל כולם</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="248" />
+        <source>connecting...</source>
+        <translation>מתחבר...</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="248" />
+        <source>offline</source>
+        <translation>לא מחובר</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="250" />
+        <source>online</source>
+        <translation>מחובר</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="273" />
+        <source>%1 wants to start an end-to-end encrypted chat.</source>
+        <translation>%1 רוצה להתחיל צ'אט מוצפן מקצה לקצה.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="274" />
+        <source>Waiting for the other side to come online and accept...</source>
+        <translation>ממתין שהצד השני יתחבר ויקבל...</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="279" />
+        <source>Accept</source>
+        <translation>קבלה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="280" />
+        <source>Decline</source>
+        <translation>דחייה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="283" />
+        <source>Cancel request</source>
+        <translation>ביטול הבקשה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="305" />
+        <source>Older messages</source>
+        <translation>הודעות ישנות יותר</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="347" />
+        <source>Could not load the messages: %1</source>
+        <translation>לא ניתן היה לטעון את ההודעות: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="347" />
+        <source>No messages yet.</source>
+        <translation>אין הודעות עדיין.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="366" />
+        <source>Editing message</source>
+        <translation>עריכת הודעה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="366" />
+        <source>Replying to</source>
+        <translation>בתגובה ל</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="367" />
+        <source>edit the text, then tap Save</source>
+        <translation>ערכו את הטקסט, ואז הקישו על שמירה</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="391" />
+        <source>channel - only its admins can post</source>
+        <translation>ערוץ — רק מנהליו יכולים לפרסם</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="410" />
+        <source>encrypted message</source>
+        <translation>הודעה מוצפנת</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="410" />
+        <source>message</source>
+        <translation>הודעה</translation>
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="421" />
         <location filename="../qml/ChatPage.qml" line="518" />
         <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatPage.qml" line="85" />
-        <location filename="../qml/ChatPage.qml" line="521" />
-        <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>שמירה</translation>
     </message>
 </context>
 <context>
@@ -556,92 +556,98 @@
         <location filename="../src/app/chatsmodel.cpp" line="107" />
         <location filename="../src/app/chatsmodel.cpp" line="117" />
         <source>All chats</source>
-        <translation>Все чаты</translation>
+        <translation>כל הצ'אטים</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="110" />
         <source>Archive</source>
-        <translation>Архив</translation>
+        <translation>ארכיון</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="154" />
         <source>Yesterday</source>
-        <translation>Вчера</translation>
+        <translation>אתמול</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="175" />
         <source>%1 is typing...</source>
-        <translation>%1 печатает...</translation>
+        <translation>%1 מקליד...</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="176" />
         <source>typing...</source>
-        <translation>печатает...</translation>
+        <translation>מקליד...</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="180" />
         <source>You: %1</source>
-        <translation>Вы: %1</translation>
+        <translation>אתם: %1</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="210" />
         <source>Secret chat</source>
-        <translation>Секретный чат</translation>
+        <translation>צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="215" />
         <source>wants to start a secret chat</source>
-        <translation>хочет начать секретный чат</translation>
+        <translation>רוצה להתחיל צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="216" />
         <source>waiting to be accepted...</source>
-        <translation>ожидает подтверждения...</translation>
+        <translation>ממתין לאישור...</translation>
     </message>
     <message>
         <location filename="../src/app/chatsmodel.cpp" line="217" />
         <source>secret chat</source>
-        <translation>секретный чат</translation>
+        <translation>צ'אט סודי</translation>
     </message>
 </context>
 <context>
     <name>ChatsPage</name>
     <message>
+        <location filename="../qml/ChatsPage.qml" line="26" />
+        <location filename="../qml/ChatsPage.qml" line="40" />
+        <source>Folders</source>
+        <translation>תיקיות</translation>
+    </message>
+    <message>
         <location filename="../qml/ChatsPage.qml" line="28" />
         <source>Connect</source>
-        <translation>Подключиться</translation>
+        <translation>התחברות</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="28" />
         <source>Disconnect</source>
-        <translation>Отключиться</translation>
+        <translation>ניתוק</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="31" />
         <source>Settings</source>
-        <translation>Настройки</translation>
+        <translation>הגדרות</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="32" />
         <source>About</source>
-        <translation>О программе</translation>
+        <translation>אודות</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="33" />
         <location filename="../qml/ChatsPage.qml" line="66" />
         <location filename="../qml/ChatsPage.qml" line="68" />
         <source>Sign out</source>
-        <translation>Выход из аккаунта</translation>
+        <translation>התנתקות</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="34" />
         <source>Exit</source>
-        <translation>Выход из приложения</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="67" />
         <source>Sign out? The session will be ended on Telegram and removed from this phone.</source>
-        <translation>Выйти из аккаунта? Сеанс будет завершён в Telegram и удалён с этого телефона.</translation>
+        <translation>להתנתק? ההפעלה תסתיים בטלגרם ותוסר מטלפון זה.</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="69" />
@@ -650,295 +656,289 @@
         <location filename="../qml/ChatsPage.qml" line="151" />
         <location filename="../qml/ChatsPage.qml" line="211" />
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="75" />
         <source>New chat</source>
-        <translation>Новый чат</translation>
+        <translation>צ'אט חדש</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="76" />
         <source>Find</source>
-        <translation>Найти</translation>
+        <translation>חיפוש</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="85" />
         <source>@username, phone number, t.me link, or a contact's name</source>
-        <translation>@username, номер телефона, ссылка t.me или имя контакта</translation>
+        <translation>@שם_משתמש, מספר טלפון, קישור t.me, או שם של איש קשר</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="91" />
         <source>@username or +phone</source>
-        <translation>@username или +телефон</translation>
+        <translation>@שם_משתמש או +טלפון</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="101" />
         <location filename="../qml/ChatsPage.qml" line="129" />
         <source>Clear history</source>
-        <translation>Очистить историю</translation>
+        <translation>ניקוי ההיסטוריה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="102" />
         <source>Delete all messages of "%1" on Telegram (for you)?</source>
-        <translation>Удалить все сообщения чата «%1» в Telegram (у себя)?</translation>
+        <translation>למחוק את כל ההודעות של «%1» בטלגרם (אצלכם)?</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="103" />
         <location filename="../qml/ChatsPage.qml" line="210" />
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>מחיקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="114" />
         <source>Unmute</source>
-        <translation>Включить уведомления</translation>
+        <translation>ביטול השתקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="114" />
         <source>Mute</source>
-        <translation>Отключить уведомления</translation>
+        <translation>השתקה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="119" />
         <source>Unarchive chat</source>
-        <translation>Разархивировать чат</translation>
+        <translation>הוצאת צ'אט מהארכיון</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="119" />
         <source>Archive chat</source>
-        <translation>Архивировать чат</translation>
+        <translation>העברת צ'אט לארכיון</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="124" />
         <location filename="../qml/ChatsPage.qml" line="172" />
         <source>Move to folder</source>
-        <translation>Переместить в папку</translation>
+        <translation>העברה לתיקייה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="134" />
         <location filename="../qml/ChatsPage.qml" line="150" />
         <source>Delete chat</source>
-        <translation>Удалить чат</translation>
+        <translation>מחיקת צ'אט</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="139" />
         <location filename="../qml/ChatsPage.qml" line="208" />
         <source>Delete secret chat</source>
-        <translation>Удалить секретный чат</translation>
+        <translation>מחיקת צ'אט סודי</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="151" />
+        <source>Myself</source>
+        <translation>אצלי</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="151" />
+        <source>All</source>
+        <translation>אצל כולם</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="160" />
+        <source>Delete the chat "%1"? "All" also removes it for the other side.</source>
+        <translation>למחוק את הצ'אט «%1»? «אצל כולם» מוחק אותו גם אצל הצד השני.</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="195" />
         <source>All chats (no folder)</source>
-        <translation>Все чаты (без папки)</translation>
+        <translation>כל הצ'אטים (ללא תיקייה)</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="209" />
         <source>End the secret chat with "%1"? Its messages live only on this device and will be removed here.</source>
-        <translation>Завершить секретный чат с «%1»? Его сообщения хранятся только на этом устройстве и будут удалены здесь.</translation>
+        <translation>לסיים את הצ'אט הסודי עם «%1»? הודעותיו שמורות רק במכשיר זה ויוסרו כאן.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="241" />
-        <source>online</source>
-        <translation>в сети</translation>
+        <location filename="../qml/ChatsPage.qml" line="240" />
+        <source>tap to switch folder</source>
+        <translation>הקישו כדי להחליף תיקייה</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="240" />
         <location filename="../qml/ChatsPage.qml" line="242" />
         <source>connecting...</source>
-        <translation>подключение...</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="26" />
-        <location filename="../qml/ChatsPage.qml" line="40" />
-        <source>Folders</source>
-        <translation>Папки</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="151" />
-        <source>Myself</source>
-        <translation>У меня</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="151" />
-        <source>All</source>
-        <translation>У всех</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="160" />
-        <source>Delete the chat "%1"? "All" also removes it for the other side.</source>
-        <translation>Удалить чат «%1»? «У всех» также удалит его у собеседника.</translation>
+        <translation>מתחבר...</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="240" />
         <location filename="../qml/ChatsPage.qml" line="242" />
         <source>offline</source>
-        <translation>не в сети</translation>
+        <translation>לא מחובר</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="240" />
-        <source>tap to switch folder</source>
-        <translation>нажмите, чтобы сменить папку</translation>
+        <location filename="../qml/ChatsPage.qml" line="241" />
+        <source>online</source>
+        <translation>מחובר</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="268" />
         <source>All chats</source>
-        <translation>Все чаты</translation>
+        <translation>כל הצ'אטים</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="293" />
         <source>loading...</source>
-        <translation>загрузка...</translation>
+        <translation>טוען...</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="293" />
         <source>Older chats</source>
-        <translation>Более старые чаты</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="436" />
-        <source>Loading chats...</source>
-        <translation>Загрузка чатов...</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="437" />
-        <source>The archive is empty.</source>
-        <translation>Архив пуст.</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="438" />
-        <source>No chats in this folder.</source>
-        <translation>В этой папке нет чатов.</translation>
-    </message>
-    <message>
-        <location filename="../qml/ChatsPage.qml" line="439" />
-        <source>No chats yet. Tap + to find someone.</source>
-        <translation>Чатов пока нет. Нажмите +, чтобы найти собеседника.</translation>
+        <translation>צ'אטים ישנים יותר</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="435" />
         <source>Connecting...</source>
-        <translation>Подключение...</translation>
+        <translation>מתחבר...</translation>
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="435" />
         <source>Offline. Use the menu to connect.</source>
-        <translation>Не в сети. Подключитесь через меню.</translation>
+        <translation>לא מחובר. השתמשו בתפריט כדי להתחבר.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="436" />
+        <source>Loading chats...</source>
+        <translation>טוען צ'אטים...</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="437" />
+        <source>The archive is empty.</source>
+        <translation>הארכיון ריק.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="438" />
+        <source>No chats in this folder.</source>
+        <translation>אין צ'אטים בתיקייה זו.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="439" />
+        <source>No chats yet. Tap + to find someone.</source>
+        <translation>אין צ'אטים עדיין. הקישו על + כדי למצוא מישהו.</translation>
     </message>
 </context>
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/LoginPage.qml" line="99" />
-        <source>Telegram for Symbian</source>
-        <translation>Telegram для Symbian</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="31" />
-        <location filename="../qml/LoginPage.qml" line="38" />
-        <source>SOCKS5 proxy</source>
-        <translation>SOCKS5-прокси</translation>
-    </message>
-    <message>
         <location filename="../qml/LoginPage.qml" line="27" />
         <source>Sign in with QR code</source>
-        <translation>Войти по QR-коду</translation>
+        <translation>כניסה עם קוד QR</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="27" />
         <location filename="../qml/LoginPage.qml" line="168" />
         <source>Sign in with phone number</source>
-        <translation>Войти по номеру телефона</translation>
+        <translation>כניסה עם מספר טלפון</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="31" />
+        <location filename="../qml/LoginPage.qml" line="38" />
+        <source>SOCKS5 proxy</source>
+        <translation>פרוקסי SOCKS5</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="32" />
         <source>Reconnect</source>
-        <translation>Переподключиться</translation>
+        <translation>התחברות מחדש</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="39" />
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>שמירה</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="39" />
         <source>Enable</source>
-        <translation>Включить</translation>
+        <translation>הפעלה</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="39" />
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="39" />
         <source>Off</source>
-        <translation>Выкл.</translation>
+        <translation>כבוי</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="44" />
         <source>Server</source>
-        <translation>Сервер</translation>
+        <translation>שרת</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="45" />
         <source>host or IP</source>
-        <translation>хост или IP</translation>
+        <translation>מארח או IP</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="46" />
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="48" />
         <source>Username (optional)</source>
-        <translation>Имя пользователя (необязательно)</translation>
+        <translation>שם משתמש (רשות)</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="50" />
         <source>Password (optional)</source>
-        <translation>Пароль (необязательно)</translation>
+        <translation>סיסמה (רשות)</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="99" />
+        <source>Telegram for Symbian</source>
+        <translation>טלגרם ל-Symbian</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="140" />
         <source>No connection through the proxy. Check the proxy or tap Reconnect.</source>
-        <translation>Нет соединения через прокси. Проверьте прокси или нажмите «Переподключиться».</translation>
+        <translation>אין חיבור דרך הפרוקסי. בדקו את הפרוקסי או הקישו על התחברות מחדש.</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="141" />
         <source>No connection. Tap Reconnect, or set up a proxy if Telegram is blocked.</source>
-        <translation>Нет соединения. Нажмите «Переподключиться» или настройте прокси, если Telegram заблокирован.</translation>
+        <translation>אין חיבור. הקישו על התחברות מחדש, או הגדירו פרוקסי אם טלגרם חסום.</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="145" />
         <source>Proxy: %1</source>
-        <translation>Прокси: %1</translation>
+        <translation>פרוקסי: %1</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="145" />
         <source>on</source>
-        <translation>вкл</translation>
+        <translation>פועל</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="145" />
         <source>Set up proxy</source>
-        <translation>Настроить прокси</translation>
+        <translation>הגדרת פרוקסי</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="156" />
         <source>The code renews in %1 s</source>
-        <translation>Код обновится через %1 с</translation>
+        <translation>הקוד יתחדש בעוד %1 שנ'</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="163" />
         <source>Open Telegram on a phone or PC where you are signed in: Settings &gt; Devices &gt; Link Desktop Device, and scan this code.</source>
-        <translation>Откройте Telegram на телефоне или ПК, где вы уже вошли: Настройки &gt; Устройства &gt; Подключить устройство, и отсканируйте этот код.</translation>
+        <translation>פתחו את טלגרם בטלפון או במחשב שבו אתם מחוברים: הגדרות &gt; מכשירים &gt; קישור מכשיר שולחני, וסרקו קוד זה.</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="177" />
         <source>Phone number</source>
-        <translation>Номер телефона</translation>
+        <translation>מספר טלפון</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="181" />
@@ -948,83 +948,83 @@
     <message>
         <location filename="../qml/LoginPage.qml" line="192" />
         <source>Include the country code. Telegram will send a login code to this number.</source>
-        <translation>Укажите код страны. Telegram пришлёт на этот номер код для входа.</translation>
+        <translation>כללו את קידומת המדינה. טלגרם ישלח קוד כניסה למספר זה.</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="196" />
         <source>requesting...</source>
-        <translation>запрос...</translation>
+        <translation>מבקש...</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="196" />
         <source>send code</source>
-        <translation>отправить код</translation>
+        <translation>שליחת קוד</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="202" />
         <source>Use QR code instead</source>
-        <translation>Использовать QR-код</translation>
+        <translation>שימוש בקוד QR במקום</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="215" />
         <source>Enter the code sent to %1</source>
-        <translation>Введите код, отправленный на %1</translation>
+        <translation>הזינו את הקוד שנשלח אל %1</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="221" />
         <source>code</source>
-        <translation>код</translation>
+        <translation>קוד</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="229" />
         <source>signing in...</source>
-        <translation>вход...</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="238" />
-        <source>Resend code</source>
-        <translation>Отправить код снова</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="244" />
-        <source>Change number</source>
-        <translation>Изменить номер</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="256" />
-        <source>Two-step verification password</source>
-        <translation>Пароль двухэтапной проверки</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="262" />
-        <source>hint: %1</source>
-        <translation>подсказка: %1</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="262" />
-        <source>password</source>
-        <translation>пароль</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="267" />
-        <source>show password</source>
-        <translation>показать пароль</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="270" />
-        <source>checking...</source>
-        <translation>проверка...</translation>
+        <translation>מתחבר...</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="229" />
         <location filename="../qml/LoginPage.qml" line="270" />
         <source>sign in</source>
-        <translation>войти</translation>
+        <translation>כניסה</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="238" />
+        <source>Resend code</source>
+        <translation>שליחת קוד מחדש</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="244" />
+        <source>Change number</source>
+        <translation>שינוי מספר</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="256" />
+        <source>Two-step verification password</source>
+        <translation>סיסמת אימות דו-שלבי</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="262" />
+        <source>hint: %1</source>
+        <translation>רמז: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="262" />
+        <source>password</source>
+        <translation>סיסמה</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="267" />
+        <source>show password</source>
+        <translation>הצגת הסיסמה</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="270" />
+        <source>checking...</source>
+        <translation>בודק...</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="300" />
         <source>Symbigram talks MTProto 2.0 straight to Telegram's servers: the encryption key is made on this phone and never leaves it. The session shows up under Devices in Telegram, where it can be ended at any time.</source>
-        <translation>Symbigram говорит с серверами Telegram напрямую по MTProto 2.0: ключ шифрования создаётся на этом телефоне и никогда его не покидает. Сеанс виден в разделе «Устройства» в Telegram, где его можно завершить в любой момент.</translation>
+        <translation>Symbigram מדבר MTProto 2.0 ישירות מול השרתים של טלגרם: מפתח ההצפנה נוצר בטלפון זה ולעולם אינו עוזב אותו. ההפעלה מופיעה תחת «מכשירים» בטלגרם, שם ניתן לסיים אותה בכל עת.</translation>
     </message>
 </context>
 <context>
@@ -1032,72 +1032,72 @@
     <message>
         <location filename="../qml/MessageDelegate.qml" line="118" />
         <source>Forwarded from %1</source>
-        <translation>Переслано от %1</translation>
+        <translation>הועבר מ-%1</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="163" />
         <source>Tap to load</source>
-        <translation>Нажмите, чтобы загрузить</translation>
+        <translation>הקישו כדי לטעון</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="170" />
         <source>Failed - tap to retry</source>
-        <translation>Ошибка — нажмите, чтобы повторить</translation>
+        <translation>נכשל — הקישו כדי לנסות שוב</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="212" />
         <source>Voice message</source>
-        <translation>Голосовое сообщение</translation>
+        <translation>הודעה קולית</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="213" />
         <source>Video</source>
-        <translation>Видео</translation>
+        <translation>וידאו</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="221" />
         <source>playing... tap to stop</source>
-        <translation>воспроизведение... нажмите, чтобы остановить</translation>
+        <translation>מנגן... הקישו כדי לעצור</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="222" />
         <source>loading %1%</source>
-        <translation>загрузка %1%</translation>
+        <translation>טוען %1%</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="222" />
         <source>tap to play</source>
-        <translation>нажмите, чтобы воспроизвести</translation>
+        <translation>הקישו כדי לנגן</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="224" />
         <source>buffering %1%... opening player</source>
-        <translation>буферизация %1%... открываю плеер</translation>
+        <translation>ממלא מאגר %1%... פותח את הנגן</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="224" />
         <source>tap to play in player</source>
-        <translation>нажмите, чтобы открыть в плеере</translation>
+        <translation>הקישו כדי לנגן בנגן</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="225" />
         <source>tap to open</source>
-        <translation>нажмите, чтобы открыть</translation>
+        <translation>הקישו כדי לפתוח</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="225" />
         <source>downloading %1%</source>
-        <translation>загрузка %1%</translation>
+        <translation>מוריד %1%</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="225" />
         <source>tap to download</source>
-        <translation>нажмите, чтобы скачать</translation>
+        <translation>הקישו כדי להוריד</translation>
     </message>
     <message>
         <location filename="../qml/MessageDelegate.qml" line="280" />
         <source>edited</source>
-        <translation>изменено</translation>
+        <translation>נערך</translation>
     </message>
 </context>
 <context>
@@ -1105,167 +1105,167 @@
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="116" />
         <source>Today</source>
-        <translation>Сегодня</translation>
+        <translation>היום</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="117" />
         <source>Yesterday</source>
-        <translation>Вчера</translation>
-    </message>
-    <message>
-        <location filename="../src/app/messagesmodel.cpp" line="893" />
-        <source>reply</source>
-        <translation>ответ</translation>
-    </message>
-    <message>
-        <location filename="../src/app/messagesmodel.cpp" line="895" />
-        <source>You</source>
-        <translation>Вы</translation>
+        <translation>אתמול</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="186" />
         <source>%1 MB</source>
-        <translation>%1 МБ</translation>
+        <translation>%1 MB</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="187" />
         <source>%1 KB</source>
-        <translation>%1 КБ</translation>
+        <translation>%1 KB</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="188" />
         <source>%1 B</source>
-        <translation>%1 Б</translation>
+        <translation>%1 B</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="321" />
         <source>Could not save the file to %1</source>
-        <translation>Не удалось сохранить файл в %1</translation>
+        <translation>לא ניתן היה לשמור את הקובץ ב-%1</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="362" />
         <source>Could not open the file.</source>
-        <translation>Не удалось открыть файл.</translation>
+        <translation>לא ניתן היה לפתוח את הקובץ.</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="442" />
         <source>Could not play this audio: %1</source>
-        <translation>Не удалось воспроизвести аудио: %1</translation>
+        <translation>לא ניתן היה לנגן שמע זה: %1</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="558" />
         <source>online</source>
-        <translation>в сети</translation>
+        <translation>מחובר</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="562" />
         <source>last seen at %1</source>
-        <translation>был(а) в %1</translation>
+        <translation>נראה לאחרונה ב-%1</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="563" />
         <source>last seen yesterday at %1</source>
-        <translation>был(а) вчера в %1</translation>
+        <translation>נראה לאחרונה אתמול ב-%1</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="564" />
         <source>last seen %1</source>
-        <translation>был(а) %1</translation>
+        <translation>נראה לאחרונה %1</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="566" />
         <source>last seen recently</source>
-        <translation>был(а) недавно</translation>
+        <translation>נראה לאחרונה לפני זמן קצר</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="567" />
         <source>last seen within a week</source>
-        <translation>был(а) на этой неделе</translation>
+        <translation>נראה לאחרונה בשבוע האחרון</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="568" />
         <source>last seen within a month</source>
-        <translation>был(а) в этом месяце</translation>
+        <translation>נראה לאחרונה בחודש האחרון</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="569" />
         <source>last seen a long time ago</source>
-        <translation>был(а) давно</translation>
+        <translation>נראה לאחרונה לפני זמן רב</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="578" />
         <source>wants to start a secret chat</source>
-        <translation>хочет начать секретный чат</translation>
+        <translation>רוצה להתחיל צ'אט סודי</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="579" />
         <source>waiting to be accepted...</source>
-        <translation>ожидает подтверждения...</translation>
+        <translation>ממתין לאישור...</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="580" />
         <source>end-to-end encrypted, self-destruct %1s</source>
-        <translation>сквозное шифрование, самоуничтожение %1с</translation>
+        <translation>מוצפן מקצה לקצה, השמדה עצמית %1 שנ'</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="581" />
         <source>end-to-end encrypted</source>
-        <translation>сквозное шифрование</translation>
+        <translation>מוצפן מקצה לקצה</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="585" />
         <source>%1 is typing...</source>
-        <translation>%1 печатает...</translation>
+        <translation>%1 מקליד...</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="586" />
         <source>typing...</source>
-        <translation>печатает...</translation>
+        <translation>מקליד...</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="590" />
         <source>bot</source>
-        <translation>бот</translation>
+        <translation>בוט</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="591" />
         <source>Saved Messages</source>
-        <translation>Избранное</translation>
+        <translation>הודעות שמורות</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="594" />
         <source>channel, %1 subscribers</source>
-        <translation>канал, подписчиков: %1</translation>
+        <translation>ערוץ, %1 מנויים</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="594" />
         <source>channel</source>
-        <translation>канал</translation>
+        <translation>ערוץ</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="595" />
         <source>%1 members</source>
-        <translation>участников: %1</translation>
+        <translation>%1 חברים</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="595" />
         <source>group</source>
-        <translation>группа</translation>
+        <translation>קבוצה</translation>
+    </message>
+    <message>
+        <location filename="../src/app/messagesmodel.cpp" line="893" />
+        <source>reply</source>
+        <translation>תגובה</translation>
+    </message>
+    <message>
+        <location filename="../src/app/messagesmodel.cpp" line="895" />
+        <source>You</source>
+        <translation>אתם</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="906" />
         <source>Not connected.</source>
-        <translation>Нет соединения.</translation>
+        <translation>לא מחובר.</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="975" />
         <source>photo</source>
-        <translation>фото</translation>
+        <translation>תמונה</translation>
     </message>
     <message>
         <location filename="../src/app/messagesmodel.cpp" line="991" />
         <source>The message was not sent: %1</source>
-        <translation>Сообщение не отправлено: %1</translation>
+        <translation>ההודעה לא נשלחה: %1</translation>
     </message>
 </context>
 <context>
@@ -1273,12 +1273,12 @@
     <message>
         <location filename="../src/core/mtprotoclient.cpp" line="113" />
         <source>key exchange failed: %1</source>
-        <translation>обмен ключами не удался: %1</translation>
+        <translation>החלפת המפתחות נכשלה: %1</translation>
     </message>
     <message>
         <location filename="../src/core/mtprotoclient.cpp" line="249" />
         <source>no response from the server</source>
-        <translation>сервер не отвечает</translation>
+        <translation>אין תגובה מהשרת</translation>
     </message>
 </context>
 <context>
@@ -1286,32 +1286,32 @@
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="137" />
         <source>the proxy refused our authentication method</source>
-        <translation>прокси отклонил метод аутентификации</translation>
+        <translation>הפרוקסי דחה את שיטת האימות שלנו</translation>
     </message>
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="142" />
         <source>proxy authentication failed - check the username and password</source>
-        <translation>ошибка аутентификации прокси — проверьте имя пользователя и пароль</translation>
+        <translation>אימות הפרוקסי נכשל — בדקו את שם המשתמש והסיסמה</translation>
     </message>
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="152" />
         <source>the proxy sent a malformed reply</source>
-        <translation>прокси прислал некорректный ответ</translation>
+        <translation>הפרוקסי שלח תגובה פגומה</translation>
     </message>
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="155" />
         <source>the proxy could not reach the server (%1)</source>
-        <translation>прокси не смог подключиться к серверу (%1)</translation>
+        <translation>הפרוקסי לא הצליח להגיע לשרת (%1)</translation>
     </message>
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="202" />
         <source>connection closed</source>
-        <translation>соединение закрыто</translation>
+        <translation>החיבור נסגר</translation>
     </message>
     <message>
         <location filename="../src/core/mtprototransport.cpp" line="207" />
         <source>connection timed out</source>
-        <translation>время ожидания соединения истекло</translation>
+        <translation>תם הזמן הקצוב לחיבור</translation>
     </message>
 </context>
 <context>
@@ -1319,177 +1319,177 @@
     <message>
         <location filename="../src/app/notifier.cpp" line="171" />
         <source>Symbigram: new message</source>
-        <translation>Symbigram: новое сообщение</translation>
+        <translation>Symbigram: הודעה חדשה</translation>
     </message>
     <message>
         <location filename="../src/app/notifier.cpp" line="171" />
         <source>Symbigram: %1 new messages</source>
-        <translation>Symbigram: новых сообщений: %1</translation>
+        <translation>Symbigram: %1 הודעות חדשות</translation>
     </message>
 </context>
 <context>
     <name>SettingsPage</name>
     <message>
+        <location filename="../qml/SettingsPage.qml" line="15" />
+        <location filename="../qml/SettingsPage.qml" line="296" />
+        <source>Clear cache</source>
+        <translation>ניקוי המטמון</translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="16" />
+        <source>Delete the %1 of downloaded media held on the phone? It will be fetched again when needed.</source>
+        <translation>למחוק את %1 של המדיה שהורדה ונשמרת בטלפון? היא תורד שוב בעת הצורך.</translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="17" />
+        <source>Clear</source>
+        <translation>נקה</translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="18" />
+        <location filename="../qml/SettingsPage.qml" line="81" />
+        <source>Cancel</source>
+        <translation>ביטול</translation>
+    </message>
+    <message>
         <location filename="../qml/SettingsPage.qml" line="24" />
         <location filename="../qml/SettingsPage.qml" line="348" />
         <source>App language</source>
-        <translation>Язык приложения</translation>
+        <translation>שפת היישום</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="41" />
         <location filename="../qml/SettingsPage.qml" line="107" />
         <location filename="../qml/SettingsPage.qml" line="108" />
         <source>System default</source>
-        <translation>Как в системе</translation>
+        <translation>ברירת המחדל של המערכת</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="56" />
         <location filename="../qml/SettingsPage.qml" line="271" />
         <source>Save downloads to</source>
-        <translation>Сохранять загрузки в</translation>
+        <translation>שמירת הורדות אל</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="58" />
         <source>Choose folder...</source>
-        <translation>Выбрать папку...</translation>
+        <translation>בחירת תיקייה...</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="80" />
         <location filename="../qml/SettingsPage.qml" line="227" />
         <source>SOCKS5 proxy</source>
-        <translation>SOCKS5-прокси</translation>
+        <translation>פרוקסי SOCKS5</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="81" />
         <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="18" />
-        <location filename="../qml/SettingsPage.qml" line="81" />
-        <source>Cancel</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="15" />
-        <location filename="../qml/SettingsPage.qml" line="296" />
-        <source>Clear cache</source>
-        <translation>Очистить кэш</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="16" />
-        <source>Delete the %1 of downloaded media held on the phone? It will be fetched again when needed.</source>
-        <translation>Удалить %1 загруженных медиа на телефоне? Они будут загружены заново при необходимости.</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="17" />
-        <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>שמירה</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="86" />
         <source>Server</source>
-        <translation>Сервер</translation>
+        <translation>שרת</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="87" />
         <source>host or IP</source>
-        <translation>хост или IP</translation>
+        <translation>מארח או IP</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="88" />
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="90" />
         <source>Username (optional)</source>
-        <translation>Имя пользователя (необязательно)</translation>
+        <translation>שם משתמש (רשות)</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="92" />
         <source>Password (optional)</source>
-        <translation>Пароль (необязательно)</translation>
+        <translation>סיסמה (רשות)</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="114" />
         <source>Settings</source>
-        <translation>Настройки</translation>
+        <translation>הגדרות</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="131" />
         <source>Notifications</source>
-        <translation>Уведомления</translation>
+        <translation>התראות</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="149" />
         <source>Popup for new messages</source>
-        <translation>Всплывающее окно о новых сообщениях</translation>
+        <translation>חלון קופץ להודעות חדשות</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="167" />
         <source>Vibrate</source>
-        <translation>Вибрация</translation>
+        <translation>רטט</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="185" />
         <source>Groups and channels</source>
-        <translation>Группы и каналы</translation>
+        <translation>קבוצות וערוצים</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="202" />
         <source>For messages that arrive while another application is in front: the "new messages" dialog, the popup and the vibration. Chats muted in Telegram stay quiet. Symbigram stays connected in the background either way.</source>
-        <translation>Для сообщений, пришедших, пока открыто другое приложение: диалог «новые сообщения», всплывающее окно и вибрация. Чаты, отключённые в Telegram, остаются беззвучными. Symbigram в любом случае остаётся на связи в фоне.</translation>
+        <translation>עבור הודעות שמגיעות כאשר יישום אחר נמצא בחזית: חלון «הודעות חדשות», החלון הקופץ והרטט. צ'אטים שהושתקו בטלגרם נשארים שקטים. Symbigram נשאר מחובר ברקע בכל מקרה.</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="211" />
         <source>Connect on start</source>
-        <translation>Подключаться при запуске</translation>
+        <translation>התחברות בעת ההפעלה</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="245" />
         <source>Proxy server</source>
-        <translation>Сервер прокси</translation>
+        <translation>שרת פרוקסי</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="248" />
         <source>not set</source>
-        <translation>не задан</translation>
+        <translation>לא הוגדר</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="262" />
         <source>Route the connection through a SOCKS5 proxy. Changing it reconnects.</source>
-        <translation>Направлять соединение через SOCKS5-прокси. Изменение переподключает.</translation>
+        <translation>ניתוב החיבור דרך פרוקסי SOCKS5. שינוי גורם להתחברות מחדש.</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="288" />
         <source>Saved photos and files go here. Pick a drive, or "Choose folder..." for any folder.</source>
-        <translation>Сюда сохраняются фото и файлы. Выберите диск или «Выбрать папку...» для любой папки.</translation>
+        <translation>תמונות וקבצים שנשמרו יגיעו לכאן. בחרו כונן, או «בחירת תיקייה...» לכל תיקייה שהיא.</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="299" />
         <source>Downloaded media held on the phone: %1</source>
-        <translation>Загруженные медиа на телефоне: %1</translation>
+        <translation>מדיה שהורדה ונשמרת בטלפון: %1</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="313" />
         <source>The app's private store of downloaded photos, avatars and files (separate from the folder above). Clearing it just re-downloads on demand.</source>
-        <translation>Внутреннее хранилище загруженных фото, аватаров и файлов (отдельно от папки выше). После очистки они будут загружаться заново по мере необходимости.</translation>
+        <translation>האחסון הפרטי של היישום לתמונות, לתמונות פרופיל ולקבצים שהורדו (נפרד מהתיקייה שלמעלה). ניקויו רק גורם להורדה מחדש לפי הצורך.</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="322" />
         <source>Keep a log</source>
-        <translation>Вести журнал</translation>
+        <translation>שמירת יומן</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="339" />
         <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
-        <translation>По умолчанию выключено. Включайте только для сбора диагностического журнала (виден на странице «О программе»), когда что-то идёт не так.</translation>
+        <translation>כבוי כברירת מחדל. הפעילו רק כדי לאסוף יומן אבחון (מוצג בעמוד «אודות») כשמשהו משתבש.</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="369" />
         <source>Takes effect after the app is restarted.</source>
-        <translation>Вступает в силу после перезапуска приложения.</translation>
+        <translation>ייכנס לתוקף לאחר הפעלה מחדש של היישום.</translation>
     </message>
 </context>
 <context>
@@ -1502,17 +1502,7 @@
         <location filename="../src/core/telegramsession.cpp" line="994" />
         <location filename="../src/core/telegramsession.cpp" line="1412" />
         <source>Signed out.</source>
-        <translation>Выход выполнен.</translation>
-    </message>
-    <message>
-        <location filename="../src/core/telegramsession.cpp" line="472" />
-        <source>Enter the password.</source>
-        <translation>Введите пароль.</translation>
-    </message>
-    <message>
-        <location filename="../src/core/telegramsession.cpp" line="779" />
-        <source>Enter a username, a phone number or a name.</source>
-        <translation>Введите имя пользователя, номер телефона или имя.</translation>
+        <translation>התנתקתם.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="224" />
@@ -1520,184 +1510,194 @@
         <location filename="../src/core/telegramsession.cpp" line="1981" />
         <location filename="../src/core/telegramsession.cpp" line="2009" />
         <source>Not connected.</source>
-        <translation>Нет соединения.</translation>
+        <translation>לא מחובר.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="325" />
         <source>Enter a valid phone number, with the country code.</source>
-        <translation>Введите корректный номер телефона с кодом страны.</translation>
+        <translation>הזינו מספר טלפון תקין, עם קידומת המדינה.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="341" />
         <location filename="../src/core/telegramsession.cpp" line="1402" />
         <source>Enter the code.</source>
-        <translation>Введите код.</translation>
+        <translation>הזינו את הקוד.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="472" />
+        <source>Enter the password.</source>
+        <translation>הזינו את הסיסמה.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="779" />
+        <source>Enter a username, a phone number or a name.</source>
+        <translation>הזינו שם משתמש, מספר טלפון או שם.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="839" />
         <location filename="../src/core/telegramsession.cpp" line="871" />
         <source>That folder no longer exists.</source>
-        <translation>Этой папки больше нет.</translation>
+        <translation>התיקייה הזו כבר אינה קיימת.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="957" />
         <source>This account has no password set.</source>
-        <translation>У этого аккаунта нет пароля.</translation>
+        <translation>לחשבון זה לא הוגדרה סיסמה.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="958" />
         <source>Unsupported password method.</source>
-        <translation>Неподдерживаемый способ проверки пароля.</translation>
+        <translation>שיטת סיסמה לא נתמכת.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="987" />
         <location filename="../src/core/telegramsession.cpp" line="1404" />
         <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
-        <translation>К этому номеру не привязан аккаунт Telegram. Регистрация здесь не поддерживается.</translation>
+        <translation>אין חשבון טלגרם שמשתמש במספר זה. הרשמה אינה נתמכת כאן.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1221" />
         <source>the server rejected a part of the file</source>
-        <translation>сервер отклонил часть файла</translation>
+        <translation>השרת דחה חלק מהקובץ</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1244" />
         <source>the file is served from a CDN, which is not supported</source>
-        <translation>файл раздаётся через CDN, что не поддерживается</translation>
+        <translation>הקובץ מוגש מ-CDN, שאינו נתמך</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1245" />
         <source>unexpected reply</source>
-        <translation>неожиданный ответ</translation>
+        <translation>תגובה בלתי צפויה</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1248" />
         <source>could not write the file</source>
-        <translation>не удалось записать файл</translation>
+        <translation>לא ניתן היה לכתוב את הקובץ</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1275" />
         <location filename="../src/core/telegramsession.cpp" line="1284" />
         <location filename="../src/core/telegramsession.cpp" line="1457" />
         <source>Nobody found.</source>
-        <translation>Никого не найдено.</translation>
+        <translation>לא נמצא אף אחד.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1334" />
         <source>The session was ended (%1). Please sign in again.</source>
-        <translation>Сеанс завершён (%1). Войдите снова.</translation>
+        <translation>ההפעלה הסתיימה (%1). אנא היכנסו שוב.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1371" />
         <source>Wrong password.</source>
-        <translation>Неверный пароль.</translation>
+        <translation>סיסמה שגויה.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1372" />
         <location filename="../src/core/telegramsession.cpp" line="1381" />
         <location filename="../src/core/telegramsession.cpp" line="1406" />
         <source>Too many attempts. Wait %1 seconds.</source>
-        <translation>Слишком много попыток. Подождите %1 с.</translation>
+        <translation>יותר מדי ניסיונות. המתינו %1 שניות.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1382" />
         <source>That phone number is not valid.</source>
-        <translation>Этот номер телефона недействителен.</translation>
+        <translation>מספר הטלפון הזה אינו תקין.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1383" />
         <source>That phone number is banned from Telegram.</source>
-        <translation>Этот номер заблокирован в Telegram.</translation>
+        <translation>מספר הטלפון הזה חסום בטלגרם.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1384" />
         <source>Too many codes requested for this number. Try again later.</source>
-        <translation>Слишком много запросов кода для этого номера. Повторите позже.</translation>
+        <translation>התבקשו יותר מדי קודים למספר זה. נסו שוב מאוחר יותר.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1385" />
         <source>Too many attempts. Try again later.</source>
-        <translation>Слишком много попыток. Повторите позже.</translation>
+        <translation>יותר מדי ניסיונות. נסו שוב מאוחר יותר.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1386" />
         <source>This build's Telegram API key was rejected.</source>
-        <translation>Ключ API Telegram этой сборки отклонён.</translation>
+        <translation>מפתח ה-API של טלגרם בגרסה זו נדחה.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1398" />
         <source>Wrong code. Check it and try again.</source>
-        <translation>Неверный код. Проверьте и попробуйте снова.</translation>
+        <translation>קוד שגוי. בדקו אותו ונסו שוב.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1400" />
         <source>The code expired. Request a new one.</source>
-        <translation>Код истёк. Запросите новый.</translation>
+        <translation>הקוד פג. בקשו קוד חדש.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1417" />
         <source>Could not load the chat list: %1</source>
-        <translation>Не удалось загрузить список чатов: %1</translation>
+        <translation>לא ניתן היה לטעון את רשימת הצ'אטים: %1</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1468" />
         <source>Could not start the secret chat: %1</source>
-        <translation>Не удалось начать секретный чат: %1</translation>
+        <translation>לא ניתן היה להתחיל את הצ'אט הסודי: %1</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1471" />
         <source>Could not accept the secret chat: %1</source>
-        <translation>Не удалось принять секретный чат: %1</translation>
+        <translation>לא ניתן היה לקבל את הצ'אט הסודי: %1</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1491" />
         <source>Could not edit the message: %1</source>
-        <translation>Не удалось изменить сообщение: %1</translation>
+        <translation>לא ניתן היה לערוך את ההודעה: %1</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1497" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
-        <translation>В папке должен остаться хотя бы один чат, поэтому чат останется и в ней.</translation>
+        <translation>בתיקייה זו חייב להישאר לפחות צ'אט אחד, ולכן הצ'אט נשאר גם בה.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1499" />
         <source>Could not change the folder: %1</source>
-        <translation>Не удалось изменить папку: %1</translation>
+        <translation>לא ניתן היה לשנות את התיקייה: %1</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1858" />
         <source>could not create the file</source>
-        <translation>не удалось создать файл</translation>
+        <translation>לא ניתן היה ליצור את הקובץ</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1933" />
         <source>the file is empty</source>
-        <translation>файл пуст</translation>
+        <translation>הקובץ ריק</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1966" />
         <source>could not read the file</source>
-        <translation>не удалось прочитать файл</translation>
+        <translation>לא ניתן היה לקרוא את הקובץ</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="1977" />
         <source>the file is too large</source>
-        <translation>файл слишком большой</translation>
+        <translation>הקובץ גדול מדי</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="2001" />
         <source>could not read the recording</source>
-        <translation>не удалось прочитать запись</translation>
+        <translation>לא ניתן היה לקרוא את ההקלטה</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="2142" />
         <source>Secret chats can only be opened with a person.</source>
-        <translation>Секретные чаты можно открывать только с человеком.</translation>
+        <translation>ניתן לפתוח צ'אטים סודיים רק עם אדם.</translation>
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="2192" />
         <source>The secret chat is not ready.</source>
-        <translation>Секретный чат не готов.</translation>
+        <translation>הצ'אט הסודי אינו מוכן.</translation>
     </message>
 </context>
 <context>
@@ -1706,110 +1706,110 @@
         <location filename="../src/core/tgapi.cpp" line="62" />
         <location filename="../src/core/tgapi.cpp" line="98" />
         <source>user %1</source>
-        <translation>пользователь %1</translation>
+        <translation>משתמש %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="62" />
         <location filename="../src/core/tgapi.cpp" line="121" />
         <source>chat %1</source>
-        <translation>чат %1</translation>
+        <translation>צ'אט %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="81" />
         <location filename="../src/core/tgapi.cpp" line="98" />
         <source>deleted account</source>
-        <translation>удалённый аккаунт</translation>
+        <translation>חשבון שנמחק</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="644" />
         <location filename="../src/core/tgapi.cpp" line="685" />
         <source>video</source>
-        <translation>видео</translation>
+        <translation>וידאו</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="644" />
         <source>photo</source>
-        <translation>фото</translation>
+        <translation>תמונה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="649" />
         <source>location %1, %2</source>
-        <translation>геопозиция %1, %2</translation>
+        <translation>מיקום %1, %2</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="650" />
         <source>location</source>
-        <translation>геопозиция</translation>
+        <translation>מיקום</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="652" />
         <source>location: %1</source>
-        <translation>место: %1</translation>
+        <translation>מיקום: %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="653" />
         <source>contact: %1 %2 %3</source>
-        <translation>контакт: %1 %2 %3</translation>
+        <translation>איש קשר: %1 %2 %3</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="658" />
         <source>poll: %1</source>
-        <translation>опрос: %1</translation>
+        <translation>סקר: %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="660" />
         <source>dice: %1</source>
-        <translation>кубик: %1</translation>
+        <translation>קובייה: %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="661" />
         <source>game</source>
-        <translation>игра</translation>
+        <translation>משחק</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="662" />
         <source>invoice</source>
-        <translation>счёт</translation>
+        <translation>חשבונית</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="663" />
         <source>story</source>
-        <translation>история</translation>
+        <translation>סטורי</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="666" />
         <source>file</source>
-        <translation>файл</translation>
+        <translation>קובץ</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="681" />
         <source>sticker</source>
-        <translation>стикер</translation>
+        <translation>מדבקה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="681" />
         <source>sticker %1</source>
-        <translation>стикер %1</translation>
+        <translation>מדבקה %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="682" />
         <source>voice message %1</source>
-        <translation>голосовое сообщение %1</translation>
+        <translation>הודעה קולית %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="682" />
         <source>voice message</source>
-        <translation>голосовое сообщение</translation>
+        <translation>הודעה קולית</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="683" />
         <source>video message %1</source>
-        <translation>видеосообщение %1</translation>
+        <translation>הודעת וידאו %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="683" />
         <source>video message</source>
-        <translation>видеосообщение</translation>
+        <translation>הודעת וידאו</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="684" />
@@ -1819,107 +1819,107 @@
     <message>
         <location filename="../src/core/tgapi.cpp" line="685" />
         <source>video %1</source>
-        <translation>видео %1</translation>
+        <translation>וידאו %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="686" />
         <source>audio %1</source>
-        <translation>аудио %1</translation>
+        <translation>שמע %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="686" />
         <source>audio</source>
-        <translation>аудио</translation>
+        <translation>שמע</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="687" />
         <source>image</source>
-        <translation>изображение</translation>
+        <translation>תמונה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="689" />
         <source>%1 MB</source>
-        <translation>%1 МБ</translation>
+        <translation>%1 MB</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="690" />
         <source>%1 KB</source>
-        <translation>%1 КБ</translation>
+        <translation>%1 KB</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="690" />
         <source>%1 B</source>
-        <translation>%1 Б</translation>
+        <translation>%1 B</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="691" />
         <source>file: %1 (%2)</source>
-        <translation>файл: %1 (%2)</translation>
+        <translation>קובץ: %1 (%2)</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="693" />
         <source>unsupported attachment</source>
-        <translation>неподдерживаемое вложение</translation>
+        <translation>קובץ מצורף לא נתמך</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="694" />
         <source>attachment</source>
-        <translation>вложение</translation>
+        <translation>קובץ מצורף</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="833" />
         <source>created the group "%1"</source>
-        <translation>создал(а) группу «%1»</translation>
+        <translation>יצר את הקבוצה «%1»</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="834" />
         <source>created the channel "%1"</source>
-        <translation>создал(а) канал «%1»</translation>
+        <translation>יצר את הערוץ «%1»</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="839" />
         <source>added %1</source>
-        <translation>добавил(а) %1</translation>
+        <translation>הוסיף את %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="841" />
         <source>removed %1</source>
-        <translation>удалил(а) %1</translation>
+        <translation>הסיר את %1</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="842" />
         <source>joined by invite link</source>
-        <translation>вступил(а) по ссылке-приглашению</translation>
+        <translation>הצטרף באמצעות קישור הזמנה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="843" />
         <source>pinned a message</source>
-        <translation>закрепил(а) сообщение</translation>
+        <translation>נעץ הודעה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="844" />
         <source>joined Telegram</source>
-        <translation>присоединился(-ась) к Telegram</translation>
+        <translation>הצטרף לטלגרם</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="845" />
         <source>cleared the history</source>
-        <translation>очистил(а) историю</translation>
+        <translation>ניקה את ההיסטוריה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="846" />
         <source>service message</source>
-        <translation>служебное сообщение</translation>
+        <translation>הודעת שירות</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="854" />
         <source>empty message</source>
-        <translation>пустое сообщение</translation>
+        <translation>הודעה ריקה</translation>
     </message>
     <message>
         <location filename="../src/core/tgapi.cpp" line="1026" />
         <source>Folder</source>
-        <translation>Папка</translation>
+        <translation>תיקייה</translation>
     </message>
 </context>
 <context>
@@ -1927,37 +1927,37 @@
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="74" />
         <source>could not open the voice file</source>
-        <translation>не удалось открыть голосовой файл</translation>
+        <translation>לא ניתן היה לפתוח את קובץ השמע</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="80" />
         <source>could not decode the voice message</source>
-        <translation>не удалось декодировать голосовое сообщение</translation>
+        <translation>לא ניתן היה לפענח את ההודעה הקולית</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="86" />
         <source>audio is unavailable (%1)</source>
-        <translation>аудио недоступно (%1)</translation>
+        <translation>השמע אינו זמין (%1)</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="92" />
         <source>could not open audio (%1)</source>
-        <translation>не удалось открыть аудио (%1)</translation>
+        <translation>לא ניתן היה לפתוח את השמע (%1)</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="99" />
         <source>could not prepare playback</source>
-        <translation>не удалось подготовить воспроизведение</translation>
+        <translation>לא ניתן היה להכין את הנגינה</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="132" />
         <source>could not start playback (%1)</source>
-        <translation>не удалось начать воспроизведение (%1)</translation>
+        <translation>לא ניתן היה להתחיל בנגינה (%1)</translation>
     </message>
     <message>
         <location filename="../src/app/voiceplayer.cpp" line="136" />
         <source>could not play (%1)</source>
-        <translation>не удалось воспроизвести (%1)</translation>
+        <translation>לא ניתן היה לנגן (%1)</translation>
     </message>
 </context>
 <context>
@@ -1965,37 +1965,37 @@
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="36" />
         <source>the microphone is unavailable (%1)</source>
-        <translation>микрофон недоступен (%1)</translation>
+        <translation>המיקרופון אינו זמין (%1)</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="41" />
         <source>could not open the microphone (%1)</source>
-        <translation>не удалось открыть микрофон (%1)</translation>
+        <translation>לא ניתן היה לפתוח את המיקרופון (%1)</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="48" />
         <source>recording is only available on the phone</source>
-        <translation>запись доступна только на телефоне</translation>
+        <translation>הקלטה זמינה רק בטלפון</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="81" />
         <source>the recording was too short</source>
-        <translation>запись слишком короткая</translation>
+        <translation>ההקלטה הייתה קצרה מדי</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="88" />
         <source>could not encode the recording</source>
-        <translation>не удалось закодировать запись</translation>
+        <translation>לא ניתן היה לקודד את ההקלטה</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="95" />
         <source>could not save the recording</source>
-        <translation>не удалось сохранить запись</translation>
+        <translation>לא ניתן היה לשמור את ההקלטה</translation>
     </message>
     <message>
         <location filename="../src/app/voicerecorder.cpp" line="104" />
         <source>could not start recording (%1)</source>
-        <translation>не удалось начать запись (%1)</translation>
+        <translation>לא ניתן היה להתחיל בהקלטה (%1)</translation>
     </message>
 </context>
 </TS>

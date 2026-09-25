@@ -14,6 +14,11 @@ PageStackWindow {
     platformSoftwareInputPanelEnabled: true
     initialPage: startPage
 
+    // Hebrew is RTL: mirror the anchor-based layouts (main.cpp also sets the application layout
+    // direction, which handles the components and text alignment). uiLanguage is the resolved code.
+    LayoutMirroring.enabled: uiLanguage == "he"
+    LayoutMirroring.childrenInherit: true
+
     Page {
         id: startPage
         BusyIndicator {

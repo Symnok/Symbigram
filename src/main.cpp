@@ -58,6 +58,12 @@ int main(int argc, char *argv[])
     if (lang != QLatin1String("en") && translator.load(QLatin1String(":/translations/symbigram_") + lang))
         app.installTranslator(&translator);
 
+    // Hebrew is right-to-left: flip the whole UI. The Symbian components and the default text
+    // alignment follow the application layout direction; main.qml adds LayoutMirroring so the
+    // custom anchor-based layouts mirror too.
+    if (lang == QLatin1String("he"))
+        app.setLayoutDirection(Qt::RightToLeft);
+
     qmlRegisterType<ChatsModel>();
     qmlRegisterType<MessagesModel>();
 
