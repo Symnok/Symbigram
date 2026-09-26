@@ -292,6 +292,12 @@ QString MessagesModel::exportToPublic(int row, bool unique)
     const Row &r = m_rows.at(row);
     if (r.fullPath.isEmpty()) return QString();
     QString base = m_downloadFolder.isEmpty() ? downloadDir(r.m.media.kind == TgMedia::Photo) : m_downloadFolder;
+    // The saved download folder may carry a trailing separator; strip it (and normalise to forward
+    // slashes) so we never build a doubled separator like "E:/Symbigram//file.sis". QFile tolerates
+    // the double slash, but a native handler - the Software Installer especially - chokes on it and
+    // shows a black screen instead of the install prompt.
+    base = QDir::fromNativeSeparators(base);
+    while (base.endsWith(QLatin1Char('/'))) base.chop(1);
     QDir().mkpath(base);
     QString name = sanitizeName(r.m.media.fileName.isEmpty() ? QFileInfo(r.fullPath).fileName() : r.m.media.fileName);
     QString target = base + QLatin1Char('/') + name;
@@ -354,16 +360,24 @@ void MessagesModel::onVoiceStopped()
 void MessagesModel::openMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
-    if (m_rows.at(row).fullPath.isEmpty()) { downloadMedia(row); return; }
+    const Row &r = m_rows.at(row);
+    // Diagnostics for the "tap to open" flow (visible on the About page when Keep a log is on).
+    qDebug("open: row=%d kind=%d name=[%s] mime=[%s] cache=[%s]", row, int(r.m.media.kind),
+           qPrintable(r.m.media.fileName), qPrintable(r.m.media.mimeType), qPrintable(r.fullPath));
+    if (r.fullPath.isEmpty()) { qDebug("open: not downloaded yet -> downloadMedia"); downloadMedia(row); return; }
 #ifdef Q_OS_SYMBIAN
     // The download cache is the app's private folder, which the phone's audio player and other
     // handlers cannot read. Open a real-named copy in the public download folder instead.
     QString path = exportToPublic(row, false);
-    if (path.isEmpty()) { emit sendFailed(tr("Could not open the file.")); return; }
+    if (path.isEmpty()) { qWarning("open: exportToPublic FAILED (row=%d)", row); emit sendFailed(tr("Could not open the file.")); return; }
+    qDebug("open: exported -> [%s] exists=%d size=%lld cacheSize=%lld",
+           qPrintable(QDir::toNativeSeparators(path)), int(QFile::exists(path)),
+           qint64(QFileInfo(path).size()), qint64(QFileInfo(r.fullPath).size()));
 #else
     QString path = m_rows.at(row).fullPath;
 #endif
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    const bool ok = QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    qDebug("open: openUrl returned %d for [%s]", int(ok), qPrintable(path));
 }
 
 QString MessagesModel::audioStreamPath(const TgMedia &m) const
