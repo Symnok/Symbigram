@@ -404,11 +404,10 @@ void MessagesModel::streamAudio(int row)
         return;
     }
     if (m_audioJobId) m_session->cancelDownload(m_audioJobId);   // drop a previous stream
-    // MP3 streams from the start (header up front); M4A usually has its index at the END of the
-    // file, so the player can only start it once the whole file has arrived - buffer it fully.
-    QString ext = m.fileName.section(QLatin1Char('.'), -1).toLower();
-    bool isMp3 = ext == QLatin1String("mp3") || m.mimeType == QLatin1String("audio/mpeg") || m.mimeType == QLatin1String("audio/mp3");
-    m_audioHeadStart = isMp3 ? qint64(512 * 1024) : (m.fileSize > 0 ? m.fileSize : (qint64(1) << 62));
+    // The external Media Player reads the file size once, when it opens, and does NOT follow the
+    // file as it keeps downloading - so a partial hand-off plays only the buffered head (~1 min)
+    // and stops. Wait for the WHOLE file to arrive before opening it (both mp3 and m4a).
+    m_audioHeadStart = m.fileSize > 0 ? m.fileSize : (qint64(1) << 62);
     m_audioRow = row;
     m_audioBuffer = 0;
     m_audioOpened = false;

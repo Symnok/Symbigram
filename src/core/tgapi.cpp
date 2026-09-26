@@ -76,7 +76,10 @@ void TgPeerCache::absorbUser(const TlObject &u)
     if (u.isNull() || !u.has("id")) return;
     qint64 id = u.longOr("id");
     TgPeerInfo info = m_infos.value(TgPeer(TgPeer::User, id).key());
-    info.peer = TgPeer(TgPeer::User, id, u.longOr("access_hash", info.peer.accessHash));
+    // A "min" user (flags.20) has a context-only access_hash; don't let it overwrite a real one.
+    qint64 uhash = u.longOr("access_hash", info.peer.accessHash);
+    if (u.flag("flags", 20) && info.peer.accessHash != 0) uhash = info.peer.accessHash;
+    info.peer = TgPeer(TgPeer::User, id, uhash);
     if (u.ctor() == Tl::UserEmpty) {
         info.title = TgApi::tr("deleted account");
         info.isDeleted = true;
@@ -115,7 +118,12 @@ void TgPeerCache::absorbChat(const TlObject &c)
     bool channel = c.ctor() == Tl::Channel || c.ctor() == Tl::ChannelForbidden;
     TgPeer peer(channel ? TgPeer::Channel : TgPeer::Chat, id, c.longOr("access_hash"));
     TgPeerInfo info = m_infos.value(peer.key());
-    if (peer.accessHash == 0) peer.accessHash = info.peer.accessHash;
+    // A "min" channel (flags.12) carries an access_hash that is valid only in the context it
+    // arrived in (e.g. a forward or a mention from a chat you are not in); using it for getHistory
+    // fails with CHANNEL_INVALID. Never let a min channel - or a hash-less object - overwrite a real
+    // access_hash we already hold (from the dialog list). This is per-user, so only some users hit it.
+    bool min = channel && c.flag("flags", 12);
+    if (peer.accessHash == 0 || (min && info.peer.accessHash != 0)) peer.accessHash = info.peer.accessHash;
     info.peer = peer;
     QString title = c.str("title");
     info.title = title.isEmpty() ? TgApi::tr("chat %1").arg(id) : title;
