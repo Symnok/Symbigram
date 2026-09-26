@@ -10,6 +10,11 @@ import com.nokia.symbian 1.1
 Page {
     id: page
 
+    // Give keyboard focus back to the chat list whenever this page becomes active again - e.g. after
+    // returning from a chat - so the D-pad keeps navigating (otherwise focus stays with the composer
+    // we left behind and the arrow keys do nothing here).
+    onStatusChanged: if (status == PageStatus.Active) list.forceActiveFocus()
+
     Component { id: settingsPage; SettingsPage {} }
     Component { id: aboutPage; AboutPage {} }
 
@@ -283,6 +288,20 @@ Page {
         model: app.chats
         clip: true
         cacheBuffer: 600
+
+        // D-pad / arrow-key navigation (Nokia E6/E7 and other keypad devices): up/down move a
+        // highlight, the centre key (or Enter) opens the highlighted chat. Touch still works.
+        focus: true
+        highlightMoveDuration: 120
+        highlight: Rectangle { color: "#3d5a80"; opacity: 0.35 }
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Up) { decrementCurrentIndex(); event.accepted = true }
+            else if (event.key == Qt.Key_Down) { incrementCurrentIndex(); event.accepted = true }
+            else if (event.key == Qt.Key_Select || event.key == Qt.Key_Enter || event.key == Qt.Key_Return) {
+                if (currentIndex >= 0 && currentIndex < app.chats.count) window.openChat(app.chats.get(currentIndex).peerKey)
+                event.accepted = true
+            }
+        }
         footer: Item {
             width: list.width
             height: app.chats.hasMore ? platformStyle.graphicSizeMedium + 2 * platformStyle.paddingLarge : 0

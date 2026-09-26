@@ -11,6 +11,16 @@ Page {
     id: page
     property variant chat: app.chat
 
+    // Send/save the composed text. Shared by the Send button and the keyboard Enter key
+    // (Nokia E6/E7 and other hardware keyboards: Enter sends instead of inserting a newline).
+    function sendMessage() {
+        if (composer.text.length == 0 || chat.peerKey == "" || app.connection != "online") return
+        if (chat.isSecret && chat.secretState != 2) return
+        if (chat.editing) chat.commitEdit(composer.text)
+        else chat.send(composer.text)
+        composer.text = ""
+    }
+
     tools: ToolBarLayout {
         ToolButton { iconSource: "toolbar-back"; onClicked: { chat.close(); pageStack.pop() } }
         ToolButton { iconSource: "toolbar-menu"; onClicked: menu.open() }
@@ -412,6 +422,9 @@ Page {
             wrapMode: TextEdit.Wrap
             platformMaxImplicitHeight: 120
             onTextChanged: chat.composing(text)
+            // Hardware Enter sends the message (E6/E7 etc.) rather than inserting a newline.
+            Keys.onReturnPressed: { page.sendMessage(); event.accepted = true }
+            Keys.onEnterPressed: { page.sendMessage(); event.accepted = true }
         }
         Button {
             id: sendButton
@@ -420,11 +433,7 @@ Page {
             width: Math.max(80, implicitWidth)
             text: chat.editing ? qsTr("Save") : qsTr("Send")
             enabled: composer.text.length > 0 && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
-            onClicked: {
-                if (chat.editing) chat.commitEdit(composer.text)
-                else chat.send(composer.text)
-                composer.text = ""
-            }
+            onClicked: page.sendMessage()
         }
         // a round record button when there is nothing typed
         Rectangle {
