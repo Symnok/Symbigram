@@ -41,7 +41,7 @@ namespace
     const char *const KeyLanguage = "ui/language";
     const char *const KeyNotifications = "ui/notifications";
     const char *const KeyVibrate = "ui/vibrate";
-    const char *const KeyPopups = "ui/popups";
+    const char *const KeyPopupMode = "ui/popupMode";   // 0 off, 1 first message, 2 every message
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
@@ -98,7 +98,6 @@ AppController::AppController(QObject *parent)
     m_notifier = new Notifier(this);
     m_notifier->setEnabled(notifications());
     m_notifier->setVibrate(vibrate());
-    m_notifier->setPopups(popups());
 
     // Optional status-bar ("envelope") notifications on Belle via Pigler. init() quietly fails
     // (and everything stays as-is) when Pigler is not installed, or on S^3/Anna.
@@ -264,8 +263,23 @@ bool AppController::notifications() const { return m_settings.value(QLatin1Strin
 void AppController::setNotifications(bool on) { m_settings.setValue(QLatin1String(KeyNotifications), on); m_notifier->setEnabled(on); emit settingsChanged(); }
 bool AppController::vibrate() const { return m_settings.value(QLatin1String(KeyVibrate), true).toBool(); }
 void AppController::setVibrate(bool on) { m_settings.setValue(QLatin1String(KeyVibrate), on); m_notifier->setVibrate(on); emit settingsChanged(); }
-bool AppController::popups() const { return m_settings.value(QLatin1String(KeyPopups), true).toBool(); }
-void AppController::setPopups(bool on) { m_settings.setValue(QLatin1String(KeyPopups), on); m_notifier->setPopups(on); emit settingsChanged(); }
+int AppController::popupMode() const
+{
+    int m = m_settings.value(QLatin1String(KeyPopupMode), 1).toInt();   // default: first message
+    return (m < 0 || m > 2) ? 1 : m;
+}
+void AppController::setPopupMode(int mode)
+{
+    if (mode < 0 || mode > 2 || mode == popupMode()) return;
+    m_settings.setValue(QLatin1String(KeyPopupMode), mode);
+    emit settingsChanged();
+}
+QStringList AppController::popupModeNames() const
+{
+    QStringList names;
+    names << tr("Off") << tr("First message only") << tr("Every message");
+    return names;
+}
 bool AppController::groupNotifications() const { return m_settings.value(QLatin1String(KeyGroupNotifications), true).toBool(); }
 void AppController::setGroupNotifications(bool on) { m_settings.setValue(QLatin1String(KeyGroupNotifications), on); emit settingsChanged(); }
 bool AppController::autoConnect() const { return m_settings.value(QLatin1String(KeyAutoConnect), true).toBool(); }
@@ -635,20 +649,29 @@ void AppController::onMessage(const TgMessage &m)
         return;
     }
     if (foreground) return;
-    // Notify only when the global switch is on AND this chat is not muted (a logical AND):
-    // the global setting overrides, and a per-chat mute (read from Telegram's notify
-    // settings) or the Archive each silences it on their own.
-    if (!notifications()) return;                 // global notifications off
-    if (m_session->isArchived(m.peer)) return;    // archived chats never notify
-    TgDialog d = m_session->dialog(m.peer);
-    if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;   // this chat is muted on Telegram
-    if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return; // group/channel notifications off
+    if (!notifications()) return;                 // the master switch silences everything, Pigler too
+
     QString who = m_session->peers().title(m.peer);
     if (m.peer.isGroup()) who = m_session->peers().userName(m.fromId) + QLatin1String(" @ ") + who;
     QString text = m.text.isEmpty() ? m.note : m.text;
-    m_notifier->notify(who, text);
-    m_notifier->setPendingCount(m_notifier->pendingCount() + 1);
-    m_pigler->showMessage(m.peer.key(), who, text);   // persistent status-bar entry on Belle (no-op otherwise)
+
+    // Pigler (Belle status-bar envelope) fires for EVERY incoming message while backgrounded, by
+    // request: it deliberately ignores the per-chat Telegram mute, the Archive and the group
+    // toggle. No-op when Pigler isn't installed. (Cleared when the app comes to the foreground.)
+    m_pigler->showMessage(m.peer.key(), who, text);
+
+    // The pop-up / "new messages" query / vibration still respect the fine-grained silencers: a
+    // per-chat mute (from Telegram's notify settings), the Archive, and the groups/channels toggle.
+    if (m_session->isArchived(m.peer)) return;
+    TgDialog d = m_session->dialog(m.peer);
+    if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;
+    if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return;
+    // Pop-up frequency: 0 = never, 1 = only the first unread (count was 0), 2 = every message.
+    const int mode = popupMode();
+    const bool firstUnread = m_notifier->pendingCount() == 0;
+    const bool popNow = mode == 2 || (mode == 1 && firstUnread);
+    m_notifier->notify(who, text, popNow);
+    m_notifier->setPendingCount(m_notifier->pendingCount() + 1, popNow);
 }
 
 // -- actions ---------------------------------------------------------------------------------------------
@@ -766,7 +789,7 @@ void AppController::onSecretRequested(int id, qint64 adminId)
     setNotice(who.isEmpty() ? tr("Someone wants to start a secret chat.")
                             : tr("%1 wants to start a secret chat.").arg(who));
     if (!appInForeground() && notifications())
-        m_notifier->notify(tr("Secret chat"), tr("%1 wants to start a secret chat").arg(who));
+        m_notifier->notify(tr("Secret chat"), tr("%1 wants to start a secret chat").arg(who), popupMode() != 0);
 }
 
 void AppController::onSecretReady(int id)
@@ -786,7 +809,7 @@ void AppController::onSecretMessage(int id, qint64 randomId, const QString &text
     if (!notifications()) return;               // global switch (secret chats are never archived/muted in v1)
     TgSecretChat sc = m_session->secretChat(id);
     QString who = m_session->peers().userName(sc.peerUserId);
-    m_notifier->notify(who.isEmpty() ? tr("Secret chat") : who, text.isEmpty() ? tr("Encrypted message") : text);
+    m_notifier->notify(who.isEmpty() ? tr("Secret chat") : who, text.isEmpty() ? tr("Encrypted message") : text, popupMode() != 0);
     m_notifier->setPendingCount(m_notifier->pendingCount() + 1);
 }
 

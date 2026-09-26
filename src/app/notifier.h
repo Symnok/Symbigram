@@ -23,22 +23,23 @@ public:
     /// no envelope (the unread badges in the list are not affected).
     void setEnabled(bool on);
     void setVibrate(bool on) { m_vibrate = on; }
-    void setPopups(bool on) { m_popups = on; }
 
-    /// Shows the popup (title = who, text = what) and vibrates, according to the settings.
-    void notify(const QString &title, const QString &text);
+    /// Optionally shows the discreet popup (title = who, text = what) and always vibrates per the
+    /// vibrate setting. The caller decides whether the popup shows (Off / first / every message).
+    void notify(const QString &title, const QString &text, bool showPopup);
     /// Just the vibration, e.g. for an authorization request.
     void vibrate(int ms = 400);
-    /// "N new messages" query with a "Show" softkey that raises the app (a global query,
-    /// answered in this process), plus the status-bar envelope while count > 0.
-    void setPendingCount(int count);
+    /// Tracks the unread count and lights the status-bar envelope. popQuery also raises the
+    /// "N new messages" query (a global query with a "Show" softkey that brings the app forward);
+    /// pass it true only when a popup should fire for this message.
+    void setPendingCount(int count, bool popQuery = false);
     int pendingCount() const { return m_pending; }
 
 private:
     void showPending();
     bool m_enabled;
     bool m_vibrate;
-    bool m_popups;
+    bool m_popQuery;   // whether the next showPending() should raise the query
     int m_pending;
     static QString pendingText(int count);
 

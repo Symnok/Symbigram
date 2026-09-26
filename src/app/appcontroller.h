@@ -50,7 +50,7 @@ class AppController : public QObject
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY settingsChanged)
     Q_PROPERTY(bool notifications READ notifications WRITE setNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool vibrate READ vibrate WRITE setVibrate NOTIFY settingsChanged)
-    Q_PROPERTY(bool popups READ popups WRITE setPopups NOTIFY settingsChanged)
+    Q_PROPERTY(int popupMode READ popupMode WRITE setPopupMode NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
     Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
@@ -103,8 +103,9 @@ public:
     void setNotifications(bool on);
     bool vibrate() const;
     void setVibrate(bool on);
-    bool popups() const;
-    void setPopups(bool on);
+    int popupMode() const;          // 0 = off, 1 = first message only, 2 = every message
+    void setPopupMode(int mode);
+    Q_INVOKABLE QStringList popupModeNames() const;
     bool groupNotifications() const;
     void setGroupNotifications(bool on);
     bool autoConnect() const;

@@ -116,7 +116,7 @@ namespace
 #endif
 
 Notifier::Notifier(QObject *parent)
-    : QObject(parent), m_enabled(true), m_vibrate(true), m_popups(true), m_pending(0), m_query(0)
+    : QObject(parent), m_enabled(true), m_vibrate(true), m_popQuery(false), m_pending(0), m_query(0)
 {
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = 0;
@@ -137,14 +137,15 @@ void Notifier::setEnabled(bool on)
 {
     if (m_enabled == on) return;
     m_enabled = on;
-    showPending();   // takes the query and the envelope down, or brings them back
+    m_popQuery = false;   // a state change is not a new message; don't pop the query
+    showPending();        // takes the query and the envelope down, or brings the envelope back
 }
 
-void Notifier::notify(const QString &title, const QString &text)
+void Notifier::notify(const QString &title, const QString &text, bool showPopup)
 {
     if (!m_enabled) return;
 #ifdef Q_OS_SYMBIAN
-    if (m_popups) {
+    if (showPopup) {
         QString t = title;
         QString b = text.simplified();
         if (b.size() > 120) b = b.left(117) + QLatin1String("...");
@@ -152,7 +153,7 @@ void Notifier::notify(const QString &title, const QString &text)
     }
     if (m_vibrate) TRAP_IGNORE(vibrateL(400));
 #else
-    qDebug() << "NOTIFY" << title << ":" << text << (m_popups ? "" : "(popups off)") << (m_vibrate ? "" : "(vibrate off)");
+    qDebug() << "NOTIFY" << title << ":" << text << (showPopup ? "" : "(popup off)") << (m_vibrate ? "" : "(vibrate off)");
 #endif
 }
 
@@ -171,10 +172,11 @@ QString Notifier::pendingText(int count)
     return count == 1 ? tr("Symbigram: new message") : tr("Symbigram: %1 new messages").arg(count);
 }
 
-void Notifier::setPendingCount(int count)
+void Notifier::setPendingCount(int count, bool popQuery)
 {
     if (count < 0) count = 0;
-    if (count == m_pending) return;
+    m_popQuery = popQuery;
+    if (count == m_pending && !popQuery) return;
     m_pending = count;
     showPending();
 }
@@ -185,16 +187,21 @@ void Notifier::showPending()
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = static_cast<PendingQuery *>(m_query);
     if (q) {
-        if (count > 0) {
+        // The "N new messages" query is a pop-up: it is raised only when a popup should fire for
+        // this message (m_popQuery). Otherwise leave whatever is showing, and take it down only
+        // when nothing is pending. The passive envelope (and Pigler) are independent of all this.
+        if (count > 0 && m_popQuery) {
             TRAPD(err, q->ShowL(pendingText(count)));
             if (err != KErrNone) qWarning() << "notification query failed:" << err;
-        } else {
+        } else if (count <= 0) {
             q->Cancel();
         }
     }
     TRAPD(err, setEnvelopeL(count > 0));
     if (err != KErrNone) qWarning() << "envelope indicator failed:" << err;
+    m_popQuery = false;
 #else
-    qDebug() << "NOTIFICATION" << pendingText(count);
+    qDebug() << "NOTIFICATION" << pendingText(count) << (m_popQuery ? "(query)" : "");
+    m_popQuery = false;
 #endif
 }

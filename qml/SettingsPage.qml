@@ -20,6 +20,13 @@ Page {
     }
 
     SelectionDialog {
+        id: popupModeDialog
+        titleText: qsTr("Popup for new messages")
+        model: app.popupModeNames()
+        onAccepted: if (selectedIndex >= 0) app.popupMode = selectedIndex
+    }
+
+    SelectionDialog {
         id: languageDialog
         titleText: qsTr("App language")
         model: ListModel {
@@ -141,21 +148,21 @@ Page {
             }
             ListItem {
                 id: popupsItem
+                subItemIndicator: true
                 enabled: app.notifications
                 opacity: enabled ? 1 : 0.4
-                ListItemText {
-                    anchors { left: popupsItem.paddingItem.left; right: popupsSwitch.left; verticalCenter: parent.verticalCenter }
-                    role: "Title"
-                    text: qsTr("Popup for new messages")
-                    wrapMode: Text.Wrap
+                Column {
+                    anchors { left: popupsItem.paddingItem.left; right: popupsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Popup for new messages") }
+                    Label {
+                        width: parent.width
+                        text: app.popupModeNames()[app.popupMode]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
                 }
-                Switch {
-                    id: popupsSwitch
-                    anchors { right: popupsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    checked: app.popups
-                    onCheckedChanged: if (checked != app.popups) app.popups = checked
-                }
-                onClicked: popupsSwitch.checked = !popupsSwitch.checked
+                onClicked: { popupModeDialog.selectedIndex = app.popupMode; popupModeDialog.open() }
             }
             ListItem {
                 id: vibrateItem

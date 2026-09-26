@@ -50,7 +50,7 @@ void PiglerNotifier::showMessage(const QString &peerKey, const QString &title, c
 {
 #ifdef Q_OS_SYMBIAN
     if (!m_available || !m_api) return;
-    if (m_ids.contains(peerKey)) {                 // one entry per chat: update it
+    if (m_ids.contains(peerKey)) {                 // one entry per chat: update it in place
         m_api->updateNotification(m_ids.value(peerKey), title, text);
         return;
     }

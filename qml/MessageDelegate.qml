@@ -110,6 +110,7 @@ Item {
                     font.pixelSize: platformStyle.fontSizeSmall
                     color: "#8fd1ff"
                     width: parent.width
+                    horizontalAlignment: Text.AlignLeft
                     elide: Text.ElideRight
                 }
                 Label {
@@ -120,6 +121,7 @@ Item {
                     font.pixelSize: platformStyle.fontSizeSmall
                     color: "#b8d8f0"
                     width: parent.width
+                    horizontalAlignment: Text.AlignLeft
                     elide: Text.ElideRight
                 }
                 Label {
@@ -129,6 +131,7 @@ Item {
                     font.pixelSize: platformStyle.fontSizeSmall
                     color: "#b8d8f0"
                     width: parent.width
+                    horizontalAlignment: Text.AlignLeft
                     elide: Text.ElideRight
                 }
 
@@ -235,6 +238,11 @@ Item {
                     text: root.linkify(model.body)
                     visible: model.body != ""
                     wrapMode: Text.Wrap
+                    // The label spans the max bubble width while the bubble shrinks to the painted
+                    // text; Qt would auto-align RTL (Persian/Arabic/Hebrew) text to the far right of
+                    // that full width - outside the shrunken bubble, so it looks empty. Pin it left
+                    // so short RTL text stays inside the bubble (LTR is unchanged).
+                    horizontalAlignment: Text.AlignLeft
                     color: "white"
                     textFormat: Text.StyledText
                     onLinkActivated: Qt.openUrlExternally(link)
@@ -252,6 +260,7 @@ Item {
                     width: parent.width
                     visible: model.body == "" && !isPhoto && !hasFileRow && model.note != ""
                     text: "[" + model.note + "]"
+                    horizontalAlignment: Text.AlignLeft
                     wrapMode: Text.Wrap
                     font.italic: true
                     color: "#d0d0d0"
