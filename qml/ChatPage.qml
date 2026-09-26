@@ -371,7 +371,7 @@ Page {
             id: cancelReply
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: 56
-            text: "✕"    // ✕
+            text: "X"    // ✕
             onClicked: { if (chat.editing) { chat.cancelEdit(); composer.text = "" } else chat.cancelReply() }
         }
     }
