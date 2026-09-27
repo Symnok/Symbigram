@@ -39,8 +39,10 @@ namespace
 {
     const char *const KeyAutoConnect = "account/autoConnect";
     const char *const KeyLanguage = "ui/language";
-    const char *const KeyAlertMode = "ui/alertMode";   // 0 off, 1 sound, 2 vibration, 3 both
-    const char *const KeyPopupMode = "ui/popupMode";   // 0 off, 1 first message, 2 every message
+    // Three alert channels, each 0 off / 1 first message only / 2 every message.
+    const char *const KeyPopupMode = "ui/popupMode";
+    const char *const KeySoundMode = "ui/soundMode";
+    const char *const KeyVibrationMode = "ui/vibrationMode";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
@@ -95,9 +97,6 @@ AppController::AppController(QObject *parent)
     connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
     connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
     m_notifier = new Notifier(this);
-    m_notifier->setEnabled(alertMode() != 0);
-    m_notifier->setSound(alertMode() & 1);
-    m_notifier->setVibrate(alertMode() & 2);
 
     // Optional status-bar ("envelope") notifications on Belle via Pigler. init() quietly fails
     // (and everything stays as-is) when Pigler is not installed, or on S^3/Anna.
@@ -259,25 +258,21 @@ int AppController::qrExpires() const { return m_session->qrExpires(); }
 bool AppController::passwordNeeded() const { return m_session->passwordNeeded(); }
 QString AppController::passwordHint() const { return m_session->passwordHint(); }
 QString AppController::version() const { return QLatin1String(SGM_STR(APP_VERSION)); }
-int AppController::alertMode() const
+static int clampMode(int m) { return (m < 0 || m > 2) ? 1 : m; }
+
+int AppController::soundMode() const { return clampMode(m_settings.value(QLatin1String(KeySoundMode), 1).toInt()); }
+void AppController::setSoundMode(int mode)
 {
-    int m = m_settings.value(QLatin1String(KeyAlertMode), 3).toInt();   // default: sound + vibration
-    return (m < 0 || m > 3) ? 3 : m;
-}
-void AppController::setAlertMode(int mode)
-{
-    if (mode < 0 || mode > 3 || mode == alertMode()) return;
-    m_settings.setValue(QLatin1String(KeyAlertMode), mode);
-    m_notifier->setEnabled(mode != 0);
-    m_notifier->setSound(mode & 1);
-    m_notifier->setVibrate(mode & 2);
+    if (mode < 0 || mode > 2 || mode == soundMode()) return;
+    m_settings.setValue(QLatin1String(KeySoundMode), mode);
     emit settingsChanged();
 }
-QStringList AppController::alertModeNames() const
+int AppController::vibrationMode() const { return clampMode(m_settings.value(QLatin1String(KeyVibrationMode), 1).toInt()); }
+void AppController::setVibrationMode(int mode)
 {
-    QStringList names;
-    names << tr("Off") << tr("Sound") << tr("Vibration") << tr("Sound and vibration");
-    return names;
+    if (mode < 0 || mode > 2 || mode == vibrationMode()) return;
+    m_settings.setValue(QLatin1String(KeyVibrationMode), mode);
+    emit settingsChanged();
 }
 int AppController::popupMode() const
 {
@@ -682,12 +677,13 @@ void AppController::onMessage(const TgMessage &m)
     TgDialog d = m_session->dialog(m.peer);
     if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;
     if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return;
-    // Pop-up frequency: 0 = never, 1 = only the first unread (count was 0), 2 = every message.
-    const int mode = popupMode();
-    const bool firstUnread = m_notifier->pendingCount() == 0;
-    const bool popNow = mode == 2 || (mode == 1 && firstUnread);
-    m_notifier->notify(who, text, popNow);
-    m_notifier->setPendingCount(m_notifier->pendingCount() + 1, popNow);
+    // Each channel: 0 = never, 1 = only the first unread of a burst (count was 0), 2 = every message.
+    const bool first = m_notifier->pendingCount() == 0;
+    const bool showPopup = popupMode() == 2 || (popupMode() == 1 && first);
+    const bool playSound = soundMode() == 2 || (soundMode() == 1 && first);
+    const bool vibrate = vibrationMode() == 2 || (vibrationMode() == 1 && first);
+    m_notifier->alert(who, text, showPopup, playSound, vibrate);
+    m_notifier->setPendingCount(m_notifier->pendingCount() + 1, showPopup);
 }
 
 // -- actions ---------------------------------------------------------------------------------------------
@@ -805,7 +801,8 @@ void AppController::onSecretRequested(int id, qint64 adminId)
     setNotice(who.isEmpty() ? tr("Someone wants to start a secret chat.")
                             : tr("%1 wants to start a secret chat.").arg(who));
     if (!appInForeground() && notifications())
-        m_notifier->notify(tr("Secret chat"), tr("%1 wants to start a secret chat").arg(who), popupMode() != 0);
+        m_notifier->alert(tr("Secret chat"), tr("%1 wants to start a secret chat").arg(who),
+                          popupMode() != 0, soundMode() != 0, vibrationMode() != 0);
 }
 
 void AppController::onSecretReady(int id)
@@ -825,7 +822,8 @@ void AppController::onSecretMessage(int id, qint64 randomId, const QString &text
     if (!notifications()) return;               // global switch (secret chats are never archived/muted in v1)
     TgSecretChat sc = m_session->secretChat(id);
     QString who = m_session->peers().userName(sc.peerUserId);
-    m_notifier->notify(who.isEmpty() ? tr("Secret chat") : who, text.isEmpty() ? tr("Encrypted message") : text, popupMode() != 0);
+    m_notifier->alert(who.isEmpty() ? tr("Secret chat") : who, text.isEmpty() ? tr("Encrypted message") : text,
+                      popupMode() != 0, soundMode() != 0, vibrationMode() != 0);
     m_notifier->setPendingCount(m_notifier->pendingCount() + 1);
 }
 

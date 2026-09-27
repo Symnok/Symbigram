@@ -5,6 +5,7 @@
         <file>qml/ChatsPage.qml</file>
         <file>qml/LoginPage.qml</file>
         <file>qml/MessageDelegate.qml</file>
+        <file>qml/NotificationsPage.qml</file>
         <file>qml/SettingsPage.qml</file>
         <file>qml/main.qml</file>
         <file>images/logo.png</file>

@@ -20,20 +20,6 @@ Page {
     }
 
     SelectionDialog {
-        id: alertModeDialog
-        titleText: qsTr("Notification")
-        model: app.alertModeNames()
-        onAccepted: if (selectedIndex >= 0) app.alertMode = selectedIndex
-    }
-
-    SelectionDialog {
-        id: popupModeDialog
-        titleText: qsTr("Popup for new messages")
-        model: app.popupModeNames()
-        onAccepted: if (selectedIndex >= 0) app.popupMode = selectedIndex
-    }
-
-    SelectionDialog {
         id: languageDialog
         titleText: qsTr("App language")
         model: ListModel {
@@ -138,56 +124,25 @@ Page {
             width: parent.width
 
             ListItem {
-                id: notifyItem
+                id: notificationsItem
                 subItemIndicator: true
                 Column {
-                    anchors { left: notifyItem.paddingItem.left; right: notifyItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Notification") }
+                    anchors { left: notificationsItem.paddingItem.left; right: notificationsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Notifications") }
                     Label {
                         width: parent.width
-                        text: app.alertModeNames()[app.alertMode]
+                        text: (app.popupMode || app.soundMode || app.vibrationMode)
+                              ? qsTr("Popup: %1, Sound: %2, Vibration: %3")
+                                  .arg(app.popupModeNames()[app.popupMode])
+                                  .arg(app.popupModeNames()[app.soundMode])
+                                  .arg(app.popupModeNames()[app.vibrationMode])
+                              : qsTr("Off")
                         color: "white"
                         font.pixelSize: platformStyle.fontSizeSmall
                         elide: Text.ElideRight
                     }
                 }
-                onClicked: { alertModeDialog.selectedIndex = app.alertMode; alertModeDialog.open() }
-            }
-            ListItem {
-                id: popupsItem
-                subItemIndicator: true
-                enabled: app.alertMode != 0
-                opacity: enabled ? 1 : 0.4
-                Column {
-                    anchors { left: popupsItem.paddingItem.left; right: popupsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Popup for new messages") }
-                    Label {
-                        width: parent.width
-                        text: app.popupModeNames()[app.popupMode]
-                        color: "white"
-                        font.pixelSize: platformStyle.fontSizeSmall
-                        elide: Text.ElideRight
-                    }
-                }
-                onClicked: { popupModeDialog.selectedIndex = app.popupMode; popupModeDialog.open() }
-            }
-            ListItem {
-                id: groupsItem
-                enabled: app.alertMode != 0
-                opacity: enabled ? 1 : 0.4
-                ListItemText {
-                    anchors { left: groupsItem.paddingItem.left; right: groupsSwitch.left; verticalCenter: parent.verticalCenter }
-                    role: "Title"
-                    text: qsTr("Groups and channels")
-                    wrapMode: Text.Wrap
-                }
-                Switch {
-                    id: groupsSwitch
-                    anchors { right: groupsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    checked: app.groupNotifications
-                    onCheckedChanged: if (checked != app.groupNotifications) app.groupNotifications = checked
-                }
-                onClicked: groupsSwitch.checked = !groupsSwitch.checked
+                onClicked: pageStack.push(notificationsPage)
             }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge
@@ -195,7 +150,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("For messages that arrive while another application is in front: the \"new messages\" dialog, the popup and the vibration. Chats muted in Telegram stay quiet. Symbigram stays connected in the background either way.")
+                text: qsTr("Popup, sound and vibration for messages that arrive while another application is in front.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

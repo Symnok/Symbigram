@@ -48,8 +48,9 @@ class AppController : public QObject
     Q_PROPERTY(bool codeBusy READ codeBusy NOTIFY loginChanged)
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY settingsChanged)
-    Q_PROPERTY(int alertMode READ alertMode WRITE setAlertMode NOTIFY settingsChanged)
     Q_PROPERTY(int popupMode READ popupMode WRITE setPopupMode NOTIFY settingsChanged)
+    Q_PROPERTY(int soundMode READ soundMode WRITE setSoundMode NOTIFY settingsChanged)
+    Q_PROPERTY(int vibrationMode READ vibrationMode WRITE setVibrationMode NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
     Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
@@ -98,13 +99,16 @@ public:
     QString version() const;
     QString language() const;
     void setLanguage(const QString &lang);
-    int alertMode() const;          // 0 = off, 1 = sound, 2 = vibration, 3 = sound + vibration
-    void setAlertMode(int mode);
-    Q_INVOKABLE QStringList alertModeNames() const;
-    bool notifications() const { return alertMode() != 0; }   // the master switch (any alert on)
-    int popupMode() const;          // 0 = off, 1 = first message only, 2 = every message
+    // Three independent alert channels, each Off (0) / First message only (1) / Every message (2).
+    int popupMode() const;
     void setPopupMode(int mode);
-    Q_INVOKABLE QStringList popupModeNames() const;
+    int soundMode() const;
+    void setSoundMode(int mode);
+    int vibrationMode() const;
+    void setVibrationMode(int mode);
+    Q_INVOKABLE QStringList popupModeNames() const;   // shared Off/First/Every labels for all three
+    // Any alert channel on (used to gate the intrusive alerts; Pigler fires regardless).
+    bool notifications() const { return popupMode() || soundMode() || vibrationMode(); }
     bool groupNotifications() const;
     void setGroupNotifications(bool on);
     bool autoConnect() const;

@@ -41,6 +41,7 @@ PageStackWindow {
     Component { id: chatsPage; ChatsPage {} }
     Component { id: chatPage; ChatPage {} }
     Component { id: settingsPage; SettingsPage {} }
+    Component { id: notificationsPage; NotificationsPage {} }
     Component { id: aboutPage; AboutPage {} }
 
     function route() {

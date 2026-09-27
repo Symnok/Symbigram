@@ -19,15 +19,10 @@ public:
     explicit Notifier(QObject *parent = 0);
     ~Notifier();
 
-    /// The master switch: off means no popup, no vibration, no "new messages" query and
-    /// no envelope (the unread badges in the list are not affected).
-    void setEnabled(bool on);
-    void setVibrate(bool on) { m_vibrate = on; }
-    void setSound(bool on) { m_sound = on; }   // whether the popup plays its alert tone
-
-    /// Optionally shows the discreet popup (title = who, text = what) and always vibrates per the
-    /// vibrate setting. The caller decides whether the popup shows (Off / first / every message).
-    void notify(const QString &title, const QString &text, bool showPopup);
+    /// Fires the enabled alert channels for one message: the discreet popup (title = who, text =
+    /// what) if showPopup, the alert tone if playSound, and the vibration if vibrate. The three are
+    /// independent; the caller decides each from its own Off/First/Every setting.
+    void alert(const QString &title, const QString &text, bool showPopup, bool playSound, bool vibrate);
     /// Just the vibration, e.g. for an authorization request.
     void vibrate(int ms = 400);
     /// Tracks the unread count and lights the status-bar envelope. popQuery also raises the
@@ -38,9 +33,6 @@ public:
 
 private:
     void showPending();
-    bool m_enabled;
-    bool m_vibrate;
-    bool m_sound;      // whether the discreet popup includes its confirmation tone
     bool m_popQuery;   // whether the next showPending() should raise the query
     int m_pending;
     static QString pendingText(int count);

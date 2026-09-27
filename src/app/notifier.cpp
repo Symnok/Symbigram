@@ -119,8 +119,7 @@ namespace
 #endif
 
 Notifier::Notifier(QObject *parent)
-    : QObject(parent), m_enabled(true), m_vibrate(true), m_sound(true), m_popQuery(false),
-      m_pending(0), m_query(0), m_vibra(0)
+    : QObject(parent), m_popQuery(false), m_pending(0), m_query(0), m_vibra(0)
 {
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = 0;
@@ -138,36 +137,27 @@ Notifier::~Notifier()
 #endif
 }
 
-void Notifier::setEnabled(bool on)
+void Notifier::alert(const QString &title, const QString &text, bool showPopup, bool playSound, bool vibrate)
 {
-    if (m_enabled == on) return;
-    m_enabled = on;
-    m_popQuery = false;   // a state change is not a new message; don't pop the query
-    showPending();        // takes the query and the envelope down, or brings the envelope back
-}
-
-void Notifier::notify(const QString &title, const QString &text, bool showPopup)
-{
-    if (!m_enabled) return;
 #ifdef Q_OS_SYMBIAN
     if (showPopup) {
         QString t = title;
         QString b = text.simplified();
         if (b.size() > 120) b = b.left(117) + QLatin1String("...");
-        TRAP_IGNORE(showPopupL(t, b, m_sound));
+        // The popup carries the alert tone, so the tone plays iff Sound fires AND a popup shows.
+        TRAP_IGNORE(showPopupL(t, b, playSound));
     }
-    if (m_vibrate) TRAP_IGNORE(vibrateL(m_vibra, 400));
+    if (vibrate) TRAP_IGNORE(vibrateL(m_vibra, 400));
 #else
-    qDebug() << "NOTIFY" << title << ":" << text << (showPopup ? "" : "(popup off)")
-             << (m_sound ? "(sound)" : "") << (m_vibrate ? "(vibrate)" : "");
+    qDebug() << "ALERT" << title << ":" << text << (showPopup ? "(popup)" : "")
+             << (playSound ? "(sound)" : "") << (vibrate ? "(vibrate)" : "");
 #endif
 }
 
 void Notifier::vibrate(int ms)
 {
-    if (!m_enabled) return;
 #ifdef Q_OS_SYMBIAN
-    if (m_vibrate) TRAP_IGNORE(vibrateL(m_vibra, ms));
+    TRAP_IGNORE(vibrateL(m_vibra, ms));
 #else
     qDebug() << "VIBRATE" << ms;
 #endif
@@ -189,7 +179,7 @@ void Notifier::setPendingCount(int count, bool popQuery)
 
 void Notifier::showPending()
 {
-    int count = m_enabled ? m_pending : 0;
+    int count = m_pending;
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = static_cast<PendingQuery *>(m_query);
     if (q) {
