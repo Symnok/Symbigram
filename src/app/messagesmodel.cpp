@@ -27,7 +27,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
-      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0)
+      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0), m_topicId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -599,6 +599,7 @@ int MessagesModel::rowByRandomId(qint64 randomId) const
 
 QString MessagesModel::title() const
 {
+    if (m_topicId) return m_topicTitle;
     return m_peer.isNull() ? QString() : m_session->peers().title(m_peer);
 }
 
@@ -655,6 +656,8 @@ QString MessagesModel::subtitle() const
         return tr("end-to-end encrypted");
     }
     if (m_peer.isNull()) return QString();
+    // In a forum topic the header title is the topic; the subtitle names the group it lives in.
+    if (m_topicId && !m_peerTypingTimer->isActive()) return m_session->peers().title(m_peer);
     if (m_peerTypingTimer->isActive()) {
         if (m_peer.isGroup()) return tr("%1 is typing...").arg(m_session->peers().userName(m_peerTypingUser));
         return tr("typing...");
@@ -690,10 +693,12 @@ void MessagesModel::open(const QString &peerKey)
 {
     if (peerKey.startsWith(QLatin1String("secret:"))) { openSecret(peerKey.mid(7).toInt()); return; }
     TgPeer p = TgPeer::fromKey(peerKey);
-    if (p == m_peer && m_secretId == 0 && !m_rows.isEmpty()) return;
+    if (p == m_peer && m_secretId == 0 && m_topicId == 0 && !m_rows.isEmpty()) return;
     close();
     beginResetModel();
     m_peer = m_session->peers().withHash(p);
+    m_topicId = 0;
+    m_topicTitle.clear();
     m_rows.clear();
     TgDialog od = m_session->dialog(m_peer);
     m_readOutboxMaxId = od.readOutboxMaxId;
@@ -710,6 +715,30 @@ void MessagesModel::open(const QString &peerKey)
     m_session->loadHistory(m_peer, 0, HistoryPage);
 }
 
+void MessagesModel::openTopic(const QString &peerKey, int topicId, const QString &topicTitle)
+{
+    close();
+    TgPeer p = TgPeer::fromKey(peerKey);
+    beginResetModel();
+    m_peer = m_session->peers().withHash(p);
+    m_secretId = 0;
+    m_topicId = topicId;
+    m_topicTitle = topicTitle;
+    m_rows.clear();
+    m_readOutboxMaxId = m_session->dialog(m_peer).readOutboxMaxId;
+    m_openInboxMax = 0;                // per-topic unread isn't tracked in this first version
+    m_openUnread = 0;
+    endResetModel();
+    m_error.clear();
+    m_loading = true;
+    m_hasOlder = false;
+    emit chatChanged();
+    emit peerChanged();
+    emit countChanged();
+    emit loadingChanged();
+    m_session->loadTopicHistory(m_peer, topicId, 0, HistoryPage);
+}
+
 void MessagesModel::openSecret(int id)
 {
     if (m_secretId == id && !m_rows.isEmpty()) return;
@@ -717,6 +746,7 @@ void MessagesModel::openSecret(int id)
     TgSecretChat sc = m_session->secretChat(id);
     beginResetModel();
     m_secretId = id;
+    m_topicId = 0;
     // Borrow the peer for the header (name, avatar, presence).
     TgPeer u; u.kind = TgPeer::User; u.id = sc.peerUserId;
     m_peer = m_session->peers().withHash(u);
@@ -777,7 +807,8 @@ void MessagesModel::loadOlder()
     if (!oldest) return;
     m_loading = true;
     emit loadingChanged();
-    m_session->loadHistory(m_peer, oldest, HistoryPage);
+    if (m_topicId) m_session->loadTopicHistory(m_peer, m_topicId, oldest, HistoryPage);
+    else m_session->loadHistory(m_peer, oldest, HistoryPage);
 }
 
 void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more)
@@ -828,7 +859,7 @@ void MessagesModel::onHistoryFailed(const TgPeer &peer, const QString &error)
 
 void MessagesModel::markRead()
 {
-    if (m_peer.isNull() || m_secretId) return;
+    if (m_peer.isNull() || m_secretId || m_topicId) return;   // topic read-marking uses a separate API (later)
     int maxId = 0;
     for (int i = m_rows.size() - 1; i >= 0; --i)
         if (m_rows.at(i).m.id > 0) { maxId = m_rows.at(i).m.id; break; }
@@ -841,6 +872,12 @@ void MessagesModel::markRead()
 void MessagesModel::onMessageReceived(const TgMessage &m)
 {
     if (m.peer != m_peer) return;
+    // In a forum topic, only show messages that belong to it. The "General" topic (id 1) also
+    // catches messages that carry no topic marker at all.
+    if (m_topicId) {
+        const bool inTopic = m.topicId == m_topicId || (m_topicId == 1 && m.topicId == 0);
+        if (!inTopic) return;
+    }
     if (rowById(m.id) >= 0) return;
     // Our own send echoed back through updates while its result is pending: tie it to
     // the pending row by text rather than showing it twice.
@@ -994,7 +1031,7 @@ void MessagesModel::sendRow(int row)
         emit sendFailed(tr("Not connected."));
         return;
     }
-    m_rows[row].randomId = m_session->sendText(m_peer, m_rows.at(row).m.text, m_rows.at(row).m.replyToId);
+    m_rows[row].randomId = m_session->sendText(m_peer, m_rows.at(row).m.text, m_rows.at(row).m.replyToId, m_topicId);
     m_rows[row].pending = true;
     m_rows[row].failed = false;
     emit dataChanged(index(row), index(row));

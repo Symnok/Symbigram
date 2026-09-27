@@ -33,7 +33,7 @@ struct TgPeer
 /// A user or a chat, as far as the responses have said so far.
 struct TgPeerInfo
 {
-    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false), photoId(0), photoDcId(0) {}
+    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false), isForum(false), photoId(0), photoDcId(0) {}
     TgPeer peer;
     QString title;         // display name or chat title
     QString firstName, lastName, username, phone;
@@ -43,8 +43,25 @@ struct TgPeerInfo
     int statusKind;        // 0 unknown, 1 online, 2 offline with lastSeen, 3 recently, 4 last week, 5 last month, 6 long ago
     int membersCount;
     bool isBroadcast;      // a channel (not a megagroup)
+    bool isForum;          // a supergroup organised into topics (forum)
     qint64 photoId;        // profile / chat picture, 0 when none
     int photoDcId;
+};
+
+/// A topic (thread) in a forum supergroup. id is the topic's root message id (the "General"
+/// topic is always id 1).
+struct TgForumTopic
+{
+    TgForumTopic() : id(0), iconColor(0), topMessage(0), unreadCount(0), closed(false), pinned(false), hidden(false), iconEmojiId(0) {}
+    int id;
+    QString title;
+    int iconColor;         // RGB int for the default (letter) icon
+    int topMessage;        // id of the latest message in the topic
+    int unreadCount;
+    bool closed;
+    bool pinned;
+    bool hidden;
+    qint64 iconEmojiId;    // custom-emoji icon (not rendered here), 0 = none
 };
 
 /// An attachment: what is needed to fetch it, plus what a text client shows about it.
@@ -72,7 +89,7 @@ struct TgMedia
 /// One message, reduced to what a text-only client displays.
 struct TgMessage
 {
-    TgMessage() : id(0), date(0), out(false), fromId(0), replyToId(0), viaBot(false), service(false), mentioned(false), editDate(0) {}
+    TgMessage() : id(0), date(0), out(false), fromId(0), replyToId(0), topicId(0), viaBot(false), service(false), mentioned(false), editDate(0) {}
     int id;
     int date;
     bool out;
@@ -81,6 +98,7 @@ struct TgMessage
     QString text;
     QString note;          // "photo", "sticker", "forwarded" - set when not plain text
     int replyToId;
+    int topicId;           // forum topic this message belongs to (0 = none / not a forum)
     bool viaBot;
     bool service;          // a service message: the note is the whole story
     bool mentioned;

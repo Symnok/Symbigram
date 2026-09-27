@@ -124,6 +124,9 @@ namespace Tl
     const quint32 DialogFolder = 0x71bd134c;
     const quint32 PeerNotifySettings = 0x99622c0c;
     const quint32 MessagesGetHistory = 0x4423e6c5;
+    const quint32 MessagesGetForumTopics = 0x3ba47bff;   // forum (topics) supergroups
+    const quint32 MessagesGetReplies = 0x22ddd30c;        // a forum topic's messages (thread)
+    const quint32 ForumTopic = 0xfcdad815;                // a topic in messages.forumTopics
     const quint32 MessagesMessages = 0x1d73e7ea;
     const quint32 MessagesMessagesSlice = 0x5f206716;
     const quint32 MessagesChannelMessages = 0xc776ba4e;

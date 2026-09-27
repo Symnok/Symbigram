@@ -130,6 +130,7 @@ void TgPeerCache::absorbChat(const TlObject &c)
     info.username = c.str("username");
     info.membersCount = c.intOr("participants_count", info.membersCount);
     info.isBroadcast = channel && c.flag("flags", 5) && !c.flag("flags", 8);
+    info.isForum = channel && c.flag("flags", 30);   // organised into topics
     if (c.has("photo")) {
         TlObject photo = c.obj("photo");
         info.photoId = photo.ctor() == Tl::ChatPhoto ? photo.longOr("photo_id") : 0;
@@ -291,13 +292,60 @@ QByteArray TgApi::getHistory(const TgPeer &peer, int offsetId, int limit)
     return w.toByteArray();
 }
 
-QByteArray TgApi::sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId)
+QByteArray TgApi::sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId, int topMsgId)
 {
     TlWriter w(text.size() * 3 + 64);
-    w.writeConstructor(Tl::MessagesSendMessage).writeInt(replyToId ? 1 : 0).writeRaw(inputPeer(peer));
-    if (replyToId) w.writeConstructor(Tl::InputReplyToMessage).writeInt(0).writeInt(replyToId);
+    const bool hasReply = replyToId || topMsgId;
+    w.writeConstructor(Tl::MessagesSendMessage).writeInt(hasReply ? 1 : 0).writeRaw(inputPeer(peer));
+    if (hasReply) {
+        // inputReplyToMessage: reply_to_msg_id is always written; top_msg_id (flags.0) places the
+        // message in a forum topic. Posting to a topic with no specific reply targets the topic root.
+        const int replyMsg = replyToId ? replyToId : topMsgId;
+        w.writeConstructor(Tl::InputReplyToMessage).writeInt(topMsgId ? 1 : 0).writeInt(replyMsg);
+        if (topMsgId) w.writeInt(topMsgId);
+    }
     w.writeString(text).writeLong(randomId);
     return w.toByteArray();
+}
+
+QByteArray TgApi::getForumTopics(const TgPeer &peer, int offsetDate, int offsetId, int offsetTopic, int limit)
+{
+    // messages.getForumTopics#3ba47bff flags=# peer q:flags.0?string offset_date offset_id offset_topic limit
+    TlWriter w(64);
+    w.writeConstructor(Tl::MessagesGetForumTopics).writeInt(0).writeRaw(inputPeer(peer))
+     .writeInt(offsetDate).writeInt(offsetId).writeInt(offsetTopic).writeInt(limit);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::getReplies(const TgPeer &peer, int topicId, int offsetId, int limit)
+{
+    // messages.getReplies#22ddd30c peer msg_id offset_id offset_date add_offset limit max_id min_id hash
+    TlWriter w(64);
+    w.writeConstructor(Tl::MessagesGetReplies).writeRaw(inputPeer(peer)).writeInt(topicId)
+     .writeInt(offsetId).writeInt(0).writeInt(0).writeInt(limit).writeInt(0).writeInt(0).writeLong(0);
+    return w.toByteArray();
+}
+
+QList<TgForumTopic> TgApi::readForumTopics(const TlObject &o)
+{
+    QList<TgForumTopic> topics;
+    QVariantList list = o.vec("topics");
+    for (int i = 0; i < list.size(); ++i) {
+        TlObject t = TlSchema::toObject(list.at(i));
+        if (t.ctor() != Tl::ForumTopic) continue;    // skip forumTopicDeleted
+        TgForumTopic ft;
+        ft.id = t.intOr("id");
+        ft.title = t.str("title");
+        ft.iconColor = t.intOr("icon_color");
+        ft.iconEmojiId = t.longOr("icon_emoji_id");
+        ft.topMessage = t.intOr("top_message");
+        ft.unreadCount = t.intOr("unread_count");
+        ft.closed = t.flag("flags", 2);
+        ft.pinned = t.flag("flags", 3);
+        ft.hidden = t.flag("flags", 6);
+        topics.append(ft);
+    }
+    return topics;
 }
 
 QByteArray TgApi::editMessage(const TgPeer &peer, int msgId, const QString &text)
@@ -895,7 +943,14 @@ TgMessage TgApi::readMessage(const TlObject &m)
         if (t.forwardedFrom.isEmpty() && fwd.has("from_id")) t.forwardedFrom = readPeer(fwd.obj("from_id")).key();
         if (t.forwardedFrom.isEmpty()) t.forwardedFrom = QLatin1String("?");
     }
-    if (m.has("reply_to")) t.replyToId = m.obj("reply_to").intOr("reply_to_msg_id");
+    if (m.has("reply_to")) {
+        TlObject rt = m.obj("reply_to");
+        t.replyToId = rt.intOr("reply_to_msg_id");
+        // Forum topic: reply_to_top_id is the topic's root id; a top-level topic message instead
+        // carries forum_topic + reply_to_msg_id = the topic root.
+        if (rt.has("reply_to_top_id")) t.topicId = rt.intOr("reply_to_top_id");
+        else if (rt.flag("flags", 3)) t.topicId = t.replyToId;
+    }
     return t;
 }
 

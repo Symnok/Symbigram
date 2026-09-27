@@ -42,6 +42,7 @@ PageStackWindow {
     Component { id: chatPage; ChatPage {} }
     Component { id: settingsPage; SettingsPage {} }
     Component { id: notificationsPage; NotificationsPage {} }
+    Component { id: topicsPage; TopicsPage {} }
     Component { id: aboutPage; AboutPage {} }
 
     function route() {
@@ -57,7 +58,19 @@ PageStackWindow {
     }
 
     function openChat(peerKey) {
-        app.chat.open(peerKey)
+        // A forum supergroup opens as a list of topics; everything else opens straight to messages.
+        if (app.isForum(peerKey)) {
+            app.topics.loadFor(peerKey)
+            pageStack.push(topicsPage)
+        } else {
+            app.chat.open(peerKey)
+            pageStack.push(chatPage)
+        }
+    }
+
+    // A topic picked on the TopicsPage: open its messages in the shared ChatPage (topic mode).
+    function openTopic(topicId, title) {
+        app.chat.openTopic(app.topics.peerKey, topicId, title)
         pageStack.push(chatPage)
     }
 

@@ -96,8 +96,12 @@ public:
     void loadFolders();
     /// Recent messages of a chat; offsetId 0 = the newest, otherwise older than that id.
     void loadHistory(const TgPeer &peer, int offsetId, int count);
+    /// Forum (topics) supergroups: fetch the topic list, and page one topic's messages (via
+    /// getReplies). The topic history arrives through the same historyLoaded signal.
+    void loadForumTopics(const TgPeer &peer);
+    void loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count);
     /// Returns the random id that messageSent/messageFailed will carry.
-    qint64 sendText(const TgPeer &peer, const QString &text, int replyToId = 0);
+    qint64 sendText(const TgPeer &peer, const QString &text, int replyToId = 0, int topicId = 0);
     /// Edits one of our own messages' text/caption; the change arrives via the update stream.
     void editMessage(const TgPeer &peer, int msgId, const QString &text);
     /// Forwards messages (by id, from fromPeer) into toPeer; they arrive there via the update stream.
@@ -175,6 +179,7 @@ signals:
     void foldersChanged();
     void dialogChanged(const TgPeer &peer);
     void historyLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
+    void forumTopicsLoaded(const TgPeer &peer, const QList<TgForumTopic> &topics);
     void historyFailed(const TgPeer &peer, const QString &error);
     void messageReceived(const TgMessage &message);
     void messageEdited(const TgMessage &message);
@@ -231,15 +236,17 @@ private:
         GetArchive, GetFolders,
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
-        SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers
+        SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers,
+        GetForumTopics, GetReplies
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false), topicId(0) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
         int offsetId;
+        int topicId;            // GetReplies: the forum topic being paged
         bool more;              // GetDialogs: appending a page rather than replacing
         int folderId;           // GetDialogs/GetArchive: which folder
         int secretChatId;       // secret-chat requests

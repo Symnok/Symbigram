@@ -727,14 +727,31 @@ void TelegramSession::loadHistory(const TgPeer &peer, int offsetId, int count)
     send(GetHistory, TgApi::getHistory(r.peer, offsetId, count), r);
 }
 
-qint64 TelegramSession::sendText(const TgPeer &peer, const QString &text, int replyToId)
+qint64 TelegramSession::sendText(const TgPeer &peer, const QString &text, int replyToId, int topicId)
 {
     Request r;
     r.peer = m_peers.withHash(peer);
     r.randomId = qint64(Crypto::randomUInt64());
     r.query = text;
-    send(SendMessage, TgApi::sendMessage(r.peer, text, r.randomId, replyToId), r);
+    send(SendMessage, TgApi::sendMessage(r.peer, text, r.randomId, replyToId, topicId), r);
     return r.randomId;
+}
+
+void TelegramSession::loadForumTopics(const TgPeer &peer)
+{
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    send(GetForumTopics, TgApi::getForumTopics(r.peer, 0, 0, 0, 100), r);
+}
+
+void TelegramSession::loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count)
+{
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    r.offsetId = offsetId;
+    r.topicId = topicId;
+    r.more = count;
+    send(GetReplies, TgApi::getReplies(r.peer, topicId, offsetId, count), r);
 }
 
 void TelegramSession::editMessage(const TgPeer &peer, int msgId, const QString &text)
@@ -1165,13 +1182,20 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             }
             break;
         }
-        case GetHistory: {
+        case GetHistory:
+        case GetReplies: {   // a forum topic's thread parses exactly like a normal history page
             TlObject o = TlSchema::readObject(r);
             TgHistoryPage page = TgApi::readHistory(o, m_peers);
             for (int i = 0; i < page.messages.size(); ++i) fillSender(page.messages[i]);
             bool more = page.messages.size() >= int(req.more);
             if (o.ctor() == Tl::MessagesMessages) more = false;
             emit historyLoaded(req.peer, page.messages, req.offsetId, more);
+            break;
+        }
+        case GetForumTopics: {
+            TlObject o = TlSchema::readObject(r);
+            m_peers.absorb(o);
+            emit forumTopicsLoaded(req.peer, TgApi::readForumTopics(o));
             break;
         }
         case SendMessage: {
@@ -1350,7 +1374,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
         emit log(QString::fromLatin1("result of request kind %1 unreadable: %2").arg(int(req.kind)).arg(e.message()));
         if (req.kind == GetDialogs) { m_dialogsLoading = false; if (m_state == Syncing) setState(Online); }
         if (req.kind == GetDifference) m_differencePending = false;
-        if (req.kind == GetHistory) emit historyFailed(req.peer, e.message());
+        if (req.kind == GetHistory || req.kind == GetReplies) emit historyFailed(req.peer, e.message());
         if (req.kind == SendMessage) emit messageFailed(req.peer, req.randomId, e.message());
     }
 }
@@ -1452,7 +1476,11 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         m_differencePending = false;
         break;
     case GetHistory:
+    case GetReplies:
         emit historyFailed(req.peer, type);
+        break;
+    case GetForumTopics:
+        emit forumTopicsLoaded(req.peer, QList<TgForumTopic>());   // empty list ends the loading state
         break;
     case SendMessage:
         emit messageFailed(req.peer, req.randomId, type);

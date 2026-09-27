@@ -88,7 +88,10 @@ public:
     static QByteArray getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit, int folderId = 0);
     static QByteArray getDialogFilters();
     static QByteArray getHistory(const TgPeer &peer, int offsetId, int limit);
-    static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0);
+    static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0, int topMsgId = 0);
+    static QByteArray getForumTopics(const TgPeer &peer, int offsetDate, int offsetId, int offsetTopic, int limit);
+    static QByteArray getReplies(const TgPeer &peer, int topicId, int offsetId, int limit);
+    static QList<TgForumTopic> readForumTopics(const TlObject &o);
     static QByteArray editMessage(const TgPeer &peer, int msgId, const QString &text);
     static QByteArray forwardMessages(const TgPeer &fromPeer, const QList<qint32> &ids,
                                       const QList<qint64> &randomIds, const TgPeer &toPeer);

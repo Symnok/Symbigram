@@ -3,6 +3,7 @@
 #include "appcontroller.h"
 #include "chatsmodel.h"
 #include "messagesmodel.h"
+#include "topicsmodel.h"
 #include "mediacache.h"
 #include "voicerecorder.h"
 #include "notifier.h"
@@ -92,6 +93,7 @@ AppController::AppController(QObject *parent)
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
     m_chat->setAutoPreview(imagePreview() == 1);   // Image Preview: Full auto-loads, Thumbnail waits for a tap
+    m_topics = new TopicsModel(m_session, this);
     applyDownloadFolder();
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
 
@@ -803,6 +805,12 @@ void AppController::findPeer(const QString &query)
 void AppController::onPeerResolved(const TgPeer &peer)
 {
     emit peerFound(peer.key());
+}
+
+bool AppController::isForum(const QString &peerKey) const
+{
+    if (peerKey.isEmpty() || peerKey.startsWith(QLatin1String("secret:"))) return false;
+    return m_session->peers().info(TgPeer::fromKey(peerKey)).isForum;
 }
 
 void AppController::searchPeers(const QString &query)

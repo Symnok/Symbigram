@@ -3,6 +3,7 @@
 #include "appcontroller.h"
 #include "chatsmodel.h"
 #include "messagesmodel.h"
+#include "topicsmodel.h"
 #include "qrimageprovider.h"
 #include "tgtypes.h"
 #include "tlobject.h"
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ChatsModel>();
     qmlRegisterType<MessagesModel>();
+    qmlRegisterType<TopicsModel>();
 
     AppController controller;
 

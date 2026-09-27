@@ -101,6 +101,9 @@ public:
     QString error() const { return m_error; }
 
     Q_INVOKABLE void open(const QString &peerKey);
+    /// Opens one topic of a forum supergroup: its messages (via getReplies) with sending routed
+    /// into the topic. topicTitle is shown in the header; the group name becomes the subtitle.
+    Q_INVOKABLE void openTopic(const QString &peerKey, int topicId, const QString &topicTitle);
     Q_INVOKABLE void close();
     Q_INVOKABLE void send(const QString &text);
     /// Compose a reply to the message in this row; cancelReply() clears the target.
@@ -265,6 +268,8 @@ private:
     qint64 m_peerTypingUser;
     int m_replyToId;                        // message id the composer will reply to (0 = none)
     int m_editId;                           // message id being edited (0 = not editing)
+    int m_topicId;                          // forum topic being viewed (0 = whole chat / not a forum)
+    QString m_topicTitle;                   // the open topic's title (header)
     bool m_autoPreview;                     // Image Preview = Full (auto-load photos) vs Thumbnail
     int m_openInboxMax;                     // readInboxMaxId captured when the chat opened (for unread)
     int m_openUnread;                       // unreadCount captured when the chat opened
