@@ -12,11 +12,32 @@ Page {
     id: page
     property variant chat: app.chat
 
-    // Send/save the composed text. Shared by the Send button and the keyboard Enter key
-    // (Nokia E6/E7 and other hardware keyboards: Enter sends instead of inserting a newline).
+    // A file staged for sending: the composer becomes its caption. Kept out of a dialog so the
+    // text field's own copy/paste bubble is not hidden behind one.
+    property string pendingFile: ""
+    property bool pendingPhoto: true
+
+    function pickFile(photo) {
+        var p = app.pickAttachment(photo)
+        if (p == "") return
+        page.pendingFile = p
+        page.pendingPhoto = photo
+        composer.forceActiveFocus()
+        composer.openSoftwareInputPanel()
+    }
+
+    // Send the composed text, or the staged file with the composer as its caption. Shared by the
+    // Send button and the keyboard Enter key (E6/E7 etc.: Enter sends instead of a newline).
     function sendMessage() {
-        if (composer.text.length == 0 || chat.peerKey == "" || app.connection != "online") return
+        if (chat.peerKey == "" || app.connection != "online") return
         if (chat.isSecret && chat.secretState != 2) return
+        if (page.pendingFile != "") {
+            app.sendAttachment(page.pendingFile, page.pendingPhoto, composer.text)
+            page.pendingFile = ""
+            composer.text = ""
+            return
+        }
+        if (composer.text.length == 0) return
         if (chat.editing) chat.commitEdit(composer.text)
         else chat.send(composer.text)
         composer.text = ""
@@ -181,45 +202,8 @@ Page {
     Menu {
         id: attachMenu
         MenuLayout {
-            MenuItem { text: qsTr("Image"); onClicked: captionDialog.pick(true) }
-            MenuItem { text: qsTr("File"); onClicked: captionDialog.pick(false) }
-        }
-    }
-
-    // After a file is chosen: add/edit a caption (prefilled with whatever is in the composer),
-    // then send. This lets you attach first and caption afterwards.
-    CommonDialog {
-        id: captionDialog
-        property string path: ""
-        property bool asPhoto: true
-        titleText: asPhoto ? qsTr("Send image") : qsTr("Send file")
-        buttonTexts: [qsTr("Send"), qsTr("Cancel")]
-        function pick(photo) {
-            var p = app.pickAttachment(photo)
-            if (p == "") return
-            path = p
-            asPhoto = photo
-            captionField.text = composer.text
-            open()
-        }
-        content: Column {
-            width: parent.width
-            spacing: platformStyle.paddingMedium
-            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
-            Label {
-                width: parent.width
-                text: captionDialog.path.split(/[\\/]/).pop()
-                color: "white"; elide: Text.ElideMiddle
-            }
-            Label { text: qsTr("Caption (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField {
-                id: captionField
-                width: parent.width
-                placeholderText: qsTr("add a caption")
-            }
-        }
-        onButtonClicked: {
-            if (index == 0) { app.sendAttachment(captionDialog.path, captionDialog.asPhoto, captionField.text); composer.text = "" }
+            MenuItem { text: qsTr("Image"); onClicked: page.pickFile(true) }
+            MenuItem { text: qsTr("File"); onClicked: page.pickFile(false) }
         }
     }
 
@@ -408,7 +392,7 @@ Page {
         target: chat
         onMessageAppended: list.scrollToEnd()
         onOlderPrepended: list.positionViewAtIndex(count, ListView.Beginning)
-        onChatChanged: list.scrollToEnd()
+        onChatChanged: { page.pendingFile = ""; list.scrollToEnd() }
         // First page in: jump to the first unread message, or the end when all is read.
         onInitialLoaded: {
             if (firstUnreadRow >= 0 && firstUnreadRow < list.count)
@@ -428,11 +412,39 @@ Page {
         text: chat.error != "" ? qsTr("Could not load the messages: %1").arg(chat.error) : qsTr("No messages yet.")
     }
 
-    // -- reply / edit bar (above the composer) --
+    // -- staged-file bar (above the composer): shows the file whose caption you are typing --
+    Item {
+        id: attachmentBar
+        property bool active: page.pendingFile != ""
+        anchors { left: parent.left; right: parent.right; bottom: composerRow.top }
+        height: active ? attachContent.height + 2 * platformStyle.paddingSmall : 0
+        visible: active
+        clip: true
+        Rectangle { anchors.fill: parent; color: "#173021" }
+        Rectangle { anchors { left: parent.left; top: parent.top; bottom: parent.bottom } width: 3; color: "#5ab943" }
+        Row {
+            id: attachContent
+            anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: cancelAttach.left; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            Column {
+                width: parent.width
+                Label { text: page.pendingPhoto ? qsTr("Image") : qsTr("File"); color: "#5ab943"; font.pixelSize: platformStyle.fontSizeSmall }
+                Label { width: parent.width; text: page.pendingFile.split(/[\\/]/).pop(); color: "white"; font.pixelSize: platformStyle.fontSizeSmall; elide: Text.ElideMiddle }
+            }
+        }
+        Button {
+            id: cancelAttach
+            anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            width: 56
+            text: "X"
+            onClicked: page.pendingFile = ""
+        }
+    }
+
+    // -- reply / edit bar (above the composer, or the staged-file bar) --
     Item {
         id: replyBar
         property bool active: chat.replyToId > 0 || chat.editing
-        anchors { left: parent.left; right: parent.right; bottom: composerRow.top }
+        anchors { left: parent.left; right: parent.right; bottom: attachmentBar.top }
         height: active ? replyContent.height + 2 * platformStyle.paddingSmall : 0
         visible: active
         clip: true
@@ -488,7 +500,7 @@ Page {
                 right: sendButton.left; rightMargin: platformStyle.paddingSmall
                 verticalCenter: parent.verticalCenter
             }
-            placeholderText: chat.isSecret ? qsTr("encrypted message") : qsTr("message")
+            placeholderText: page.pendingFile != "" ? qsTr("add a caption") : (chat.isSecret ? qsTr("encrypted message") : qsTr("message"))
             enabled: !chat.isSecret || chat.secretState == 2
             wrapMode: TextEdit.Wrap
             platformMaxImplicitHeight: 120
@@ -499,17 +511,17 @@ Page {
         }
         Button {
             id: sendButton
-            visible: !chat.peerIsChannel && !app.recording && composer.text.length > 0
+            visible: !chat.peerIsChannel && !app.recording && (composer.text.length > 0 || page.pendingFile != "")
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: Math.max(80, implicitWidth)
             text: chat.editing ? qsTr("Save") : qsTr("Send")
-            enabled: composer.text.length > 0 && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
+            enabled: (composer.text.length > 0 || page.pendingFile != "") && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
             onClicked: page.sendMessage()
         }
-        // a round record button when there is nothing typed
+        // a round record button when there is nothing typed and no file staged
         Rectangle {
             id: micButton
-            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && composer.text.length == 0
+            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && composer.text.length == 0 && page.pendingFile == ""
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             width: 56; height: 56; radius: 28
             color: micMouse.pressed ? "#3d5a80" : "#2f4a66"

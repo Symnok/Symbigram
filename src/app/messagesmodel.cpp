@@ -14,6 +14,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QUrl>
+#include <QVector>
 
 namespace
 {
@@ -21,6 +22,34 @@ namespace
     const int TypingIdleMs = 5000;
     const int PeerTypingMs = 6000;
     int now() { return int(QDateTime::currentDateTime().toTime_t()); }
+
+    // The phone font has no emoji glyphs, so emoji render as empty boxes. Drop them from any text
+    // we display (message body, previews) rather than showing the boxes. Covers the emoji blocks
+    // plus the variation selector, ZWJ and keycap joiners that hold emoji sequences together.
+    bool isEmojiCodePoint(uint c)
+    {
+        return (c >= 0x1F000 && c <= 0x1FFFF)   // emoticons, pictographs, transport, flags, ...
+            || (c >= 0x2600 && c <= 0x27BF)     // misc symbols + dingbats
+            || (c >= 0x2B00 && c <= 0x2BFF)     // arrows/stars used as emoji
+            || (c >= 0xFE00 && c <= 0xFE0F)     // variation selectors
+            || c == 0x200D                      // zero-width joiner
+            || c == 0x20E3;                     // combining enclosing keycap
+    }
+
+    QString stripEmoji(const QString &s)
+    {
+        if (s.isEmpty()) return s;
+        QVector<uint> in = s.toUcs4();
+        bool any = false;
+        for (int i = 0; i < in.size(); ++i) if (isEmojiCodePoint(in.at(i))) { any = true; break; }
+        if (!any) return s;
+        QString out;
+        for (int i = 0; i < in.size(); ++i) {
+            uint c = in.at(i);
+            if (!isEmojiCodePoint(c)) out += QString::fromUcs4(&c, 1);
+        }
+        return out.trimmed();   // trim the ends but keep newlines/structure intact
+    }
 }
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
@@ -127,8 +156,8 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     const TgMessage &m = r.m;
     switch (role) {
     case MsgIdRole: return m.id;
-    case BodyRole: return m.text;
-    case NoteRole: return m.note;
+    case BodyRole: return stripEmoji(m.text);
+    case NoteRole: return stripEmoji(m.note);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);
     case TimeTextRole: return timeText(m.date);
@@ -859,12 +888,14 @@ void MessagesModel::onHistoryFailed(const TgPeer &peer, const QString &error)
 
 void MessagesModel::markRead()
 {
-    if (m_peer.isNull() || m_secretId || m_topicId) return;   // topic read-marking uses a separate API (later)
+    if (m_peer.isNull() || m_secretId) return;
     int maxId = 0;
     for (int i = m_rows.size() - 1; i >= 0; --i)
         if (m_rows.at(i).m.id > 0) { maxId = m_rows.at(i).m.id; break; }
+    if (maxId <= 0) return;
+    if (m_topicId) { m_session->markTopicRead(m_peer, m_topicId, maxId); return; }
     TgDialog d = m_session->dialog(m_peer);
-    if (maxId > 0 && (d.unreadCount > 0 || maxId > d.readInboxMaxId)) m_session->markRead(m_peer, maxId);
+    if (d.unreadCount > 0 || maxId > d.readInboxMaxId) m_session->markRead(m_peer, maxId);
 }
 
 // -- incoming --------------------------------------------------------------------------------------
@@ -1018,7 +1049,7 @@ QString MessagesModel::replySnippet(int msgId) const
     if (row < 0) return tr("reply");
     const TgMessage &to = m_rows.at(row).m;
     QString who = to.out ? tr("You") : m_session->peers().userName(to.fromId);
-    QString text = to.text.isEmpty() ? to.note : to.text;
+    QString text = to.text.isEmpty() ? to.note : stripEmoji(to.text);
     return who + QLatin1String(": ") + text.simplified().left(60);
 }
 

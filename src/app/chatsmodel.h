@@ -48,7 +48,8 @@ public:
         ColorRole,
         AvatarRole,     // file:// url of the profile picture, or "" (fall back to initials)
         SecretRole,     // true for an end-to-end secret chat row
-        SecretStateRole // 0 requested-by-me, 1 requested-to-me, 2 ready
+        SecretStateRole,// 0 requested-by-me, 1 requested-to-me, 2 ready
+        ForumRole       // true for a forum supergroup (unread shown as a dot, not a count)
     };
 
     explicit ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -70,6 +71,8 @@ public:
     bool archiveSelected() const;
     Q_INVOKABLE void selectFolder(int listIndex);
     Q_INVOKABLE void setMuted(const QString &peerKey, bool muted);
+    Q_INVOKABLE void markAllRead(const QString &peerKey);   // whole chat, or every topic of a forum
+    Q_INVOKABLE void blockUser(const QString &peerKey);     // 1:1 dialogs only
     Q_INVOKABLE void clearHistory(const QString &peerKey);
     Q_INVOKABLE void discardSecret(const QString &peerKey);
     Q_INVOKABLE void deleteChat(const QString &peerKey, bool forEveryone);

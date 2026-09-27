@@ -127,6 +127,8 @@ namespace Tl
     const quint32 MessagesGetForumTopics = 0x3ba47bff;   // forum (topics) supergroups
     const quint32 MessagesGetReplies = 0x22ddd30c;        // a forum topic's messages (thread)
     const quint32 ForumTopic = 0xfcdad815;                // a topic in messages.forumTopics
+    const quint32 MessagesReadDiscussion = 0xf731a9f4;    // mark a forum topic read
+    const quint32 ContactsBlock = 0x2e2e8734;             // block a user
     const quint32 MessagesMessages = 0x1d73e7ea;
     const quint32 MessagesMessagesSlice = 0x5f206716;
     const quint32 MessagesChannelMessages = 0xc776ba4e;
@@ -153,6 +155,7 @@ namespace Tl
     const quint32 AccountUpdateStatus = 0x6628562c;
     const quint32 AccountUpdateNotifySettings = 0x84be5b93;
     const quint32 InputNotifyPeer = 0xb8bc5b0c;
+    const quint32 InputNotifyForumTopic = 0x5c467992;   // notify settings for one forum topic
     const quint32 InputPeerNotifySettings = 0xcacb6ae2;
     const quint32 MessagesForwardMessages = 0x13704a7c;
     const quint32 MessageFwdHeader = 0x4e4df4bb;

@@ -16,9 +16,12 @@ TopicsModel::TopicsModel(TelegramSession *session, QObject *parent)
     roles[ColorRole] = "color";
     roles[ClosedRole] = "closed";
     roles[PinnedRole] = "pinned";
+    roles[MutedRole] = "muted";
     setRoleNames(roles);
     connect(m_session, SIGNAL(forumTopicsLoaded(TgPeer,QList<TgForumTopic>)),
             this, SLOT(onTopicsLoaded(TgPeer,QList<TgForumTopic>)));
+    connect(m_session, SIGNAL(topicRead(TgPeer,int)), this, SLOT(onTopicRead(TgPeer,int)));
+    connect(m_session, SIGNAL(topicMuted(TgPeer,int,bool)), this, SLOT(onTopicMuted(TgPeer,int,bool)));
 }
 
 int TopicsModel::rowCount(const QModelIndex &parent) const
@@ -37,6 +40,7 @@ QVariant TopicsModel::data(const QModelIndex &index, int role) const
     case ColorRole: return colorHex(t.iconColor);
     case ClosedRole: return t.closed;
     case PinnedRole: return t.pinned;
+    case MutedRole: return t.muted;
     }
     return QVariant();
 }
@@ -82,6 +86,45 @@ void TopicsModel::onTopicsLoaded(const TgPeer &peer, const QList<TgForumTopic> &
     if (m_topics.isEmpty()) m_error = tr("No topics.");
     endResetModel();
     emit changed();
+}
+
+void TopicsModel::markRead(int topicId)
+{
+    for (int i = 0; i < m_topics.size(); ++i) {
+        if (m_topics.at(i).id == topicId) {
+            if (m_topics.at(i).topMessage > 0) m_session->markTopicRead(m_peer, topicId, m_topics.at(i).topMessage);
+            return;
+        }
+    }
+}
+
+void TopicsModel::setMuted(int topicId, bool muted)
+{
+    if (!m_peer.isNull()) m_session->setTopicMuted(m_peer, topicId, muted);
+}
+
+void TopicsModel::onTopicMuted(const TgPeer &peer, int topicId, bool muted)
+{
+    if (peer != m_peer) return;
+    for (int i = 0; i < m_topics.size(); ++i) {
+        if (m_topics.at(i).id == topicId && m_topics.at(i).muted != muted) {
+            m_topics[i].muted = muted;
+            emit dataChanged(index(i), index(i));
+            break;
+        }
+    }
+}
+
+void TopicsModel::onTopicRead(const TgPeer &peer, int topicId)
+{
+    if (peer != m_peer) return;
+    for (int i = 0; i < m_topics.size(); ++i) {
+        if (m_topics.at(i).id == topicId && m_topics.at(i).unreadCount != 0) {
+            m_topics[i].unreadCount = 0;
+            emit dataChanged(index(i), index(i));
+            break;
+        }
+    }
 }
 
 QString TopicsModel::colorHex(int rgb)

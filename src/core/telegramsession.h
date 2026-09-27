@@ -100,6 +100,14 @@ public:
     /// getReplies). The topic history arrives through the same historyLoaded signal.
     void loadForumTopics(const TgPeer &peer);
     void loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count);
+    /// Marks a forum topic read up to maxId (zeroes its unread counter). Fires topicRead at once.
+    void markTopicRead(const TgPeer &peer, int topicId, int maxId);
+    /// "Mark all as read": a normal chat/channel reads its whole history; a forum reads every topic.
+    void markAllRead(const TgPeer &peer);
+    /// Blocks a user (1:1). Reports through notice.
+    void blockUser(const TgPeer &peer);
+    /// Mutes/unmutes one forum topic (the group mute, setMuted, propagates to all topics).
+    void setTopicMuted(const TgPeer &peer, int topicId, bool muted);
     /// Returns the random id that messageSent/messageFailed will carry.
     qint64 sendText(const TgPeer &peer, const QString &text, int replyToId = 0, int topicId = 0);
     /// Edits one of our own messages' text/caption; the change arrives via the update stream.
@@ -180,6 +188,8 @@ signals:
     void dialogChanged(const TgPeer &peer);
     void historyLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more);
     void forumTopicsLoaded(const TgPeer &peer, const QList<TgForumTopic> &topics);
+    void topicRead(const TgPeer &peer, int topicId);   // a forum topic's unread was cleared
+    void topicMuted(const TgPeer &peer, int topicId, bool muted);
     void historyFailed(const TgPeer &peer, const QString &error);
     void messageReceived(const TgMessage &message);
     void messageEdited(const TgMessage &message);
@@ -237,16 +247,18 @@ private:
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
         SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers,
-        GetForumTopics, GetReplies
+        GetForumTopics, GetReplies, ReadDiscussion, BlockUser
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false), topicId(0) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false), topicId(0), readAll(false), muteState(-1) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
         int offsetId;
         int topicId;            // GetReplies: the forum topic being paged
+        bool readAll;           // GetForumTopics: mark every topic read on arrival
+        int muteState;          // GetForumTopics: -1 none, else mute(1)/unmute(0) every topic
         bool more;              // GetDialogs: appending a page rather than replacing
         int folderId;           // GetDialogs/GetArchive: which folder
         int secretChatId;       // secret-chat requests

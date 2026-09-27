@@ -754,6 +754,39 @@ void TelegramSession::loadTopicHistory(const TgPeer &peer, int topicId, int offs
     send(GetReplies, TgApi::getReplies(r.peer, topicId, offsetId, count), r);
 }
 
+void TelegramSession::markTopicRead(const TgPeer &peer, int topicId, int maxId)
+{
+    if (topicId <= 0 || maxId <= 0) return;
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    r.topicId = topicId;
+    send(ReadDiscussion, TgApi::readDiscussion(r.peer, topicId, maxId), r);
+    emit topicRead(r.peer, topicId);   // clear the badge now; the server call confirms it
+}
+
+void TelegramSession::markAllRead(const TgPeer &peer)
+{
+    TgPeer p = m_peers.withHash(peer);
+    int di = dialogIndex(p);
+    if (m_peers.info(p).isForum) {
+        // Fetch the topics, then read each of them (see the GetForumTopics result handler).
+        Request r;
+        r.peer = p;
+        r.readAll = true;
+        send(GetForumTopics, TgApi::getForumTopics(p, 0, 0, 0, 100), r);
+    } else if (di >= 0 && m_dialogs[di].topMessageId > 0) {
+        markRead(p, m_dialogs[di].topMessageId);
+    }
+    if (di >= 0 && m_dialogs[di].unreadCount != 0) { m_dialogs[di].unreadCount = 0; emit dialogChanged(p); }
+}
+
+void TelegramSession::blockUser(const TgPeer &peer)
+{
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    send(BlockUser, TgApi::blockUser(r.peer), r);
+}
+
 void TelegramSession::editMessage(const TgPeer &peer, int msgId, const QString &text)
 {
     Request r;
@@ -972,6 +1005,30 @@ void TelegramSession::setMuted(const TgPeer &peer, bool muted)
     r.peer = m_peers.withHash(peer);
     r.more = muted;
     send(UpdateNotifySettings, TgApi::updateNotifySettings(r.peer, muted), r);
+    // A forum's group mute propagates to every topic: fetch the topics, then set each (see the
+    // GetForumTopics result handler).
+    if (m_peers.info(r.peer).isForum) {
+        Request f;
+        f.peer = r.peer;
+        f.muteState = muted ? 1 : 0;
+        send(GetForumTopics, TgApi::getForumTopics(r.peer, 0, 0, 0, 100), f);
+    }
+}
+
+void TelegramSession::setTopicMuted(const TgPeer &peer, int topicId, bool muted)
+{
+    if (topicId <= 0) return;
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    r.topicId = topicId;
+    r.more = muted;
+    send(UpdateNotifySettings, TgApi::updateNotifySettings(r.peer, muted, topicId), r);
+    emit topicMuted(r.peer, topicId, muted);   // reflect it now; the server call confirms it
+    // A forum counts as muted only when every topic is; unmuting one clears the group's muted mark.
+    if (!muted) {
+        int di = dialogIndex(r.peer);
+        if (di >= 0 && m_dialogs[di].mutedUntil != 0) { m_dialogs[di].mutedUntil = 0; emit dialogChanged(r.peer); }
+    }
 }
 
 // -- results -------------------------------------------------------------------------------------------------
@@ -1195,9 +1252,32 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
         case GetForumTopics: {
             TlObject o = TlSchema::readObject(r);
             m_peers.absorb(o);
-            emit forumTopicsLoaded(req.peer, TgApi::readForumTopics(o));
+            QList<TgForumTopic> topics = TgApi::readForumTopics(o);
+            emit forumTopicsLoaded(req.peer, topics);
+            if (req.readAll)   // "Mark all as read": read every topic that still has unread
+                for (int i = 0; i < topics.size(); ++i)
+                    if (topics.at(i).unreadCount > 0 && topics.at(i).topMessage > 0)
+                        markTopicRead(req.peer, topics.at(i).id, topics.at(i).topMessage);
+            if (req.muteState >= 0)   // group mute/unmute: force every topic to the same state
+                for (int i = 0; i < topics.size(); ++i)
+                    setTopicMuted(req.peer, topics.at(i).id, req.muteState == 1);
+            else if (!topics.isEmpty()) {
+                // A plain load: the forum shows as muted only when EVERY topic is muted.
+                bool allMuted = true;
+                for (int i = 0; i < topics.size(); ++i) if (!topics.at(i).muted) { allMuted = false; break; }
+                int di = dialogIndex(req.peer);
+                int want = allMuted ? 0x7fffffff : 0;
+                if (di >= 0 && m_dialogs[di].mutedUntil != want) { m_dialogs[di].mutedUntil = want; emit dialogChanged(req.peer); }
+            }
             break;
         }
+        case ReadDiscussion:
+            r.readBool();   // Bool result; the badge was already cleared optimistically
+            break;
+        case BlockUser:
+            r.readBool();
+            emit notice(tr("User blocked."));
+            break;
         case SendMessage: {
             TlObject o = TlSchema::readObject(r);
             int id = TgApi::sentMessageId(o);
@@ -1351,6 +1431,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             break;
         }
         case UpdateNotifySettings: {
+            if (req.topicId) break;   // a per-topic mute: no dialog row to update (topicMuted already fired)
             int di = dialogIndex(req.peer);
             if (di >= 0) { m_dialogs[di].mutedUntil = req.more ? 0x7fffffff : 0; emit dialogChanged(req.peer); }
             break;
@@ -1545,6 +1626,7 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     case GetUser:
     case ArchivePeer:
     case DeleteChat:
+    case ReadDiscussion:
         break;
     case EditMessage:
         if (type.contains(QLatin1String("MESSAGE_NOT_MODIFIED"))) break;   // no change - ignore
@@ -1552,6 +1634,9 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         break;
     case ForwardMessages:
         emit notice(tr("Could not forward the message: %1").arg(type));
+        break;
+    case BlockUser:
+        emit notice(tr("Could not block the user: %1").arg(type));
         break;
     case SearchPeers:
         emit peersFound(req.query, QList<TgPeer>());   // search failed - keep the local matches only

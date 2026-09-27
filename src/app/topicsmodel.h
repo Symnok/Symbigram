@@ -29,7 +29,8 @@ public:
         UnreadRole,
         ColorRole,       // "#rrggbb" for the letter icon
         ClosedRole,
-        PinnedRole
+        PinnedRole,
+        MutedRole
     };
 
     explicit TopicsModel(TelegramSession *session, QObject *parent = 0);
@@ -44,12 +45,16 @@ public:
 
     Q_INVOKABLE void loadFor(const QString &peerKey);
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE void markRead(int topicId);   // mark one topic read (zeroes its unread)
+    Q_INVOKABLE void setMuted(int topicId, bool muted);
 
 signals:
     void changed();
 
 private slots:
     void onTopicsLoaded(const TgPeer &peer, const QList<TgForumTopic> &topics);
+    void onTopicRead(const TgPeer &peer, int topicId);
+    void onTopicMuted(const TgPeer &peer, int topicId, bool muted);
 
 private:
     static QString colorHex(int rgb);

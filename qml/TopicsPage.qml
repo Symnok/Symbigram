@@ -21,6 +21,19 @@ Page {
         }
     }
 
+    ContextMenu {
+        id: topicContextMenu
+        property int topicId: 0
+        property bool topicMuted: false
+        MenuLayout {
+            MenuItem { text: qsTr("Mark all as read"); onClicked: app.topics.markRead(topicContextMenu.topicId) }
+            MenuItem {
+                text: topicContextMenu.topicMuted ? qsTr("Unmute topic") : qsTr("Mute topic")
+                onClicked: app.topics.setMuted(topicContextMenu.topicId, !topicContextMenu.topicMuted)
+            }
+        }
+    }
+
     ListHeading {
         id: heading
         anchors { top: parent.top; left: parent.left; right: parent.right }
@@ -55,31 +68,43 @@ Page {
                     }
                 }
                 Column {
-                    anchors { left: icon.right; leftMargin: platformStyle.paddingMedium; right: badge.left; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+                    anchors { left: icon.right; leftMargin: platformStyle.paddingMedium; right: rightRow.left; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
                     ListItemText {
                         width: parent.width
                         role: "Title"
                         text: (model.closed ? qsTr("[closed] ") : "") + model.title
                     }
                 }
-                Rectangle {
-                    id: badge
+                Row {
+                    id: rightRow
                     anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-                    visible: model.unread > 0
-                    height: 24
-                    width: Math.max(24, unreadLabel.width + 12)
-                    radius: 12
-                    color: "#5b8fd0"
-                    Label {
-                        id: unreadLabel
-                        anchors.centerIn: parent
-                        text: model.unread > 99 ? "99+" : model.unread
-                        color: "white"
-                        font.pixelSize: platformStyle.fontSizeSmall
+                    spacing: platformStyle.paddingSmall
+                    // Positioners lay out only visible children, so the icon/badge appear as needed.
+                    Image {
+                        source: "qrc:/images/muted.png"
+                        visible: model.muted === true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Rectangle {
+                        id: badge
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: model.unread > 0
+                        height: 24
+                        width: Math.max(24, unreadLabel.width + 12)
+                        radius: 12
+                        color: model.muted === true ? "#5a6674" : "#5b8fd0"
+                        Label {
+                            id: unreadLabel
+                            anchors.centerIn: parent
+                            text: model.unread > 99 ? "99+" : model.unread
+                            color: "white"
+                            font.pixelSize: platformStyle.fontSizeSmall
+                        }
                     }
                 }
             }
             onClicked: window.openTopic(model.topicId, model.title)
+            onPressAndHold: { topicContextMenu.topicId = model.topicId; topicContextMenu.topicMuted = (model.muted === true); topicContextMenu.open() }
         }
 
         ScrollDecorator { flickableItem: list }

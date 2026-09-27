@@ -117,8 +117,30 @@ Page {
         MenuLayout {
             MenuItem {
                 text: contextMenu.item && contextMenu.item.muted ? qsTr("Unmute") : qsTr("Mute")
-                visible: !contextMenu.isSecret
+                visible: !contextMenu.isSecret && !(contextMenu.item && contextMenu.item.isForum === true)
                 onClicked: app.chats.setMuted(contextMenu.item.peerKey, !contextMenu.item.muted)
+            }
+            // A forum can hold a mix of muted and unmuted topics, so it offers both actions
+            // (each forces every topic to that state).
+            MenuItem {
+                text: qsTr("Mute all topics")
+                visible: !contextMenu.isSecret && contextMenu.item && contextMenu.item.isForum === true
+                onClicked: app.chats.setMuted(contextMenu.item.peerKey, true)
+            }
+            MenuItem {
+                text: qsTr("Unmute all topics")
+                visible: !contextMenu.isSecret && contextMenu.item && contextMenu.item.isForum === true
+                onClicked: app.chats.setMuted(contextMenu.item.peerKey, false)
+            }
+            MenuItem {
+                text: qsTr("Block user")
+                visible: !contextMenu.isSecret && contextMenu.item && !contextMenu.item.isGroup
+                onClicked: app.chats.blockUser(contextMenu.item.peerKey)
+            }
+            MenuItem {
+                text: qsTr("Mark all as read")
+                visible: !contextMenu.isSecret && contextMenu.item && contextMenu.item.unread > 0
+                onClicked: app.chats.markAllRead(contextMenu.item.peerKey)
             }
             MenuItem {
                 text: app.chats.archiveSelected ? qsTr("Unarchive chat") : qsTr("Archive chat")
@@ -413,14 +435,17 @@ Page {
                 Rectangle {
                     id: badge
                     anchors.right: parent.right
-                    width: Math.max(badgeLabel.width + 12, 24)
-                    height: 22
-                    radius: 11
+                    // A forum supergroup shows a plain dot (topics have new messages) rather than a
+                    // count, since counting unread topics would need a request per group.
+                    width: model.isForum === true ? 14 : Math.max(badgeLabel.width + 12, 24)
+                    height: model.isForum === true ? 14 : 22
+                    radius: height / 2
                     color: model.muted ? "#5a6674" : "#2f8fd8"
                     visible: model.unread > 0
                     Label {
                         id: badgeLabel
                         anchors.centerIn: parent
+                        visible: model.isForum !== true
                         text: model.unread > 999 ? "999+" : model.unread
                         font.pixelSize: platformStyle.fontSizeSmall * 0.85
                         color: "white"

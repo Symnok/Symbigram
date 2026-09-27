@@ -4,6 +4,7 @@
 #include "tlconstructors.h"
 #include "tlwriter.h"
 
+#include <QDateTime>
 #include <QStringList>
 
 // -- TgPeer -------------------------------------------------------------------------------------------------
@@ -326,6 +327,22 @@ QByteArray TgApi::getReplies(const TgPeer &peer, int topicId, int offsetId, int 
     return w.toByteArray();
 }
 
+QByteArray TgApi::readDiscussion(const TgPeer &peer, int topicId, int readMaxId)
+{
+    // messages.readDiscussion#f731a9f4 peer msg_id(=topic root) read_max_id
+    TlWriter w(48);
+    w.writeConstructor(Tl::MessagesReadDiscussion).writeRaw(inputPeer(peer)).writeInt(topicId).writeInt(readMaxId);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::blockUser(const TgPeer &peer)
+{
+    // contacts.block#2e2e8734 flags=# my_stories_from:flags.0?true id:InputPeer
+    TlWriter w(48);
+    w.writeConstructor(Tl::ContactsBlock).writeInt(0).writeRaw(inputPeer(peer));
+    return w.toByteArray();
+}
+
 QList<TgForumTopic> TgApi::readForumTopics(const TlObject &o)
 {
     QList<TgForumTopic> topics;
@@ -343,6 +360,10 @@ QList<TgForumTopic> TgApi::readForumTopics(const TlObject &o)
         ft.closed = t.flag("flags", 2);
         ft.pinned = t.flag("flags", 3);
         ft.hidden = t.flag("flags", 6);
+        if (t.has("notify_settings")) {
+            int mu = t.obj("notify_settings").intOr("mute_until");
+            ft.muted = mu > int(QDateTime::currentDateTime().toTime_t());
+        }
         topics.append(ft);
     }
     return topics;
@@ -477,12 +498,14 @@ QByteArray TgApi::deleteMessages(const TgPeer &peer, const QList<int> &ids, bool
     return w.toByteArray();
 }
 
-QByteArray TgApi::updateNotifySettings(const TgPeer &peer, bool muted)
+QByteArray TgApi::updateNotifySettings(const TgPeer &peer, bool muted, int topicId)
 {
     TlWriter w(64);
-    w.writeConstructor(Tl::AccountUpdateNotifySettings)
-     .writeConstructor(Tl::InputNotifyPeer).writeRaw(inputPeer(peer))
-     .writeConstructor(Tl::InputPeerNotifySettings).writeInt(1 << 2).writeInt(muted ? 0x7fffffff : 0);
+    w.writeConstructor(Tl::AccountUpdateNotifySettings);
+    // A whole peer, or one forum topic of it.
+    if (topicId) w.writeConstructor(Tl::InputNotifyForumTopic).writeRaw(inputPeer(peer)).writeInt(topicId);
+    else w.writeConstructor(Tl::InputNotifyPeer).writeRaw(inputPeer(peer));
+    w.writeConstructor(Tl::InputPeerNotifySettings).writeInt(1 << 2).writeInt(muted ? 0x7fffffff : 0);
     return w.toByteArray();
 }
 
@@ -858,6 +881,8 @@ TgMedia TgApi::readMedia(const TlObject &media)
             }
         }
         if (m.mimeType == QLatin1String("image/webp") || m.mimeType == QLatin1String("application/x-tgsticker")) m.kind = TgMedia::Sticker;
+        // Any GIF (animated MPEG4 already caught above, plus real image/gif files) - not played here.
+        if (m.mimeType == QLatin1String("image/gif") || m.fileName.endsWith(QLatin1String(".gif"), Qt::CaseInsensitive)) m.kind = TgMedia::Gif;
         // Name music (audio) from its tags the way Telegram's clients do: "<title>_<performer>.<ext>"
         // (performer = the "Contributing Artists" tag). Tags win over any file-name attribute for
         // audio; other files keep their file name, falling back to a generic name when there is none.

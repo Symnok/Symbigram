@@ -91,6 +91,8 @@ public:
     static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0, int topMsgId = 0);
     static QByteArray getForumTopics(const TgPeer &peer, int offsetDate, int offsetId, int offsetTopic, int limit);
     static QByteArray getReplies(const TgPeer &peer, int topicId, int offsetId, int limit);
+    static QByteArray readDiscussion(const TgPeer &peer, int topicId, int readMaxId);
+    static QByteArray blockUser(const TgPeer &peer);
     static QList<TgForumTopic> readForumTopics(const TlObject &o);
     static QByteArray editMessage(const TgPeer &peer, int msgId, const QString &text);
     static QByteArray forwardMessages(const TgPeer &fromPeer, const QList<qint32> &ids,
@@ -110,7 +112,7 @@ public:
     static QByteArray editPeerFolders(const TgPeer &peer, int folderId);   // 1 = archive, 0 = main
     static QByteArray updateDialogFilter(const QByteArray &filter, int id);
     static QByteArray deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke);
-    static QByteArray updateNotifySettings(const TgPeer &peer, bool muted);
+    static QByteArray updateNotifySettings(const TgPeer &peer, bool muted, int topicId = 0);
     /// upload.getFile for a location built by fileLocation()/peerPhotoLocation().
     static QByteArray getFile(const QByteArray &location, qint64 offset, int limit);
     static QByteArray fileLocation(const TgMedia &media, const QString &sizeType);

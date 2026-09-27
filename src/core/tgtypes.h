@@ -52,7 +52,7 @@ struct TgPeerInfo
 /// topic is always id 1).
 struct TgForumTopic
 {
-    TgForumTopic() : id(0), iconColor(0), topMessage(0), unreadCount(0), closed(false), pinned(false), hidden(false), iconEmojiId(0) {}
+    TgForumTopic() : id(0), iconColor(0), topMessage(0), unreadCount(0), closed(false), pinned(false), hidden(false), muted(false), iconEmojiId(0) {}
     int id;
     QString title;
     int iconColor;         // RGB int for the default (letter) icon
@@ -61,6 +61,7 @@ struct TgForumTopic
     bool closed;
     bool pinned;
     bool hidden;
+    bool muted;            // notify_settings.mute_until is in the future
     qint64 iconEmojiId;    // custom-emoji icon (not rendered here), 0 = none
 };
 

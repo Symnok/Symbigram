@@ -39,8 +39,10 @@ Item {
         var m = Math.floor(s / 60), ss = s % 60
         return m + ":" + (ss < 10 ? "0" + ss : ss)
     }
-    property bool isPhoto: model.mediaKind == "photo" || model.mediaKind == "sticker" || model.mediaKind == "gif"
-    property bool hasFileRow: model.mediaKind != "" && !isPhoto
+    // GIFs (animated MPEG4 and real .gif files) are not shown on the phone: we just flag them.
+    property bool isGif: model.mediaKind == "gif"
+    property bool isPhoto: model.mediaKind == "photo" || model.mediaKind == "sticker"
+    property bool hasFileRow: model.mediaKind != "" && !isPhoto && !isGif
 
     height: column.height + platformStyle.paddingSmall
 
@@ -215,7 +217,7 @@ Item {
                                 ? (model.voicePlaying ? "■" : "▶")
                                 : (model.mediaKind == "audio"
                                    ? (chat.audioRow == index ? chat.audioBuffer + "%" : "▶")
-                                   : (model.mediaState == "ready" ? "✓"
+                                   : (model.mediaState == "ready" ? "O"
                                    : (model.mediaState == "loading" ? model.mediaProgress + "%"
                                    : (model.mediaKind == "video" ? "▶" : "↓"))))
                         }
@@ -246,6 +248,36 @@ Item {
                                 : (model.mediaKind == "audio"
                                    ? (chat.audioRow == index ? qsTr("buffering %1%... opening player").arg(chat.audioBuffer) : qsTr("tap to play in player"))
                                    : (model.mediaState == "ready" ? qsTr("tap to open") : (model.mediaState == "loading" ? qsTr("downloading %1%").arg(model.mediaProgress) : (model.mediaKind == "video" ? model.mediaInfo : qsTr("tap to download")))))
+                            color: "#c0d4e6"
+                            font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                        }
+                    }
+                }
+
+                // -- an animated GIF: not played on the phone, shown as an "unsupported" placeholder --
+                Row {
+                    id: gifRow
+                    visible: isGif
+                    spacing: platformStyle.paddingMedium
+                    Rectangle {
+                        width: platformStyle.graphicSizeMedium
+                        height: platformStyle.graphicSizeMedium
+                        radius: 6
+                        color: "#6a6a6a"
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label { anchors.centerIn: parent; text: "GIF"; color: "white"; font.bold: true; font.pixelSize: platformStyle.fontSizeSmall * 0.9 }
+                    }
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label {
+                            text: qsTr("GIF file")
+                            color: "white"
+                            font.pixelSize: platformStyle.fontSizeSmall
+                            width: maxBubbleWidth - 2 * platformStyle.paddingMedium - platformStyle.graphicSizeMedium - platformStyle.paddingMedium
+                            elide: Text.ElideRight
+                        }
+                        Label {
+                            text: qsTr("not supported")
                             color: "#c0d4e6"
                             font.pixelSize: platformStyle.fontSizeSmall * 0.85
                         }

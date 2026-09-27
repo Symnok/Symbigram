@@ -34,6 +34,7 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
     roles[AvatarRole] = "avatar";
     roles[SecretRole] = "secret";
     roles[SecretStateRole] = "secretState";
+    roles[ForumRole] = "isForum";
     setRoleNames(roles);
 
     connect(session, SIGNAL(dialogsChanged()), this, SLOT(onDialogsChanged()));
@@ -187,6 +188,7 @@ QVariant ChatsModel::data(const QModelIndex &index, int role) const
     case MutedRole: return d.isMuted(now());
     case PinnedRole: return d.pinned;
     case GroupRole: return d.peer.isGroup();
+    case ForumRole: return info.isForum;
     case OnlineRole: return d.peer.kind == TgPeer::User && info.online;
     case TypingRole: return m_typingUntil.value(key, 0) > now();
     case InitialsRole: return initials(m_session->peers().title(d.peer));
@@ -220,6 +222,7 @@ QVariant ChatsModel::secretData(int row, int role) const
     case MutedRole: return false;
     case PinnedRole: return true;              // kept at the top of the list
     case GroupRole: return false;
+    case ForumRole: return false;
     case OnlineRole: return info.online;
     case TypingRole: return false;
     case InitialsRole: return initials(name);
@@ -267,6 +270,8 @@ void ChatsModel::loadMore()
 }
 void ChatsModel::refresh() { m_session->refreshDialogs(); m_session->loadFolders(); if (m_folderSel == -2) m_session->loadArchive(); emit countChanged(); }
 void ChatsModel::setMuted(const QString &peerKey, bool muted) { m_session->setMuted(TgPeer::fromKey(peerKey), muted); }
+void ChatsModel::markAllRead(const QString &peerKey) { if (!peerKey.startsWith(QLatin1String("secret:"))) m_session->markAllRead(TgPeer::fromKey(peerKey)); }
+void ChatsModel::blockUser(const QString &peerKey) { TgPeer p = TgPeer::fromKey(peerKey); if (p.kind == TgPeer::User) m_session->blockUser(p); }
 void ChatsModel::clearHistory(const QString &peerKey) { m_session->deleteHistory(TgPeer::fromKey(peerKey)); }
 void ChatsModel::discardSecret(const QString &peerKey) { if (peerKey.startsWith(QLatin1String("secret:"))) m_session->discardSecretChat(peerKey.mid(7).toInt()); }
 void ChatsModel::deleteChat(const QString &peerKey, bool forEveryone) { m_session->deleteChat(TgPeer::fromKey(peerKey), forEveryone); }
