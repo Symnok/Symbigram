@@ -666,17 +666,20 @@ void AppController::onMessage(const TgMessage &m)
     if (m.peer.isGroup()) who = m_session->peers().userName(m.fromId) + QLatin1String(" @ ") + who;
     QString text = m.text.isEmpty() ? m.note : m.text;
 
-    // Pigler (Belle status-bar envelope) fires for EVERY incoming message while backgrounded, by
-    // request: it deliberately ignores the per-chat Telegram mute, the Archive and the group
-    // toggle. No-op when Pigler isn't installed. (Cleared when the app comes to the foreground.)
-    m_pigler->showMessage(m.peer.key(), who, text);
+    // Pigler (Belle notification-drawer entry) fires for incoming messages while backgrounded. It
+    // deliberately ignores the per-chat Telegram mute and the Archive, but DOES respect the
+    // groups/channels toggle (user request): a silenced group posts nothing to Pigler either. No-op
+    // when Pigler isn't installed. (Cleared when the app comes to the foreground.)
+    const bool groupSilenced = m.peer.isGroup() && !groupNotifications() && !m.mentioned;
+    if (!groupSilenced)
+        m_pigler->showMessage(m.peer.key(), who, text);
 
     // The pop-up / "new messages" query / vibration still respect the fine-grained silencers: a
     // per-chat mute (from Telegram's notify settings), the Archive, and the groups/channels toggle.
     if (m_session->isArchived(m.peer)) return;
     TgDialog d = m_session->dialog(m.peer);
     if (d.isMuted(int(QDateTime::currentDateTime().toTime_t()))) return;
-    if (m.peer.isGroup() && !groupNotifications() && !m.mentioned) return;
+    if (groupSilenced) return;
     // Each channel: 0 = never, 1 = only the first unread of a burst (count was 0), 2 = every message.
     const bool first = m_notifier->pendingCount() == 0;
     const bool showPopup = popupMode() == 2 || (popupMode() == 1 && first);

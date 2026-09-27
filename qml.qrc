@@ -13,5 +13,6 @@
         <file>images/pinned.png</file>
         <file>images/lock.png</file>
         <file>images/lock_green.png</file>
+        <file>images/pigler.png</file>
     </qresource>
 </RCC>

@@ -11,6 +11,7 @@
 #define PIGLERNOTIFIER_H
 
 #include <QHash>
+#include <QImage>
 #include <QObject>
 #include <QString>
 
@@ -43,7 +44,10 @@ private:
     QHash<QString, int> m_ids;    // peerKey -> Pigler notification id
     QHash<int, QString> m_keys;   // Pigler notification id -> peerKey
 #ifdef Q_OS_SYMBIAN
+    void applyIcon(int id);       // sets the Symbigram tray icon on a notification
     QPiglerAPI *m_api;
+    bool m_iconTried;             // load the icon from resources once
+    QImage m_icon;                // cached 52x52 tray icon (empty if load failed)
 #endif
 };
 

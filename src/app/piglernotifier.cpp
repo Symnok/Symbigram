@@ -9,7 +9,7 @@
 PiglerNotifier::PiglerNotifier(QObject *parent)
     : QObject(parent), m_available(false)
 #ifdef Q_OS_SYMBIAN
-    , m_api(0)
+    , m_api(0), m_iconTried(false)
 #endif
 {
 }
@@ -46,17 +46,38 @@ bool PiglerNotifier::init(const QString &appName, int appUid)
 #endif
 }
 
+#ifdef Q_OS_SYMBIAN
+void PiglerNotifier::applyIcon(int id)
+{
+    // Give the tray notification the Symbigram icon (a paper plane) rather than Pigler's default
+    // marker - the same trick Kutegram uses. Pigler's v>=? servers take a raw ARGB image and pack
+    // it themselves (QPiglerAPI::setNotificationIcon centres/scales it to the server's bitmap size,
+    // recommended 52x52); an older server that predates icons just returns an error, which we
+    // ignore. Loaded once from the app resources and reused.
+    if (!m_iconTried) {
+        m_iconTried = true;
+        if (!m_icon.load(QLatin1String(":/images/pigler.png")))
+            m_icon = QImage();   // no icon available - fall back to the default marker
+    }
+    if (!m_icon.isNull())
+        m_api->setNotificationIcon(id, m_icon);
+}
+#endif
+
 void PiglerNotifier::showMessage(const QString &peerKey, const QString &title, const QString &text)
 {
 #ifdef Q_OS_SYMBIAN
     if (!m_available || !m_api) return;
     if (m_ids.contains(peerKey)) {                 // one entry per chat: update it in place
-        m_api->updateNotification(m_ids.value(peerKey), title, text);
-        return;
+        int id = m_ids.value(peerKey);
+        m_api->updateNotification(id, title, text);
+        applyIcon(id);                             // SetNotification redraws with the default marker,
+        return;                                    // so re-assert our icon on every update too
     }
     qint32 id = m_api->createNotification(title, text);
     if (id > 0) {                                  // <=0: an error or the per-app limit; skip quietly
         m_api->setLaunchAppOnTap(id, true);
+        applyIcon(id);                             // Symbigram plane instead of the generic dot
         m_ids.insert(peerKey, id);
         m_keys.insert(id, peerKey);
     }
