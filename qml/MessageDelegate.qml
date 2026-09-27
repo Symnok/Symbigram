@@ -91,8 +91,16 @@ Item {
                 anchors.fill: parent
                 onPressAndHold: root.pressAndHold()
                 onClicked: {
-                    if (isPhoto && model.mediaState == "ready") root.openImage(model.localPath != "" ? model.localPath : model.mediaThumb, index)
-                    else if (isPhoto && model.mediaState == "idle") chat.downloadMedia(index)
+                    if (!isPhoto) return
+                    if (model.mediaState == "ready") {
+                        // Full-resolution size is downloaded - open it.
+                        root.openImage(model.localPath, index)
+                    } else {
+                        // Show the small preview instantly, and fetch the full size in the background
+                        // (so it opens full-res next time and "Save to phone" saves the full image).
+                        if (model.mediaThumb != "") root.openImage(model.mediaThumb, index)
+                        if (model.mediaState == "idle") chat.downloadMedia(index)
+                    }
                 }
             }
 

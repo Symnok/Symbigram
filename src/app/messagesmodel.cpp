@@ -25,7 +25,7 @@ namespace
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
-      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1),
+      m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0)
 {
     QHash<int, QByteArray> roles;
@@ -200,12 +200,23 @@ void MessagesModel::prepareMedia(Row &r)
     if (!r.m.media.isValid() || !m_media) return;
     TgMedia &m = r.m.media;
     if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) {
-        // An instant blurred placeholder, then the small size fetched automatically.
+        // An instant blurred placeholder, then the small "show" size fetched automatically - it is
+        // the inline thumbnail only.
         QString stripped = m_media->strippedThumbFile(m);
         if (!stripped.isEmpty()) r.thumbPath = stripped;
         QString cached = m_media->cachedFile(m, m.sizeType);
-        if (!cached.isEmpty()) { r.thumbPath = cached; r.fullPath = cached; }
+        if (!cached.isEmpty()) r.thumbPath = cached;
         else { r.awaitKey = m_media->fetch(m, m.sizeType); r.mediaLoading = true; }
+        // fullPath is the FULL-resolution size (bigSizeType), used to open full-screen and to save.
+        // It is fetched on demand, not automatically. For stickers (and any photo whose full size
+        // equals the shown size) the shown file already is the full file.
+        const bool bigDiffers = m.kind == TgMedia::Photo && !m.bigSizeType.isEmpty() && m.bigSizeType != m.sizeType;
+        if (bigDiffers) {
+            QString big = m_media->cachedFile(m, m.bigSizeType);
+            if (!big.isEmpty()) r.fullPath = big;
+        } else if (!cached.isEmpty()) {
+            r.fullPath = cached;
+        }
     } else {
         // Videos/documents carry a thumbnail; show it if there is one, but do not fetch
         // the (large) file until asked.
@@ -316,7 +327,9 @@ QString MessagesModel::exportToPublic(int row, bool unique)
 void MessagesModel::saveMedia(int row)
 {
     if (row < 0 || row >= m_rows.size()) return;
-    if (m_rows.at(row).fullPath.isEmpty()) { downloadMedia(row); return; }
+    // Not downloaded yet (e.g. a photo whose full size hasn't been fetched): start the full-size
+    // download and finish the save automatically when it lands (see onMediaReady).
+    if (m_rows.at(row).fullPath.isEmpty()) { m_pendingSaveRow = row; downloadMedia(row); return; }
     QString base = m_downloadFolder.isEmpty() ? downloadDir(m_rows.at(row).m.media.kind == TgMedia::Photo) : m_downloadFolder;
     QString target = exportToPublic(row, true);
     if (!target.isEmpty()) {
@@ -476,9 +489,14 @@ void MessagesModel::onMediaReady(const QString &key, const QString &path)
     // full download would be misread as a thumbnail and never mark the row ready.
     bool isThumb = m_media && ((!m.thumbSizeType.isEmpty() && m_media->keyFor(m, m.thumbSizeType) == key) ||
                                ((m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) && m_media->keyFor(m, m.sizeType) == key));
+    const bool bigDiffers = m.kind == TgMedia::Photo && !m.bigSizeType.isEmpty() && m.bigSizeType != m.sizeType;
     if (isThumb) {
+        // The small "show" size is the inline thumbnail. For a sticker (or a photo whose full size
+        // equals the shown size) it is also the full file; for a normal photo it is NOT - the full
+        // size (bigSizeType) is a separate on-demand download.
         r.thumbPath = path;
-        if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) { r.fullPath = path; r.mediaLoading = false; }
+        r.mediaLoading = false;
+        if (!bigDiffers && (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker)) r.fullPath = path;
     } else {
         r.fullPath = path;
         r.thumbPath = (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) ? path : r.thumbPath;
@@ -487,6 +505,7 @@ void MessagesModel::onMediaReady(const QString &key, const QString &path)
     r.awaitKey.clear();
     emit dataChanged(index(row), index(row));
     if (row == m_pendingPlayRow && !r.fullPath.isEmpty()) { m_pendingPlayRow = -1; startVoice(row); }
+    if (row == m_pendingSaveRow && !r.fullPath.isEmpty()) { m_pendingSaveRow = -1; saveMedia(row); }
 }
 
 void MessagesModel::onMediaFailed(const QString &key, const QString &error)

@@ -229,6 +229,7 @@ private:
     VoicePlayer *m_voice;
     int m_voiceRow;        // the row currently playing, or -1
     int m_pendingPlayRow;  // a voice row to play as soon as its download finishes
+    int m_pendingSaveRow;  // a photo row to save once its full-size download finishes
     int m_audioRow;        // row being streamed to the media player, or -1
     int m_audioBuffer;     // percent buffered before the hand-off
     int m_audioJobId;      // the streaming download job
