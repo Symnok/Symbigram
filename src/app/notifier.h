@@ -23,6 +23,7 @@ public:
     /// no envelope (the unread badges in the list are not affected).
     void setEnabled(bool on);
     void setVibrate(bool on) { m_vibrate = on; }
+    void setSound(bool on) { m_sound = on; }   // whether the popup plays its alert tone
 
     /// Optionally shows the discreet popup (title = who, text = what) and always vibrates per the
     /// vibrate setting. The caller decides whether the popup shows (Off / first / every message).
@@ -39,11 +40,13 @@ private:
     void showPending();
     bool m_enabled;
     bool m_vibrate;
+    bool m_sound;      // whether the discreet popup includes its confirmation tone
     bool m_popQuery;   // whether the next showPending() should raise the query
     int m_pending;
     static QString pendingText(int count);
 
     void *m_query;   // the global query and its active object (Symbian only)
+    void *m_vibra;   // a kept-alive CHWRMVibra session (Symbian only)
 };
 
 #endif // NOTIFIER_H

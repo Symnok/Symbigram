@@ -88,20 +88,23 @@ namespace
         HBufC *iPrompt;
     };
 
-    void showPopupL(const QString &title, const QString &text)
+    void showPopupL(const QString &title, const QString &text, bool withTone)
     {
-        // Long popup with the lights on and the confirmation tone; tapping it launches
-        // (brings forward) this application through its UID.
+        // Long popup with the lights on and (optionally) the confirmation tone; tapping it
+        // launches (brings forward) this application through its UID.
+        TUint flags = KAknDiscreetPopupDurationLong | KAknDiscreetPopupLightsOn;
+        if (withTone) flags |= KAknDiscreetPopupConfirmationTone;
         CAknDiscreetPopup::ShowGlobalPopupL(ptr(title), ptr(text), KAknsIIDNone, KNullDesC, 0, 0,
-            KAknDiscreetPopupDurationLong | KAknDiscreetPopupLightsOn | KAknDiscreetPopupConfirmationTone,
-            0, NULL, TUid::Uid(SGM_UID3));
+            flags, 0, NULL, TUid::Uid(SGM_UID3));
     }
 
-    void vibrateL(int ms)
+    // Keep the CHWRMVibra session alive: destroying it right after StartVibraL cancels the
+    // vibration (the server drops it when the client session closes), so a throwaway object
+    // vibrated for essentially 0 ms - which is why nothing was felt. Reuse one instance.
+    void vibrateL(void *&vibra, int ms)
     {
-        CHWRMVibra *v = CHWRMVibra::NewLC();
-        v->StartVibraL(ms);
-        CleanupStack::PopAndDestroy(v);
+        if (!vibra) vibra = CHWRMVibra::NewL();
+        static_cast<CHWRMVibra *>(vibra)->StartVibraL(ms);
     }
 
     // The "new message" envelope in the status bar - the small indicator the messaging
@@ -116,7 +119,8 @@ namespace
 #endif
 
 Notifier::Notifier(QObject *parent)
-    : QObject(parent), m_enabled(true), m_vibrate(true), m_popQuery(false), m_pending(0), m_query(0)
+    : QObject(parent), m_enabled(true), m_vibrate(true), m_sound(true), m_popQuery(false),
+      m_pending(0), m_query(0), m_vibra(0)
 {
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = 0;
@@ -130,6 +134,7 @@ Notifier::~Notifier()
 {
 #ifdef Q_OS_SYMBIAN
     delete static_cast<PendingQuery *>(m_query);
+    delete static_cast<CHWRMVibra *>(m_vibra);
 #endif
 }
 
@@ -149,11 +154,12 @@ void Notifier::notify(const QString &title, const QString &text, bool showPopup)
         QString t = title;
         QString b = text.simplified();
         if (b.size() > 120) b = b.left(117) + QLatin1String("...");
-        TRAP_IGNORE(showPopupL(t, b));
+        TRAP_IGNORE(showPopupL(t, b, m_sound));
     }
-    if (m_vibrate) TRAP_IGNORE(vibrateL(400));
+    if (m_vibrate) TRAP_IGNORE(vibrateL(m_vibra, 400));
 #else
-    qDebug() << "NOTIFY" << title << ":" << text << (showPopup ? "" : "(popup off)") << (m_vibrate ? "" : "(vibrate off)");
+    qDebug() << "NOTIFY" << title << ":" << text << (showPopup ? "" : "(popup off)")
+             << (m_sound ? "(sound)" : "") << (m_vibrate ? "(vibrate)" : "");
 #endif
 }
 
@@ -161,7 +167,7 @@ void Notifier::vibrate(int ms)
 {
     if (!m_enabled) return;
 #ifdef Q_OS_SYMBIAN
-    if (m_vibrate) TRAP_IGNORE(vibrateL(ms));
+    if (m_vibrate) TRAP_IGNORE(vibrateL(m_vibra, ms));
 #else
     qDebug() << "VIBRATE" << ms;
 #endif

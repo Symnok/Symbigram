@@ -39,8 +39,7 @@ namespace
 {
     const char *const KeyAutoConnect = "account/autoConnect";
     const char *const KeyLanguage = "ui/language";
-    const char *const KeyNotifications = "ui/notifications";
-    const char *const KeyVibrate = "ui/vibrate";
+    const char *const KeyAlertMode = "ui/alertMode";   // 0 off, 1 sound, 2 vibration, 3 both
     const char *const KeyPopupMode = "ui/popupMode";   // 0 off, 1 first message, 2 every message
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyLogging = "ui/logging";
@@ -96,8 +95,9 @@ AppController::AppController(QObject *parent)
     connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
     connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
     m_notifier = new Notifier(this);
-    m_notifier->setEnabled(notifications());
-    m_notifier->setVibrate(vibrate());
+    m_notifier->setEnabled(alertMode() != 0);
+    m_notifier->setSound(alertMode() & 1);
+    m_notifier->setVibrate(alertMode() & 2);
 
     // Optional status-bar ("envelope") notifications on Belle via Pigler. init() quietly fails
     // (and everything stays as-is) when Pigler is not installed, or on S^3/Anna.
@@ -259,10 +259,26 @@ int AppController::qrExpires() const { return m_session->qrExpires(); }
 bool AppController::passwordNeeded() const { return m_session->passwordNeeded(); }
 QString AppController::passwordHint() const { return m_session->passwordHint(); }
 QString AppController::version() const { return QLatin1String(SGM_STR(APP_VERSION)); }
-bool AppController::notifications() const { return m_settings.value(QLatin1String(KeyNotifications), true).toBool(); }
-void AppController::setNotifications(bool on) { m_settings.setValue(QLatin1String(KeyNotifications), on); m_notifier->setEnabled(on); emit settingsChanged(); }
-bool AppController::vibrate() const { return m_settings.value(QLatin1String(KeyVibrate), true).toBool(); }
-void AppController::setVibrate(bool on) { m_settings.setValue(QLatin1String(KeyVibrate), on); m_notifier->setVibrate(on); emit settingsChanged(); }
+int AppController::alertMode() const
+{
+    int m = m_settings.value(QLatin1String(KeyAlertMode), 3).toInt();   // default: sound + vibration
+    return (m < 0 || m > 3) ? 3 : m;
+}
+void AppController::setAlertMode(int mode)
+{
+    if (mode < 0 || mode > 3 || mode == alertMode()) return;
+    m_settings.setValue(QLatin1String(KeyAlertMode), mode);
+    m_notifier->setEnabled(mode != 0);
+    m_notifier->setSound(mode & 1);
+    m_notifier->setVibrate(mode & 2);
+    emit settingsChanged();
+}
+QStringList AppController::alertModeNames() const
+{
+    QStringList names;
+    names << tr("Off") << tr("Sound") << tr("Vibration") << tr("Sound and vibration");
+    return names;
+}
 int AppController::popupMode() const
 {
     int m = m_settings.value(QLatin1String(KeyPopupMode), 1).toInt();   // default: first message

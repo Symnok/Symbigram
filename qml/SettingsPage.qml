@@ -20,6 +20,13 @@ Page {
     }
 
     SelectionDialog {
+        id: alertModeDialog
+        titleText: qsTr("Notification")
+        model: app.alertModeNames()
+        onAccepted: if (selectedIndex >= 0) app.alertMode = selectedIndex
+    }
+
+    SelectionDialog {
         id: popupModeDialog
         titleText: qsTr("Popup for new messages")
         model: app.popupModeNames()
@@ -132,24 +139,24 @@ Page {
 
             ListItem {
                 id: notifyItem
-                ListItemText {
-                    anchors { left: notifyItem.paddingItem.left; right: notifySwitch.left; verticalCenter: parent.verticalCenter }
-                    role: "Title"
-                    text: qsTr("Notifications")
-                    wrapMode: Text.Wrap
+                subItemIndicator: true
+                Column {
+                    anchors { left: notifyItem.paddingItem.left; right: notifyItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Notification") }
+                    Label {
+                        width: parent.width
+                        text: app.alertModeNames()[app.alertMode]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
                 }
-                Switch {
-                    id: notifySwitch
-                    anchors { right: notifyItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    checked: app.notifications
-                    onCheckedChanged: if (checked != app.notifications) app.notifications = checked
-                }
-                onClicked: notifySwitch.checked = !notifySwitch.checked
+                onClicked: { alertModeDialog.selectedIndex = app.alertMode; alertModeDialog.open() }
             }
             ListItem {
                 id: popupsItem
                 subItemIndicator: true
-                enabled: app.notifications
+                enabled: app.alertMode != 0
                 opacity: enabled ? 1 : 0.4
                 Column {
                     anchors { left: popupsItem.paddingItem.left; right: popupsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
@@ -165,26 +172,8 @@ Page {
                 onClicked: { popupModeDialog.selectedIndex = app.popupMode; popupModeDialog.open() }
             }
             ListItem {
-                id: vibrateItem
-                enabled: app.notifications
-                opacity: enabled ? 1 : 0.4
-                ListItemText {
-                    anchors { left: vibrateItem.paddingItem.left; right: vibrateSwitch.left; verticalCenter: parent.verticalCenter }
-                    role: "Title"
-                    text: qsTr("Vibrate")
-                    wrapMode: Text.Wrap
-                }
-                Switch {
-                    id: vibrateSwitch
-                    anchors { right: vibrateItem.paddingItem.right; verticalCenter: parent.verticalCenter }
-                    checked: app.vibrate
-                    onCheckedChanged: if (checked != app.vibrate) app.vibrate = checked
-                }
-                onClicked: vibrateSwitch.checked = !vibrateSwitch.checked
-            }
-            ListItem {
                 id: groupsItem
-                enabled: app.notifications
+                enabled: app.alertMode != 0
                 opacity: enabled ? 1 : 0.4
                 ListItemText {
                     anchors { left: groupsItem.paddingItem.left; right: groupsSwitch.left; verticalCenter: parent.verticalCenter }

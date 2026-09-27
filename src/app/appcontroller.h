@@ -48,8 +48,7 @@ class AppController : public QObject
     Q_PROPERTY(bool codeBusy READ codeBusy NOTIFY loginChanged)
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY settingsChanged)
-    Q_PROPERTY(bool notifications READ notifications WRITE setNotifications NOTIFY settingsChanged)
-    Q_PROPERTY(bool vibrate READ vibrate WRITE setVibrate NOTIFY settingsChanged)
+    Q_PROPERTY(int alertMode READ alertMode WRITE setAlertMode NOTIFY settingsChanged)
     Q_PROPERTY(int popupMode READ popupMode WRITE setPopupMode NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
@@ -99,10 +98,10 @@ public:
     QString version() const;
     QString language() const;
     void setLanguage(const QString &lang);
-    bool notifications() const;
-    void setNotifications(bool on);
-    bool vibrate() const;
-    void setVibrate(bool on);
+    int alertMode() const;          // 0 = off, 1 = sound, 2 = vibration, 3 = sound + vibration
+    void setAlertMode(int mode);
+    Q_INVOKABLE QStringList alertModeNames() const;
+    bool notifications() const { return alertMode() != 0; }   // the master switch (any alert on)
     int popupMode() const;          // 0 = off, 1 = first message only, 2 = every message
     void setPopupMode(int mode);
     Q_INVOKABLE QStringList popupModeNames() const;
