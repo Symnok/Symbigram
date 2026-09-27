@@ -6,6 +6,7 @@
 // to copy, save an attachment, retry or delete. Tapping an image opens the viewer.
 import QtQuick 1.1
 import com.nokia.symbian 1.1
+import com.nokia.extras 1.1
 
 Page {
     id: page
@@ -60,6 +61,64 @@ Page {
     Connections {
         target: chat
         onMediaSaved: { savedDialog.path = path; savedDialog.open() }
+        onForwarded: { forwardedBanner.text = qsTr("Forwarded to %1").arg(toTitle); forwardedBanner.open() }
+    }
+
+    InfoBanner { id: forwardedBanner; timeout: 3000 }
+
+    // Pick a chat or person to forward the selected message to. Existing chats are matched locally
+    // as you type; other people are searched on the server and appended. Tapping a row forwards.
+    Timer { id: forwardSearchTimer; interval: 350; onTriggered: app.searchPeers(forwardSearch.text) }
+    CommonDialog {
+        id: forwardDialog
+        property int row: -1
+        titleText: qsTr("Forward to")
+        buttonTexts: [qsTr("Cancel")]
+        content: Item {
+            width: parent.width
+            height: 340
+            Column {
+                anchors.fill: parent
+                spacing: platformStyle.paddingSmall
+                TextField {
+                    id: forwardSearch
+                    width: parent.width
+                    placeholderText: qsTr("search chats and people")
+                    inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+                    onTextChanged: forwardSearchTimer.restart()
+                }
+                ListView {
+                    id: forwardList
+                    width: parent.width
+                    height: parent.height - forwardSearch.height - platformStyle.paddingSmall
+                    clip: true
+                    model: app.peerSearchResults
+                    delegate: Item {
+                        width: forwardList.width
+                        height: (typeof privateStyle != "undefined") ? privateStyle.menuItemHeight : 56
+                        Rectangle { anchors.fill: parent; color: fwdMouse.pressed ? "#3d5a80" : "transparent" }
+                        Column {
+                            anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+                            Label { width: parent.width; text: modelData.title; color: "white"; elide: Text.ElideRight }
+                            Label {
+                                width: parent.width
+                                visible: !modelData.local
+                                text: qsTr("not in your chats")
+                                color: platformStyle.colorNormalMid
+                                font.pixelSize: platformStyle.fontSizeSmall
+                                elide: Text.ElideRight
+                            }
+                        }
+                        MouseArea {
+                            id: fwdMouse
+                            anchors.fill: parent
+                            onClicked: { var k = modelData.peerKey; forwardDialog.close(); chat.forwardTo(forwardDialog.row, k) }
+                        }
+                    }
+                    ScrollDecorator { flickableItem: forwardList }
+                }
+            }
+        }
     }
 
     QueryDialog {
@@ -173,6 +232,11 @@ Page {
                 text: qsTr("Reply")
                 visible: contextMenu.item ? (!contextMenu.item.pending && !contextMenu.item.service && !chat.isSecret && !chat.peerIsChannel) : false
                 onClicked: { chat.startReply(contextMenu.row); composer.forceActiveFocus(); composer.openSoftwareInputPanel() }
+            }
+            MenuItem {
+                text: qsTr("Forward")
+                visible: contextMenu.item ? (!contextMenu.item.pending && !contextMenu.item.service && !chat.isSecret) : false
+                onClicked: { forwardDialog.row = contextMenu.row; forwardSearch.text = ""; app.searchPeers(""); forwardDialog.open() }
             }
             MenuItem {
                 text: qsTr("Edit")
@@ -345,6 +409,13 @@ Page {
         onMessageAppended: list.scrollToEnd()
         onOlderPrepended: list.positionViewAtIndex(count, ListView.Beginning)
         onChatChanged: list.scrollToEnd()
+        // First page in: jump to the first unread message, or the end when all is read.
+        onInitialLoaded: {
+            if (firstUnreadRow >= 0 && firstUnreadRow < list.count)
+                list.positionViewAtIndex(firstUnreadRow, ListView.Beginning)
+            else
+                list.scrollToEnd()
+        }
     }
 
     Label {
@@ -493,6 +564,9 @@ Page {
     }
 
     // -- full-screen image viewer --
+    // Opens fit-to-screen (the whole image visible). Double-tap toggles a zoom that can be panned;
+    // a single tap zooms back out, or closes when already fit. The tap MouseArea lives INSIDE the
+    // Flickable so the Flickable can take over drags for panning (a MouseArea on top would eat them).
     Rectangle {
         id: viewer
         anchors.fill: parent
@@ -501,25 +575,42 @@ Page {
         z: 100
         property string path: ""
         property int row: -1
-        function show(p, r) { path = p; row = r; visible = true }
-        function hide() { visible = false; path = "" }
+        property bool zoomed: false
+        function show(p, r) { path = p; row = r; zoomed = false; visible = true }
+        function hide() { visible = false; path = ""; zoomed = false }
 
         Flickable {
             id: viewerFlick
             anchors.fill: parent
-            contentWidth: viewerImage.width
-            contentHeight: viewerImage.height
+            contentWidth: Math.max(width, viewerImage.width)
+            contentHeight: Math.max(height, viewerImage.height)
             clip: true
+            interactive: viewer.zoomed
             Image {
                 id: viewerImage
                 source: viewer.path
-                width: Math.max(viewer.width, sourceSize.width)
-                height: Math.max(viewer.height, sourceSize.height)
+                // fit: scale the whole image into the screen. zoomed: 2.5x that (at least 1:1 pixels)
+                // so it overflows the viewport and the Flickable can pan it.
+                property real fitScale: (sourceSize.width > 0 && sourceSize.height > 0)
+                        ? Math.min(viewerFlick.width / sourceSize.width, viewerFlick.height / sourceSize.height) : 1
+                property real scaleF: viewer.zoomed ? Math.max(fitScale * 2.5, 1) : fitScale
+                width: sourceSize.width * scaleF
+                height: sourceSize.height * scaleF
+                x: Math.max(0, (viewerFlick.contentWidth - width) / 2)
+                y: Math.max(0, (viewerFlick.contentHeight - height) / 2)
                 fillMode: Image.PreserveAspectFit
+                smooth: true
+                asynchronous: true
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: viewerTap.restart()
+                onDoubleClicked: { viewerTap.stop(); viewer.zoomed = !viewer.zoomed }
             }
         }
+        // Distinguish a single tap from the first tap of a double-tap.
+        Timer { id: viewerTap; interval: 250; onTriggered: { if (viewer.zoomed) viewer.zoomed = false; else viewer.hide() } }
         BusyIndicator { anchors.centerIn: parent; running: viewerImage.status == Image.Loading; visible: running }
-        MouseArea { anchors.fill: parent; onClicked: viewer.hide() }
         Row {
             anchors { bottom: parent.bottom; horizontalCenter: parent.horizontalCenter; bottomMargin: platformStyle.paddingLarge }
             spacing: platformStyle.paddingLarge

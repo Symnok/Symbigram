@@ -95,9 +95,13 @@ Item {
                     if (model.mediaState == "ready") {
                         // Full-resolution size is downloaded - open it.
                         root.openImage(model.localPath, index)
+                    } else if (!model.previewLoaded) {
+                        // Thumbnail preview mode: the photo is still the blurred placeholder.
+                        // First tap just loads the inline preview (no full download).
+                        chat.loadPreview(index)
                     } else {
-                        // Show the small preview instantly, and fetch the full size in the background
-                        // (so it opens full-res next time and "Save to phone" saves the full image).
+                        // Preview is loaded: open it instantly, and fetch the full size in the
+                        // background (so it opens full-res next time and "Save" saves the full image).
                         if (model.mediaThumb != "") root.openImage(model.mediaThumb, index)
                         if (model.mediaState == "idle") chat.downloadMedia(index)
                     }
@@ -167,13 +171,21 @@ Item {
                         running: model.mediaState == "loading" && image.status != Image.Ready
                         visible: running
                     }
-                    // a "tap to load" hint when nothing is showing yet
-                    Label {
+                    // a "tap to load" chip while only the blurred placeholder is shown (Thumbnail mode)
+                    Rectangle {
                         anchors.centerIn: parent
-                        visible: model.mediaState == "idle" && image.status != Image.Ready
-                        text: qsTr("Tap to load")
-                        color: "white"
-                        font.pixelSize: platformStyle.fontSizeSmall
+                        visible: isPhoto && !model.previewLoaded && model.mediaState != "loading" && model.mediaState != "failed"
+                        width: tapHint.width + 2 * platformStyle.paddingMedium
+                        height: tapHint.height + platformStyle.paddingSmall
+                        radius: height / 2
+                        color: "#99000000"
+                        Label {
+                            id: tapHint
+                            anchors.centerIn: parent
+                            text: qsTr("Tap to load")
+                            color: "white"
+                            font.pixelSize: platformStyle.fontSizeSmall
+                        }
                     }
                     Label {
                         anchors.centerIn: parent

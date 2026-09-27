@@ -308,6 +308,18 @@ QByteArray TgApi::editMessage(const TgPeer &peer, int msgId, const QString &text
     return w.toByteArray();
 }
 
+QByteArray TgApi::forwardMessages(const TgPeer &fromPeer, const QList<qint32> &ids,
+                                  const QList<qint64> &randomIds, const TgPeer &toPeer)
+{
+    // messages.forwardMessages#13704a7c flags=# from_peer id:Vector<int> random_id:Vector<long>
+    // to_peer ...  Every extra (silent, drop_author, reply_to, schedule_date, ...) is flag-gated,
+    // so a plain forward is just the four required fields with flags = 0.
+    TlWriter w(64 + ids.size() * 4 + randomIds.size() * 8);
+    w.writeConstructor(Tl::MessagesForwardMessages).writeInt(0).writeRaw(inputPeer(fromPeer))
+     .writeVectorOfInt(ids).writeVectorOfLong(randomIds).writeRaw(inputPeer(toPeer));
+    return w.toByteArray();
+}
+
 QByteArray TgApi::readHistory(const TgPeer &peer, int maxId)
 {
     TlWriter w(32);

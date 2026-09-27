@@ -52,6 +52,8 @@ class AppController : public QObject
     Q_PROPERTY(int soundMode READ soundMode WRITE setSoundMode NOTIFY settingsChanged)
     Q_PROPERTY(int vibrationMode READ vibrationMode WRITE setVibrationMode NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
+    Q_PROPERTY(int imagePreview READ imagePreview WRITE setImagePreview NOTIFY settingsChanged)
+    Q_PROPERTY(QVariantList peerSearchResults READ peerSearchResults NOTIFY peerSearchChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
     Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
     Q_PROPERTY(QStringList downloadDrives READ downloadDrives NOTIFY settingsChanged)
@@ -111,6 +113,9 @@ public:
     bool notifications() const { return popupMode() || soundMode() || vibrationMode(); }
     bool groupNotifications() const;
     void setGroupNotifications(bool on);
+    int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full
+    void setImagePreview(int mode);
+    Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full"]
     bool autoConnect() const;
     void setAutoConnect(bool on);
     bool logging() const;
@@ -160,6 +165,10 @@ public slots:
     void goOffline();
     /// Username, phone number or a name; peerResolved opens the chat.
     void findPeer(const QString &query);
+    /// Forward picker: matching chats (local, first) then people found on the server, as
+    /// [{ peerKey, title, subtitle, local }, ...]. Empty query = all existing chats.
+    QVariantList peerSearchResults() const { return m_peerSearchResults; }
+    Q_INVOKABLE void searchPeers(const QString &query);
     /// Opens a file picker and sends the chosen file to the open chat, as a photo or a
     /// document. Nothing happens if the user cancels.
     /// Two-step attach so a caption can be added after the file is chosen: pickAttachment opens
@@ -198,6 +207,7 @@ signals:
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
+    void peerSearchChanged();                         // the forward-picker search list changed
     void logChanged();
 
 private slots:
@@ -211,6 +221,7 @@ private slots:
     void onLoginChanged();
     void onMessage(const TgMessage &message);
     void onPeerResolved(const TgPeer &peer);
+    void onPeersFound(const QString &query, const QList<TgPeer> &peers);
     void onResolveFailed(const QString &error);
     void onReconnectTimer();
     void onSessionLog(const QString &line);
@@ -247,6 +258,8 @@ private:
     QNetworkSession *m_netSession;
     QTimer *m_reconnect;
     QDeclarativeView *m_view;
+    QVariantList m_peerSearchResults;   // forward-picker: local chats + server people
+    QString m_peerSearchQuery;          // the query the current results are for (drops stale replies)
     QString m_state;
     bool m_busy;
     QString m_loginError;

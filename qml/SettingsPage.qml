@@ -75,6 +75,13 @@ Page {
         }
     }
 
+    SelectionDialog {
+        id: imagePreviewDialog
+        titleText: qsTr("Image preview")
+        model: app.imagePreviewNames()
+        onAccepted: if (selectedIndex >= 0) app.imagePreview = selectedIndex
+    }
+
     CommonDialog {
         id: proxyDialog
         titleText: qsTr("SOCKS5 proxy")
@@ -237,6 +244,32 @@ Page {
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
                 text: qsTr("Saved photos and files go here. Pick a drive, or \"Choose folder...\" for any folder.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
+
+            ListItem {
+                id: imagePreviewItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: imagePreviewItem.paddingItem.left; right: imagePreviewItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Image preview") }
+                    Label {
+                        width: parent.width
+                        text: app.imagePreviewNames()[app.imagePreview]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { imagePreviewDialog.selectedIndex = app.imagePreview; imagePreviewDialog.open() }
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

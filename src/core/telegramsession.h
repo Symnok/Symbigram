@@ -100,11 +100,16 @@ public:
     qint64 sendText(const TgPeer &peer, const QString &text, int replyToId = 0);
     /// Edits one of our own messages' text/caption; the change arrives via the update stream.
     void editMessage(const TgPeer &peer, int msgId, const QString &text);
+    /// Forwards messages (by id, from fromPeer) into toPeer; they arrive there via the update stream.
+    void forwardMessages(const TgPeer &fromPeer, const QList<int> &ids, const TgPeer &toPeer);
     void markRead(const TgPeer &peer, int maxId);
     void setTyping(const TgPeer &peer, bool typing);
     void setOnline(bool online);
     /// Username, phone number, t.me link, or a name to search among contacts.
     void resolve(const QString &query);
+    /// Searches people/chats by name or @username and returns a LIST (via peersFound) rather than
+    /// opening the first match - used by the forward picker.
+    void searchPeers(const QString &query);
     void deleteHistory(const TgPeer &peer);
     /// Removes the whole chat (not just its messages). forEveryone revokes / leaves.
     void deleteChat(const TgPeer &peer, bool forEveryone);
@@ -187,6 +192,7 @@ signals:
     void readOutbox(const TgPeer &peer, int maxId);
     void peerResolved(const TgPeer &peer);
     void resolveFailed(const QString &error);
+    void peersFound(const QString &query, const QList<TgPeer> &peers);   // forward-picker search
     void notice(const QString &text);
     void log(const QString &line);
     // secret chats
@@ -225,7 +231,7 @@ private:
         GetArchive, GetFolders,
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
-        SendCode, SignIn, ResendCode, EditMessage
+        SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers
     };
     struct Request
     {

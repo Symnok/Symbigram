@@ -744,6 +744,18 @@ void TelegramSession::editMessage(const TgPeer &peer, int msgId, const QString &
     send(EditMessage, TgApi::editMessage(r.peer, msgId, text), r);
 }
 
+void TelegramSession::forwardMessages(const TgPeer &fromPeer, const QList<int> &ids, const TgPeer &toPeer)
+{
+    if (ids.isEmpty()) return;
+    Request r;
+    r.peer = m_peers.withHash(toPeer);              // the destination (for error reporting)
+    TgPeer from = m_peers.withHash(fromPeer);
+    QList<qint32> mids;
+    QList<qint64> randoms;
+    for (int i = 0; i < ids.size(); ++i) { mids.append(ids.at(i)); randoms.append(qint64(Crypto::randomUInt64())); }
+    send(ForwardMessages, TgApi::forwardMessages(from, mids, randoms, r.peer), r);
+}
+
 void TelegramSession::markRead(const TgPeer &peer, int maxId)
 {
     if (!m_client->isReady()) return;
@@ -787,6 +799,15 @@ void TelegramSession::resolve(const QString &query)
     } else {
         send(ContactsSearch, TgApi::contactsSearch(q, 5), r);
     }
+}
+
+void TelegramSession::searchPeers(const QString &query)
+{
+    QString q = query.trimmed();
+    if (q.isEmpty()) { emit peersFound(q, QList<TgPeer>()); return; }
+    Request r;
+    r.query = q;
+    send(SearchPeers, TgApi::contactsSearch(q, 10), r);
 }
 
 void TelegramSession::deleteHistory(const TgPeer &peer)
@@ -1127,7 +1148,8 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             break;
         case ArchivePeer:
         case EditMessage:
-            applyUpdatesResult(TlSchema::readObject(r));   // Updates carrying updateEditMessage
+        case ForwardMessages:
+            applyUpdatesResult(TlSchema::readObject(r));   // Updates carrying the new/edited messages
             break;
         case MoveFolder:
             TlSchema::readObject(r);
@@ -1285,6 +1307,16 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             TgPeer p = m_peers.withHash(TgApi::readPeer(TlSchema::toObject(results.first())));
             ensureDialog(p);
             emit peerResolved(p);
+            break;
+        }
+        case SearchPeers: {
+            TlObject o = TlSchema::readObject(r);
+            m_peers.absorb(o);
+            QVariantList results = o.vec("my_results") + o.vec("results");
+            QList<TgPeer> peers;
+            for (int i = 0; i < results.size(); ++i)
+                peers.append(m_peers.withHash(TgApi::readPeer(TlSchema::toObject(results.at(i)))));
+            emit peersFound(req.query, peers);
             break;
         }
         case DeleteHistory: {
@@ -1489,6 +1521,12 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     case EditMessage:
         if (type.contains(QLatin1String("MESSAGE_NOT_MODIFIED"))) break;   // no change - ignore
         emit notice(tr("Could not edit the message: %1").arg(type));
+        break;
+    case ForwardMessages:
+        emit notice(tr("Could not forward the message: %1").arg(type));
+        break;
+    case SearchPeers:
+        emit peersFound(req.query, QList<TgPeer>());   // search failed - keep the local matches only
         break;
     case MoveFolder:
         // Telegram won't let a folder with no category filters end up with an empty chat list,

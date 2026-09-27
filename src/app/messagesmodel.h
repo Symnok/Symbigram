@@ -73,7 +73,8 @@ public:
         LocalPathRole,      // the full downloaded file, once it exists
         SecretBurnRole,     // true if this message self-destructs
         SecretRemainingRole,// seconds left before it self-destructs (-1 = none)
-        VoicePlayingRole    // true while this voice message is playing
+        VoicePlayingRole,   // true while this voice message is playing
+        PreviewLoadedRole   // photo: the inline image (not just the blurred placeholder) is loaded
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -127,6 +128,14 @@ public:
     Q_INVOKABLE void setSecretTtl(int seconds);
     Q_INVOKABLE QString secretKeyHex() const;
     Q_INVOKABLE void deleteMessage(int row, bool forEveryone);
+    /// Forwards the message in this row to another chat (peerKey). Secret chats are not allowed.
+    Q_INVOKABLE void forwardTo(int row, const QString &toPeerKey);
+    /// Loads the inline preview (the "show" size) of a photo row that has not been fetched yet -
+    /// used when Image Preview is set to Thumbnail (photos then load on tap, not automatically).
+    Q_INVOKABLE void loadPreview(int row);
+    /// Image Preview setting: true = fetch and show photo previews automatically (Full), false =
+    /// show only the blurred placeholder until tapped (Thumbnail). Does not affect Save/Open.
+    void setAutoPreview(bool full) { m_autoPreview = full; }
     /// Photos: fetch the size to save and copy it out. Documents/video/etc.: fetch the
     /// whole file. Drives MediaStateRole/MediaProgressRole for the row.
     Q_INVOKABLE void downloadMedia(int row);
@@ -159,6 +168,8 @@ signals:
     void replyChanged();
     void editChanged();
     void audioChanged();
+    void initialLoaded(int firstUnreadRow);  // the first page is in; jump here (-1 = go to the end)
+    void forwarded(const QString &toTitle);  // a message was forwarded to this chat
 
 private slots:
     void onAudioStreamProgress(int jobId, qint64 received, qint64 total);
@@ -188,11 +199,12 @@ private slots:
 private:
     struct Row
     {
-        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), progress(0), ttl(0), expiresAt(0) {}
+        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), showLoaded(false), progress(0), ttl(0), expiresAt(0) {}
         TgMessage m;
         qint64 randomId;      // outgoing: for matching the send result
         bool pending;
         bool failed;
+        bool showLoaded;      // the real inline photo (not just the stripped blur) is in thumbPath
         QString thumbPath;    // a small image to show (stripped preview, then the fetched size)
         QString fullPath;     // the whole file, once downloaded
         QString awaitKey;     // the cache key this row is currently waiting on
@@ -253,6 +265,9 @@ private:
     qint64 m_peerTypingUser;
     int m_replyToId;                        // message id the composer will reply to (0 = none)
     int m_editId;                           // message id being edited (0 = not editing)
+    bool m_autoPreview;                     // Image Preview = Full (auto-load photos) vs Thumbnail
+    int m_openInboxMax;                     // readInboxMaxId captured when the chat opened (for unread)
+    int m_openUnread;                       // unreadCount captured when the chat opened
 };
 
 #endif // MESSAGESMODEL_H

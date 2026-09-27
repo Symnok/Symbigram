@@ -26,7 +26,8 @@ namespace
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
-      m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0)
+      m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
+      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -55,6 +56,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[SecretBurnRole] = "secretBurn";
     roles[SecretRemainingRole] = "secretRemaining";
     roles[VoicePlayingRole] = "voicePlaying";
+    roles[PreviewLoadedRole] = "previewLoaded";
     setRoleNames(roles);
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onMediaReady(QString,QString)));
     connect(media, SIGNAL(failed(QString,QString)), this, SLOT(onMediaFailed(QString,QString)));
@@ -155,6 +157,10 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
         return QLatin1String("idle");
     case MediaProgressRole: return r.progress;
     case MediaInfoRole: return mediaInfoText(m.media);
+    case PreviewLoadedRole:
+        // For non-photos this is irrelevant (return true so no "tap to load" hint); for a photo it
+        // is true once the real inline image (not just the stripped blur) is in thumbPath.
+        return (m.media.kind == TgMedia::Photo) ? r.showLoaded : true;
     case MediaWidthRole: return m.media.width;
     case MediaHeightRole: return m.media.height;
     case LocalPathRole: return r.fullPath;
@@ -205,8 +211,15 @@ void MessagesModel::prepareMedia(Row &r)
         QString stripped = m_media->strippedThumbFile(m);
         if (!stripped.isEmpty()) r.thumbPath = stripped;
         QString cached = m_media->cachedFile(m, m.sizeType);
-        if (!cached.isEmpty()) r.thumbPath = cached;
-        else { r.awaitKey = m_media->fetch(m, m.sizeType); r.mediaLoading = true; }
+        if (!cached.isEmpty()) {
+            r.thumbPath = cached;
+            r.showLoaded = true;
+        } else if (m_autoPreview || m.kind == TgMedia::Sticker) {
+            // Full preview (or a sticker, always shown): fetch the "show" size now. In Thumbnail mode
+            // a normal photo is left as the blurred placeholder until the user taps (loadPreview).
+            r.awaitKey = m_media->fetch(m, m.sizeType);
+            r.mediaLoading = true;
+        }
         // fullPath is the FULL-resolution size (bigSizeType), used to open full-screen and to save.
         // It is fetched on demand, not automatically. For stickers (and any photo whose full size
         // equals the shown size) the shown file already is the full file.
@@ -255,6 +268,34 @@ void MessagesModel::downloadMedia(int row)
     r.mediaFailed = false;
     r.progress = 0;
     emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::loadPreview(int row)
+{
+    // Fetch the inline "show" size of a photo whose preview was not auto-loaded (Thumbnail mode).
+    // Once it lands, onMediaReady upgrades thumbPath from the blur to the real image.
+    if (row < 0 || row >= m_rows.size() || !m_media) return;
+    Row &r = m_rows[row];
+    TgMedia &m = r.m.media;
+    if (m.kind != TgMedia::Photo || r.showLoaded || r.mediaLoading || !r.fullPath.isEmpty()) return;
+    QString cached = m_media->cachedFile(m, m.sizeType);
+    if (!cached.isEmpty()) { r.thumbPath = cached; r.showLoaded = true; emit dataChanged(index(row), index(row)); return; }
+    r.awaitKey = m_media->fetch(m, m.sizeType);
+    r.mediaLoading = true;
+    r.mediaFailed = false;
+    emit dataChanged(index(row), index(row));
+}
+
+void MessagesModel::forwardTo(int row, const QString &toPeerKey)
+{
+    if (row < 0 || row >= m_rows.size() || toPeerKey.isEmpty()) return;
+    if (m_secretId) return;                                   // can't forward out of a secret chat
+    if (toPeerKey.startsWith(QLatin1String("secret:"))) { emit sendFailed(tr("Can't forward to a secret chat.")); return; }
+    int msgId = m_rows.at(row).m.id;
+    if (msgId <= 0) return;                                   // pending/local row, no server id yet
+    TgPeer to = m_session->peers().withHash(TgPeer::fromKey(toPeerKey));
+    m_session->forwardMessages(m_peer, QList<int>() << msgId, to);
+    emit forwarded(m_session->peers().title(to));
 }
 
 QString MessagesModel::downloadDir(bool photo)
@@ -496,10 +537,11 @@ void MessagesModel::onMediaReady(const QString &key, const QString &path)
         // size (bigSizeType) is a separate on-demand download.
         r.thumbPath = path;
         r.mediaLoading = false;
+        r.showLoaded = true;
         if (!bigDiffers && (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker)) r.fullPath = path;
     } else {
         r.fullPath = path;
-        r.thumbPath = (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) ? path : r.thumbPath;
+        if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) { r.thumbPath = path; r.showLoaded = true; }
         r.mediaLoading = false;
     }
     r.awaitKey.clear();
@@ -653,7 +695,10 @@ void MessagesModel::open(const QString &peerKey)
     beginResetModel();
     m_peer = m_session->peers().withHash(p);
     m_rows.clear();
-    m_readOutboxMaxId = m_session->dialog(m_peer).readOutboxMaxId;
+    TgDialog od = m_session->dialog(m_peer);
+    m_readOutboxMaxId = od.readOutboxMaxId;
+    m_openInboxMax = od.readInboxMaxId;   // unread boundary captured before markRead() clears it
+    m_openUnread = od.unreadCount;
     endResetModel();
     m_error.clear();
     m_loading = true;
@@ -755,8 +800,19 @@ void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &
         for (int i = rows.size() - 1; i >= 0; --i) m_rows.prepend(rows.at(i));
         endInsertRows();
         emit countChanged();
-        if (offsetId == 0) emit messageAppended();
-        else emit olderPrepended(rows.size());
+        if (offsetId == 0) {
+            // Initial page: jump to the first unread message (if any) instead of the very end.
+            int firstUnread = -1;
+            if (m_openUnread > 0 && m_openInboxMax > 0) {
+                for (int i = 0; i < m_rows.size(); ++i) {
+                    const TgMessage &mm = m_rows.at(i).m;
+                    if (mm.id > m_openInboxMax && !mm.out) { firstUnread = i; break; }
+                }
+            }
+            emit initialLoaded(firstUnread);
+        } else {
+            emit olderPrepended(rows.size());
+        }
     }
     emit loadingChanged();
     if (offsetId == 0) markRead();

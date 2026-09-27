@@ -24,6 +24,7 @@
 #include <QNetworkConfigurationManager>
 #include <QNetworkSession>
 #include <QPixmap>
+#include <QSet>
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
@@ -44,6 +45,7 @@ namespace
     const char *const KeySoundMode = "ui/soundMode";
     const char *const KeyVibrationMode = "ui/vibrationMode";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
+    const char *const KeyImagePreview = "ui/imagePreview";
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
     const char *const KeyDownloadCustom = "downloads/folder";
@@ -89,6 +91,7 @@ AppController::AppController(QObject *parent)
     m_media->setDirectory(dataDir() + QLatin1String("/media"));
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
+    m_chat->setAutoPreview(imagePreview() == 1);   // Image Preview: Full auto-loads, Thumbnail waits for a tap
     applyDownloadFolder();
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
 
@@ -119,6 +122,7 @@ AppController::AppController(QObject *parent)
     connect(m_session, SIGNAL(selfChanged()), this, SIGNAL(selfChanged()));
     connect(m_session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessage(TgMessage)));
     connect(m_session, SIGNAL(peerResolved(TgPeer)), this, SLOT(onPeerResolved(TgPeer)));
+    connect(m_session, SIGNAL(peersFound(QString,QList<TgPeer>)), this, SLOT(onPeersFound(QString,QList<TgPeer>)));
     connect(m_session, SIGNAL(secretChatRequested(int,qint64)), this, SLOT(onSecretRequested(int,qint64)));
     connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
     connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool,int)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool,int)));
@@ -293,6 +297,18 @@ QStringList AppController::popupModeNames() const
 }
 bool AppController::groupNotifications() const { return m_settings.value(QLatin1String(KeyGroupNotifications), true).toBool(); }
 void AppController::setGroupNotifications(bool on) { m_settings.setValue(QLatin1String(KeyGroupNotifications), on); emit settingsChanged(); }
+
+// Image Preview: 0 = Thumbnail (show the blurred placeholder, load a photo on tap), 1 = Full
+// (fetch and show photo previews automatically). Does not change what Save/Open download.
+int AppController::imagePreview() const { return m_settings.value(QLatin1String(KeyImagePreview), 0).toInt() == 1 ? 1 : 0; }
+void AppController::setImagePreview(int mode)
+{
+    if (mode == imagePreview()) return;
+    m_settings.setValue(QLatin1String(KeyImagePreview), mode == 1 ? 1 : 0);
+    if (m_chat) m_chat->setAutoPreview(mode == 1);
+    emit settingsChanged();
+}
+QStringList AppController::imagePreviewNames() const { return QStringList() << tr("Thumbnail") << tr("Full"); }
 bool AppController::autoConnect() const { return m_settings.value(QLatin1String(KeyAutoConnect), true).toBool(); }
 void AppController::setAutoConnect(bool on) { m_settings.setValue(QLatin1String(KeyAutoConnect), on); emit settingsChanged(); }
 bool AppController::logging() const { return m_settings.value(QLatin1String(KeyLogging), false).toBool(); }
@@ -787,6 +803,54 @@ void AppController::findPeer(const QString &query)
 void AppController::onPeerResolved(const TgPeer &peer)
 {
     emit peerFound(peer.key());
+}
+
+void AppController::searchPeers(const QString &query)
+{
+    // Forward picker: existing chats matched locally (instant), then a server search for other
+    // people appended when it returns. Empty query = every existing chat.
+    QString q = query.trimmed();
+    m_peerSearchQuery = q;
+    QString ql = q.toLower();
+    m_peerSearchResults.clear();
+    QSet<QString> seen;
+    for (int i = 0; i < m_chats->rowCount(); ++i) {
+        QVariantMap row = m_chats->get(i);
+        if (row.value(QLatin1String("secret")).toBool()) continue;   // can't forward to a secret chat
+        QString key = row.value(QLatin1String("peerKey")).toString();
+        QString title = row.value(QLatin1String("title")).toString();
+        if (key.isEmpty() || seen.contains(key)) continue;
+        if (!ql.isEmpty() && !title.toLower().contains(ql)) continue;
+        QVariantMap e;
+        e[QLatin1String("peerKey")] = key;
+        e[QLatin1String("title")] = title;
+        e[QLatin1String("subtitle")] = row.value(QLatin1String("subtitle"));
+        e[QLatin1String("local")] = true;
+        m_peerSearchResults.append(e);
+        seen.insert(key);
+    }
+    emit peerSearchChanged();
+    if (!q.isEmpty() && m_session->isOnline()) m_session->searchPeers(q);
+}
+
+void AppController::onPeersFound(const QString &query, const QList<TgPeer> &peers)
+{
+    if (query != m_peerSearchQuery) return;   // a late reply for a query the user has moved on from
+    QSet<QString> seen;
+    for (int i = 0; i < m_peerSearchResults.size(); ++i)
+        seen.insert(m_peerSearchResults.at(i).toMap().value(QLatin1String("peerKey")).toString());
+    for (int i = 0; i < peers.size(); ++i) {
+        QString key = peers.at(i).key();
+        if (key.isEmpty() || key.startsWith(QLatin1String("secret:")) || seen.contains(key)) continue;
+        QVariantMap e;
+        e[QLatin1String("peerKey")] = key;
+        e[QLatin1String("title")] = m_session->peers().title(peers.at(i));
+        e[QLatin1String("subtitle")] = QString();
+        e[QLatin1String("local")] = false;
+        m_peerSearchResults.append(e);
+        seen.insert(key);
+    }
+    emit peerSearchChanged();
 }
 
 void AppController::startSecretChat(const QString &peerKey)
