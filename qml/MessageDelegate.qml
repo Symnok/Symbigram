@@ -23,6 +23,13 @@ Item {
         return u.indexOf("http") === 0 ? u : "http://" + u
     }
 
+    // How many URLs the text holds. With more than one we must let Qt work out which link was
+    // tapped (see bodyLabel) instead of always opening the first.
+    function linkCount(t) {
+        var m = t.match(/(https?:\/\/|www\.)[^\s]+/g)
+        return m ? m.length : 0
+    }
+
     // Escape HTML, turn URLs (http(s):// or www.) into tappable links, keep line breaks.
     function linkify(t) {
         var s = t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -296,13 +303,17 @@ Item {
                     // so short RTL text stays inside the bubble (LTR is unchanged).
                     horizontalAlignment: Text.AlignLeft
                     color: "white"
-                    textFormat: Text.StyledText
+                    // Qt 4.7 only hit-tests links (onLinkActivated) for RichText - StyledText is the
+                    // faster path but knows nothing about anchors. So a message with SEVERAL links is
+                    // laid out as RichText and Qt reports exactly which one was tapped; the common
+                    // 0/1-link case keeps the cheap StyledText path.
+                    textFormat: root.linkCount(model.body) > 1 ? Text.RichText : Text.StyledText
                     onLinkActivated: Qt.openUrlExternally(link)
-                    // Qt Quick 1.1 Text doesn't reliably grab link taps under the bubble's mouse
-                    // area, so a tap on body text with a URL opens it; long-press still menus.
+                    // Shortcut for a single link only. With several, the tap must reach the Text
+                    // itself, and a long-press falls through to the bubble's own mouse area.
                     MouseArea {
                         anchors.fill: parent
-                        enabled: root.firstLink(model.body) != ""
+                        enabled: root.linkCount(model.body) == 1
                         onClicked: { var u = root.firstLink(model.body); if (u != "") Qt.openUrlExternally(u) }
                         onPressAndHold: root.pressAndHold()
                     }
