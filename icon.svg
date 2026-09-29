@@ -1,7 +1,102 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="tiny" width="88" height="88" viewBox="0 0 88 88">
-  <!-- A paper plane on a blue rounded tile. -->
-  <rect x="2" y="2" width="84" height="84" rx="14" ry="14" fill="#2f8fd8"/>
-  <polygon points="18,44 70,22 54,68 42,56 36,67 34,52" fill="#ffffff"/>
-  <polygon points="34,52 42,56 54,68 45,57" fill="#d8e8f5"/>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="Слой_1"
+   x="0px"
+   y="0px"
+   width="96px"
+   height="96px"
+   viewBox="0 0 96 96"
+   enable-background="new 0 0 96 96"
+   xml:space="preserve"
+   sodipodi:docname="Symbigram1.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs4" /><sodipodi:namedview
+   id="namedview4"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="9.3125"
+   inkscape:cx="47.946309"
+   inkscape:cy="48"
+   inkscape:window-width="2048"
+   inkscape:window-height="1080"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="layer1" />
+<path
+   display="none"
+   fill-opacity="0.4"
+   d="M88,49c0,29.633-10.363,40-40,40C18.365,89,8,78.633,8,49C8,19.365,18.365,9,48,9  C77.637,9,88,19.365,88,49z"
+   id="path1" />
+<linearGradient
+   id="SVGID_1_"
+   gradientUnits="userSpaceOnUse"
+   x1="554.9053"
+   y1="-2064.2515"
+   x2="554.9053"
+   y2="-1983.5581"
+   gradientTransform="matrix(1 0 0 -1 -506.9043 -1976.7969)">
+	<stop
+   offset="0"
+   style="stop-color:#025B8C"
+   id="stop1" />
+	<stop
+   offset="0.997"
+   style="stop-color:#00B5C8"
+   id="stop2" />
+</linearGradient>
+<path
+   fill="url(#SVGID_1_)"
+   d="M88,48c0,29.633-10.363,40-40,40C18.365,88,8,77.633,8,48C8,18.365,18.365,8,48,8  C77.637,8,88,18.365,88,48z"
+   id="path2" />
+<linearGradient
+   id="SVGID_2_"
+   gradientUnits="userSpaceOnUse"
+   x1="554.9043"
+   y1="-1985.3413"
+   x2="554.9043"
+   y2="-2066.0366"
+   gradientTransform="matrix(1 0 0 -1 -506.9043 -1976.7969)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFFFF"
+   id="stop3" />
+	<stop
+   offset="1"
+   style="stop-color:#FFFFFF;stop-opacity:0"
+   id="stop4" />
+</linearGradient>
+<path
+   fill="url(#SVGID_2_)"
+   fill-opacity="0.25"
+   d="M48,8C18.365,8,8,18.365,8,48c0,29.633,10.365,40,40,40  c29.637,0,40-10.367,40-40C88,18.365,77.637,8,48,8z M48,87C18.84,87,9,77.158,9,48S18.84,9,48,9c29.158,0,39,9.842,39,39  S77.158,87,48,87z"
+   id="path4" />
+<rect
+   fill="none"
+   width="96"
+   height="96"
+   id="rect4" />
+<g
+   inkscape:groupmode="layer"
+   id="layer1"
+   inkscape:label="Layer 1"><polygon
+     points="18,44 70,22 54,68 42,56 36,67 34,52 "
+     fill="#ffffff"
+     id="polygon1"
+     transform="translate(4,3)" /><polygon
+     points="54,68 45,57 34,52 42,56 "
+     fill="#d8e8f5"
+     id="polygon2"
+     transform="translate(4,3)" /></g></svg>
