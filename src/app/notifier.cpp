@@ -16,6 +16,7 @@
 #include <coemain.h>
 #include <e32std.h>
 #include <hwrmvibra.h>
+#include <mdaaudiotoneplayer.h>
 
 #ifndef SGM_UID3
 #define SGM_UID3 0xE4B1C2D3
@@ -98,6 +99,57 @@ namespace
             flags, 0, NULL, TUid::Uid(SGM_UID3));
     }
 
+    // The discreet popup's confirmation tone has no volume control (it is a system sound), which
+    // is why it is so quiet. For the louder levels we play our own tone through
+    // CMdaAudioToneUtility, which does have SetVolume - and which, unlike the popup tone, sounds
+    // whether or not a popup is shown. Prepared once and replayed for every alert.
+    const TInt KToneHz = 1200;
+    const TInt KToneUs = 200000;   // 0.2 s
+
+    class ToneBeep : public MMdaAudioToneObserver
+    {
+    public:
+        static ToneBeep *NewL()
+        {
+            ToneBeep *t = new (ELeave) ToneBeep();
+            CleanupStack::PushL(t);
+            t->ConstructL();
+            CleanupStack::Pop(t);
+            return t;
+        }
+        ~ToneBeep()
+        {
+            if (iTone) { iTone->CancelPlay(); delete iTone; }
+        }
+        // level 1 = loud, 2 = loudest. Silently does nothing until the tone is prepared.
+        void Play(TInt aLevel)
+        {
+            if (!iReady || !iTone) return;
+            if (iTone->State() != EMdaAudioToneUtilityPrepared) return;   // still playing the last one
+            const TInt max = iTone->MaxVolume();
+            TInt vol = aLevel >= 2 ? max : (max * 3) / 5;
+            if (vol < 1) vol = 1;
+            iTone->SetVolume(vol);
+            iTone->Play();
+        }
+        TBool Ready() const { return iReady; }
+    private:
+        ToneBeep() : iTone(0), iReady(EFalse) {}
+        void ConstructL()
+        {
+            iTone = CMdaAudioToneUtility::NewL(*this);
+            iTone->PrepareToPlayTone(KToneHz, TTimeIntervalMicroSeconds(KToneUs));
+        }
+        void MatoPrepareComplete(TInt aError)
+        {
+            iReady = (aError == KErrNone);
+            if (aError != KErrNone) qWarning() << "notification tone unavailable:" << aError;
+        }
+        void MatoPlayComplete(TInt /*aError*/) {}
+        CMdaAudioToneUtility *iTone;
+        TBool iReady;
+    };
+
     // Keep the CHWRMVibra session alive: destroying it right after StartVibraL cancels the
     // vibration (the server drops it when the client session closes), so a throwaway object
     // vibrated for essentially 0 ms - which is why nothing was felt. Reuse one instance.
@@ -119,7 +171,8 @@ namespace
 #endif
 
 Notifier::Notifier(QObject *parent)
-    : QObject(parent), m_popQuery(false), m_pending(0), m_query(0), m_vibra(0)
+    : QObject(parent), m_popQuery(false), m_pending(0), m_soundLevel(0), m_vibrateMs(400),
+      m_query(0), m_vibra(0), m_tone(0)
 {
 #ifdef Q_OS_SYMBIAN
     PendingQuery *q = 0;
@@ -134,23 +187,43 @@ Notifier::~Notifier()
 #ifdef Q_OS_SYMBIAN
     delete static_cast<PendingQuery *>(m_query);
     delete static_cast<CHWRMVibra *>(m_vibra);
+    delete static_cast<ToneBeep *>(m_tone);
+#endif
+}
+
+void Notifier::setSoundVolume(int level)
+{
+    m_soundLevel = (level < 0 || level > 2) ? 0 : level;
+#ifdef Q_OS_SYMBIAN
+    // The louder levels need our own tone player; create it once, on demand.
+    if (m_soundLevel > 0 && !m_tone) {
+        ToneBeep *t = 0;
+        TRAPD(err, t = ToneBeep::NewL());
+        if (err != KErrNone) qWarning() << "notification tone unavailable:" << err;
+        m_tone = t;
+    }
 #endif
 }
 
 void Notifier::alert(const QString &title, const QString &text, bool showPopup, bool playSound, bool vibrate)
 {
 #ifdef Q_OS_SYMBIAN
+    // Louder levels use our own tone (which works with or without a popup); the Low level -
+    // and any level whose tone player failed to start - falls back to the popup's built-in tone.
+    ToneBeep *beep = static_cast<ToneBeep *>(m_tone);
+    const bool ownTone = playSound && m_soundLevel > 0 && beep && beep->Ready();
     if (showPopup) {
         QString t = title;
         QString b = text.simplified();
         if (b.size() > 120) b = b.left(117) + QLatin1String("...");
-        // The popup carries the alert tone, so the tone plays iff Sound fires AND a popup shows.
-        TRAP_IGNORE(showPopupL(t, b, playSound));
+        TRAP_IGNORE(showPopupL(t, b, playSound && !ownTone));
     }
-    if (vibrate) TRAP_IGNORE(vibrateL(m_vibra, 400));
+    if (ownTone) beep->Play(m_soundLevel);
+    if (vibrate) TRAP_IGNORE(vibrateL(m_vibra, m_vibrateMs));
 #else
     qDebug() << "ALERT" << title << ":" << text << (showPopup ? "(popup)" : "")
-             << (playSound ? "(sound)" : "") << (vibrate ? "(vibrate)" : "");
+             << (playSound ? "(sound)" : "") << (playSound ? m_soundLevel : 0)
+             << (vibrate ? "(vibrate)" : "") << (vibrate ? m_vibrateMs : 0);
 #endif
 }
 

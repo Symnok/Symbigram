@@ -45,6 +45,8 @@ namespace
     const char *const KeyPopupMode = "ui/popupMode";
     const char *const KeySoundMode = "ui/soundMode";
     const char *const KeyVibrationMode = "ui/vibrationMode";
+    const char *const KeySoundVolume = "ui/soundVolume";
+    const char *const KeyVibrationLength = "ui/vibrationLength";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyImagePreview = "ui/imagePreview";
     const char *const KeyLogging = "ui/logging";
@@ -102,6 +104,8 @@ AppController::AppController(QObject *parent)
     connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
     connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
     m_notifier = new Notifier(this);
+    m_notifier->setSoundVolume(soundVolume());
+    m_notifier->setVibrationMs(vibrationMsFor(vibrationLength()));
 
     // Optional status-bar ("envelope") notifications on Belle via Pigler. init() quietly fails
     // (and everything stays as-is) when Pigler is not installed, or on S^3/Anna.
@@ -291,6 +295,51 @@ void AppController::setPopupMode(int mode)
     m_settings.setValue(QLatin1String(KeyPopupMode), mode);
     emit settingsChanged();
 }
+int AppController::soundVolume() const
+{
+    int v = m_settings.value(QLatin1String(KeySoundVolume), 0).toInt();
+    return (v < 0 || v > 2) ? 0 : v;
+}
+
+void AppController::setSoundVolume(int level)
+{
+    if (level < 0 || level > 2 || level == soundVolume()) return;
+    m_settings.setValue(QLatin1String(KeySoundVolume), level);
+    if (m_notifier) m_notifier->setSoundVolume(level);
+    emit settingsChanged();
+}
+
+QStringList AppController::soundVolumeNames() const
+{
+    return QStringList() << tr("Low") << tr("Medium") << tr("Loud");
+}
+
+int AppController::vibrationLength() const
+{
+    int v = m_settings.value(QLatin1String(KeyVibrationLength), 0).toInt();
+    return (v < 0 || v > 4) ? 0 : v;
+}
+
+void AppController::setVibrationLength(int index)
+{
+    if (index < 0 || index > 4 || index == vibrationLength()) return;
+    m_settings.setValue(QLatin1String(KeyVibrationLength), index);
+    if (m_notifier) m_notifier->setVibrationMs(vibrationMsFor(index));
+    emit settingsChanged();
+}
+
+QStringList AppController::vibrationLengthNames() const
+{
+    return QStringList() << tr("Short (0.4 s)") << tr("1 second") << tr("2 seconds")
+                         << tr("3 seconds") << tr("5 seconds");
+}
+
+int AppController::vibrationMsFor(int index)
+{
+    static const int ms[5] = { 400, 1000, 2000, 3000, 5000 };
+    return ms[(index < 0 || index > 4) ? 0 : index];
+}
+
 QStringList AppController::popupModeNames() const
 {
     QStringList names;

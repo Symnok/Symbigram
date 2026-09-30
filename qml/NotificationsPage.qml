@@ -35,6 +35,20 @@ Page {
         onAccepted: if (selectedIndex >= 0) app.vibrationMode = selectedIndex
     }
 
+    SelectionDialog {
+        id: soundVolumeDialog
+        titleText: qsTr("Sound volume")
+        model: app.soundVolumeNames()
+        onAccepted: if (selectedIndex >= 0) app.soundVolume = selectedIndex
+    }
+
+    SelectionDialog {
+        id: vibrationLengthDialog
+        titleText: qsTr("Vibration length")
+        model: app.vibrationLengthNames()
+        onAccepted: if (selectedIndex >= 0) app.vibrationLength = selectedIndex
+    }
+
     ListHeading {
         id: heading
         anchors { top: parent.top; left: parent.left; right: parent.right }
@@ -83,6 +97,22 @@ Page {
                 onClicked: { soundModeDialog.selectedIndex = app.soundMode; soundModeDialog.open() }
             }
             ListItem {
+                id: soundVolumeItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: soundVolumeItem.paddingItem.left; right: soundVolumeItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Sound volume") }
+                    Label {
+                        width: parent.width
+                        text: app.soundVolumeNames()[app.soundVolume]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { soundVolumeDialog.selectedIndex = app.soundVolume; soundVolumeDialog.open() }
+            }
+            ListItem {
                 id: vibrationItem
                 subItemIndicator: true
                 Column {
@@ -98,13 +128,29 @@ Page {
                 }
                 onClicked: { vibrationModeDialog.selectedIndex = app.vibrationMode; vibrationModeDialog.open() }
             }
+            ListItem {
+                id: vibrationLengthItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: vibrationLengthItem.paddingItem.left; right: vibrationLengthItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Vibration length") }
+                    Label {
+                        width: parent.width
+                        text: app.vibrationLengthNames()[app.vibrationLength]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { vibrationLengthDialog.selectedIndex = app.vibrationLength; vibrationLengthDialog.open() }
+            }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge
                 x: platformStyle.paddingLarge
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("For messages that arrive while another application is in front. Each channel: Off, only the first new message, or every message. The sound rides the popup, so it plays only when a popup shows.")
+                text: qsTr("For messages that arrive while another application is in front. Each channel: Off, only the first new message, or every message. At Low volume the sound is the system popup tone, so it needs a popup to show; Medium and Loud play their own tone either way.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

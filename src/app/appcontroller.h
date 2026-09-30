@@ -52,6 +52,8 @@ class AppController : public QObject
     Q_PROPERTY(int popupMode READ popupMode WRITE setPopupMode NOTIFY settingsChanged)
     Q_PROPERTY(int soundMode READ soundMode WRITE setSoundMode NOTIFY settingsChanged)
     Q_PROPERTY(int vibrationMode READ vibrationMode WRITE setVibrationMode NOTIFY settingsChanged)
+    Q_PROPERTY(int soundVolume READ soundVolume WRITE setSoundVolume NOTIFY settingsChanged)
+    Q_PROPERTY(int vibrationLength READ vibrationLength WRITE setVibrationLength NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(int imagePreview READ imagePreview WRITE setImagePreview NOTIFY settingsChanged)
     Q_PROPERTY(QVariantList peerSearchResults READ peerSearchResults NOTIFY peerSearchChanged)
@@ -111,6 +113,15 @@ public:
     int vibrationMode() const;
     void setVibrationMode(int mode);
     Q_INVOKABLE QStringList popupModeNames() const;   // shared Off/First/Every labels for all three
+    /// How loud the alert tone is: 0 = Low (the system popup tone), 1 = Medium, 2 = Loud.
+    int soundVolume() const;
+    void setSoundVolume(int level);
+    Q_INVOKABLE QStringList soundVolumeNames() const;
+    /// How long the phone vibrates, as an index into vibrationLengthNames().
+    int vibrationLength() const;
+    void setVibrationLength(int index);
+    Q_INVOKABLE QStringList vibrationLengthNames() const;
+    static int vibrationMsFor(int index);
     // Any alert channel on (used to gate the intrusive alerts; Pigler fires regardless).
     bool notifications() const { return popupMode() || soundMode() || vibrationMode(); }
     bool groupNotifications() const;

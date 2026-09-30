@@ -25,6 +25,11 @@ public:
     void alert(const QString &title, const QString &text, bool showPopup, bool playSound, bool vibrate);
     /// Just the vibration, e.g. for an authorization request.
     void vibrate(int ms = 400);
+    /// Sound volume: 0 = Low (the discreet popup's own quiet confirmation tone, as before),
+    /// 1/2 = our own tone played at a controlled volume (and independent of the popup showing).
+    void setSoundVolume(int level);
+    /// How long the vibration runs, in milliseconds.
+    void setVibrationMs(int ms) { m_vibrateMs = ms > 0 ? ms : 400; }
     /// Tracks the unread count and lights the status-bar envelope. popQuery also raises the
     /// "N new messages" query (a global query with a "Show" softkey that brings the app forward);
     /// pass it true only when a popup should fire for this message.
@@ -37,8 +42,12 @@ private:
     int m_pending;
     static QString pendingText(int count);
 
+    int m_soundLevel;  // 0 = popup's built-in tone, 1/2 = our own tone, louder
+    int m_vibrateMs;   // vibration length
+
     void *m_query;   // the global query and its active object (Symbian only)
     void *m_vibra;   // a kept-alive CHWRMVibra session (Symbian only)
+    void *m_tone;    // a kept-alive CMdaAudioToneUtility beep (Symbian only)
 };
 
 #endif // NOTIFIER_H
