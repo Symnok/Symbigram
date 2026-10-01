@@ -16,18 +16,33 @@ Item {
     property int maxBubbleWidth: width * 0.82
     // "29s" under a minute, "M:SS" above; blank when no self-destruct timer.
     // The first URL in the text (for tapping), with a scheme added for www. links.
-    function firstLink(t) {
-        var m = t.match(/(https?:\/\/|www\.)[^\s]+/)
-        if (!m) return ""
-        var u = m[0]
-        return u.indexOf("http") === 0 ? u : "http://" + u
+    // Every tappable target in the text, as a URL: real links, plus @mentions turned into
+    // t.me links so they go through the same "open it inside Symbigram" handling.
+    // The @ must follow a space or an opening bracket, which keeps e-mail addresses out.
+    function linkTargets(t) {
+        var out = []
+        var re = /(https?:\/\/|www\.)[^\s]+|(?:^|[\s(\[])@([A-Za-z][A-Za-z0-9_]{4,31})/g
+        var m
+        while ((m = re.exec(t)) !== null) {
+            if (m[2] !== undefined) {
+                out.push("https://t.me/" + m[2])
+            } else {
+                var u = m[0]
+                out.push(u.indexOf("http") === 0 ? u : "http://" + u)
+            }
+        }
+        return out
     }
 
-    // How many URLs the text holds. With more than one we must let Qt work out which link was
-    // tapped (see bodyLabel) instead of always opening the first.
+    function firstLink(t) {
+        var a = linkTargets(t)
+        return a.length > 0 ? a[0] : ""
+    }
+
+    // How many tappable targets the text holds. With more than one we must let Qt work out which
+    // link was tapped (see bodyLabel) instead of always opening the first.
     function linkCount(t) {
-        var m = t.match(/(https?:\/\/|www\.)[^\s]+/g)
-        return m ? m.length : 0
+        return linkTargets(t).length
     }
 
     // Escape HTML, turn URLs (http(s):// or www.) into tappable links, keep line breaks.
@@ -36,6 +51,10 @@ Item {
         s = s.replace(/((https?:\/\/|www\.)[^\s<]+)/g, function(m) {
             var href = m.indexOf("http") === 0 ? m : "http://" + m
             return '<a href="' + href + '"><font color="#8fd1ff">' + m + '</font></a>'
+        })
+        // @mentions become t.me links (the lead character is kept so e-mails are not touched).
+        s = s.replace(/(^|[\s(\[])@([A-Za-z][A-Za-z0-9_]{4,31})/g, function(m, lead, name) {
+            return lead + '<a href="https://t.me/' + name + '"><font color="#8fd1ff">@' + name + '</font></a>'
         })
         return s.replace(/\n/g, "<br/>")
     }
@@ -308,13 +327,14 @@ Item {
                     // laid out as RichText and Qt reports exactly which one was tapped; the common
                     // 0/1-link case keeps the cheap StyledText path.
                     textFormat: root.linkCount(model.body) > 1 ? Text.RichText : Text.StyledText
-                    onLinkActivated: Qt.openUrlExternally(link)
+                    // t.me/<name> opens that chat in Symbigram; anything else goes to the browser.
+                    onLinkActivated: if (!app.openInternalLink(link)) Qt.openUrlExternally(link)
                     // Shortcut for a single link only. With several, the tap must reach the Text
                     // itself, and a long-press falls through to the bubble's own mouse area.
                     MouseArea {
                         anchors.fill: parent
                         enabled: root.linkCount(model.body) == 1
-                        onClicked: { var u = root.firstLink(model.body); if (u != "") Qt.openUrlExternally(u) }
+                        onClicked: { var u = root.firstLink(model.body); if (u != "" && !app.openInternalLink(u)) Qt.openUrlExternally(u) }
                         onPressAndHold: root.pressAndHold()
                     }
                 }

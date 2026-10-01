@@ -851,6 +851,45 @@ void AppController::findPeer(const QString &query)
     m_session->resolve(query);
 }
 
+bool AppController::openInternalLink(const QString &url)
+{
+    QString rest = url.trimmed();
+    if (rest.startsWith(QLatin1String("https://"), Qt::CaseInsensitive)) rest = rest.mid(8);
+    else if (rest.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) rest = rest.mid(7);
+    if (rest.startsWith(QLatin1String("www."), Qt::CaseInsensitive)) rest = rest.mid(4);
+
+    const int slash = rest.indexOf(QLatin1Char('/'));
+    if (slash < 0) return false;
+    const QString host = rest.left(slash).toLower();
+    if (host != QLatin1String("t.me") && host != QLatin1String("telegram.me")
+        && host != QLatin1String("telegram.dog")) return false;
+
+    // The first path segment is the username; anything after it (a message id) is ignored.
+    QString path = rest.mid(slash + 1).section(QLatin1Char('?'), 0, 0).section(QLatin1Char('#'), 0, 0);
+    const QString name = path.section(QLatin1Char('/'), 0, 0);
+    if (name.isEmpty()) return false;
+
+    // Private invites (t.me/+hash, /joinchat/) and the special links are not usernames and we
+    // cannot resolve them - let the browser deal with those.
+    if (name.startsWith(QLatin1Char('+'))) return false;
+    static const char *const reserved[] = {
+        "joinchat", "s", "c", "proxy", "socks", "addstickers", "addtheme", "addemoji",
+        "addlist", "share", "iv", "setlanguage", "confirmphone", "login", "bg",
+        "invoice", "giftcode", "contact", "boost", 0
+    };
+    for (int i = 0; reserved[i]; ++i)
+        if (name.compare(QLatin1String(reserved[i]), Qt::CaseInsensitive) == 0) return false;
+    for (int i = 0; i < name.size(); ++i) {
+        const QChar ch = name.at(i);
+        if (!ch.isLetterOrNumber() && ch != QLatin1Char('_')) return false;
+    }
+
+    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return true; }
+    setNotice(tr("Opening @%1...").arg(name));
+    m_session->resolve(name);   // peerResolved -> peerFound -> the chat (or its topics) opens
+    return true;
+}
+
 void AppController::onPeerResolved(const TgPeer &peer)
 {
     emit peerFound(peer.key());

@@ -181,6 +181,9 @@ public slots:
     void goOffline();
     /// Username, phone number or a name; peerResolved opens the chat.
     void findPeer(const QString &query);
+    /// A t.me/<username> link: resolve it and open that chat inside Symbigram. Returns false when
+    /// the URL is not an internal Telegram link (the caller should hand it to the browser).
+    Q_INVOKABLE bool openInternalLink(const QString &url);
     /// Forward picker: matching chats (local, first) then people found on the server, as
     /// [{ peerKey, title, subtitle, local }, ...]. Empty query = all existing chats.
     QVariantList peerSearchResults() const { return m_peerSearchResults; }
