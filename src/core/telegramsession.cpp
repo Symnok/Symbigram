@@ -718,13 +718,13 @@ void TelegramSession::ensureDialog(const TgPeer &peer)
 
 // -- actions ---------------------------------------------------------------------------------------------------
 
-void TelegramSession::loadHistory(const TgPeer &peer, int offsetId, int count)
+void TelegramSession::loadHistory(const TgPeer &peer, int offsetId, int count, int addOffset)
 {
     Request r;
     r.peer = m_peers.withHash(peer);
     r.offsetId = offsetId;
     r.more = count;
-    send(GetHistory, TgApi::getHistory(r.peer, offsetId, count), r);
+    send(GetHistory, TgApi::getHistory(r.peer, offsetId, count, addOffset), r);
 }
 
 qint64 TelegramSession::sendText(const TgPeer &peer, const QString &text, int replyToId, int topicId)
@@ -744,14 +744,14 @@ void TelegramSession::loadForumTopics(const TgPeer &peer)
     send(GetForumTopics, TgApi::getForumTopics(r.peer, 0, 0, 0, 100), r);
 }
 
-void TelegramSession::loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count)
+void TelegramSession::loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count, int addOffset)
 {
     Request r;
     r.peer = m_peers.withHash(peer);
     r.offsetId = offsetId;
     r.topicId = topicId;
     r.more = count;
-    send(GetReplies, TgApi::getReplies(r.peer, topicId, offsetId, count), r);
+    send(GetReplies, TgApi::getReplies(r.peer, topicId, offsetId, count, addOffset), r);
 }
 
 void TelegramSession::markTopicRead(const TgPeer &peer, int topicId, int maxId)

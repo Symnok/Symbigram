@@ -243,6 +243,11 @@ Page {
                 onClicked: chat.openMedia(contextMenu.row)
             }
             MenuItem {
+                text: qsTr("Copy link")
+                visible: contextMenu.row >= 0 ? chat.messageLink(contextMenu.row) != "" : false
+                onClicked: app.copyText(chat.messageLink(contextMenu.row))
+            }
+            MenuItem {
                 text: qsTr("Copy text")
                 visible: contextMenu.item ? contextMenu.item.body != "" : false
                 onClicked: app.copyText(contextMenu.item.body)

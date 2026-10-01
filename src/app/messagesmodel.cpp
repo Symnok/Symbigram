@@ -56,7 +56,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
-      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0), m_topicId(0)
+      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -737,11 +737,42 @@ void MessagesModel::open(const QString &peerKey)
     m_error.clear();
     m_loading = true;
     m_hasOlder = false;
+    m_initialLoad = true;
+    m_jumpToId = 0;
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
     emit loadingChanged();
     m_session->loadHistory(m_peer, 0, HistoryPage);
+}
+
+void MessagesModel::openAt(const QString &peerKey, int msgId)
+{
+    if (msgId <= 0 || peerKey.startsWith(QLatin1String("secret:"))) { open(peerKey); return; }
+    close();
+    TgPeer p = TgPeer::fromKey(peerKey);
+    beginResetModel();
+    m_peer = m_session->peers().withHash(p);
+    m_secretId = 0;
+    m_topicId = 0;            // a link jump shows the plain stream, even in a forum
+    m_topicTitle.clear();
+    m_rows.clear();
+    TgDialog od = m_session->dialog(m_peer);
+    m_readOutboxMaxId = od.readOutboxMaxId;
+    m_openInboxMax = 0;       // we are jumping to a specific message, not to the unread mark
+    m_openUnread = 0;
+    endResetModel();
+    m_error.clear();
+    m_loading = true;
+    m_hasOlder = false;
+    m_initialLoad = true;
+    m_jumpToId = msgId;
+    emit chatChanged();
+    emit peerChanged();
+    emit countChanged();
+    emit loadingChanged();
+    // A negative add_offset also brings in the messages after it, so the target sits mid-page.
+    m_session->loadHistory(m_peer, msgId, HistoryPage, -(HistoryPage / 2));
 }
 
 void MessagesModel::openTopic(const QString &peerKey, int topicId, const QString &topicTitle)
@@ -761,6 +792,8 @@ void MessagesModel::openTopic(const QString &peerKey, int topicId, const QString
     m_error.clear();
     m_loading = true;
     m_hasOlder = false;
+    m_initialLoad = true;
+    m_jumpToId = 0;
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
@@ -843,6 +876,8 @@ void MessagesModel::loadOlder()
 void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &messages, int offsetId, bool more)
 {
     if (peer != m_peer) return;
+    const bool initial = m_initialLoad;
+    m_initialLoad = false;
     m_loading = false;
     m_hasOlder = more;
     // The server sends newest first; the model keeps oldest first. New rows go before
@@ -860,22 +895,23 @@ void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &
         for (int i = rows.size() - 1; i >= 0; --i) m_rows.prepend(rows.at(i));
         endInsertRows();
         emit countChanged();
-        if (offsetId == 0) {
-            // Initial page: jump to the first unread message (if any) instead of the very end.
-            int firstUnread = -1;
-            if (m_openUnread > 0 && m_openInboxMax > 0) {
+        if (initial) {
+            // First page: go to the linked message if we came from one, else to the first unread.
+            int target = -1;
+            if (m_jumpToId > 0) { target = rowById(m_jumpToId); m_jumpToId = 0; }
+            if (target < 0 && m_openUnread > 0 && m_openInboxMax > 0) {
                 for (int i = 0; i < m_rows.size(); ++i) {
                     const TgMessage &mm = m_rows.at(i).m;
-                    if (mm.id > m_openInboxMax && !mm.out) { firstUnread = i; break; }
+                    if (mm.id > m_openInboxMax && !mm.out) { target = i; break; }
                 }
             }
-            emit initialLoaded(firstUnread);
+            emit initialLoaded(target);
         } else {
             emit olderPrepended(rows.size());
         }
     }
     emit loadingChanged();
-    if (offsetId == 0) markRead();
+    if (initial) markRead();
 }
 
 void MessagesModel::onHistoryFailed(const TgPeer &peer, const QString &error)
@@ -1041,6 +1077,20 @@ void MessagesModel::commitEdit(const QString &text)
     emit editChanged();
     if (t.isEmpty()) return;            // empty edit: just leave the message as it was
     m_session->editMessage(m_peer, id, t);
+}
+
+QString MessagesModel::messageLink(int row) const
+{
+    if (row < 0 || row >= m_rows.size() || m_secretId) return QString();
+    const TgMessage &m = m_rows.at(row).m;
+    if (m.id <= 0 || m_peer.kind != TgPeer::Channel) return QString();   // only channels/supergroups
+    const QString user = m_session->peers().info(m_peer).username;
+    const QString topic = m_topicId ? (QString::number(m_topicId) + QLatin1Char('/')) : QString();
+    if (!user.isEmpty())
+        return QLatin1String("https://t.me/") + user + QLatin1Char('/') + topic + QString::number(m.id);
+    // A private channel has no username: the /c/<id>/<msg> form addresses it instead.
+    return QLatin1String("https://t.me/c/") + QString::number(m_peer.id) + QLatin1Char('/')
+           + topic + QString::number(m.id);
 }
 
 QString MessagesModel::replySnippet(int msgId) const

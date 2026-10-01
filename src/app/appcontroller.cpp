@@ -70,7 +70,7 @@ namespace
 AppController::AppController(QObject *parent)
     : QObject(parent),
       m_settings(QLatin1String("Symbigram"), QLatin1String("Symbigram")),
-      m_netMgr(0), m_netSession(0), m_view(0),
+      m_netMgr(0), m_netSession(0), m_view(0), m_linkMsgId(0),
       m_state(QLatin1String("starting")), m_busy(false), m_wantOnline(false), m_everOnline(false),
       m_reconnectDelay(ReconnectMinMs), m_checkingPassword(false), m_loginMethod(QLatin1String("qr")), m_codeBusy(false), m_foreground(true)
 {
@@ -875,6 +875,7 @@ void AppController::reconnect()
 void AppController::findPeer(const QString &query)
 {
     if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
+    m_linkMsgId = 0;
     m_session->resolve(query);
 }
 
@@ -891,10 +892,31 @@ bool AppController::openInternalLink(const QString &url)
     if (host != QLatin1String("t.me") && host != QLatin1String("telegram.me")
         && host != QLatin1String("telegram.dog")) return false;
 
-    // The first path segment is the username; anything after it (a message id) is ignored.
-    QString path = rest.mid(slash + 1).section(QLatin1Char('?'), 0, 0).section(QLatin1Char('#'), 0, 0);
-    const QString name = path.section(QLatin1Char('/'), 0, 0);
-    if (name.isEmpty()) return false;
+    const QString path = rest.mid(slash + 1).section(QLatin1Char('?'), 0, 0).section(QLatin1Char('#'), 0, 0);
+    const QStringList seg = path.split(QLatin1Char('/'), QString::SkipEmptyParts);
+    if (seg.isEmpty()) return false;
+    const QString name = seg.at(0);
+
+    // A link to a message carries its id last: /<name>/<msg> or /<name>/<topic>/<msg>.
+    int msgId = 0;
+    if (seg.size() >= 2) {
+        bool ok = false;
+        const int n = seg.last().toInt(&ok);
+        if (ok && n > 0) msgId = n;
+    }
+
+    // t.me/c/<channelId>/... addresses a channel we must already know (private, no username).
+    if (name.compare(QLatin1String("c"), Qt::CaseInsensitive) == 0) {
+        if (seg.size() < 2) return false;
+        bool ok = false;
+        const qint64 chanId = seg.at(1).toLongLong(&ok);
+        if (!ok || chanId <= 0) return false;
+        if (seg.size() < 3) msgId = 0;                      // /c/<id> alone is just the chat
+        const TgPeer known = m_session->peers().withHash(TgPeer(TgPeer::Channel, chanId));
+        if (known.accessHash == 0) { setNotice(tr("That chat is not in your list.")); return true; }
+        emit openMessageRequested(known.key(), msgId);
+        return true;
+    }
 
     // Private invites (t.me/+hash, /joinchat/) and the special links are not usernames and we
     // cannot resolve them - let the browser deal with those.
@@ -913,12 +935,19 @@ bool AppController::openInternalLink(const QString &url)
 
     if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return true; }
     setNotice(tr("Opening @%1...").arg(name));
+    m_linkMsgId = msgId;        // picked up by onPeerResolved once the username comes back
     m_session->resolve(name);   // peerResolved -> peerFound -> the chat (or its topics) opens
     return true;
 }
 
 void AppController::onPeerResolved(const TgPeer &peer)
 {
+    if (m_linkMsgId > 0) {                 // the link named a message - open the chat there
+        const int msgId = m_linkMsgId;
+        m_linkMsgId = 0;
+        emit openMessageRequested(peer.key(), msgId);
+        return;
+    }
     emit peerFound(peer.key());
 }
 

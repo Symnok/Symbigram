@@ -233,6 +233,8 @@ signals:
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
+    /// A t.me link that points at one message: open peerKey and jump to msgId.
+    void openMessageRequested(const QString &peerKey, int msgId);
     void peerSearchChanged();                         // the forward-picker search list changed
     void logChanged();
 
@@ -287,6 +289,7 @@ private:
     QDeclarativeView *m_view;
     QVariantList m_peerSearchResults;   // forward-picker: local chats + server people
     QString m_peerSearchQuery;          // the query the current results are for (drops stale replies)
+    int m_linkMsgId;                    // message a pending t.me link resolve should jump to
     QString m_state;
     bool m_busy;
     QString m_loginError;

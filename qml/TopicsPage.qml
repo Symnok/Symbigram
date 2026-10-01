@@ -34,10 +34,43 @@ Page {
         }
     }
 
-    ListHeading {
+    // Same shape and height as a chat's header, so switching between them does not jump.
+    Rectangle {
         id: heading
         anchors { top: parent.top; left: parent.left; right: parent.right }
-        ListItemText { anchors.fill: heading.paddingItem; role: "Heading"; text: app.topics.title }
+        height: platformStyle.graphicSizeMedium + 2 * platformStyle.paddingMedium
+        color: "#1c2a3a"
+        Rectangle { anchors { left: parent.left; right: parent.right; bottom: parent.bottom } height: 1; color: "#3d5a80" }
+        Rectangle {
+            id: headingAvatar
+            anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+            width: platformStyle.graphicSizeMedium
+            height: platformStyle.graphicSizeMedium
+            radius: width / 2
+            color: "#3d5a80"
+            Label {
+                anchors.centerIn: parent
+                text: app.topics.title.length > 0 ? app.topics.title.charAt(0).toUpperCase() : "#"
+                color: "white"; font.bold: true
+            }
+        }
+        Column {
+            anchors { left: headingAvatar.right; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
+            Label {
+                width: parent.width
+                text: app.topics.title
+                elide: Text.ElideRight
+                font.bold: true
+                color: "white"
+            }
+            Label {
+                width: parent.width
+                font.pixelSize: platformStyle.fontSizeSmall
+                text: app.topics.loading ? qsTr("loading topics...") : qsTr("%1 topics").arg(app.topics.count)
+                elide: Text.ElideRight
+                color: platformStyle.colorNormalMid
+            }
+        }
     }
 
     ListView {

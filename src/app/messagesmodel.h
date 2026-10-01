@@ -101,6 +101,12 @@ public:
     QString error() const { return m_error; }
 
     Q_INVOKABLE void open(const QString &peerKey);
+    /// Opens the chat on a particular message (a t.me link): the history page is fetched centred
+    /// on it and the view jumps straight there.
+    Q_INVOKABLE void openAt(const QString &peerKey, int msgId);
+    /// A t.me link to this message, or "" when the chat has no public form (1:1 chats, basic
+    /// groups and secret chats have none).
+    Q_INVOKABLE QString messageLink(int row) const;
     /// Opens one topic of a forum supergroup: its messages (via getReplies) with sending routed
     /// into the topic. topicTitle is shown in the header; the group name becomes the subtitle.
     Q_INVOKABLE void openTopic(const QString &peerKey, int topicId, const QString &topicTitle);
@@ -268,6 +274,8 @@ private:
     qint64 m_peerTypingUser;
     int m_replyToId;                        // message id the composer will reply to (0 = none)
     int m_editId;                           // message id being edited (0 = not editing)
+    bool m_initialLoad;                     // the next history page is the first one of this chat
+    int m_jumpToId;                         // message to position at once that page arrives (0 = none)
     int m_topicId;                          // forum topic being viewed (0 = whole chat / not a forum)
     QString m_topicTitle;                   // the open topic's title (header)
     bool m_autoPreview;                     // Image Preview = Full (auto-load photos) vs Thumbnail

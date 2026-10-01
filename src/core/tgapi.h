@@ -87,10 +87,10 @@ public:
     static QByteArray usersGetUser(const TgPeer &user);
     static QByteArray getDialogs(int offsetDate, int offsetId, const TgPeer &offsetPeer, int limit, int folderId = 0);
     static QByteArray getDialogFilters();
-    static QByteArray getHistory(const TgPeer &peer, int offsetId, int limit);
+    static QByteArray getHistory(const TgPeer &peer, int offsetId, int limit, int addOffset = 0);
     static QByteArray sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId = 0, int topMsgId = 0);
     static QByteArray getForumTopics(const TgPeer &peer, int offsetDate, int offsetId, int offsetTopic, int limit);
-    static QByteArray getReplies(const TgPeer &peer, int topicId, int offsetId, int limit);
+    static QByteArray getReplies(const TgPeer &peer, int topicId, int offsetId, int limit, int addOffset = 0);
     static QByteArray readDiscussion(const TgPeer &peer, int topicId, int readMaxId);
     static QByteArray blockUser(const TgPeer &peer);
     static QList<TgForumTopic> readForumTopics(const TlObject &o);

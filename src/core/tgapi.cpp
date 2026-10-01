@@ -285,11 +285,13 @@ QByteArray TgApi::getDialogFilters()
     return w.toByteArray();
 }
 
-QByteArray TgApi::getHistory(const TgPeer &peer, int offsetId, int limit)
+QByteArray TgApi::getHistory(const TgPeer &peer, int offsetId, int limit, int addOffset)
 {
+    // A negative add_offset returns messages NEWER than offset_id as well, which is how a page
+    // centred on one message (jumping to a t.me link) is fetched.
     TlWriter w(64);
     w.writeConstructor(Tl::MessagesGetHistory).writeRaw(inputPeer(peer))
-     .writeInt(offsetId).writeInt(0).writeInt(0).writeInt(limit).writeInt(0).writeInt(0).writeLong(0);
+     .writeInt(offsetId).writeInt(0).writeInt(addOffset).writeInt(limit).writeInt(0).writeInt(0).writeLong(0);
     return w.toByteArray();
 }
 
@@ -318,12 +320,12 @@ QByteArray TgApi::getForumTopics(const TgPeer &peer, int offsetDate, int offsetI
     return w.toByteArray();
 }
 
-QByteArray TgApi::getReplies(const TgPeer &peer, int topicId, int offsetId, int limit)
+QByteArray TgApi::getReplies(const TgPeer &peer, int topicId, int offsetId, int limit, int addOffset)
 {
     // messages.getReplies#22ddd30c peer msg_id offset_id offset_date add_offset limit max_id min_id hash
     TlWriter w(64);
     w.writeConstructor(Tl::MessagesGetReplies).writeRaw(inputPeer(peer)).writeInt(topicId)
-     .writeInt(offsetId).writeInt(0).writeInt(0).writeInt(limit).writeInt(0).writeInt(0).writeLong(0);
+     .writeInt(offsetId).writeInt(0).writeInt(addOffset).writeInt(limit).writeInt(0).writeInt(0).writeLong(0);
     return w.toByteArray();
 }
 

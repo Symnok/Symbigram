@@ -95,11 +95,11 @@ public:
     void loadMoreDialogs();
     void loadFolders();
     /// Recent messages of a chat; offsetId 0 = the newest, otherwise older than that id.
-    void loadHistory(const TgPeer &peer, int offsetId, int count);
+    void loadHistory(const TgPeer &peer, int offsetId, int count, int addOffset = 0);
     /// Forum (topics) supergroups: fetch the topic list, and page one topic's messages (via
     /// getReplies). The topic history arrives through the same historyLoaded signal.
     void loadForumTopics(const TgPeer &peer);
-    void loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count);
+    void loadTopicHistory(const TgPeer &peer, int topicId, int offsetId, int count, int addOffset = 0);
     /// Marks a forum topic read up to maxId (zeroes its unread counter). Fires topicRead at once.
     void markTopicRead(const TgPeer &peer, int topicId, int maxId);
     /// "Mark all as read": a normal chat/channel reads its whole history; a forum reads every topic.

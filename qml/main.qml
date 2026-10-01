@@ -87,6 +87,18 @@ PageStackWindow {
             if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
             window.openChat(peerKey)
         }
+        // A t.me link that named a message: open the chat straight on it. A forum opens as the
+        // plain message stream here rather than its topic list, so the message can be shown.
+        onOpenMessageRequested: {
+            if (app.state != "ready") return
+            if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
+            if (msgId > 0) {
+                app.chat.openAt(peerKey, msgId)
+                pageStack.push(chatPage)
+            } else {
+                window.openChat(peerKey)
+            }
+        }
         onOpenChatRequested: {
             if (app.state != "ready") return
             if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
