@@ -49,6 +49,7 @@ namespace
     const char *const KeyVibrationLength = "ui/vibrationLength";
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyImagePreview = "ui/imagePreview";
+    const char *const KeyFontSize = "ui/fontSize";
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
     const char *const KeyDownloadCustom = "downloads/folder";
@@ -359,6 +360,32 @@ void AppController::setImagePreview(int mode)
     if (m_chat) m_chat->setAutoPreview(mode == 1);
     emit settingsChanged();
 }
+int AppController::fontSize() const
+{
+    // Small (1) is the original size; Medium (2) is the default, a notch larger.
+    int v = m_settings.value(QLatin1String(KeyFontSize), 2).toInt();
+    return (v < 0 || v > 4) ? 2 : v;
+}
+
+void AppController::setFontSize(int index)
+{
+    if (index < 0 || index > 4 || index == fontSize()) return;
+    m_settings.setValue(QLatin1String(KeyFontSize), index);
+    emit settingsChanged();
+}
+
+QStringList AppController::fontSizeNames() const
+{
+    return QStringList() << tr("Extra small") << tr("Small") << tr("Medium")
+                         << tr("Large") << tr("Extra large");
+}
+
+qreal AppController::fontScale() const
+{
+    static const qreal scale[5] = { 0.8, 1.0, 1.15, 1.3, 1.5 };
+    return scale[fontSize()];
+}
+
 QStringList AppController::imagePreviewNames() const { return QStringList() << tr("Thumbnail") << tr("Full"); }
 bool AppController::autoConnect() const { return m_settings.value(QLatin1String(KeyAutoConnect), true).toBool(); }
 void AppController::setAutoConnect(bool on) { m_settings.setValue(QLatin1String(KeyAutoConnect), on); emit settingsChanged(); }

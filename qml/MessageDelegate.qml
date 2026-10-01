@@ -14,6 +14,8 @@ Item {
     signal openImage(string path, int row)
 
     property int maxBubbleWidth: width * 0.82
+    // Settings > Font size. 1.0 is "Small", the original message text size.
+    property real fontScale: app.fontScale
     // "29s" under a minute, "M:SS" above; blank when no self-destruct timer.
     // The first URL in the text (for tapping), with a scheme added for www. links.
     // Every tappable target in the text, as a URL: real links, plus @mentions turned into
@@ -85,7 +87,7 @@ Item {
                 id: dateLabel
                 anchors.centerIn: parent
                 text: model.dateText
-                font.pixelSize: platformStyle.fontSizeSmall
+                font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                 color: platformStyle.colorNormalMid
             }
         }
@@ -96,7 +98,7 @@ Item {
             visible: model.service
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
-            font.pixelSize: platformStyle.fontSizeSmall
+            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
             color: platformStyle.colorNormalMid
             text: (model.sender != "" ? model.sender + " " : "") + model.note
         }
@@ -147,7 +149,7 @@ Item {
                     visible: model.sender != ""
                     text: model.sender
                     font.bold: true
-                    font.pixelSize: platformStyle.fontSizeSmall
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                     color: "#8fd1ff"
                     width: parent.width
                     horizontalAlignment: Text.AlignLeft
@@ -158,7 +160,7 @@ Item {
                     visible: model.forwarded != ""
                     text: qsTr("Forwarded from %1").arg(model.forwarded)
                     font.italic: true
-                    font.pixelSize: platformStyle.fontSizeSmall
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                     color: "#b8d8f0"
                     width: parent.width
                     horizontalAlignment: Text.AlignLeft
@@ -168,7 +170,7 @@ Item {
                     id: replyLabel
                     visible: model.reply != ""
                     text: model.reply
-                    font.pixelSize: platformStyle.fontSizeSmall
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                     color: "#b8d8f0"
                     width: parent.width
                     horizontalAlignment: Text.AlignLeft
@@ -212,7 +214,7 @@ Item {
                             anchors.centerIn: parent
                             text: qsTr("Tap to load")
                             color: "white"
-                            font.pixelSize: platformStyle.fontSizeSmall
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                         }
                     }
                     Label {
@@ -220,7 +222,7 @@ Item {
                         visible: model.mediaState == "failed"
                         text: qsTr("Failed - tap to retry")
                         color: "#ff9b9b"
-                        font.pixelSize: platformStyle.fontSizeSmall
+                        font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                     }
                 }
 
@@ -238,7 +240,7 @@ Item {
                         Label {
                             anchors.centerIn: parent
                             color: "white"
-                            font.pixelSize: platformStyle.fontSizeSmall
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                             text: model.mediaKind == "voice"
                                 ? (model.voicePlaying ? "■" : "▶")
                                 : (model.mediaKind == "audio"
@@ -263,7 +265,7 @@ Item {
                             text: model.mediaKind == "voice" ? qsTr("Voice message")
                                 : (model.mediaKind == "video" ? qsTr("Video") : model.mediaInfo)
                             color: "white"
-                            font.pixelSize: platformStyle.fontSizeSmall
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                             width: maxBubbleWidth - 2 * platformStyle.paddingMedium - platformStyle.graphicSizeMedium - platformStyle.paddingMedium
                             elide: Text.ElideMiddle
                         }
@@ -275,7 +277,7 @@ Item {
                                    ? (chat.audioRow == index ? qsTr("buffering %1%... opening player").arg(chat.audioBuffer) : qsTr("tap to play in player"))
                                    : (model.mediaState == "ready" ? qsTr("tap to open") : (model.mediaState == "loading" ? qsTr("downloading %1%").arg(model.mediaProgress) : (model.mediaKind == "video" ? model.mediaInfo : qsTr("tap to download")))))
                             color: "#c0d4e6"
-                            font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                         }
                     }
                 }
@@ -291,21 +293,21 @@ Item {
                         radius: 6
                         color: "#6a6a6a"
                         anchors.verticalCenter: parent.verticalCenter
-                        Label { anchors.centerIn: parent; text: "GIF"; color: "white"; font.bold: true; font.pixelSize: platformStyle.fontSizeSmall * 0.9 }
+                        Label { anchors.centerIn: parent; text: "GIF"; color: "white"; font.bold: true; font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.9 }
                     }
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
                         Label {
                             text: qsTr("GIF file")
                             color: "white"
-                            font.pixelSize: platformStyle.fontSizeSmall
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
                             width: maxBubbleWidth - 2 * platformStyle.paddingMedium - platformStyle.graphicSizeMedium - platformStyle.paddingMedium
                             elide: Text.ElideRight
                         }
                         Label {
                             text: qsTr("not supported")
                             color: "#c0d4e6"
-                            font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                            font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                         }
                     }
                 }
@@ -316,6 +318,7 @@ Item {
                     text: root.linkify(model.body)
                     visible: model.body != ""
                     wrapMode: Text.Wrap
+                    font.pixelSize: platformStyle.fontSizeMedium * root.fontScale
                     // The label spans the max bubble width while the bubble shrinks to the painted
                     // text; Qt would auto-align RTL (Persian/Arabic/Hebrew) text to the far right of
                     // that full width - outside the shrunken bubble, so it looks empty. Pin it left
@@ -364,19 +367,19 @@ Item {
                 Label {
                     visible: model.secretBurn === true && model.secretRemaining >= 0
                     text: root.burnText(model.secretRemaining)
-                    font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                     font.bold: true
                     color: "#ffb14e"
                 }
                 Label {
                     text: (model.edited ? qsTr("edited") + ", " : "") + model.timeText
-                    font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                     color: "#c0c0c0"
                 }
                 Label {
                     visible: model.out
                     text: model.failed ? "!" : (model.pending ? "..." : (model.read ? "✓✓" : "✓"))
-                    font.pixelSize: platformStyle.fontSizeSmall * 0.85
+                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                     color: model.failed ? "#ff9b9b" : (model.read ? "#8fd1ff" : "#c0c0c0")
                 }
             }

@@ -56,6 +56,8 @@ class AppController : public QObject
     Q_PROPERTY(int vibrationLength READ vibrationLength WRITE setVibrationLength NOTIFY settingsChanged)
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(int imagePreview READ imagePreview WRITE setImagePreview NOTIFY settingsChanged)
+    Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize NOTIFY settingsChanged)
+    Q_PROPERTY(qreal fontScale READ fontScale NOTIFY settingsChanged)
     Q_PROPERTY(QVariantList peerSearchResults READ peerSearchResults NOTIFY peerSearchChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
     Q_PROPERTY(bool logging READ logging WRITE setLogging NOTIFY settingsChanged)
@@ -129,6 +131,11 @@ public:
     int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full
     void setImagePreview(int mode);
     Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full"]
+    /// Message text size: 0 Extra small .. 4 Extra large; 1 = Small is the original size.
+    int fontSize() const;
+    void setFontSize(int index);
+    Q_INVOKABLE QStringList fontSizeNames() const;
+    qreal fontScale() const;                           // multiplier for the message fonts
     bool autoConnect() const;
     void setAutoConnect(bool on);
     bool logging() const;

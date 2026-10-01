@@ -82,6 +82,13 @@ Page {
         onAccepted: if (selectedIndex >= 0) app.imagePreview = selectedIndex
     }
 
+    SelectionDialog {
+        id: fontSizeDialog
+        titleText: qsTr("Font size")
+        model: app.fontSizeNames()
+        onAccepted: if (selectedIndex >= 0) app.fontSize = selectedIndex
+    }
+
     CommonDialog {
         id: proxyDialog
         titleText: qsTr("SOCKS5 proxy")
@@ -263,6 +270,31 @@ Page {
                 }
                 onClicked: { imagePreviewDialog.selectedIndex = app.imagePreview; imagePreviewDialog.open() }
             }
+            ListItem {
+                id: fontSizeItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: fontSizeItem.paddingItem.left; right: fontSizeItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Font size") }
+                    Label {
+                        width: parent.width
+                        text: app.fontSizeNames()[app.fontSize]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { fontSizeDialog.selectedIndex = app.fontSize; fontSizeDialog.open() }
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("The size of the message text in chats. Small is the original size.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge
                 x: platformStyle.paddingLarge
