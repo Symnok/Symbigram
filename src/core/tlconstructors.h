@@ -129,6 +129,9 @@ namespace Tl
     const quint32 ForumTopic = 0xfcdad815;                // a topic in messages.forumTopics
     const quint32 MessagesReadDiscussion = 0xf731a9f4;    // mark a forum topic read
     const quint32 ContactsBlock = 0x2e2e8734;             // block a user
+    const quint32 MessagesSendReaction = 0xd30d78d4;      // react to a message
+    const quint32 ReactionEmoji = 0x1b2286b8;             // a plain-emoji reaction
+    const quint32 UpdateMessageReactions = 0x1e297bfa;    // someone's reaction changed
     const quint32 MessagesMessages = 0x1d73e7ea;
     const quint32 MessagesMessagesSlice = 0x5f206716;
     const quint32 MessagesChannelMessages = 0xc776ba4e;

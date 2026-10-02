@@ -23,6 +23,56 @@ namespace
     const int PeerTypingMs = 6000;
     int now() { return int(QDateTime::currentDateTime().toTime_t()); }
 
+    // The phone font has no emoji glyphs, so reactions are drawn from bundled artwork. The
+    // emoticon itself still travels over the wire, so other clients see a normal emoji.
+    struct ReactionDef { const char *utf8; const char *icon; };
+    const ReactionDef kReactions[] = {
+        { "\xF0\x9F\x91\x8D", "qrc:/images/r_like.png" },
+        { "\xF0\x9F\x91\x8E", "qrc:/images/r_dislike.png" },
+        { "\xE2\x9D\xA4", "qrc:/images/r_heart.png" },
+        { "\xF0\x9F\x94\xA5", "qrc:/images/r_fire.png" },
+        { "\xF0\x9F\xA5\xB0", "qrc:/images/r_hearts.png" },
+        { "\xF0\x9F\x91\x8F", "qrc:/images/r_clap.png" },
+        { "\xF0\x9F\x98\x81", "qrc:/images/r_grin.png" },
+        { "\xF0\x9F\xA4\x94", "qrc:/images/r_think.png" },
+        { "\xF0\x9F\xA4\xAF", "qrc:/images/r_mindblown.png" },
+        { "\xF0\x9F\x98\xB1", "qrc:/images/r_scream.png" },
+        { "\xF0\x9F\x98\xA2", "qrc:/images/r_cry.png" },
+        { "\xF0\x9F\x8E\x89", "qrc:/images/r_party.png" },
+        { "\xF0\x9F\x99\x8F", "qrc:/images/r_pray.png" },
+        { "\xF0\x9F\x91\x8C", "qrc:/images/r_ok.png" },
+        { "\xF0\x9F\x98\x8D", "qrc:/images/r_hearteyes.png" },
+        { "\xF0\x9F\x92\xAF", "qrc:/images/r_hundred.png" },
+        { "\xF0\x9F\xA4\xA3", "qrc:/images/r_rofl.png" },
+        { "\xE2\x9A\xA1", "qrc:/images/r_zap.png" },
+        { "\xF0\x9F\x8F\x86", "qrc:/images/r_trophy.png" },
+        { "\xF0\x9F\x92\x94", "qrc:/images/r_broken.png" },
+        { "\xF0\x9F\x98\xAD", "qrc:/images/r_sob.png" },
+        { "\xF0\x9F\x91\x80", "qrc:/images/r_eyes.png" },
+        { "\xF0\x9F\x98\x87", "qrc:/images/r_halo.png" },
+        { "\xF0\x9F\x98\x8E", "qrc:/images/r_cool.png" },
+        { "\xF0\x9F\x98\xA1", "qrc:/images/r_rage.png" },
+        { "\xF0\x9F\x92\xA9", "qrc:/images/r_poop.png" }
+    };
+    const int kReactionCount = int(sizeof(kReactions) / sizeof(kReactions[0]));
+
+    /// Telegram sends the heart both with and without the emoji presentation selector.
+    QString normalEmoticon(const QString &e)
+    {
+        QString s = e;
+        s.remove(QChar(0xFE0F));
+        s.remove(QChar(0xFE0E));
+        return s;
+    }
+
+    QString reactionIcon(const QString &emoticon)
+    {
+        const QString key = normalEmoticon(emoticon);
+        for (int i = 0; i < kReactionCount; ++i)
+            if (key == QString::fromUtf8(kReactions[i].utf8)) return QLatin1String(kReactions[i].icon);
+        return QString();
+    }
+
     // The phone font has no emoji glyphs, so emoji render as empty boxes. Drop them from any text
     // we display (message body, previews) rather than showing the boxes. Covers the emoji blocks
     // plus the variation selector, ZWJ and keycap joiners that hold emoji sequences together.
@@ -86,6 +136,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[SecretRemainingRole] = "secretRemaining";
     roles[VoicePlayingRole] = "voicePlaying";
     roles[PreviewLoadedRole] = "previewLoaded";
+    roles[ReactionsRole] = "reactions";
     setRoleNames(roles);
     connect(media, SIGNAL(ready(QString,QString)), this, SLOT(onMediaReady(QString,QString)));
     connect(media, SIGNAL(failed(QString,QString)), this, SLOT(onMediaFailed(QString,QString)));
@@ -93,6 +144,8 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
 
     connect(session, SIGNAL(historyLoaded(TgPeer,QList<TgMessage>,int,bool)), this, SLOT(onHistoryLoaded(TgPeer,QList<TgMessage>,int,bool)));
     connect(session, SIGNAL(historyFailed(TgPeer,QString)), this, SLOT(onHistoryFailed(TgPeer,QString)));
+    connect(session, SIGNAL(messageReactionsChanged(TgPeer,int,QList<TgReaction>)),
+            this, SLOT(onReactionsChanged(TgPeer,int,QList<TgReaction>)));
     connect(session, SIGNAL(messageReceived(TgMessage)), this, SLOT(onMessageReceived(TgMessage)));
     connect(session, SIGNAL(messageEdited(TgMessage)), this, SLOT(onMessageEdited(TgMessage)));
     connect(session, SIGNAL(messagesDeleted(TgPeer,QList<int>)), this, SLOT(onMessagesDeleted(TgPeer,QList<int>)));
@@ -186,6 +239,21 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
         return QLatin1String("idle");
     case MediaProgressRole: return r.progress;
     case MediaInfoRole: return mediaInfoText(m.media);
+    case ReactionsRole: {
+        QVariantList out;
+        for (int i = 0; i < m.reactions.size(); ++i) {
+            const TgReaction &tr = m.reactions.at(i);
+            const QString icon = reactionIcon(tr.emoticon);
+            if (icon.isEmpty()) continue;   // no artwork for it, and the font cannot draw emoji
+            QVariantMap e;
+            e[QLatin1String("emoticon")] = tr.emoticon;
+            e[QLatin1String("icon")] = icon;
+            e[QLatin1String("count")] = tr.count;
+            e[QLatin1String("chosen")] = tr.chosen;
+            out.append(e);
+        }
+        return out;
+    }
     case PreviewLoadedRole:
         // For non-photos this is irrelevant (return true so no "tap to load" hint); for a photo it
         // is true once the real inline image (not just the stripped blur) is in thumbPath.
@@ -1077,6 +1145,40 @@ void MessagesModel::commitEdit(const QString &text)
     emit editChanged();
     if (t.isEmpty()) return;            // empty edit: just leave the message as it was
     m_session->editMessage(m_peer, id, t);
+}
+
+void MessagesModel::react(int row, const QString &emoticon)
+{
+    if (row < 0 || row >= m_rows.size() || m_secretId || emoticon.isEmpty()) return;
+    const TgMessage &m = m_rows.at(row).m;
+    if (m.id <= 0) return;
+    // Tapping the reaction we already chose takes it back.
+    QString send = emoticon;
+    const QString key = normalEmoticon(emoticon);
+    for (int i = 0; i < m.reactions.size(); ++i)
+        if (m.reactions.at(i).chosen && normalEmoticon(m.reactions.at(i).emoticon) == key) { send.clear(); break; }
+    m_session->sendReaction(m_peer, m.id, send);
+}
+
+QVariantList MessagesModel::availableReactions() const
+{
+    QVariantList out;
+    for (int i = 0; i < kReactionCount; ++i) {
+        QVariantMap e;
+        e[QLatin1String("emoticon")] = QString::fromUtf8(kReactions[i].utf8);
+        e[QLatin1String("icon")] = QLatin1String(kReactions[i].icon);
+        out.append(e);
+    }
+    return out;
+}
+
+void MessagesModel::onReactionsChanged(const TgPeer &peer, int msgId, const QList<TgReaction> &reactions)
+{
+    if (peer != m_peer) return;
+    const int row = rowById(msgId);
+    if (row < 0) return;
+    m_rows[row].m.reactions = reactions;
+    emit dataChanged(index(row), index(row));
 }
 
 QString MessagesModel::messageLink(int row) const

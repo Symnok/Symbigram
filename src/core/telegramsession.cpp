@@ -780,6 +780,14 @@ void TelegramSession::markAllRead(const TgPeer &peer)
     if (di >= 0 && m_dialogs[di].unreadCount != 0) { m_dialogs[di].unreadCount = 0; emit dialogChanged(p); }
 }
 
+void TelegramSession::sendReaction(const TgPeer &peer, int msgId, const QString &emoticon)
+{
+    if (msgId <= 0) return;
+    Request r;
+    r.peer = m_peers.withHash(peer);
+    send(SendReaction, TgApi::sendReaction(r.peer, msgId, emoticon), r);
+}
+
 void TelegramSession::blockUser(const TgPeer &peer)
 {
     Request r;
@@ -1222,6 +1230,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             break;
         case ArchivePeer:
         case EditMessage:
+        case SendReaction:
         case ForwardMessages:
             applyUpdatesResult(TlSchema::readObject(r));   // Updates carrying the new/edited messages
             break;
@@ -1635,6 +1644,12 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
     case ForwardMessages:
         emit notice(tr("Could not forward the message: %1").arg(type));
         break;
+    case SendReaction:
+        if (type.contains(QLatin1String("REACTION_INVALID")))
+            emit notice(tr("That reaction is not allowed in this chat."));
+        else
+            emit notice(tr("Could not react: %1").arg(type));
+        break;
     case BlockUser:
         emit notice(tr("Could not block the user: %1").arg(type));
         break;
@@ -1743,6 +1758,13 @@ void TelegramSession::applyUpdate(const TlObject &u)
             m_dialogs[di].lastText = m.text.isEmpty() ? m.note : m.text;
             emit dialogChanged(m.peer);
         }
+        break;
+    }
+    case Tl::UpdateMessageReactions: {
+        TgPeer p = m_peers.withHash(TgApi::readPeer(u.obj("peer")));
+        const int msgId = u.intOr("msg_id");
+        if (!p.isNull() && msgId > 0)
+            emit messageReactionsChanged(p, msgId, TgApi::readReactions(u.obj("reactions")));
         break;
     }
     case Tl::UpdateDeleteMessages: {

@@ -87,6 +87,44 @@ Page {
 
     InfoBanner { id: forwardedBanner; timeout: 3000 }
 
+    // Pick a reaction. The icons are bundled images - the phone font has no emoji glyphs - but
+    // the emoticon itself is what gets sent, so other clients see a normal reaction.
+    CommonDialog {
+        id: reactDialog
+        property int row: -1
+        titleText: qsTr("React")
+        buttonTexts: [qsTr("Cancel")]
+        content: Item {
+            width: parent.width
+            height: reactGrid.height + 2 * platformStyle.paddingMedium
+            Grid {
+                id: reactGrid
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                columns: 6
+                spacing: platformStyle.paddingSmall
+                Repeater {
+                    model: chat.availableReactions()
+                    delegate: Rectangle {
+                        width: 48; height: 48; radius: 8
+                        color: reactMouse.pressed ? "#3d5a80" : "transparent"
+                        Image {
+                            anchors.centerIn: parent
+                            source: modelData.icon
+                            width: 32; height: 32
+                            smooth: true
+                        }
+                        MouseArea {
+                            id: reactMouse
+                            anchors.fill: parent
+                            onClicked: { var e = modelData.emoticon; reactDialog.close(); chat.react(reactDialog.row, e) }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Pick a chat or person to forward the selected message to. Existing chats are matched locally
     // as you type; other people are searched on the server and appended. Tapping a row forwards.
     Timer { id: forwardSearchTimer; interval: 350; onTriggered: app.searchPeers(forwardSearch.text) }
@@ -241,6 +279,11 @@ Page {
                 text: qsTr("Open")
                 visible: contextMenu.item ? (contextMenu.item.mediaState == "ready" && contextMenu.item.mediaKind != "photo") : false
                 onClicked: chat.openMedia(contextMenu.row)
+            }
+            MenuItem {
+                text: qsTr("React")
+                visible: contextMenu.item ? (!contextMenu.item.pending && !contextMenu.item.service && !chat.isSecret) : false
+                onClicked: { reactDialog.row = contextMenu.row; reactDialog.open() }
             }
             MenuItem {
                 text: qsTr("Copy link")

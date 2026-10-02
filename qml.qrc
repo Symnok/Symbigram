@@ -15,5 +15,33 @@
         <file>images/lock.png</file>
         <file>images/lock_green.png</file>
         <file>images/pigler.png</file>
+        <file>images/tick_sent.png</file>
+        <file>images/tick_read.png</file>
+        <file>images/r_like.png</file>
+        <file>images/r_dislike.png</file>
+        <file>images/r_heart.png</file>
+        <file>images/r_fire.png</file>
+        <file>images/r_hearts.png</file>
+        <file>images/r_clap.png</file>
+        <file>images/r_grin.png</file>
+        <file>images/r_think.png</file>
+        <file>images/r_mindblown.png</file>
+        <file>images/r_scream.png</file>
+        <file>images/r_cry.png</file>
+        <file>images/r_party.png</file>
+        <file>images/r_pray.png</file>
+        <file>images/r_ok.png</file>
+        <file>images/r_hearteyes.png</file>
+        <file>images/r_hundred.png</file>
+        <file>images/r_rofl.png</file>
+        <file>images/r_zap.png</file>
+        <file>images/r_trophy.png</file>
+        <file>images/r_broken.png</file>
+        <file>images/r_sob.png</file>
+        <file>images/r_eyes.png</file>
+        <file>images/r_halo.png</file>
+        <file>images/r_cool.png</file>
+        <file>images/r_rage.png</file>
+        <file>images/r_poop.png</file>
     </qresource>
 </RCC>

@@ -48,6 +48,15 @@ struct TgPeerInfo
     int photoDcId;
 };
 
+/// One reaction on a message: which emoji, how many people, and whether we are one of them.
+struct TgReaction
+{
+    TgReaction() : count(0), chosen(false) {}
+    QString emoticon;
+    int count;
+    bool chosen;
+};
+
 /// A topic (thread) in a forum supergroup. id is the topic's root message id (the "General"
 /// topic is always id 1).
 struct TgForumTopic
@@ -100,6 +109,7 @@ struct TgMessage
     QString note;          // "photo", "sticker", "forwarded" - set when not plain text
     int replyToId;
     int topicId;           // forum topic this message belongs to (0 = none / not a forum)
+    QList<TgReaction> reactions;
     bool viaBot;
     bool service;          // a service message: the note is the whole story
     bool mentioned;

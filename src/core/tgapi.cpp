@@ -345,6 +345,37 @@ QByteArray TgApi::blockUser(const TgPeer &peer)
     return w.toByteArray();
 }
 
+QByteArray TgApi::sendReaction(const TgPeer &peer, int msgId, const QString &emoticon)
+{
+    // messages.sendReaction#d30d78d4 flags big:1 add_to_recent:2 peer msg_id reaction:flags.0?Vector<Reaction>
+    // Leaving the reaction vector out clears whatever we had chosen.
+    const bool has = !emoticon.isEmpty();
+    TlWriter w(64 + emoticon.size() * 3);
+    w.writeConstructor(Tl::MessagesSendReaction).writeInt(has ? ((1 << 0) | (1 << 2)) : 0)
+     .writeRaw(inputPeer(peer)).writeInt(msgId);
+    if (has)
+        w.writeConstructor(Tl::Vector).writeInt(1)
+         .writeConstructor(Tl::ReactionEmoji).writeString(emoticon);
+    return w.toByteArray();
+}
+
+QList<TgReaction> TgApi::readReactions(const TlObject &o)
+{
+    QList<TgReaction> out;
+    QVariantList list = o.vec("results");
+    for (int i = 0; i < list.size(); ++i) {
+        TlObject rc = TlSchema::toObject(list.at(i));
+        TlObject r = rc.obj("reaction");
+        if (r.ctor() != Tl::ReactionEmoji) continue;   // custom-emoji reactions cannot be drawn here
+        TgReaction tr;
+        tr.emoticon = r.str("emoticon");
+        tr.count = rc.intOr("count");
+        tr.chosen = rc.has("chosen_order");
+        if (!tr.emoticon.isEmpty() && tr.count > 0) out.append(tr);
+    }
+    return out;
+}
+
 QList<TgForumTopic> TgApi::readForumTopics(const TlObject &o)
 {
     QList<TgForumTopic> topics;
@@ -978,6 +1009,7 @@ TgMessage TgApi::readMessage(const TlObject &m)
         if (rt.has("reply_to_top_id")) t.topicId = rt.intOr("reply_to_top_id");
         else if (rt.flag("flags", 3)) t.topicId = t.replyToId;
     }
+    if (m.has("reactions")) t.reactions = readReactions(m.obj("reactions"));
     return t;
 }
 

@@ -106,6 +106,8 @@ public:
     void markAllRead(const TgPeer &peer);
     /// Blocks a user (1:1). Reports through notice.
     void blockUser(const TgPeer &peer);
+    /// Reacts to a message; an empty emoticon takes our reaction back.
+    void sendReaction(const TgPeer &peer, int msgId, const QString &emoticon);
     /// Mutes/unmutes one forum topic (the group mute, setMuted, propagates to all topics).
     void setTopicMuted(const TgPeer &peer, int topicId, bool muted);
     /// Returns the random id that messageSent/messageFailed will carry.
@@ -190,6 +192,7 @@ signals:
     void forumTopicsLoaded(const TgPeer &peer, const QList<TgForumTopic> &topics);
     void topicRead(const TgPeer &peer, int topicId);   // a forum topic's unread was cleared
     void topicMuted(const TgPeer &peer, int topicId, bool muted);
+    void messageReactionsChanged(const TgPeer &peer, int msgId, const QList<TgReaction> &reactions);
     void historyFailed(const TgPeer &peer, const QString &error);
     void messageReceived(const TgMessage &message);
     void messageEdited(const TgMessage &message);
@@ -247,7 +250,7 @@ private:
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
         SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers,
-        GetForumTopics, GetReplies, ReadDiscussion, BlockUser
+        GetForumTopics, GetReplies, ReadDiscussion, BlockUser, SendReaction
     };
     struct Request
     {

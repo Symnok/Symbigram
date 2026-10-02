@@ -16,6 +16,10 @@ Item {
     property int maxBubbleWidth: width * 0.82
     // Settings > Font size. 1.0 is "Small", the original message text size.
     property real fontScale: app.fontScale
+    // Reactions are bundled artwork: the phone font cannot draw emoji at all.
+    property variant reactionList: model.reactions
+    property int msgIndex: index
+    property real reactionIconSize: 18 * fontScale
     // "29s" under a minute, "M:SS" above; blank when no self-destruct timer.
     // The first URL in the text (for tapping), with a scheme added for www. links.
     // Every tappable target in the text, as a URL: real links, plus @mentions turned into
@@ -108,7 +112,7 @@ Item {
             visible: !model.service
             function w(item) { return item.visible ? item.paintedWidth : 0 }
             property real textWidth: Math.max(w(bodyLabel), Math.max(w(senderLabel), Math.max(w(fwdLabel), w(replyLabel))))
-            property real innerWidth: Math.max(Math.max(textWidth, timeRow.width),
+            property real innerWidth: Math.max(Math.max(Math.max(textWidth, timeRow.width), reactionsRow.width),
                                                isPhoto && photo.shownWidth > 0 ? photo.shownWidth : (hasFileRow ? fileRow.width : 0))
             width: Math.min(maxBubbleWidth, innerWidth + 2 * platformStyle.paddingMedium)
             height: inner.height + timeRow.height + 2 * platformStyle.paddingMedium + platformStyle.paddingSmall
@@ -351,6 +355,46 @@ Item {
                     font.italic: true
                     color: "#d0d0d0"
                 }
+
+                // -- reactions: tap one to add it, tap your own again to take it back --
+                Row {
+                    id: reactionsRow
+                    spacing: platformStyle.paddingSmall
+                    visible: root.reactionList !== undefined && root.reactionList.length > 0
+                    height: visible ? childrenRect.height : 0
+                    Repeater {
+                        model: root.reactionList
+                        delegate: Rectangle {
+                            width: chipRow.width + 12
+                            height: chipRow.height + 6
+                            radius: height / 2
+                            color: modelData.chosen ? "#2f6ba8" : "#33000000"
+                            Row {
+                                id: chipRow
+                                anchors.centerIn: parent
+                                spacing: 3
+                                Image {
+                                    source: modelData.icon
+                                    width: root.reactionIconSize
+                                    height: root.reactionIconSize
+                                    smooth: true
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                Label {
+                                    text: modelData.count
+                                    font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
+                                    color: "white"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: chat.react(root.msgIndex, modelData.emoticon)
+                                onPressAndHold: root.pressAndHold()
+                            }
+                        }
+                    }
+                }
             }
 
             Row {
@@ -376,11 +420,22 @@ Item {
                     font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
                     color: "#c0c0c0"
                 }
+                // Delivery state. Drawn from bundled artwork: the check glyph (U+2713) is not in
+                // the phone font, so as text it came out as an empty box.
                 Label {
-                    visible: model.out
-                    text: model.failed ? "!" : (model.pending ? "..." : (model.read ? "✓✓" : "✓"))
+                    visible: model.out && (model.failed || model.pending)
+                    text: model.failed ? "!" : "..."
                     font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale) * 0.85
-                    color: model.failed ? "#ff9b9b" : (model.read ? "#8fd1ff" : "#c0c0c0")
+                    color: model.failed ? "#ff9b9b" : "#c0c0c0"
+                }
+                Image {
+                    // one white tick = sent, two green ticks = read (all Telegram reports)
+                    visible: model.out && !model.failed && !model.pending
+                    source: model.read ? "qrc:/images/tick_read.png" : "qrc:/images/tick_sent.png"
+                    height: (platformStyle.fontSizeSmall * root.fontScale) * 0.9
+                    width: height * 1.5
+                    smooth: true
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

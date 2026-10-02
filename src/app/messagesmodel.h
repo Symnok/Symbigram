@@ -74,7 +74,8 @@ public:
         SecretBurnRole,     // true if this message self-destructs
         SecretRemainingRole,// seconds left before it self-destructs (-1 = none)
         VoicePlayingRole,   // true while this voice message is playing
-        PreviewLoadedRole   // photo: the inline image (not just the blurred placeholder) is loaded
+        PreviewLoadedRole,  // photo: the inline image (not just the blurred placeholder) is loaded
+        ReactionsRole       // [{ emoticon, icon, count, chosen }] for the reaction chips
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -107,6 +108,10 @@ public:
     /// A t.me link to this message, or "" when the chat has no public form (1:1 chats, basic
     /// groups and secret chats have none).
     Q_INVOKABLE QString messageLink(int row) const;
+    /// Adds our reaction to this message, or takes it back when it is the one already chosen.
+    Q_INVOKABLE void react(int row, const QString &emoticon);
+    /// The reactions we ship artwork for: [{ emoticon, icon }].
+    Q_INVOKABLE QVariantList availableReactions() const;
     /// Opens one topic of a forum supergroup: its messages (via getReplies) with sending routed
     /// into the topic. topicTitle is shown in the header; the group name becomes the subtitle.
     Q_INVOKABLE void openTopic(const QString &peerKey, int topicId, const QString &topicTitle);
@@ -200,6 +205,7 @@ private slots:
     void onSecretExpired(int id, qint64 randomId);
     void onBurnTick();
     void onSecretChatsChanged();
+    void onReactionsChanged(const TgPeer &peer, int msgId, const QList<TgReaction> &reactions);
     void onMediaReady(const QString &key, const QString &path);
     void onMediaFailed(const QString &key, const QString &error);
     void onMediaProgress(const QString &key, int percent);

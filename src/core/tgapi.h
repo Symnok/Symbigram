@@ -93,6 +93,9 @@ public:
     static QByteArray getReplies(const TgPeer &peer, int topicId, int offsetId, int limit, int addOffset = 0);
     static QByteArray readDiscussion(const TgPeer &peer, int topicId, int readMaxId);
     static QByteArray blockUser(const TgPeer &peer);
+    /// An empty emoticon removes our reaction.
+    static QByteArray sendReaction(const TgPeer &peer, int msgId, const QString &emoticon);
+    static QList<TgReaction> readReactions(const TlObject &o);
     static QList<TgForumTopic> readForumTopics(const TlObject &o);
     static QByteArray editMessage(const TgPeer &peer, int msgId, const QString &text);
     static QByteArray forwardMessages(const TgPeer &fromPeer, const QList<qint32> &ids,
