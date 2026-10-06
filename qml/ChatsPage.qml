@@ -21,6 +21,7 @@ Page {
     tools: ToolBarLayout {
         ToolButton { iconSource: "toolbar-back"; onClicked: Qt.quit() }
         ToolButton { iconSource: "toolbar-add"; onClicked: findDialog.open() }
+        ToolButton { iconSource: "qrc:/images/contacts.png"; onClicked: { app.contacts.load(); pageStack.push(contactsPage) } }
         ToolButton { iconSource: "toolbar-refresh"; onClicked: app.connection == "offline" ? app.reconnect() : app.chats.refresh() }
         ToolButton { iconSource: "toolbar-menu"; onClicked: menu.open() }
     }

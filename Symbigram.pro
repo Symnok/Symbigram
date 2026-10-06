@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.81
+VERSION = 1.0.83
 
 QT += core gui network declarative
 
@@ -20,6 +20,7 @@ HEADERS += \
     src/app/chatsmodel.h \
     src/app/messagesmodel.h \
     src/app/topicsmodel.h \
+    src/app/phonebook.h \
     src/app/notifier.h \
     src/app/mediacache.h \
     src/app/qrimageprovider.h \
@@ -33,6 +34,7 @@ SOURCES += \
     src/app/chatsmodel.cpp \
     src/app/messagesmodel.cpp \
     src/app/topicsmodel.cpp \
+    src/app/phonebook.cpp \
     src/app/notifier.cpp \
     src/app/mediacache.cpp \
     src/app/qrimageprovider.cpp \
@@ -68,6 +70,7 @@ symbian {
     # Notifier: discreet popups (avkon), the "new messages" global query + status-bar
     # envelope (aknnotify), vibration (hwrm), bringing the app forward (apgrfx, ws32).
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
+    LIBS += -lcntmodel            # the phone's address book (CContactDatabase)
     LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
 

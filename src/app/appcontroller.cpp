@@ -4,6 +4,7 @@
 #include "chatsmodel.h"
 #include "messagesmodel.h"
 #include "topicsmodel.h"
+#include "phonebook.h"
 #include "mediacache.h"
 #include "voicerecorder.h"
 #include "notifier.h"
@@ -97,6 +98,7 @@ AppController::AppController(QObject *parent)
     m_chat = new MessagesModel(m_session, m_media, this);
     m_chat->setAutoPreview(imagePreview() == 1);   // Image Preview: Full auto-loads, Thumbnail waits for a tap
     m_topics = new TopicsModel(m_session, this);
+    m_contacts = new PhoneBook(this);
     applyDownloadFolder();
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
 
