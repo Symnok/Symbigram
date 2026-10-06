@@ -30,6 +30,7 @@ Page {
     // Send button and the keyboard Enter key (E6/E7 etc.: Enter sends instead of a newline).
     function sendMessage() {
         if (chat.peerKey == "" || app.connection != "online") return
+        list.followNew = true   // sending always brings us back to the newest message
         if (chat.isSecret && chat.secretState != 2) return
         if (page.pendingFile != "") {
             app.sendAttachment(page.pendingFile, page.pendingPhoto, composer.text)
@@ -51,6 +52,8 @@ Page {
     Menu {
         id: menu
         MenuLayout {
+            // Jump back to the newest message (and resume following new arrivals).
+            MenuItem { text: qsTr("Skip to bottom"); onClicked: list.scrollToEnd() }
             MenuItem { text: chat.hasOlder ? qsTr("Load older messages") : qsTr("Reload"); visible: !chat.isSecret; onClicked: chat.hasOlder ? chat.loadOlder() : reopen() }
             MenuItem { text: chat.peerMuted ? qsTr("Unmute") : qsTr("Mute"); visible: !chat.isSecret; onClicked: chat.setMuted(!chat.peerMuted) }
             MenuItem { text: qsTr("Mark as read"); visible: !chat.isSecret; onClicked: chat.markRead() }
@@ -430,23 +433,33 @@ Page {
 
         ScrollDecorator { flickableItem: list }
 
+        // Only stay pinned to the newest message while the user is actually at the bottom.
+        // Once they scroll up to read older messages, new ones are appended quietly instead of
+        // yanking the view down - which matters most in busy groups and channels.
+        property bool followNew: true
+        onMovementEnded: followNew = atYEnd
+
         function scrollToEnd() {
             if (count > 0) positionViewAtEnd()
+            followNew = true
         }
         Component.onCompleted: scrollToEnd()
     }
 
     Connections {
         target: chat
-        onMessageAppended: list.scrollToEnd()
+        onMessageAppended: if (list.followNew) list.scrollToEnd()
         onOlderPrepended: list.positionViewAtIndex(count, ListView.Beginning)
         onChatChanged: { page.pendingFile = ""; list.scrollToEnd() }
-        // First page in: jump to the first unread message, or the end when all is read.
+        // First page in: jump to the first unread message, or the end when all is read. Landing on
+        // an unread/linked message means the user reads from there, so do not follow new arrivals.
         onInitialLoaded: {
-            if (firstUnreadRow >= 0 && firstUnreadRow < list.count)
+            if (firstUnreadRow >= 0 && firstUnreadRow < list.count) {
                 list.positionViewAtIndex(firstUnreadRow, ListView.Beginning)
-            else
+                list.followNew = false
+            } else {
                 list.scrollToEnd()
+            }
         }
     }
 
