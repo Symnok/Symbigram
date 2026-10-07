@@ -17,6 +17,14 @@ Page {
 
     Timer { id: searchTimer; interval: 250; onTriggered: app.contacts.setFilter(searchField.text) }
 
+    // The phonebook model outlives this page, so a filter typed last time would still be applied
+    // while the (recreated) search box looks empty - showing only the contact searched for before.
+    // Start every visit from the full list.
+    Component.onCompleted: {
+        searchField.text = ""
+        app.contacts.setFilter("")
+    }
+
     // Same header shape and height as a chat, so the pages line up.
     Rectangle {
         id: heading
