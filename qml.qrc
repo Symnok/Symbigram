@@ -8,6 +8,7 @@
         <file>qml/NotificationsPage.qml</file>
         <file>qml/SettingsPage.qml</file>
         <file>qml/ContactsPage.qml</file>
+        <file>qml/NewContactPage.qml</file>
         <file>qml/TopicsPage.qml</file>
         <file>qml/main.qml</file>
         <file>images/logo.png</file>

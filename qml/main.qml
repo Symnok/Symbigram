@@ -44,6 +44,20 @@ PageStackWindow {
     Component { id: notificationsPage; NotificationsPage {} }
     Component { id: topicsPage; TopicsPage {} }
     Component { id: contactsPage; ContactsPage {} }
+    Component { id: newContactPage; NewContactPage {} }
+
+    // A chat offering to be saved in the phonebook: guess the name halves from the chat title and
+    // let the user correct everything before it is written.
+    function openNewContact(title, username) {
+        var t = app.contacts.plainName(title)
+        var i = t.indexOf(" ")
+        pageStack.push(newContactPage, {
+            firstName: i < 0 ? t : t.substring(0, i),
+            lastName: i < 0 ? "" : t.substring(i + 1),
+            phone: "",
+            url: "https://t.me/" + username
+        })
+    }
     Component { id: aboutPage; AboutPage {} }
 
     function route() {

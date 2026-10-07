@@ -84,11 +84,12 @@ Page {
                 Column {
                     anchors { left: avatar.right; leftMargin: platformStyle.paddingMedium; right: parent.right; verticalCenter: parent.verticalCenter }
                     ListItemText { width: parent.width; role: "Title"; text: model.name }
-                    ListItemText { width: parent.width; role: "SubTitle"; text: model.number }
+                    ListItemText { width: parent.width; role: "SubTitle"; text: model.detail }
                 }
             }
-            // Only this number is sent, and only to look it up.
-            onClicked: app.findPeer(model.number)
+            // A Web Address entry resolves its @name; otherwise only this one number is sent,
+            // and only to look it up.
+            onClicked: app.findPeer(model.target)
         }
 
         ScrollDecorator { flickableItem: list }

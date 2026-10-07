@@ -881,6 +881,17 @@ void AppController::findPeer(const QString &query)
     m_session->resolve(query);
 }
 
+void AppController::addLocalContact(const QString &firstName, const QString &lastName,
+                                   const QString &phone, const QString &url)
+{
+    if (m_contacts->addContact(firstName, lastName, phone, url)) {
+        const QString shown = (firstName + QLatin1Char(' ') + lastName).simplified();
+        setNotice(shown.isEmpty() ? tr("Added to Contacts.") : tr("%1 added to Contacts.").arg(shown));
+    } else {
+        setNotice(m_contacts->error());
+    }
+}
+
 bool AppController::openInternalLink(const QString &url)
 {
     QString rest = url.trimmed();

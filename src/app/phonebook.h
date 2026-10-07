@@ -30,6 +30,9 @@ public:
     enum Roles {
         NameRole = Qt::UserRole + 1,
         NumberRole,
+        UsernameRole,    // from a t.me Web Address on the contact, without the @
+        DetailRole,      // what the row shows: "@name" or the phone number
+        TargetRole,      // what to hand to findPeer(): "@name" or the phone number
         InitialsRole,
         ColorRole
     };
@@ -48,6 +51,13 @@ public:
     Q_INVOKABLE void reload();
     /// Narrows the list to names or numbers containing text (empty shows everything).
     Q_INVOKABLE void setFilter(const QString &text);
+    /// Creates a phonebook entry. Any field may be empty; a t.me Web Address is what lets the
+    /// contact be opened later when no phone number is known. Returns false and sets error().
+    Q_INVOKABLE bool addContact(const QString &firstName, const QString &lastName,
+                                const QString &phone, const QString &url);
+    /// A name the phonebook can actually render: emoji are dropped, since the phone font has no
+    /// glyphs for them and they would be stored as empty boxes.
+    Q_INVOKABLE QString plainName(const QString &text) const;
 
 signals:
     void changed();
@@ -56,12 +66,15 @@ private:
     struct Entry
     {
         QString name;
-        QString number;
+        QString number;     // empty for a Web Address entry
+        QString username;   // empty for a plain phone entry
     };
 
     void readAll();        // fills m_all; platform specific
 #ifdef Q_OS_SYMBIAN
     void readContactsL(void *db);   // CContactDatabase*; separate so TRAPD gets one statement
+    void addContactL(void *db, const QString &firstName, const QString &lastName,
+                     const QString &phone, const QString &url);
 #endif
     void applyFilter();
 

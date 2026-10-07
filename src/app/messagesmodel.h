@@ -32,6 +32,7 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(bool peerIsChannel READ peerIsChannel NOTIFY chatChanged)
     Q_PROPERTY(bool peerMuted READ peerMuted NOTIFY peerChanged)
     Q_PROPERTY(QString initials READ initials NOTIFY peerChanged)
+    Q_PROPERTY(QString peerUsername READ peerUsername NOTIFY peerChanged)
     Q_PROPERTY(QString color READ color NOTIFY chatChanged)
     Q_PROPERTY(QString avatar READ avatar NOTIFY peerChanged)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
@@ -95,6 +96,7 @@ public:
     bool peerIsChannel() const;
     bool peerMuted() const;
     QString initials() const;
+    QString peerUsername() const;   // public @name, or "" when there is none
     QString color() const;
     QString avatar() const;
     bool loading() const { return m_loading; }

@@ -58,6 +58,13 @@ Page {
             MenuItem { text: chat.peerMuted ? qsTr("Unmute") : qsTr("Mute"); visible: !chat.isSecret; onClicked: chat.setMuted(!chat.peerMuted) }
             MenuItem { text: qsTr("Mark as read"); visible: !chat.isSecret; onClicked: chat.markRead() }
             MenuItem {
+                // Saves the person in the phone's address book with t.me/<name> as the Web
+                // Address, so they can be reopened from Contacts without a phone number.
+                text: qsTr("Add to local contacts")
+                visible: !chat.isSecret && !chat.peerIsGroup && chat.peerUsername != ""
+                onClicked: window.openNewContact(chat.title, chat.peerUsername)
+            }
+            MenuItem {
                 text: qsTr("Start secret chat")
                 visible: !chat.isSecret && !chat.peerIsGroup && !chat.peerIsChannel && chat.peerKey != ""
                 onClicked: app.startSecretChat(chat.peerKey)

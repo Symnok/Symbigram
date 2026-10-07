@@ -743,6 +743,12 @@ QString MessagesModel::lastSeenText(const TgPeerInfo &info) const
     }
 }
 
+QString MessagesModel::peerUsername() const
+{
+    if (m_peer.isNull() || m_secretId) return QString();
+    return m_session->peers().info(m_peer).username;
+}
+
 QString MessagesModel::subtitle() const
 {
     if (m_secretId) {
