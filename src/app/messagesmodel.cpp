@@ -531,6 +531,64 @@ void MessagesModel::openMedia(int row)
     qDebug("open: openUrl returned %d for [%s]", int(ok), qPrintable(path));
 }
 
+namespace
+{
+    /// The folders our scratch can be in: the drive folder audioStreamPath() uses, and the one the
+    /// user chose for downloads (often the same).
+    QStringList scratchFolders(const QString &defaultFolder, const QString &chosenFolder)
+    {
+        QStringList dirs;
+        dirs << defaultFolder;
+        if (!chosenFolder.isEmpty() && !dirs.contains(chosenFolder)) dirs << chosenFolder;
+        return dirs;
+    }
+
+    /// Only these names are ever considered ours.
+    const char *const ScratchFiles[] = { "_rec.ogg", "_voice.wav", 0 };
+}
+
+qint64 MessagesModel::scratchBytes(const QString &chosenFolder)
+{
+    qint64 total = 0;
+    QStringList dirs = scratchFolders(downloadDir(false), chosenFolder);
+    for (int i = 0; i < dirs.size(); ++i) {
+        QFileInfoList audio = QDir(dirs.at(i) + QLatin1String("/.audio"))
+                                  .entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+        for (int k = 0; k < audio.size(); ++k) total += audio.at(k).size();
+        for (int k = 0; ScratchFiles[k]; ++k) {
+            QFileInfo fi(dirs.at(i) + QLatin1Char('/') + QLatin1String(ScratchFiles[k]));
+            if (fi.exists()) total += fi.size();
+        }
+    }
+    return total;
+}
+
+qint64 MessagesModel::clearScratch(const QString &chosenFolder)
+{
+    qint64 freed = 0;
+    QStringList dirs = scratchFolders(downloadDir(false), chosenFolder);
+    for (int i = 0; i < dirs.size(); ++i) {
+        // The hand-off folder is created by us and holds nothing but our copies, so it goes whole.
+        const QString audioDir = dirs.at(i) + QLatin1String("/.audio");
+        QDir audio(audioDir);
+        QFileInfoList files = audio.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+        for (int k = 0; k < files.size(); ++k) {
+            const qint64 sz = files.at(k).size();
+            if (QFile::remove(files.at(k).absoluteFilePath())) freed += sz;
+        }
+        QDir().rmdir(audioDir);
+        // The two fixed scratch names, and nothing else in this folder.
+        for (int k = 0; ScratchFiles[k]; ++k) {
+            const QString path = dirs.at(i) + QLatin1Char('/') + QLatin1String(ScratchFiles[k]);
+            QFileInfo fi(path);
+            if (!fi.exists()) continue;
+            const qint64 sz = fi.size();
+            if (QFile::remove(path)) freed += sz;
+        }
+    }
+    return freed;
+}
+
 QString MessagesModel::audioStreamPath(const TgMedia &m) const
 {
     // A PUBLIC file (the media-player process can't read our private cache) with the real

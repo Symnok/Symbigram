@@ -14,6 +14,7 @@
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
+#include <QLocale>
 #include <QSettings>
 #include <QTranslator>
 #include <QUrl>
@@ -67,10 +68,13 @@ int main(int argc, char *argv[])
             app.installTranslator(&translator);
     }
 
-    // Hebrew is right-to-left: flip the whole UI. The Symbian components and the default text
-    // alignment follow the application layout direction; main.qml adds LayoutMirroring so the
-    // custom anchor-based layouts mirror too.
-    if (lang == QLatin1String("he"))
+    // A right-to-left language flips the whole UI. The direction comes from the locale, NOT from
+    // a hardcoded language list, so an add-on pack for Hebrew, Arabic or Persian mirrors correctly
+    // without the application having to know that language exists. The Symbian components and the
+    // default text alignment follow the application layout direction; main.qml adds LayoutMirroring
+    // so the custom anchor-based layouts mirror too.
+    const bool rightToLeft = QLocale(lang).textDirection() == Qt::RightToLeft;
+    if (rightToLeft)
         app.setLayoutDirection(Qt::RightToLeft);
 
     qmlRegisterType<ChatsModel>();
@@ -85,6 +89,7 @@ int main(int argc, char *argv[])
     view.engine()->addImageProvider(QLatin1String("qr"), new QrImageProvider);
     view.rootContext()->setContextProperty(QLatin1String("app"), &controller);
     view.rootContext()->setContextProperty(QLatin1String("uiLanguage"), lang);
+    view.rootContext()->setContextProperty(QLatin1String("uiRightToLeft"), rightToLeft);
     controller.setView(&view);
     view.setSource(QUrl(QLatin1String("qrc:/qml/main.qml")));
     if (view.status() == QDeclarativeView::Error) {

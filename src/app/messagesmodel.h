@@ -114,6 +114,14 @@ public:
     Q_INVOKABLE void react(int row, const QString &emoticon);
     /// The reactions we ship artwork for: [{ emoticon, icon }].
     Q_INVOKABLE QVariantList availableReactions() const;
+    /// Symbigram's own scratch files that are forced to live in a PUBLIC folder, because the
+    /// media-player and installer processes cannot read our private cage: the per-track hand-off
+    /// copies in ".audio", the recording buffer and the voice WAV. These are ours, so the cache
+    /// figure counts them and clearing the cache removes them. Files the user saved or opened
+    /// ("Save to phone", "Open") sit in the same folder under their real names and are NEVER
+    /// touched - only these fixed, app-made names are.
+    static qint64 scratchBytes(const QString &chosenFolder);
+    static qint64 clearScratch(const QString &chosenFolder);
     /// Opens one topic of a forum supergroup: its messages (via getReplies) with sending routed
     /// into the topic. topicTitle is shown in the header; the group name becomes the subtitle.
     Q_INVOKABLE void openTopic(const QString &peerKey, int topicId, const QString &topicTitle);

@@ -2,7 +2,5 @@
     <qresource prefix="/">
         <file>translations/symbigram_ru.qm</file>
         <file>translations/symbigram_uk.qm</file>
-        <file>translations/symbigram_vi.qm</file>
-        <file>translations/symbigram_he.qm</file>
     </qresource>
 </RCC>

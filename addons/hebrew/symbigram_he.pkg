@@ -1,0 +1,13 @@
+; Symbigram Hebrew language pack (add-on).
+;
+; Installs one .qm into the folder Symbigram scans for add-on languages. No executable, no
+; capabilities - it is a data-only package, so a self-signed certificate is enough.
+&EN
+
+; name, package UID, version, TYPE=SA
+#{"Symbigram Hebrew"}, (0xE4B1C2D5), 1, 0, 0, TYPE=SA
+
+%{"Symnok"}
+:"Symnok"
+
+"symbigram_he.qm" - "C:\Data\Symbigram\translations\symbigram_he.qm"

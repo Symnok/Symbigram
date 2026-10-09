@@ -321,7 +321,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("The app's private store of downloaded photos, avatars and files (separate from the folder above). Clearing it just re-downloads on demand.")
+                text: qsTr("The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

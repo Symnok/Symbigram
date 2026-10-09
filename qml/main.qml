@@ -14,9 +14,10 @@ PageStackWindow {
     platformSoftwareInputPanelEnabled: true
     initialPage: startPage
 
-    // Hebrew is RTL: mirror the anchor-based layouts (main.cpp also sets the application layout
-    // direction, which handles the components and text alignment). uiLanguage is the resolved code.
-    LayoutMirroring.enabled: uiLanguage == "he"
+    // Mirror the anchor-based layouts for a right-to-left language (main.cpp also sets the
+    // application layout direction, which handles the components and text alignment). The flag
+    // comes from the locale, so an add-on language pack mirrors without any change here.
+    LayoutMirroring.enabled: uiRightToLeft
     LayoutMirroring.childrenInherit: true
 
     Page {

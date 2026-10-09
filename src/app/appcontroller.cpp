@@ -47,6 +47,7 @@ namespace
     {
         struct Native { const char *code; const char *name; };
         static const Native known[] = {
+            { "vi", "\x54\x69\xE1\xBA\xBF\x6E\x67\x20\x56\x69\xE1\xBB\x87\x74" },
             { "tr", "\x54\xC3\xBC\x72\x6B\xC3\xA7\x65" },
             { "de", "\x44\x65\x75\x74\x73\x63\x68" },
             { "fr", "\x46\x72\x61\x6E\xC3\xA7\x61\x69\x73" },
@@ -239,7 +240,8 @@ void AppController::onNotice(const QString &text) { setNotice(text); }
 
 QString AppController::cacheSize() const
 {
-    qint64 b = m_media ? m_media->cacheBytes() : 0;
+    // Counts the scratch too, so the figure matches what "Clear cache" actually frees.
+    qint64 b = (m_media ? m_media->cacheBytes() : 0) + MessagesModel::scratchBytes(m_downloadPath);
     if (b >= 1048576) return tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1);
     if (b >= 1024) return tr("%1 KB").arg(int(b / 1024));
     return tr("%1 B").arg(b);
@@ -248,7 +250,9 @@ QString AppController::cacheSize() const
 void AppController::clearCache()
 {
     if (!m_media) return;
-    qint64 freed = m_media->clearCache();
+    // The private cache, plus our own scratch copies that have to sit in a public folder.
+    // Anything the user saved or opened keeps its real name and is left alone.
+    qint64 freed = m_media->clearCache() + MessagesModel::clearScratch(m_downloadPath);
     QString human = freed >= 1048576 ? tr("%1 MB").arg(double(freed) / 1048576.0, 0, 'f', 1)
                   : (freed >= 1024 ? tr("%1 KB").arg(int(freed / 1024)) : tr("%1 B").arg(freed));
     setNotice(tr("Cache cleared (%1 freed).").arg(human));
@@ -408,9 +412,7 @@ QVariantList AppController::availableLanguages() const
         { "", "\x53\x79\x73\x74\x65\x6D\x20\x64\x65\x66\x61\x75\x6C\x74" },
         { "en", "\x45\x6E\x67\x6C\x69\x73\x68" },
         { "ru", "\xD0\xA0\xD1\x83\xD1\x81\xD1\x81\xD0\xBA\xD0\xB8\xD0\xB9" },
-        { "uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0" },
-        { "vi", "\x54\x69\xE1\xBA\xBF\x6E\x67\x20\x56\x69\xE1\xBB\x87\x74" },
-        { "he", "\xD7\xA2\xD7\x91\xD7\xA8\xD7\x99\xD7\xAA" }
+        { "uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0" }
     };
     const int builtinCount = int(sizeof(builtin) / sizeof(builtin[0]));
 
