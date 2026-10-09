@@ -56,9 +56,16 @@ int main(int argc, char *argv[])
 
     QSettings settings(QLatin1String("Symbigram"), QLatin1String("Symbigram"));
     const QString lang = AppController::effectiveLanguage(settings);
+    // An add-on language pack installed in AppController::translationsDir() is tried first, so a
+    // new language ships as its own small .sis instead of growing this one. Built-in languages
+    // stay inside the binary. Anything a pack does not translate falls back to English.
     QTranslator translator;
-    if (lang != QLatin1String("en") && translator.load(QLatin1String(":/translations/symbigram_") + lang))
-        app.installTranslator(&translator);
+    if (lang != QLatin1String("en")) {
+        const QString pack = AppController::translationsDir()
+                           + QLatin1String("/symbigram_") + lang;
+        if (translator.load(pack) || translator.load(QLatin1String(":/translations/symbigram_") + lang))
+            app.installTranslator(&translator);
+    }
 
     // Hebrew is right-to-left: flip the whole UI. The Symbian components and the default text
     // alignment follow the application layout direction; main.qml adds LayoutMirroring so the

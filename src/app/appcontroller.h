@@ -133,6 +133,12 @@ public:
     int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full
     void setImagePreview(int mode);
     Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full"]
+    /// Where add-on language packs install their .qm files. A pack dropped here is picked up
+    /// without rebuilding the application.
+    static QString translationsDir();
+    /// Languages on offer: the built-in ones plus every add-on pack found, as
+    /// [{ code, name }, ...] with "" first for the system default.
+    Q_INVOKABLE QVariantList availableLanguages() const;
     /// Message text size: 0 Extra small .. 4 Extra large; 1 = Small is the original size.
     int fontSize() const;
     void setFontSize(int index);

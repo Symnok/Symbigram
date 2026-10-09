@@ -301,6 +301,8 @@ void PhoneBook::readContactsL(void *dbPtr)
 
         // A t.me Web Address names the person outright, so it gets its own row - this is what
         // makes a contact with no phone number usable.
+        // A t.me Web Address names the person outright, so it gets its own row - this is what
+        // makes a contact with no phone number usable.
         for (int k = 0; k < urls.size(); ++k) {
             const QString user = usernameFromUrl(urls.at(k));
             if (user.isEmpty()) continue;

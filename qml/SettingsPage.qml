@@ -22,14 +22,8 @@ Page {
     SelectionDialog {
         id: languageDialog
         titleText: qsTr("App language")
-        model: ListModel {
-            ListElement { name: "System default"; code: "" }
-            ListElement { name: "English"; code: "en" }
-            ListElement { name: "Русский"; code: "ru" }
-            ListElement { name: "Українська"; code: "uk" }
-            ListElement { name: "Tiếng Việt"; code: "vi" }
-            ListElement { name: "עברית"; code: "he" }
-        }
+        // Built-in languages plus any add-on pack found in the translations folder.
+        model: app.availableLanguages()
         // The stock delegate shows modelData (a string list); this model has roles, and the
         // phone theme's dialog text is hard to read - so: our own rows, white on the dialog.
         delegate: Item {
@@ -38,7 +32,7 @@ Page {
             Rectangle { anchors.fill: parent; color: rowMouse.pressed ? "#3d5a80" : "transparent" }
             Label {
                 anchors { left: parent.left; leftMargin: platformStyle.paddingLarge; right: parent.right; verticalCenter: parent.verticalCenter }
-                text: (index == 0 ? qsTr("System default") : model.name) + (model.code == app.language ? "   *" : "")
+                text: (index == 0 ? qsTr("System default") : modelData.name) + (modelData.code == app.language ? "   *" : "")
                 color: "white"
                 elide: Text.ElideRight
             }
@@ -48,7 +42,7 @@ Page {
                 onClicked: { languageDialog.selectedIndex = index; languageDialog.accept() }
             }
         }
-        onAccepted: if (selectedIndex >= 0) app.language = model.get(selectedIndex).code
+        onAccepted: if (selectedIndex >= 0) app.language = model[selectedIndex].code
     }
 
     SelectionDialog {
@@ -116,9 +110,10 @@ Page {
     }
 
     function languageName() {
-        for (var i = 0; i < languageDialog.model.count; ++i)
-            if (languageDialog.model.get(i).code == app.language)
-                return i == 0 ? qsTr("System default") : languageDialog.model.get(i).name
+        var list = app.availableLanguages()
+        for (var i = 0; i < list.length; ++i)
+            if (list[i].code == app.language)
+                return i == 0 ? qsTr("System default") : list[i].name
         return qsTr("System default")
     }
 
@@ -371,8 +366,9 @@ Page {
                     }
                 }
                 onClicked: {
-                    for (var i = 0; i < languageDialog.model.count; ++i)
-                        if (languageDialog.model.get(i).code == app.language) languageDialog.selectedIndex = i
+                    var list = app.availableLanguages()
+                    for (var i = 0; i < list.length; ++i)
+                        if (list[i].code == app.language) languageDialog.selectedIndex = i
                     languageDialog.open()
                 }
             }

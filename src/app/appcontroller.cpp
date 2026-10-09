@@ -40,6 +40,36 @@
 
 namespace
 {
+    /// The language's own name where we know it, otherwise Qt's English name for the locale
+    /// ("Turkish"), otherwise the bare code. Add-on packs can therefore name themselves properly
+    /// without the application needing to know about them in advance.
+    QString nativeLanguageName(const QString &code)
+    {
+        struct Native { const char *code; const char *name; };
+        static const Native known[] = {
+            { "tr", "\x54\xC3\xBC\x72\x6B\xC3\xA7\x65" },
+            { "de", "\x44\x65\x75\x74\x73\x63\x68" },
+            { "fr", "\x46\x72\x61\x6E\xC3\xA7\x61\x69\x73" },
+            { "es", "\x45\x73\x70\x61\xC3\xB1\x6F\x6C" },
+            { "it", "\x49\x74\x61\x6C\x69\x61\x6E\x6F" },
+            { "pl", "\x50\x6F\x6C\x73\x6B\x69" },
+            { "pt", "\x50\x6F\x72\x74\x75\x67\x75\xC3\xAA\x73" },
+            { "nl", "\x4E\x65\x64\x65\x72\x6C\x61\x6E\x64\x73" },
+            { "ro", "\x52\x6F\x6D\xC3\xA2\x6E\xC4\x83" },
+            { "cs", "\xC4\x8C\x65\xC5\xA1\x74\x69\x6E\x61" },
+            { "ar", "\xD8\xA7\xD9\x84\xD8\xB9\xD8\xB1\xD8\xA8\xD9\x8A\xD8\xA9" },
+            { "fa", "\xD9\x81\xD8\xA7\xD8\xB1\xD8\xB3\xDB\x8C" },
+            { "kk", "\xD2\x9A\xD0\xB0\xD0\xB7\xD0\xB0\xD2\x9B\xD1\x88\xD0\xB0" },
+            { "be", "\xD0\x91\xD0\xB5\xD0\xBB\xD0\xB0\xD1\x80\xD1\x83\xD1\x81\xD0\xBA\xD0\xB0\xD1\x8F" }
+        };
+        for (int i = 0; i < int(sizeof(known) / sizeof(known[0])); ++i)
+            if (code == QLatin1String(known[i].code)) return QString::fromUtf8(known[i].name);
+
+        const QLocale locale(code);
+        const QString english = QLocale::languageToString(locale.language());
+        return english.isEmpty() || locale.language() == QLocale::C ? code : english;
+    }
+
     const char *const KeyAutoConnect = "account/autoConnect";
     const char *const KeyLanguage = "ui/language";
     // Three alert channels, each 0 off / 1 first message only / 2 every message.
@@ -362,6 +392,57 @@ void AppController::setImagePreview(int mode)
     if (m_chat) m_chat->setAutoPreview(mode == 1);
     emit settingsChanged();
 }
+QString AppController::translationsDir()
+{
+#ifdef Q_OS_SYMBIAN
+    return QLatin1String("C:/Data/Symbigram/translations");
+#else
+    return QCoreApplication::applicationDirPath() + QLatin1String("/translations");
+#endif
+}
+
+QVariantList AppController::availableLanguages() const
+{
+    struct Builtin { const char *code; const char *name; };
+    static const Builtin builtin[] = {
+        { "", "\x53\x79\x73\x74\x65\x6D\x20\x64\x65\x66\x61\x75\x6C\x74" },
+        { "en", "\x45\x6E\x67\x6C\x69\x73\x68" },
+        { "ru", "\xD0\xA0\xD1\x83\xD1\x81\xD1\x81\xD0\xBA\xD0\xB8\xD0\xB9" },
+        { "uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0" },
+        { "vi", "\x54\x69\xE1\xBA\xBF\x6E\x67\x20\x56\x69\xE1\xBB\x87\x74" },
+        { "he", "\xD7\xA2\xD7\x91\xD7\xA8\xD7\x99\xD7\xAA" }
+    };
+    const int builtinCount = int(sizeof(builtin) / sizeof(builtin[0]));
+
+    QVariantList out;
+    QSet<QString> seen;
+    for (int i = 0; i < builtinCount; ++i) {
+        QVariantMap e;
+        e[QLatin1String("code")] = QLatin1String(builtin[i].code);
+        e[QLatin1String("name")] = QString::fromUtf8(builtin[i].name);
+        out.append(e);
+        seen.insert(QLatin1String(builtin[i].code));
+    }
+
+    // Anything an add-on pack installed. The native name comes from the small table below when we
+    // know it, otherwise from Qt's English name for the locale - so a brand new pack still shows
+    // something readable without changing this code.
+    QDir dir(translationsDir());
+    QStringList packs = dir.entryList(QStringList() << QLatin1String("symbigram_*.qm"), QDir::Files);
+    for (int i = 0; i < packs.size(); ++i) {
+        QString code = packs.at(i);
+        code = code.mid(code.indexOf(QLatin1Char('_')) + 1);
+        code.chop(3);                                  // ".qm"
+        if (code.isEmpty() || seen.contains(code)) continue;
+        seen.insert(code);
+        QVariantMap e;
+        e[QLatin1String("code")] = code;
+        e[QLatin1String("name")] = nativeLanguageName(code);
+        out.append(e);
+    }
+    return out;
+}
+
 int AppController::fontSize() const
 {
     // Small (1) is the original size; Medium (2) is the default, a notch larger.
