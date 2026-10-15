@@ -5,6 +5,7 @@
 #include "messagesmodel.h"
 #include "topicsmodel.h"
 #include "phonebook.h"
+#include "imagepicker.h"
 #include "qrimageprovider.h"
 #include "tgtypes.h"
 #include "tlobject.h"
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<MessagesModel>();
     qmlRegisterType<TopicsModel>();
     qmlRegisterType<PhoneBook>();
+    qmlRegisterType<ImagePicker>();
 
     AppController controller;
 

@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.97
+VERSION = 1.0.98
 
 QT += core gui network declarative
 
@@ -21,6 +21,7 @@ HEADERS += \
     src/app/messagesmodel.h \
     src/app/topicsmodel.h \
     src/app/phonebook.h \
+    src/app/imagepicker.h \
     src/app/notifier.h \
     src/app/mediacache.h \
     src/app/qrimageprovider.h \
@@ -35,6 +36,7 @@ SOURCES += \
     src/app/messagesmodel.cpp \
     src/app/topicsmodel.cpp \
     src/app/phonebook.cpp \
+    src/app/imagepicker.cpp \
     src/app/notifier.cpp \
     src/app/mediacache.cpp \
     src/app/qrimageprovider.cpp \
@@ -61,12 +63,7 @@ symbian {
     # notifier so that tapping a popup brings this app forward.
     TARGET.UID3 = 0xE4B1C2D3
     DEFINES += SGM_UID3=0xE4B1C2D3
-    # WriteDeviceData is needed ONLY by the phone's own image fetcher (MGFetch, the Photos
-    # picker used by Attach > Image): without it MGFetch::RunL leaves with -46
-    # KErrPermissionDenied. Established by elimination with tools/pickprobe - it is not
-    # AllFiles, DRM, SwEvent, TrustedUI or ReadDeviceData. It is a system capability, so
-    # the package must now be signed with cert/symbigram.cer rather than bare self-signed.
-    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData UserEnvironment WriteDeviceData
+    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData UserEnvironment
     # The TL schema table, the DH arithmetic and a few chats' worth of messages: a roomy heap.
     TARGET.EPOCHEAPSIZE = 0x020000 0x4000000
     TARGET.EPOCSTACKSIZE = 0x14000
@@ -76,7 +73,6 @@ symbian {
     # envelope (aknnotify), vibration (hwrm), bringing the app forward (apgrfx, ws32).
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
     LIBS += -lcntmodel            # the phone's address book (CContactDatabase)
-    LIBS += -lmgfetch -lbafl      # the Photos/Gallery image fetcher (+ CDesCArrayFlat)
     LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
 

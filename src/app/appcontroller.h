@@ -17,6 +17,7 @@ class ChatsModel;
 class MessagesModel;
 class TopicsModel;
 class PhoneBook;
+class ImagePicker;
 class Notifier;
 class PiglerNotifier;
 class MediaCache;
@@ -77,6 +78,7 @@ class AppController : public QObject
     Q_PROPERTY(MessagesModel *chat READ chat CONSTANT)
     Q_PROPERTY(TopicsModel *topics READ topics CONSTANT)
     Q_PROPERTY(PhoneBook *contacts READ contacts CONSTANT)
+    Q_PROPERTY(ImagePicker *imagePicker READ imagePicker CONSTANT)
     Q_PROPERTY(QString notice READ notice NOTIFY noticeChanged)
     Q_PROPERTY(QString cacheSize READ cacheSize NOTIFY cacheChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
@@ -164,6 +166,7 @@ public:
     MessagesModel *chat() const { return m_chat; }
     TopicsModel *topics() const { return m_topics; }
     PhoneBook *contacts() const { return m_contacts; }
+    ImagePicker *imagePicker() const { return m_imagePicker; }
     /// True when the peer is a forum supergroup (its chat opens as a topic list).
     Q_INVOKABLE bool isForum(const QString &peerKey) const;
     QString notice() const { return m_notice; }
@@ -291,6 +294,7 @@ private:
     MessagesModel *m_chat;
     TopicsModel *m_topics;
     PhoneBook *m_contacts;
+    ImagePicker *m_imagePicker;
     Notifier *m_notifier;
     PiglerNotifier *m_pigler;   // Belle status-bar notifications (optional; no-op if unavailable)
     MediaCache *m_media;

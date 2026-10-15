@@ -34,10 +34,12 @@ if errorlevel 1 exit /b 1
 rem One self-signed package (installs on Belle and Anna). Pigler is NOT embedded - install it
 rem separately from Pigler.sis if you want the Belle status-bar notifications. The No-Anna Smart
 rem Installer wrapper is not built (its online Qt Quick Components resource no longer exists).
-rem Signed with our own certificate: the declared WriteDeviceData (needed by the Photos
-rem image picker) is a system capability, which a bare self-sign would strip instead of
-rem grant. Installs on a rooted phone; see cert/make-cert.cmd.
-call createpackage.bat Symbigram_template.pkg release-armv5 cert\symbigram.cer cert\symbigram.key symbigram
+rem Back to a bare self-sign: the capability list is again user-grantable only, so this
+rem installs on ANY phone and upgrades an existing install in place. (Certificate signing
+rem was needed only while the app declared WriteDeviceData for the platform image picker,
+rem which is gone - see src/app/imagepicker.h. cert/ is kept should a system capability be
+rem needed again.)
+call createpackage.bat Symbigram_template.pkg release-armv5
 if errorlevel 1 exit /b 1
 
 rem The only package left behind carries the version in its name; the unsigned intermediate goes.

@@ -247,11 +247,36 @@ Page {
         }
     }
 
+    Component { id: imagePickerPage; ImagePickerPage {} }
+
+    // Our own thumbnail grid, not the platform's Photos picker - that one froze or came up blank
+    // on several phones (see imagepicker.h).
+    function openImagePicker() {
+        var picker = pageStack.push(imagePickerPage)
+        picker.picked.connect(function(path) {
+            if (path == "") return
+            page.pendingFile = path
+            page.pendingPhoto = true
+            composer.forceActiveFocus()
+            composer.openSoftwareInputPanel()
+        })
+    }
+
+    // Both attach actions start from a timer rather than straight out of onClicked, so the menu
+    // has finished closing first. The file dialog is modal and runs its own event loop, which is
+    // not a good thing to enter from inside the still-open menu's signal handler.
+    Timer {
+        id: attachTimer
+        interval: 50
+        property bool photo: true
+        onTriggered: photo ? page.openImagePicker() : page.pickFile(false)
+    }
+
     Menu {
         id: attachMenu
         MenuLayout {
-            MenuItem { text: qsTr("Image"); onClicked: page.pickFile(true) }
-            MenuItem { text: qsTr("File"); onClicked: page.pickFile(false) }
+            MenuItem { text: qsTr("Image"); onClicked: { attachTimer.photo = true; attachTimer.start() } }
+            MenuItem { text: qsTr("File"); onClicked: { attachTimer.photo = false; attachTimer.start() } }
         }
     }
 
