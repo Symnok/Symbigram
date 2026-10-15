@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.93
+VERSION = 1.0.97
 
 QT += core gui network declarative
 
@@ -48,11 +48,11 @@ RESOURCES += qml.qrc translations.qrc
 # (stringified in code), which survives every generator's quoting rules.
 DEFINES += APP_VERSION=$$VERSION
 
+# Built-in languages only. Add-on languages keep their own .ts under addons/<lang>/ and are
+# compiled by addons/build-pack.cmd into a separate data-only .sis.
 TRANSLATIONS += \
     translations/symbigram_ru.ts \
-    translations/symbigram_uk.ts \
-    translations/symbigram_vi.ts \
-    translations/symbigram_he.ts
+    translations/symbigram_uk.ts
 
 OTHER_FILES += qml/*.qml README.md credentials.cfg.template
 
@@ -61,7 +61,12 @@ symbian {
     # notifier so that tapping a popup brings this app forward.
     TARGET.UID3 = 0xE4B1C2D3
     DEFINES += SGM_UID3=0xE4B1C2D3
-    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData UserEnvironment
+    # WriteDeviceData is needed ONLY by the phone's own image fetcher (MGFetch, the Photos
+    # picker used by Attach > Image): without it MGFetch::RunL leaves with -46
+    # KErrPermissionDenied. Established by elimination with tools/pickprobe - it is not
+    # AllFiles, DRM, SwEvent, TrustedUI or ReadDeviceData. It is a system capability, so
+    # the package must now be signed with cert/symbigram.cer rather than bare self-signed.
+    TARGET.CAPABILITY += NetworkServices ReadUserData WriteUserData UserEnvironment WriteDeviceData
     # The TL schema table, the DH arithmetic and a few chats' worth of messages: a roomy heap.
     TARGET.EPOCHEAPSIZE = 0x020000 0x4000000
     TARGET.EPOCSTACKSIZE = 0x14000
@@ -71,6 +76,7 @@ symbian {
     # envelope (aknnotify), vibration (hwrm), bringing the app forward (apgrfx, ws32).
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
     LIBS += -lcntmodel            # the phone's address book (CContactDatabase)
+    LIBS += -lmgfetch -lbafl      # the Photos/Gallery image fetcher (+ CDesCArrayFlat)
     LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
 

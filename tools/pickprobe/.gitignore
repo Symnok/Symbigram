@@ -1,0 +1,11 @@
+# qmake/sbs output for the probes. gen.py regenerates the .pro files and build.cmd;
+# probe.cpp, gen.py and the built .sis packages are the parts worth keeping.
+Makefile
+bld.inf
+*_exe.mmp
+*.loc
+*.rss
+*_installer.pkg
+*_stub.pkg
+*_template.pkg
+*_unsigned.sis

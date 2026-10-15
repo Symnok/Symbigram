@@ -27,6 +27,12 @@
 #include <QNetworkSession>
 #include <QPixmap>
 #include <QSet>
+
+#ifdef Q_OS_SYMBIAN
+#include <badesca.h>
+#include <e32base.h>
+#include <mgfetch.h>      // the phone's own Photos/Gallery fetcher
+#endif
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
@@ -70,6 +76,23 @@ namespace
         const QString english = QLocale::languageToString(locale.language());
         return english.isEmpty() || locale.language() == QLocale::C ? code : english;
     }
+
+#ifdef Q_OS_SYMBIAN
+    /// Shows the phone's own image fetcher (the Photos grid, with thumbnails) and returns what was
+    /// picked, or an empty string if the user backed out. Leaves with KErrNotSupported when the
+    /// fetch plug-in is missing, which the caller treats as "fall back to the file dialog".
+    void pickImageFromGalleryL(QString &out)
+    {
+        CDesCArrayFlat *files = new (ELeave) CDesCArrayFlat(1);
+        CleanupStack::PushL(files);
+        const TBool chosen = MGFetch::RunL(*files, EImageFile, EFalse);
+        if (chosen && files->Count() > 0) {
+            const TPtrC path = (*files)[0];
+            out = QString::fromUtf16(reinterpret_cast<const ushort *>(path.Ptr()), path.Length());
+        }
+        CleanupStack::PopAndDestroy(files);
+    }
+#endif
 
     const char *const KeyAutoConnect = "account/autoConnect";
     const char *const KeyLanguage = "ui/language";
@@ -1151,6 +1174,17 @@ QString AppController::pickAttachment(bool asPhoto)
 {
     if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return QString(); }
     if (m_chat->peerKey().isEmpty()) return QString();
+#ifdef Q_OS_SYMBIAN
+    // "Image" opens the phone's Photos/Gallery picker rather than a file browser. A cancel there
+    // is a real answer (empty), so only a LEAVE - no fetch plug-in on this firmware - falls back
+    // to the file dialog below.
+    if (asPhoto) {
+        QString picked;
+        TRAPD(err, pickImageFromGalleryL(picked));
+        if (err == KErrNone) return QDir::fromNativeSeparators(picked);
+        qWarning() << "gallery picker unavailable, using the file dialog:" << err;
+    }
+#endif
     QString filter = asPhoto ? tr("Images (*.jpg *.jpeg *.png *.gif *.bmp)") : tr("All files (*)");
     return QFileDialog::getOpenFileName(0, asPhoto ? tr("Choose an image") : tr("Choose a file"), QString(), filter);
 }
