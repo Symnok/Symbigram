@@ -5,6 +5,12 @@
 # fallback: when the application gains new strings this file can lag behind without breaking
 # anything. Rebuild the pack with addons/turkish/build.py after changing it.
 TR = {
+"Image from Gallery (Slow)": "Galeriden resim (yavaş)",
+"Image from File System": "Dosya sisteminden resim",
+"looking for pictures... %1": "resimler aranıyor... %1",
+"%1 images": "%1 resim",
+"No pictures found in the phone's image folders.": "Telefonun resim klasörlerinde resim bulunamadı.",
+"Browse files...": "Dosyalara gözat...",
 "version %1": "sürüm %1",
 "A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.": "Symbian Anna/Belle için, Windows Phone 8.1'deki Lumigram/LumigramPlus'tan uyarlanmış bir Telegram istemcisi. Telegram ile doğrudan MTProto 2.0 konuşur - köprü yok, vekil sunucu yok; şifreleme anahtarı telefonda oluşturulur.",
 "Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.": "Giriş yalnızca QR kodla yapılır (giriş yapılmış bir Telegram'dan taratın, ayarlıysa iki adımlı parolayla birlikte). Metin iletileri, fotoğraflar ve dosyalar (görüntüleme, kaydetme ve gönderme), gruplar ve kanallar.",

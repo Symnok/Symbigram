@@ -7,6 +7,12 @@
 #
 # Moved out of tools/translate.py when Vietnamese became an add-on, so this is now the only copy.
 TABLE = {
+"Image from Gallery (Slow)": "Ảnh từ thư viện (chậm)",
+"Image from File System": "Ảnh từ hệ thống tệp",
+"looking for pictures... %1": "đang tìm ảnh... %1",
+"%1 images": "%1 ảnh",
+"No pictures found in the phone's image folders.": "Không tìm thấy ảnh trong các thư mục ảnh của điện thoại.",
+"Browse files...": "Duyệt tệp...",
 'version %1': 'phiên bản %1',
 'A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.': 'Một ứng dụng Telegram cho Symbian Anna/Belle, được chuyển từ Lumigram/LumigramPlus cho Windows Phone 8.1. Nó giao tiếp MTProto 2.0 trực tiếp với Telegram — không cầu nối, không proxy; khóa mã hóa được tạo trên điện thoại.',
 'Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.': 'Chỉ đăng nhập bằng mã QR (quét từ một Telegram đã đăng nhập, kèm mật khẩu hai bước nếu có). Tin nhắn văn bản, ảnh và tệp (xem, lưu và gửi), nhóm và kênh.',

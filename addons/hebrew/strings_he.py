@@ -7,6 +7,12 @@
 #
 # Moved out of tools/translate.py when Hebrew became an add-on, so this is now the only copy.
 TABLE = {
+"Image from Gallery (Slow)": "תמונה מהגלריה (איטי)",
+"Image from File System": "תמונה ממערכת הקבצים",
+"looking for pictures... %1": "מחפש תמונות... %1",
+"%1 images": "%1 תמונות",
+"No pictures found in the phone's image folders.": "לא נמצאו תמונות בתיקיות התמונות של הטלפון.",
+"Browse files...": "עיון בקבצים...",
 'version %1': 'גרסה %1',
 'A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.': 'לקוח טלגרם ל-Symbian Anna/Belle, מבוסס על Lumigram/LumigramPlus ל-Windows Phone 8.1. הוא מדבר MTProto 2.0 ישירות מול טלגרם — ללא גשר וללא פרוקסי; מפתח ההצפנה נוצר בטלפון.',
 'Sign-in is by QR code only (scan from a signed-in Telegram, plus the two-step password if set). Text messages, photos and files (view, save and send), groups and channels.': 'הכניסה היא בעזרת קוד QR בלבד (סריקה מטלגרם שכבר מחוברים בו, בתוספת סיסמת האימות הדו-שלבי אם הוגדרה). הודעות טקסט, תמונות וקבצים (צפייה, שמירה ושליחה), קבוצות וערוצים.',

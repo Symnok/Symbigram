@@ -262,21 +262,34 @@ Page {
         })
     }
 
-    // Both attach actions start from a timer rather than straight out of onClicked, so the menu
+    // Every attach action starts from a timer rather than straight out of onClicked, so the menu
     // has finished closing first. The file dialog is modal and runs its own event loop, which is
     // not a good thing to enter from inside the still-open menu's signal handler.
     Timer {
         id: attachTimer
         interval: 50
-        property bool photo: true
-        onTriggered: photo ? page.openImagePicker() : page.pickFile(false)
+        // 0 = our thumbnail grid, 1 = the file browser filtered to images, 2 = any file.
+        property int mode: 0
+        onTriggered: {
+            if (mode == 0) page.openImagePicker()
+            else page.pickFile(mode == 1)
+        }
     }
 
+    function startAttach(mode) {
+        attachTimer.mode = mode
+        attachTimer.start()
+    }
+
+    // Two ways to pick a picture on purpose: the thumbnail grid has to read and decode every
+    // image it shows, which is slow on a big card, while the file browser is instant if you know
+    // where the file is. Opinion among users is genuinely split, so both stay.
     Menu {
         id: attachMenu
         MenuLayout {
-            MenuItem { text: qsTr("Image"); onClicked: { attachTimer.photo = true; attachTimer.start() } }
-            MenuItem { text: qsTr("File"); onClicked: { attachTimer.photo = false; attachTimer.start() } }
+            MenuItem { text: qsTr("Image from Gallery (Slow)"); onClicked: page.startAttach(0) }
+            MenuItem { text: qsTr("Image from File System"); onClicked: page.startAttach(1) }
+            MenuItem { text: qsTr("File"); onClicked: page.startAttach(2) }
         }
     }
 

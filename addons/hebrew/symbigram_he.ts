@@ -36,322 +36,322 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="245" />
-        <location filename="../../src/app/appcontroller.cpp" line="256" />
+        <location filename="../../src/app/appcontroller.cpp" line="254" />
+        <location filename="../../src/app/appcontroller.cpp" line="265" />
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="246" />
-        <location filename="../../src/app/appcontroller.cpp" line="257" />
+        <location filename="../../src/app/appcontroller.cpp" line="255" />
+        <location filename="../../src/app/appcontroller.cpp" line="266" />
         <source>%1 KB</source>
         <translation>%1 KB</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="247" />
-        <location filename="../../src/app/appcontroller.cpp" line="257" />
+        <location filename="../../src/app/appcontroller.cpp" line="256" />
+        <location filename="../../src/app/appcontroller.cpp" line="266" />
         <source>%1 B</source>
         <translation>%1 B</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="258" />
+        <location filename="../../src/app/appcontroller.cpp" line="267" />
         <source>Cache cleared (%1 freed).</source>
         <translation>המטמון נוקה (%1 פונו).</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="275" />
-        <location filename="../../src/app/appcontroller.cpp" line="588" />
-        <location filename="../../src/app/appcontroller.cpp" line="962" />
-        <location filename="../../src/app/appcontroller.cpp" line="1032" />
-        <location filename="../../src/app/appcontroller.cpp" line="1152" />
+        <location filename="../../src/app/appcontroller.cpp" line="284" />
+        <location filename="../../src/app/appcontroller.cpp" line="597" />
+        <location filename="../../src/app/appcontroller.cpp" line="971" />
+        <location filename="../../src/app/appcontroller.cpp" line="1041" />
+        <location filename="../../src/app/appcontroller.cpp" line="1161" />
         <source>Not connected.</source>
         <translation>לא מחובר.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="276" />
+        <location filename="../../src/app/appcontroller.cpp" line="285" />
         <source>Connecting...</source>
         <translation>מתחבר...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="276" />
+        <location filename="../../src/app/appcontroller.cpp" line="285" />
         <source>Connecting and creating the encryption key...</source>
         <translation>מתחבר ויוצר את מפתח ההצפנה...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="278" />
+        <location filename="../../src/app/appcontroller.cpp" line="287" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>בודק את הסיסמה (זה אורך כמה שניות)...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="279" />
+        <location filename="../../src/app/appcontroller.cpp" line="288" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>לחשבון זה יש אימות דו-שלבי. הזינו את הסיסמה.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="281" />
-        <location filename="../../src/app/appcontroller.cpp" line="285" />
+        <location filename="../../src/app/appcontroller.cpp" line="290" />
+        <location filename="../../src/app/appcontroller.cpp" line="294" />
         <source>Signing in...</source>
         <translation>מתחבר...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="281" />
+        <location filename="../../src/app/appcontroller.cpp" line="290" />
         <source>Enter the code Telegram sent to %1.</source>
         <translation>הזינו את הקוד שטלגרם שלח אל %1.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="282" />
+        <location filename="../../src/app/appcontroller.cpp" line="291" />
         <source>Requesting a code...</source>
         <translation>מבקש קוד...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="282" />
+        <location filename="../../src/app/appcontroller.cpp" line="291" />
         <source>Enter your phone number, with the country code, to get a code.</source>
         <translation>הזינו את מספר הטלפון שלכם, עם קידומת המדינה, כדי לקבל קוד.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="284" />
+        <location filename="../../src/app/appcontroller.cpp" line="293" />
         <source>Requesting a sign-in code...</source>
         <translation>מבקש קוד כניסה...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="284" />
+        <location filename="../../src/app/appcontroller.cpp" line="293" />
         <source>Waiting for the code to be scanned...</source>
         <translation>ממתין לסריקת הקוד...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="351" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
         <source>Low</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="351" />
-        <location filename="../../src/app/appcontroller.cpp" line="464" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Medium</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="351" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
         <source>Loud</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="370" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>Short (0.4 s)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="370" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>1 second</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="370" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>2 seconds</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="371" />
+        <location filename="../../src/app/appcontroller.cpp" line="380" />
         <source>3 seconds</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="371" />
+        <location filename="../../src/app/appcontroller.cpp" line="380" />
         <source>5 seconds</source>
         <translation>5 שניות</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="383" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>Off</source>
         <translation>כבוי</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="383" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>First message only</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="383" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>Every message</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="464" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Extra small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="464" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="465" />
+        <location filename="../../src/app/appcontroller.cpp" line="474" />
         <source>Large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="465" />
+        <location filename="../../src/app/appcontroller.cpp" line="474" />
         <source>Extra large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="474" />
+        <location filename="../../src/app/appcontroller.cpp" line="483" />
         <source>Thumbnail</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="474" />
+        <location filename="../../src/app/appcontroller.cpp" line="483" />
         <source>Full</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="513" />
+        <location filename="../../src/app/appcontroller.cpp" line="522" />
         <source>Phone memory</source>
         <translation>זיכרון הטלפון</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="514" />
+        <location filename="../../src/app/appcontroller.cpp" line="523" />
         <source>Mass memory</source>
         <translation>אחסון המוני</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="515" />
+        <location filename="../../src/app/appcontroller.cpp" line="524" />
         <source>Memory card</source>
         <translation>כרטיס זיכרון</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="561" />
+        <location filename="../../src/app/appcontroller.cpp" line="570" />
         <source>Choose download folder</source>
         <translation>בחירת תיקיית הורדות</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="590" />
+        <location filename="../../src/app/appcontroller.cpp" line="599" />
         <source>Cannot record a voice message here.</source>
         <translation>לא ניתן להקליט כאן הודעה קולית.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="613" />
+        <location filename="../../src/app/appcontroller.cpp" line="622" />
         <source>Sending the voice message...</source>
         <translation>שולח את ההודעה הקולית...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="769" />
+        <location filename="../../src/app/appcontroller.cpp" line="778" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>החיבור אבד: %1. מתחבר מחדש...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="770" />
+        <location filename="../../src/app/appcontroller.cpp" line="779" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>החיבור נכשל: %1. מנסה שוב...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="875" />
+        <location filename="../../src/app/appcontroller.cpp" line="884" />
         <source>Enter the password.</source>
         <translation>הזינו את הסיסמה.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="900" />
+        <location filename="../../src/app/appcontroller.cpp" line="909" />
         <source>Enter your phone number.</source>
         <translation>הזינו את מספר הטלפון שלכם.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="910" />
+        <location filename="../../src/app/appcontroller.cpp" line="919" />
         <source>Enter the code.</source>
         <translation>הזינו את הקוד.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="972" />
+        <location filename="../../src/app/appcontroller.cpp" line="981" />
         <source>Added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="972" />
+        <location filename="../../src/app/appcontroller.cpp" line="981" />
         <source>%1 added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1012" />
+        <location filename="../../src/app/appcontroller.cpp" line="1021" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1033" />
+        <location filename="../../src/app/appcontroller.cpp" line="1042" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1107" />
+        <location filename="../../src/app/appcontroller.cpp" line="1116" />
         <source>Secret chats can only be started with a person.</source>
         <translation>ניתן להתחיל צ'אטים סודיים רק עם אדם.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1109" />
+        <location filename="../../src/app/appcontroller.cpp" line="1118" />
         <source>Starting a secret chat...</source>
         <translation>מתחיל צ'אט סודי...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1116" />
+        <location filename="../../src/app/appcontroller.cpp" line="1125" />
         <source>Someone wants to start a secret chat.</source>
         <translation>מישהו רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1117" />
+        <location filename="../../src/app/appcontroller.cpp" line="1126" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1119" />
-        <location filename="../../src/app/appcontroller.cpp" line="1140" />
+        <location filename="../../src/app/appcontroller.cpp" line="1128" />
+        <location filename="../../src/app/appcontroller.cpp" line="1149" />
         <source>Secret chat</source>
         <translation>צ'אט סודי</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1119" />
+        <location filename="../../src/app/appcontroller.cpp" line="1128" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 רוצה להתחיל צ'אט סודי</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1126" />
+        <location filename="../../src/app/appcontroller.cpp" line="1135" />
         <source>Secret chat is ready.</source>
         <translation>הצ'אט הסודי מוכן.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1140" />
+        <location filename="../../src/app/appcontroller.cpp" line="1149" />
         <source>Encrypted message</source>
         <translation>הודעה מוצפנת</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1154" />
+        <location filename="../../src/app/appcontroller.cpp" line="1163" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>תמונות (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1154" />
+        <location filename="../../src/app/appcontroller.cpp" line="1163" />
         <source>All files (*)</source>
         <translation>כל הקבצים (*)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1155" />
+        <location filename="../../src/app/appcontroller.cpp" line="1164" />
         <source>Choose an image</source>
         <translation>בחירת תמונה</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1155" />
+        <location filename="../../src/app/appcontroller.cpp" line="1164" />
         <source>Choose a file</source>
         <translation>בחירת קובץ</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1163" />
+        <location filename="../../src/app/appcontroller.cpp" line="1172" />
         <source>Sending the image...</source>
         <translation>שולח את התמונה...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1163" />
+        <location filename="../../src/app/appcontroller.cpp" line="1172" />
         <source>Sending the file...</source>
         <translation>שולח את הקובץ...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1174" />
+        <location filename="../../src/app/appcontroller.cpp" line="1183" />
         <source>Copied.</source>
         <translation>הועתק.</translation>
     </message>
@@ -422,7 +422,7 @@
     </message>
     <message>
         <location filename="../../qml/ChatPage.qml" line="105" />
-        <location filename="../../qml/ChatPage.qml" line="294" />
+        <location filename="../../qml/ChatPage.qml" line="332" />
         <source>React</source>
         <translation type="unfinished" />
     </message>
@@ -430,7 +430,7 @@
         <location filename="../../qml/ChatPage.qml" line="106" />
         <location filename="../../qml/ChatPage.qml" line="145" />
         <location filename="../../qml/ChatPage.qml" line="206" />
-        <location filename="../../qml/ChatPage.qml" line="630" />
+        <location filename="../../qml/ChatPage.qml" line="668" />
         <source>Cancel</source>
         <translation>ביטול</translation>
     </message>
@@ -516,7 +516,7 @@
     </message>
     <message>
         <location filename="../../qml/ChatPage.qml" line="223" />
-        <location filename="../../qml/ChatPage.qml" line="701" />
+        <location filename="../../qml/ChatPage.qml" line="739" />
         <source>Close</source>
         <translation>סגירה</translation>
     </message>
@@ -526,166 +526,175 @@
         <translation>אם מפתח זה תואם בשני הטלפונים, אף אחד אינו מיירט את הצ'אט. השוו אותו עם %1 באופן אישי או דרך ערוץ מהימן.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="253" />
-        <location filename="../../qml/ChatPage.qml" line="498" />
+        <location filename="../../qml/ChatPage.qml" line="290" />
+        <source>Image from Gallery (Slow)</source>
+        <translation>תמונה מהגלריה (איטי)</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="291" />
+        <source>Image from File System</source>
+        <translation>תמונה ממערכת הקבצים</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="536" />
         <source>Image</source>
         <translation>תמונה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="254" />
-        <location filename="../../qml/ChatPage.qml" line="498" />
+        <location filename="../../qml/ChatPage.qml" line="292" />
+        <location filename="../../qml/ChatPage.qml" line="536" />
         <source>File</source>
         <translation>קובץ</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="264" />
+        <location filename="../../qml/ChatPage.qml" line="302" />
         <source>Reply</source>
         <translation>תגובה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="269" />
+        <location filename="../../qml/ChatPage.qml" line="307" />
         <source>Forward</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="274" />
+        <location filename="../../qml/ChatPage.qml" line="312" />
         <source>Edit</source>
         <translation>עריכה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="284" />
+        <location filename="../../qml/ChatPage.qml" line="322" />
         <source>Save to phone</source>
         <translation>שמירה בטלפון</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="289" />
+        <location filename="../../qml/ChatPage.qml" line="327" />
         <source>Open</source>
         <translation>פתיחה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="299" />
+        <location filename="../../qml/ChatPage.qml" line="337" />
         <source>Copy link</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="304" />
+        <location filename="../../qml/ChatPage.qml" line="342" />
         <source>Copy text</source>
         <translation>העתקת הטקסט</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="309" />
+        <location filename="../../qml/ChatPage.qml" line="347" />
         <source>Retry</source>
         <translation>ניסיון חוזר</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="314" />
+        <location filename="../../qml/ChatPage.qml" line="352" />
         <source>Delete for me</source>
         <translation>מחיקה אצלי</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="319" />
+        <location filename="../../qml/ChatPage.qml" line="357" />
         <source>Delete for everyone</source>
         <translation>מחיקה אצל כולם</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="364" />
+        <location filename="../../qml/ChatPage.qml" line="402" />
         <source>connecting...</source>
         <translation>מתחבר...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="364" />
+        <location filename="../../qml/ChatPage.qml" line="402" />
         <source>offline</source>
         <translation>לא מחובר</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="366" />
+        <location filename="../../qml/ChatPage.qml" line="404" />
         <source>online</source>
         <translation>מחובר</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="389" />
+        <location filename="../../qml/ChatPage.qml" line="427" />
         <source>%1 wants to start an end-to-end encrypted chat.</source>
         <translation>%1 רוצה להתחיל צ'אט מוצפן מקצה לקצה.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="390" />
+        <location filename="../../qml/ChatPage.qml" line="428" />
         <source>Waiting for the other side to come online and accept...</source>
         <translation>ממתין שהצד השני יתחבר ויקבל...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="395" />
+        <location filename="../../qml/ChatPage.qml" line="433" />
         <source>Accept</source>
         <translation>קבלה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="396" />
+        <location filename="../../qml/ChatPage.qml" line="434" />
         <source>Decline</source>
         <translation>דחייה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="399" />
+        <location filename="../../qml/ChatPage.qml" line="437" />
         <source>Cancel request</source>
         <translation>ביטול הבקשה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="421" />
+        <location filename="../../qml/ChatPage.qml" line="459" />
         <source>Older messages</source>
         <translation>הודעות ישנות יותר</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="480" />
+        <location filename="../../qml/ChatPage.qml" line="518" />
         <source>Could not load the messages: %1</source>
         <translation>לא ניתן היה לטעון את ההודעות: %1</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="480" />
+        <location filename="../../qml/ChatPage.qml" line="518" />
         <source>No messages yet.</source>
         <translation>אין הודעות עדיין.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="527" />
+        <location filename="../../qml/ChatPage.qml" line="565" />
         <source>Editing message</source>
         <translation>עריכת הודעה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="527" />
+        <location filename="../../qml/ChatPage.qml" line="565" />
         <source>Replying to</source>
         <translation>בתגובה ל</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="528" />
+        <location filename="../../qml/ChatPage.qml" line="566" />
         <source>edit the text, then tap Save</source>
         <translation>ערכו את הטקסט, ואז הקישו על שמירה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="552" />
+        <location filename="../../qml/ChatPage.qml" line="590" />
         <source>channel - only its admins can post</source>
         <translation>ערוץ — רק מנהליו יכולים לפרסם</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>add a caption</source>
         <translation>הוספת כיתוב</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>encrypted message</source>
         <translation>הודעה מוצפנת</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>message</source>
         <translation>הודעה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="585" />
-        <location filename="../../qml/ChatPage.qml" line="698" />
+        <location filename="../../qml/ChatPage.qml" line="623" />
+        <location filename="../../qml/ChatPage.qml" line="736" />
         <source>Save</source>
         <translation>שמירה</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="585" />
-        <location filename="../../qml/ChatPage.qml" line="625" />
+        <location filename="../../qml/ChatPage.qml" line="623" />
+        <location filename="../../qml/ChatPage.qml" line="663" />
         <source>Send</source>
         <translation>שליחה</translation>
     </message>
@@ -1012,6 +1021,34 @@
         <location filename="../../qml/ContactsPage.qml" line="113" />
         <source>No contacts found.</source>
         <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>ImagePickerPage</name>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="36" />
+        <source>Choose an image</source>
+        <translation>בחירת תמונה</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="43" />
+        <source>looking for pictures... %1</source>
+        <translation>מחפש תמונות... %1</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="44" />
+        <source>%1 images</source>
+        <translation>%1 תמונות</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="118" />
+        <source>No pictures found in the phone's image folders.</source>
+        <translation>לא נמצאו תמונות בתיקיות התמונות של הטלפון.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="125" />
+        <source>Browse files...</source>
+        <translation>עיון בקבצים...</translation>
     </message>
 </context>
 <context>

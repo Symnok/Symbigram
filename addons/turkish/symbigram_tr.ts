@@ -36,322 +36,322 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="243" />
-        <location filename="../../src/app/appcontroller.cpp" line="252" />
+        <location filename="../../src/app/appcontroller.cpp" line="254" />
+        <location filename="../../src/app/appcontroller.cpp" line="265" />
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="244" />
-        <location filename="../../src/app/appcontroller.cpp" line="253" />
+        <location filename="../../src/app/appcontroller.cpp" line="255" />
+        <location filename="../../src/app/appcontroller.cpp" line="266" />
         <source>%1 KB</source>
         <translation>%1 KB</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="245" />
-        <location filename="../../src/app/appcontroller.cpp" line="253" />
+        <location filename="../../src/app/appcontroller.cpp" line="256" />
+        <location filename="../../src/app/appcontroller.cpp" line="266" />
         <source>%1 B</source>
         <translation>%1 B</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="254" />
+        <location filename="../../src/app/appcontroller.cpp" line="267" />
         <source>Cache cleared (%1 freed).</source>
         <translation>Önbellek temizlendi (%1 boşaltıldı).</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="271" />
-        <location filename="../../src/app/appcontroller.cpp" line="586" />
-        <location filename="../../src/app/appcontroller.cpp" line="960" />
-        <location filename="../../src/app/appcontroller.cpp" line="1030" />
-        <location filename="../../src/app/appcontroller.cpp" line="1150" />
+        <location filename="../../src/app/appcontroller.cpp" line="284" />
+        <location filename="../../src/app/appcontroller.cpp" line="597" />
+        <location filename="../../src/app/appcontroller.cpp" line="971" />
+        <location filename="../../src/app/appcontroller.cpp" line="1041" />
+        <location filename="../../src/app/appcontroller.cpp" line="1161" />
         <source>Not connected.</source>
         <translation>Bağlı değil.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="272" />
+        <location filename="../../src/app/appcontroller.cpp" line="285" />
         <source>Connecting...</source>
         <translation>Bağlanıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="272" />
+        <location filename="../../src/app/appcontroller.cpp" line="285" />
         <source>Connecting and creating the encryption key...</source>
         <translation>Bağlanılıyor ve şifreleme anahtarı oluşturuluyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="274" />
+        <location filename="../../src/app/appcontroller.cpp" line="287" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>Parola denetleniyor (birkaç saniye sürer)...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="275" />
+        <location filename="../../src/app/appcontroller.cpp" line="288" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>Bu hesapta iki adımlı doğrulama var. Parolayı girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="277" />
-        <location filename="../../src/app/appcontroller.cpp" line="281" />
+        <location filename="../../src/app/appcontroller.cpp" line="290" />
+        <location filename="../../src/app/appcontroller.cpp" line="294" />
         <source>Signing in...</source>
         <translation>Giriş yapılıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="277" />
+        <location filename="../../src/app/appcontroller.cpp" line="290" />
         <source>Enter the code Telegram sent to %1.</source>
         <translation>Telegram'ın %1 numarasına gönderdiği kodu girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="278" />
+        <location filename="../../src/app/appcontroller.cpp" line="291" />
         <source>Requesting a code...</source>
         <translation>Kod isteniyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="278" />
+        <location filename="../../src/app/appcontroller.cpp" line="291" />
         <source>Enter your phone number, with the country code, to get a code.</source>
         <translation>Kod almak için telefon numaranızı ülke koduyla girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="280" />
+        <location filename="../../src/app/appcontroller.cpp" line="293" />
         <source>Requesting a sign-in code...</source>
         <translation>Giriş kodu isteniyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="280" />
+        <location filename="../../src/app/appcontroller.cpp" line="293" />
         <source>Waiting for the code to be scanned...</source>
         <translation>Kodun taranması bekleniyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="347" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
         <source>Low</source>
         <translation>Düşük</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="347" />
-        <location filename="../../src/app/appcontroller.cpp" line="462" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Medium</source>
         <translation>Orta</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="347" />
+        <location filename="../../src/app/appcontroller.cpp" line="360" />
         <source>Loud</source>
         <translation>Yüksek</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="366" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>Short (0.4 s)</source>
         <translation>Kısa (0,4 sn)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="366" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>1 second</source>
         <translation>1 saniye</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="366" />
+        <location filename="../../src/app/appcontroller.cpp" line="379" />
         <source>2 seconds</source>
         <translation>2 saniye</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="367" />
+        <location filename="../../src/app/appcontroller.cpp" line="380" />
         <source>3 seconds</source>
         <translation>3 saniye</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="367" />
+        <location filename="../../src/app/appcontroller.cpp" line="380" />
         <source>5 seconds</source>
         <translation>5 saniye</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="379" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>Off</source>
         <translation>Kapalı</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="379" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>First message only</source>
         <translation>Yalnızca ilk ileti</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="379" />
+        <location filename="../../src/app/appcontroller.cpp" line="392" />
         <source>Every message</source>
         <translation>Her ileti</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="462" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Extra small</source>
         <translation>Çok küçük</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="462" />
+        <location filename="../../src/app/appcontroller.cpp" line="473" />
         <source>Small</source>
         <translation>Küçük</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="463" />
+        <location filename="../../src/app/appcontroller.cpp" line="474" />
         <source>Large</source>
         <translation>Büyük</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="463" />
+        <location filename="../../src/app/appcontroller.cpp" line="474" />
         <source>Extra large</source>
         <translation>Çok büyük</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="472" />
+        <location filename="../../src/app/appcontroller.cpp" line="483" />
         <source>Thumbnail</source>
         <translation>Küçük resim</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="472" />
+        <location filename="../../src/app/appcontroller.cpp" line="483" />
         <source>Full</source>
         <translation>Tam</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="511" />
+        <location filename="../../src/app/appcontroller.cpp" line="522" />
         <source>Phone memory</source>
         <translation>Telefon belleği</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="512" />
+        <location filename="../../src/app/appcontroller.cpp" line="523" />
         <source>Mass memory</source>
         <translation>Yığın bellek</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="513" />
+        <location filename="../../src/app/appcontroller.cpp" line="524" />
         <source>Memory card</source>
         <translation>Hafıza kartı</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="559" />
+        <location filename="../../src/app/appcontroller.cpp" line="570" />
         <source>Choose download folder</source>
         <translation>İndirme klasörünü seçin</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="588" />
+        <location filename="../../src/app/appcontroller.cpp" line="599" />
         <source>Cannot record a voice message here.</source>
         <translation>Burada sesli ileti kaydedilemez.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="611" />
+        <location filename="../../src/app/appcontroller.cpp" line="622" />
         <source>Sending the voice message...</source>
         <translation>Sesli ileti gönderiliyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="767" />
+        <location filename="../../src/app/appcontroller.cpp" line="778" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>Bağlantı koptu: %1. Yeniden bağlanılıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="768" />
+        <location filename="../../src/app/appcontroller.cpp" line="779" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Bağlantı başarısız: %1. Yeniden deneniyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="873" />
+        <location filename="../../src/app/appcontroller.cpp" line="884" />
         <source>Enter the password.</source>
         <translation>Parolayı girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="898" />
+        <location filename="../../src/app/appcontroller.cpp" line="909" />
         <source>Enter your phone number.</source>
         <translation>Telefon numaranızı girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="908" />
+        <location filename="../../src/app/appcontroller.cpp" line="919" />
         <source>Enter the code.</source>
         <translation>Kodu girin.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="970" />
+        <location filename="../../src/app/appcontroller.cpp" line="981" />
         <source>Added to Contacts.</source>
         <translation>Rehbere eklendi.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="970" />
+        <location filename="../../src/app/appcontroller.cpp" line="981" />
         <source>%1 added to Contacts.</source>
         <translation>%1 rehbere eklendi.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1010" />
+        <location filename="../../src/app/appcontroller.cpp" line="1021" />
         <source>That chat is not in your list.</source>
         <translation>Bu sohbet listenizde yok.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1031" />
+        <location filename="../../src/app/appcontroller.cpp" line="1042" />
         <source>Opening @%1...</source>
         <translation>@%1 açılıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1105" />
+        <location filename="../../src/app/appcontroller.cpp" line="1116" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Gizli sohbet yalnızca bir kişiyle başlatılabilir.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1107" />
+        <location filename="../../src/app/appcontroller.cpp" line="1118" />
         <source>Starting a secret chat...</source>
         <translation>Gizli sohbet başlatılıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1114" />
+        <location filename="../../src/app/appcontroller.cpp" line="1125" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Biri gizli sohbet başlatmak istiyor.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1115" />
+        <location filename="../../src/app/appcontroller.cpp" line="1126" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 gizli sohbet başlatmak istiyor.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1117" />
-        <location filename="../../src/app/appcontroller.cpp" line="1138" />
+        <location filename="../../src/app/appcontroller.cpp" line="1128" />
+        <location filename="../../src/app/appcontroller.cpp" line="1149" />
         <source>Secret chat</source>
         <translation>Gizli sohbet</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1117" />
+        <location filename="../../src/app/appcontroller.cpp" line="1128" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 gizli sohbet başlatmak istiyor</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1124" />
+        <location filename="../../src/app/appcontroller.cpp" line="1135" />
         <source>Secret chat is ready.</source>
         <translation>Gizli sohbet hazır.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1138" />
+        <location filename="../../src/app/appcontroller.cpp" line="1149" />
         <source>Encrypted message</source>
         <translation>Şifreli ileti</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1152" />
+        <location filename="../../src/app/appcontroller.cpp" line="1163" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Resimler (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1152" />
+        <location filename="../../src/app/appcontroller.cpp" line="1163" />
         <source>All files (*)</source>
         <translation>Tüm dosyalar (*)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1153" />
+        <location filename="../../src/app/appcontroller.cpp" line="1164" />
         <source>Choose an image</source>
         <translation>Bir resim seçin</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1153" />
+        <location filename="../../src/app/appcontroller.cpp" line="1164" />
         <source>Choose a file</source>
         <translation>Bir dosya seçin</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1161" />
+        <location filename="../../src/app/appcontroller.cpp" line="1172" />
         <source>Sending the image...</source>
         <translation>Resim gönderiliyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1161" />
+        <location filename="../../src/app/appcontroller.cpp" line="1172" />
         <source>Sending the file...</source>
         <translation>Dosya gönderiliyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1172" />
+        <location filename="../../src/app/appcontroller.cpp" line="1183" />
         <source>Copied.</source>
         <translation>Kopyalandı.</translation>
     </message>
@@ -422,7 +422,7 @@
     </message>
     <message>
         <location filename="../../qml/ChatPage.qml" line="105" />
-        <location filename="../../qml/ChatPage.qml" line="294" />
+        <location filename="../../qml/ChatPage.qml" line="332" />
         <source>React</source>
         <translation>Tepki ver</translation>
     </message>
@@ -430,7 +430,7 @@
         <location filename="../../qml/ChatPage.qml" line="106" />
         <location filename="../../qml/ChatPage.qml" line="145" />
         <location filename="../../qml/ChatPage.qml" line="206" />
-        <location filename="../../qml/ChatPage.qml" line="630" />
+        <location filename="../../qml/ChatPage.qml" line="668" />
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
@@ -516,7 +516,7 @@
     </message>
     <message>
         <location filename="../../qml/ChatPage.qml" line="223" />
-        <location filename="../../qml/ChatPage.qml" line="701" />
+        <location filename="../../qml/ChatPage.qml" line="739" />
         <source>Close</source>
         <translation>Kapat</translation>
     </message>
@@ -526,166 +526,175 @@
         <translation>Bu anahtar iki telefonda da aynıysa sohbeti kimse dinlemiyordur. %1 ile yüz yüze veya güvendiğiniz bir kanaldan karşılaştırın.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="253" />
-        <location filename="../../qml/ChatPage.qml" line="498" />
+        <location filename="../../qml/ChatPage.qml" line="290" />
+        <source>Image from Gallery (Slow)</source>
+        <translation>Galeriden resim (yavaş)</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="291" />
+        <source>Image from File System</source>
+        <translation>Dosya sisteminden resim</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="536" />
         <source>Image</source>
         <translation>Resim</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="254" />
-        <location filename="../../qml/ChatPage.qml" line="498" />
+        <location filename="../../qml/ChatPage.qml" line="292" />
+        <location filename="../../qml/ChatPage.qml" line="536" />
         <source>File</source>
         <translation>Dosya</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="264" />
+        <location filename="../../qml/ChatPage.qml" line="302" />
         <source>Reply</source>
         <translation>Yanıtla</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="269" />
+        <location filename="../../qml/ChatPage.qml" line="307" />
         <source>Forward</source>
         <translation>İlet</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="274" />
+        <location filename="../../qml/ChatPage.qml" line="312" />
         <source>Edit</source>
         <translation>Düzenle</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="284" />
+        <location filename="../../qml/ChatPage.qml" line="322" />
         <source>Save to phone</source>
         <translation>Telefona kaydet</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="289" />
+        <location filename="../../qml/ChatPage.qml" line="327" />
         <source>Open</source>
         <translation>Aç</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="299" />
+        <location filename="../../qml/ChatPage.qml" line="337" />
         <source>Copy link</source>
         <translation>Bağlantıyı kopyala</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="304" />
+        <location filename="../../qml/ChatPage.qml" line="342" />
         <source>Copy text</source>
         <translation>Metni kopyala</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="309" />
+        <location filename="../../qml/ChatPage.qml" line="347" />
         <source>Retry</source>
         <translation>Yeniden dene</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="314" />
+        <location filename="../../qml/ChatPage.qml" line="352" />
         <source>Delete for me</source>
         <translation>Bende sil</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="319" />
+        <location filename="../../qml/ChatPage.qml" line="357" />
         <source>Delete for everyone</source>
         <translation>Herkesten sil</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="364" />
+        <location filename="../../qml/ChatPage.qml" line="402" />
         <source>connecting...</source>
         <translation>bağlanıyor...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="364" />
+        <location filename="../../qml/ChatPage.qml" line="402" />
         <source>offline</source>
         <translation>çevrimdışı</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="366" />
+        <location filename="../../qml/ChatPage.qml" line="404" />
         <source>online</source>
         <translation>çevrimiçi</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="389" />
+        <location filename="../../qml/ChatPage.qml" line="427" />
         <source>%1 wants to start an end-to-end encrypted chat.</source>
         <translation>%1 uçtan uca şifreli bir sohbet başlatmak istiyor.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="390" />
+        <location filename="../../qml/ChatPage.qml" line="428" />
         <source>Waiting for the other side to come online and accept...</source>
         <translation>Karşı tarafın çevrimiçi olup kabul etmesi bekleniyor...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="395" />
+        <location filename="../../qml/ChatPage.qml" line="433" />
         <source>Accept</source>
         <translation>Kabul et</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="396" />
+        <location filename="../../qml/ChatPage.qml" line="434" />
         <source>Decline</source>
         <translation>Reddet</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="399" />
+        <location filename="../../qml/ChatPage.qml" line="437" />
         <source>Cancel request</source>
         <translation>İsteği iptal et</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="421" />
+        <location filename="../../qml/ChatPage.qml" line="459" />
         <source>Older messages</source>
         <translation>Daha eski iletiler</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="480" />
+        <location filename="../../qml/ChatPage.qml" line="518" />
         <source>Could not load the messages: %1</source>
         <translation>İletiler yüklenemedi: %1</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="480" />
+        <location filename="../../qml/ChatPage.qml" line="518" />
         <source>No messages yet.</source>
         <translation>Henüz ileti yok.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="527" />
+        <location filename="../../qml/ChatPage.qml" line="565" />
         <source>Editing message</source>
         <translation>İleti düzenleniyor</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="527" />
+        <location filename="../../qml/ChatPage.qml" line="565" />
         <source>Replying to</source>
         <translation>Yanıtlanan</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="528" />
+        <location filename="../../qml/ChatPage.qml" line="566" />
         <source>edit the text, then tap Save</source>
         <translation>metni düzenleyip Kaydet'e dokunun</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="552" />
+        <location filename="../../qml/ChatPage.qml" line="590" />
         <source>channel - only its admins can post</source>
         <translation>kanal - yalnızca yöneticileri gönderebilir</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>add a caption</source>
         <translation>açıklama ekleyin</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>encrypted message</source>
         <translation>şifreli ileti</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="571" />
+        <location filename="../../qml/ChatPage.qml" line="609" />
         <source>message</source>
         <translation>ileti</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="585" />
-        <location filename="../../qml/ChatPage.qml" line="698" />
+        <location filename="../../qml/ChatPage.qml" line="623" />
+        <location filename="../../qml/ChatPage.qml" line="736" />
         <source>Save</source>
         <translation>Kaydet</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="585" />
-        <location filename="../../qml/ChatPage.qml" line="625" />
+        <location filename="../../qml/ChatPage.qml" line="623" />
+        <location filename="../../qml/ChatPage.qml" line="663" />
         <source>Send</source>
         <translation>Gönder</translation>
     </message>
@@ -1015,6 +1024,34 @@
     </message>
 </context>
 <context>
+    <name>ImagePickerPage</name>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="36" />
+        <source>Choose an image</source>
+        <translation>Bir resim seçin</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="43" />
+        <source>looking for pictures... %1</source>
+        <translation>resimler aranıyor... %1</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="44" />
+        <source>%1 images</source>
+        <translation>%1 resim</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="118" />
+        <source>No pictures found in the phone's image folders.</source>
+        <translation>Telefonun resim klasörlerinde resim bulunamadı.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ImagePickerPage.qml" line="125" />
+        <source>Browse files...</source>
+        <translation>Dosyalara gözat...</translation>
+    </message>
+</context>
+<context>
     <name>LoginPage</name>
     <message>
         <location filename="../../qml/LoginPage.qml" line="27" />
@@ -1341,132 +1378,132 @@
         <translation>Dosya açılamadı.</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="606" />
+        <location filename="../../src/app/messagesmodel.cpp" line="664" />
         <source>Could not play this audio: %1</source>
         <translation>Bu ses çalınamadı: %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="730" />
+        <location filename="../../src/app/messagesmodel.cpp" line="788" />
         <source>online</source>
         <translation>çevrimiçi</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="734" />
+        <location filename="../../src/app/messagesmodel.cpp" line="792" />
         <source>last seen at %1</source>
         <translation>son görülme %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="735" />
+        <location filename="../../src/app/messagesmodel.cpp" line="793" />
         <source>last seen yesterday at %1</source>
         <translation>son görülme dün %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="736" />
+        <location filename="../../src/app/messagesmodel.cpp" line="794" />
         <source>last seen %1</source>
         <translation>son görülme %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="738" />
+        <location filename="../../src/app/messagesmodel.cpp" line="796" />
         <source>last seen recently</source>
         <translation>son görülme yakın zamanda</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="739" />
+        <location filename="../../src/app/messagesmodel.cpp" line="797" />
         <source>last seen within a week</source>
         <translation>son görülme bir hafta içinde</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="740" />
+        <location filename="../../src/app/messagesmodel.cpp" line="798" />
         <source>last seen within a month</source>
         <translation>son görülme bir ay içinde</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="741" />
+        <location filename="../../src/app/messagesmodel.cpp" line="799" />
         <source>last seen a long time ago</source>
         <translation>son görülme uzun zaman önce</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="756" />
+        <location filename="../../src/app/messagesmodel.cpp" line="814" />
         <source>wants to start a secret chat</source>
         <translation>gizli sohbet başlatmak istiyor</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="757" />
+        <location filename="../../src/app/messagesmodel.cpp" line="815" />
         <source>waiting to be accepted...</source>
         <translation>kabul edilmesi bekleniyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="758" />
+        <location filename="../../src/app/messagesmodel.cpp" line="816" />
         <source>end-to-end encrypted, self-destruct %1s</source>
         <translation>uçtan uca şifreli, kendini imha %1sn</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="759" />
+        <location filename="../../src/app/messagesmodel.cpp" line="817" />
         <source>end-to-end encrypted</source>
         <translation>uçtan uca şifreli</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="765" />
+        <location filename="../../src/app/messagesmodel.cpp" line="823" />
         <source>%1 is typing...</source>
         <translation>%1 yazıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="766" />
+        <location filename="../../src/app/messagesmodel.cpp" line="824" />
         <source>typing...</source>
         <translation>yazıyor...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="770" />
+        <location filename="../../src/app/messagesmodel.cpp" line="828" />
         <source>bot</source>
         <translation>bot</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="771" />
+        <location filename="../../src/app/messagesmodel.cpp" line="829" />
         <source>Saved Messages</source>
         <translation>Kaydedilenler</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="774" />
+        <location filename="../../src/app/messagesmodel.cpp" line="832" />
         <source>channel, %1 subscribers</source>
         <translation>kanal, %1 abone</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="774" />
+        <location filename="../../src/app/messagesmodel.cpp" line="832" />
         <source>channel</source>
         <translation>kanal</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="775" />
+        <location filename="../../src/app/messagesmodel.cpp" line="833" />
         <source>%1 members</source>
         <translation>%1 üye</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="775" />
+        <location filename="../../src/app/messagesmodel.cpp" line="833" />
         <source>group</source>
         <translation>grup</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1207" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1265" />
         <source>reply</source>
         <translation>yanıt</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1209" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1267" />
         <source>You</source>
         <translation>Siz</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1220" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1278" />
         <source>Not connected.</source>
         <translation>Bağlı değil.</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1289" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1347" />
         <source>photo</source>
         <translation>fotoğraf</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1305" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1363" />
         <source>The message was not sent: %1</source>
         <translation>İleti gönderilemedi: %1</translation>
     </message>
@@ -1819,8 +1856,8 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="324" />
-        <source>The app's private store of downloaded photos, avatars and files (separate from the folder above). Clearing it just re-downloads on demand.</source>
-        <translation>Uygulamanın indirilen fotoğraflar, profil resimleri ve dosyalar için özel deposu (yukarıdaki klasörden ayrıdır). Temizlemek, gerektiğinde yeniden indirilmesine yol açar.</translation>
+        <source>The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="333" />

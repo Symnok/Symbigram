@@ -13,6 +13,12 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RU = {
+"Image from Gallery (Slow)": "Изображение из галереи (медленно)",
+"Image from File System": "Изображение из файловой системы",
+"looking for pictures... %1": "поиск изображений... %1",
+"%1 images": "%1 изображений",
+"No pictures found in the phone's image folders.": "В папках изображений телефона ничего не найдено.",
+"Browse files...": "Обзор файлов...",
     "version %1": "версия %1",
     "A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.":
         "Telegram-клиент для Symbian Anna/Belle, перенесённый с Lumigram/LumigramPlus для Windows Phone 8.1. Говорит с Telegram напрямую по MTProto 2.0 — без моста и прокси; ключ шифрования создаётся на телефоне.",
@@ -364,6 +370,12 @@ RU = {
 }
 
 UK = {
+"Image from Gallery (Slow)": "Зображення з галереї (повільно)",
+"Image from File System": "Зображення з файлової системи",
+"looking for pictures... %1": "пошук зображень... %1",
+"%1 images": "%1 зображень",
+"No pictures found in the phone's image folders.": "У теках зображень телефону нічого не знайдено.",
+"Browse files...": "Огляд файлів...",
     "version %1": "версія %1",
     "A Telegram client for Symbian Anna/Belle, ported from Lumigram/LumigramPlus for Windows Phone 8.1. It speaks MTProto 2.0 directly to Telegram - no bridge, no proxy; the encryption key is made on the phone.":
         "Telegram-клієнт для Symbian Anna/Belle, перенесений із Lumigram/LumigramPlus для Windows Phone 8.1. Спілкується з Telegram напряму по MTProto 2.0 — без мосту та проксі; ключ шифрування створюється на телефоні.",
