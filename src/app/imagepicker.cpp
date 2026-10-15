@@ -1,10 +1,12 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "imagepicker.h"
+#include "thumbnailer.h"
 
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+#include <QFile>
 #include <QTimer>
 #include <QUrl>
 #include <QtAlgorithms>
@@ -30,12 +32,14 @@ namespace
 ImagePicker::ImagePicker(QObject *parent)
     : QAbstractListModel(parent)
     , m_timer(new QTimer(this))
+    , m_thumbs(new Thumbnailer(this))
     , m_scanning(false)
     , m_dirsVisited(0)
 {
     QHash<int, QByteArray> roles;
     roles[PathRole] = "path";
     roles[UrlRole] = "url";
+    roles[ThumbRole] = "thumb";
     roles[NameRole] = "name";
     roles[FolderRole] = "folder";
     setRoleNames(roles);
@@ -43,6 +47,12 @@ ImagePicker::ImagePicker(QObject *parent)
     // Interval 0: one directory per turn of the event loop, so touch and paint still get served.
     m_timer->setInterval(0);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(scanSlice()));
+
+    // The worker lives for the life of the model; a queued connection back onto this thread is
+    // what the default Qt::AutoConnection gives us across a thread boundary.
+    connect(m_thumbs, SIGNAL(ready(QString, QString)),
+            this, SLOT(thumbReady(QString, QString)));
+    m_thumbs->start(QThread::LowPriority);
 }
 
 int ImagePicker::rowCount(const QModelIndex &parent) const
@@ -57,6 +67,8 @@ QVariant ImagePicker::data(const QModelIndex &index, int role) const
     switch (role) {
     case PathRole: return e.path;
     case UrlRole: return QUrl::fromLocalFile(e.path).toString();
+    case ThumbRole: return e.thumb.isEmpty() ? QString()
+                                             : QUrl::fromLocalFile(e.thumb).toString();
     case NameRole: return e.name;
     case FolderRole: return e.folder;
     default: return QVariant();
@@ -69,9 +81,39 @@ QString ImagePicker::pathAt(int row) const
     return QDir::toNativeSeparators(m_rows.at(row).path);
 }
 
+void ImagePicker::requestThumb(int row, int edge)
+{
+    if (row < 0 || row >= m_rows.size()) return;
+    const Entry &e = m_rows.at(row);
+    if (!e.thumb.isEmpty()) return;
+
+    // Already cached from an earlier visit: take it now and skip the worker entirely.
+    const QString cached = Thumbnailer::thumbPathFor(e.path);
+    if (QFile::exists(cached)) {
+        m_rows[row].thumb = cached;
+        const QModelIndex idx = index(row);
+        emit dataChanged(idx, idx);
+        return;
+    }
+    m_thumbs->request(e.path, edge);
+}
+
+void ImagePicker::thumbReady(const QString &imagePath, const QString &thumbPath)
+{
+    if (thumbPath.isEmpty()) return;   // unreadable picture; the cell keeps its placeholder
+    for (int i = 0; i < m_rows.size(); ++i) {
+        if (m_rows.at(i).path != imagePath) continue;
+        m_rows[i].thumb = thumbPath;
+        const QModelIndex idx = index(i);
+        emit dataChanged(idx, idx);
+        return;
+    }
+}
+
 void ImagePicker::rescan()
 {
     m_timer->stop();
+    m_thumbs->clearQueue();
     m_found.clear();
     m_todo.clear();
     m_dirsVisited = 0;

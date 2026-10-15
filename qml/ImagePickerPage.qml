@@ -64,11 +64,12 @@ Page {
                 anchors { fill: parent; margins: 1 }
                 color: "#10181f"
 
+                // The cached thumbnail, not the picture itself: a full JPEG per cell is what made
+                // this grid slow. Empty until the thumbnailer has one, hence the busy indicator.
                 Image {
                     id: thumb
                     anchors.fill: parent
-                    source: url
-                    // Decode no bigger than the cell: the whole point of not holding full photos.
+                    source: model.thumb
                     sourceSize.width: grid.cellWidth
                     sourceSize.height: grid.cellHeight
                     fillMode: Image.PreserveAspectCrop
@@ -77,9 +78,13 @@ Page {
                     clip: true
                 }
 
+                // Delegates exist only for cells in or near view, so this asks for exactly the
+                // thumbnails that are needed, in the order they are revealed.
+                Component.onCompleted: if (model.thumb == "") app.imagePicker.requestThumb(index, grid.cellWidth)
+
                 BusyIndicator {
                     anchors.centerIn: parent
-                    running: thumb.status == Image.Loading
+                    running: model.thumb == "" || thumb.status == Image.Loading
                     visible: running
                     width: platformStyle.graphicSizeSmall
                     height: platformStyle.graphicSizeSmall

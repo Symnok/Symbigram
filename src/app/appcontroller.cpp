@@ -6,6 +6,7 @@
 #include "topicsmodel.h"
 #include "phonebook.h"
 #include "imagepicker.h"
+#include "thumbnailer.h"
 #include "mediacache.h"
 #include "voicerecorder.h"
 #include "notifier.h"
@@ -250,7 +251,8 @@ void AppController::onNotice(const QString &text) { setNotice(text); }
 QString AppController::cacheSize() const
 {
     // Counts the scratch too, so the figure matches what "Clear cache" actually frees.
-    qint64 b = (m_media ? m_media->cacheBytes() : 0) + MessagesModel::scratchBytes(m_downloadPath);
+    qint64 b = (m_media ? m_media->cacheBytes() : 0) + MessagesModel::scratchBytes(m_downloadPath)
+             + Thumbnailer::cacheBytes();
     if (b >= 1048576) return tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1);
     if (b >= 1024) return tr("%1 KB").arg(int(b / 1024));
     return tr("%1 B").arg(b);
@@ -261,7 +263,8 @@ void AppController::clearCache()
     if (!m_media) return;
     // The private cache, plus our own scratch copies that have to sit in a public folder.
     // Anything the user saved or opened keeps its real name and is left alone.
-    qint64 freed = m_media->clearCache() + MessagesModel::clearScratch(m_downloadPath);
+    qint64 freed = m_media->clearCache() + MessagesModel::clearScratch(m_downloadPath)
+                 + Thumbnailer::clearCache();   // the image picker's thumbnails
     QString human = freed >= 1048576 ? tr("%1 MB").arg(double(freed) / 1048576.0, 0, 'f', 1)
                   : (freed >= 1024 ? tr("%1 KB").arg(int(freed / 1024)) : tr("%1 B").arg(freed));
     setNotice(tr("Cache cleared (%1 freed).").arg(human));

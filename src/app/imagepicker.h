@@ -25,6 +25,7 @@
 #include <QStringList>
 
 class QTimer;
+class Thumbnailer;
 
 class ImagePicker : public QAbstractListModel
 {
@@ -37,7 +38,8 @@ class ImagePicker : public QAbstractListModel
 public:
     enum Roles {
         PathRole = Qt::UserRole + 1,   ///< native path, for sendFile
-        UrlRole,                       ///< file:/// URL, for a QML Image source
+        UrlRole,                       ///< file:/// URL of the full picture
+        ThumbRole,                     ///< file:/// URL of the cached thumbnail, "" until ready
         NameRole,
         FolderRole
     };
@@ -56,6 +58,10 @@ public:
     Q_INVOKABLE void rescan();
     Q_INVOKABLE QString pathAt(int row) const;
 
+    /// Asks for a row's thumbnail. Called by a delegate as it is created, so only cells in or
+    /// near view are ever decoded; returns at once and the row updates when the file is there.
+    Q_INVOKABLE void requestThumb(int row, int edge);
+
 signals:
     void countChanged();
     void scanningChanged();
@@ -63,12 +69,14 @@ signals:
 
 private slots:
     void scanSlice();
+    void thumbReady(const QString &imagePath, const QString &thumbPath);
 
 private:
     struct Entry {
         QString path;
         QString name;
         QString folder;
+        QString thumb;    ///< empty until the thumbnailer has one
         uint modified;
     };
 
@@ -85,6 +93,7 @@ private:
     QList<Entry> m_found;     ///< accumulated during the scan, unsorted
     QList<Dir> m_todo;        ///< directories still to visit
     QTimer *m_timer;
+    Thumbnailer *m_thumbs;
     bool m_scanning;
     int m_dirsVisited;
 };
