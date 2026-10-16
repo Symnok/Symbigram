@@ -232,6 +232,20 @@ namespace
     };
 }
 
+QByteArray Crypto::hmacSha256(const QByteArray &key, const QByteArray &data)
+{
+    // RFC 2104 over the one-shot sha256; SHA-256's block is 64 bytes. Needed by the FakeTLS
+    // handshake, which keys an HMAC with the proxy secret.
+    QByteArray k = key.size() > 64 ? sha256(key) : key;
+    QByteArray ipad(64, char(0x36));
+    QByteArray opad(64, char(0x5c));
+    for (int i = 0; i < k.size(); ++i) {
+        ipad[i] = char(uchar(ipad.at(i)) ^ uchar(k.at(i)));
+        opad[i] = char(uchar(opad.at(i)) ^ uchar(k.at(i)));
+    }
+    return sha256(opad + sha256(ipad + data));
+}
+
 QByteArray Crypto::hmacSha512(const QByteArray &key, const QByteArray &data)
 {
     HmacSha512 h(key);

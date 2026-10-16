@@ -50,6 +50,9 @@ public:
     void setProxy(const QNetworkProxy &proxy);
     /// MTProto proxy secret; empty for none. See MtprotoTransport::setObfuscation.
     void setObfuscation(const QByteArray &secret);
+    /// Seconds to add to the phone's clock to get real time; the FakeTLS handshake is timestamped
+    /// and these phones drift. See MtprotoTransport::setTimeOffset.
+    void setTimeOffset(int seconds);
     const ClientInfo &info() const { return m_info; }
 
     /// Connects and, without a valid key, negotiates one. connected() follows.

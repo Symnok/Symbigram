@@ -14,6 +14,7 @@
 #define MTPROTOTRANSPORT_H
 
 #include "crypto.h"
+#include "faketls.h"
 
 #include <QAbstractSocket>
 #include <QByteArray>
@@ -36,9 +37,14 @@ public:
     void setProxy(const QNetworkProxy &proxy) { m_proxy = proxy; }
 
     /// Turns on MTProto proxy obfuscation. An empty secret turns it off. 16 bytes is plain
-    /// obfuscation; 17 bytes beginning 0xdd selects padded intermediate framing; 17 bytes
-    /// beginning 0xee is FakeTLS, which is NOT implemented and is refused at connect time.
+    /// obfuscation; 17 bytes beginning 0xdd selects padded intermediate framing; 0xee followed by
+    /// 16 bytes and a domain selects FakeTLS, which dresses the whole thing up as HTTPS.
     void setObfuscation(const QByteArray &secret) { m_secret = secret; }
+
+    /// Seconds to add to the phone's clock to get real time. The FakeTLS handshake carries a
+    /// timestamp the proxy checks against a few minutes' tolerance, and these phones drift, so a
+    /// remembered offset from the last good connection is what makes it work on a stale clock.
+    void setTimeOffset(int seconds) { m_timeOffset = seconds; }
     void close();
     bool isConnected() const;
     /// Sends one MTProto packet (a whole number of 4-byte words).
@@ -62,6 +68,10 @@ private:
     /// Everything from here on is MTProto framing: sends the obfuscation init when one is wanted,
     /// then reports the connection up. Shared by the direct and the SOCKS5 paths.
     void beginStream();
+    /// Sends the fake ClientHello. The stream only starts once the server has answered.
+    void sendClientHello();
+    /// Consumes the server's handshake from m_inbuf. Returns false while it is still arriving.
+    bool processTlsHandshake();
     void sendObfuscatedInit();
     /// Writes into the MTProto stream, encrypting first when obfuscated. SOCKS5 bytes must not
     /// go through here.
@@ -88,10 +98,19 @@ private:
     int m_targetPort;
     int m_dcId;
     QByteArray m_secret;      // empty unless an MTProto proxy is configured
+    QByteArray m_proxyKey;    // the 16 key bytes within it, mode byte and domain removed
     bool m_obfuscated;        // this connection is wrapped (set at connect time from m_secret)
     bool m_padded;            // ... with padded intermediate framing (a "dd" secret)
     AesCtr m_enc;
     AesCtr m_dec;
+
+    // FakeTLS ("ee"): the obfuscated stream above rides inside TLS application-data records.
+    bool m_fakeTls;
+    bool m_tlsReady;          // the fake handshake is done; records carry the stream
+    QByteArray m_tlsDomain;   // the SNI the secret named
+    QByteArray m_tlsDigest;   // our ClientHello digest, needed to check the server's reply
+    FakeTls::RecordReader m_tlsReader;
+    int m_timeOffset;
 };
 
 #endif // MTPROTOTRANSPORT_H

@@ -778,14 +778,11 @@ bool AppController::parseProxyLink(const QString &link, QString *error)
     }
 
     const QByteArray raw = decodeProxySecret(secret);
-    // A FakeTLS secret is 0xee + 16 bytes + the proxy's domain, so it runs well past 17 bytes;
-    // testing for exactly 17 would reject a real one with a nonsense complaint about its length.
-    if (raw.size() >= 17 && uchar(raw.at(0)) == 0xee) {
-        if (error) *error = tr("This proxy needs FakeTLS, which Symbigram cannot do yet.");
-        return false;
-    }
+    // Three shapes are valid: 16 bytes plain, "dd" + 16 for padded framing, and "ee" + 16 + the
+    // proxy's domain for FakeTLS - the last runs well past 17 bytes, so no exact-length test.
     const bool padded = (raw.size() == 17 && uchar(raw.at(0)) == 0xdd);
-    if (raw.size() != 16 && !padded) {
+    const bool fakeTls = (raw.size() >= 17 && uchar(raw.at(0)) == 0xee);
+    if (raw.size() != 16 && !padded && !fakeTls) {
         if (error) *error = tr("That secret is not a valid length.");
         return false;
     }

@@ -13,6 +13,10 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RU = {
+"hex or base64, from the proxy link": "hex или base64, из ссылки прокси",
+"the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "прокси ответил не по TLS - неверный секрет или это не FakeTLS-прокси",
+"the proxy failed its TLS check - wrong secret, or the phone's clock is off": "прокси не прошёл проверку TLS - неверный секрет или сбиты часы телефона",
+"the proxy sent a malformed TLS record": "прокси отправил некорректную TLS-запись",
 "Use this proxy?": "Использовать этот прокси?",
 "Route Symbigram through the MTProto proxy %1? This reconnects.": "Направить Symbigram через прокси MTProto %1? Произойдёт переподключение.",
 "Route Symbigram through the SOCKS5 proxy %1? This reconnects.": "Направить Symbigram через прокси SOCKS5 %1? Произойдёт переподключение.",
@@ -395,6 +399,10 @@ RU = {
 }
 
 UK = {
+"hex or base64, from the proxy link": "hex або base64, з посилання проксі",
+"the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "проксі відповів не по TLS - неправильний секрет або це не FakeTLS-проксі",
+"the proxy failed its TLS check - wrong secret, or the phone's clock is off": "проксі не пройшов перевірку TLS - неправильний секрет або збитий годинник телефону",
+"the proxy sent a malformed TLS record": "проксі надіслав некоректний TLS-запис",
 "Use this proxy?": "Використати цей проксі?",
 "Route Symbigram through the MTProto proxy %1? This reconnects.": "Спрямувати Symbigram через проксі MTProto %1? Відбудеться перепідключення.",
 "Route Symbigram through the SOCKS5 proxy %1? This reconnects.": "Спрямувати Symbigram через проксі SOCKS5 %1? Відбудеться перепідключення.",

@@ -199,6 +199,7 @@ void TelegramSession::connectToServer()
     m_client->setInfo(m_info);
     setState(Connecting);
     emit log(QString::fromLatin1("connecting to dc%1 (%2 key)").arg(m_dcId).arg(m_authKey.isValid() ? QLatin1String("stored") : QLatin1String("new")));
+    m_client->setTimeOffset(m_authKey.timeOffset);
     m_client->connectToDc(dialHost(m_dcId), dialPort(), m_dcId, m_authKey);
 }
 
@@ -432,6 +433,7 @@ void TelegramSession::handleLoginStep(const TgQrLoginStep &step, bool fromMovedD
         connect(m_moved, SIGNAL(rpcResult(quint64,QByteArray)), this, SLOT(onRpcResult(quint64,QByteArray)));
         connect(m_moved, SIGNAL(rpcError(quint64,int,QString)), this, SLOT(onRpcError(quint64,int,QString)));
         connect(m_moved, SIGNAL(log(QString)), this, SIGNAL(log(QString)));
+        m_moved->setTimeOffset(m_authKey.timeOffset);   // no key yet; borrow the known offset
         m_moved->connectToDc(dialHost(step.dcId), dialPort(), step.dcId);
         break;
     }
@@ -1997,6 +1999,7 @@ MtprotoClient *TelegramSession::clientForDc(int dcId)
     connect(link.client, SIGNAL(log(QString)), this, SIGNAL(log(QString)));
     m_dcLinks.insert(dcId, link);
     emit log(QString::fromLatin1("opening dc%1 for files (%2 key)").arg(dcId).arg(m_dcKeys.contains(dcId) ? QLatin1String("stored") : QLatin1String("new")));
+    link.client->setTimeOffset(m_authKey.timeOffset);
     link.client->connectToDc(dialHost(dcId), dialPort(), dcId, m_dcKeys.value(dcId));
     return link.client;
 }

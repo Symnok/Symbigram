@@ -3,6 +3,9 @@
 #include "mtprototransport.h"
 
 #include "crypto.h"
+#include "faketls.h"
+
+#include <QDateTime>
 
 #include <QHostAddress>
 #include <QTcpSocket>
@@ -40,6 +43,7 @@ namespace
 MtprotoTransport::MtprotoTransport(QObject *parent)
     : QObject(parent), m_tagSent(false), m_open(false), m_useProxy(false), m_socks(SocksNone)
     , m_targetPort(0), m_dcId(0), m_obfuscated(false), m_padded(false)
+    , m_fakeTls(false), m_tlsReady(false), m_timeOffset(0)
 {
     m_socket = new QTcpSocket(this);
     connect(m_socket, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -62,26 +66,35 @@ void MtprotoTransport::connectToHost(const QString &host, int port, int dcId)
     m_targetPort = port;
     m_dcId = dcId;
 
-    // A 16-byte secret is plain obfuscation; "dd" + 16 asks for padded intermediate framing.
+    // 16 bytes is plain obfuscation; "dd" + 16 asks for padded intermediate framing; "ee" + 16
+    // plus a domain asks for that same framing wrapped in a fake TLS session.
     m_obfuscated = false;
     m_padded = false;
+    m_fakeTls = false;
+    m_tlsReady = false;
+    m_tlsDomain.clear();
+    m_tlsDigest.clear();
+    m_tlsReader.reset();
+    m_proxyKey.clear();
     if (m_secret.size() == 16) {
         m_obfuscated = true;
+        m_proxyKey = m_secret;
     } else if (m_secret.size() == 17 && uchar(m_secret.at(0)) == 0xdd) {
         m_obfuscated = true;
         m_padded = true;
+        m_proxyKey = m_secret.mid(1, 16);
+    } else if (m_secret.size() >= 17 && uchar(m_secret.at(0)) == 0xee) {
+        // The domain is the SNI to claim. A bare 0xee with no domain is unusual but harmless -
+        // fall back to the host we are dialling, which is what the connection looks like anyway.
+        m_obfuscated = true;
+        m_padded = true;                       // FakeTLS always carries padded intermediate
+        m_fakeTls = true;
+        m_proxyKey = m_secret.mid(1, 16);
+        m_tlsDomain = m_secret.mid(17);
+        if (m_tlsDomain.isEmpty()) m_tlsDomain = m_targetHost.toUtf8();
     } else if (!m_secret.isEmpty()) {
-        // 0xee is FakeTLS, which needs a whole fake TLS handshake and record layer. Refusing
-        // loudly beats connecting and timing out with nothing to show the user.
-        //
-        // Note the length: a FakeTLS secret is 0xee + 16 bytes + the proxy's DOMAIN, so it runs
-        // well past 17 bytes. Testing for exactly 17 would miss every real one and complain about
-        // its length instead.
-        const bool fakeTls = (m_secret.size() >= 17 && uchar(m_secret.at(0)) == 0xee);
         m_open = false;
-        emit disconnected(fakeTls
-            ? tr("this proxy needs FakeTLS (an \"ee\" secret), which is not supported yet")
-            : tr("the proxy secret must be 32 or 34 hex characters"));
+        emit disconnected(tr("the proxy secret must be 32 or 34 hex characters"));
         return;
     }
     m_useProxy = (m_proxy.type() == QNetworkProxy::Socks5Proxy && !m_proxy.hostName().isEmpty());
@@ -143,6 +156,13 @@ void MtprotoTransport::onConnected()
 
 void MtprotoTransport::beginStream()
 {
+    // With FakeTLS the socket must first look like an HTTPS session; only once the far end has
+    // answered does the obfuscated stream start, inside application-data records.
+    if (m_fakeTls && !m_tlsReady) {
+        sendClientHello();
+        return;                               // connected() waits for the server's reply
+    }
+
     // From here on the socket carries the MTProto stream. When a proxy secret is configured the
     // obfuscation init goes first, and it carries the transport tag with it.
     if (m_obfuscated) {
@@ -152,6 +172,56 @@ void MtprotoTransport::beginStream()
     }
     m_connectTimer->stop();
     emit connected();
+}
+
+void MtprotoTransport::sendClientHello()
+{
+    // The timestamp the proxy checks is OUR idea of the time, corrected by whatever offset the
+    // last successful connection measured. A Symbian phone with a stale clock would otherwise be
+    // rejected by every FakeTLS proxy, with nothing on screen to explain why.
+    const int now = int(QDateTime::currentDateTime().toTime_t()) + m_timeOffset;
+    const QByteArray hello = FakeTls::clientHello(m_proxyKey,
+                                                  QString::fromUtf8(m_tlsDomain), now, &m_tlsDigest);
+    m_socket->write(hello);
+}
+
+bool MtprotoTransport::processTlsHandshake()
+{
+    const int blob = FakeTls::serverHelloLength(m_inbuf);
+    if (blob < 0) {
+        fail(tr("the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy"));
+        return false;
+    }
+    if (blob == 0) return false;                        // still arriving
+
+    const QByteArray response = m_inbuf.left(blob);
+    m_inbuf.remove(0, blob);
+
+    if (!FakeTls::verifyServerHello(m_proxyKey, m_tlsDigest, response)) {
+        fail(tr("the proxy failed its TLS check - wrong secret, or the phone's clock is off"));
+        return false;
+    }
+    m_tlsReady = true;
+
+    // The handshake's last record already carries the first of the obfuscated stream, and
+    // anything buffered behind it is further records.
+    const QByteArray tail = FakeTls::streamTail(response);
+    const QByteArray rest = m_inbuf;
+    m_inbuf.clear();
+
+    beginStream();                                      // the init now goes inside records
+    if (!m_open) return false;
+
+    QByteArray stream = tail;
+    if (!rest.isEmpty() && !m_tlsReader.feed(rest, &stream)) {
+        fail(tr("the proxy sent a malformed TLS record"));
+        return false;
+    }
+    if (!stream.isEmpty()) {
+        m_dec.apply(stream);
+        m_inbuf = stream;
+    }
+    return true;
 }
 
 void MtprotoTransport::sendObfuscatedInit()
@@ -172,9 +242,9 @@ void MtprotoTransport::sendObfuscatedInit()
     QByteArray reversed(init);
     for (int i = 0; i < 64; ++i) reversed[i] = init.at(63 - i);
 
-    // The 17-byte "dd"/"ee" forms carry the mode in the first byte; only the 16 after it are key
-    // material.
-    const QByteArray secret = m_secret.size() == 17 ? m_secret.mid(1) : m_secret;
+    // Always the 16 key bytes - NOT the raw secret, which for "ee" also carries a mode byte and
+    // the whole domain name. Hashing those in silently produces a different key from the proxy's.
+    const QByteArray &secret = m_proxyKey;
 
     const QByteArray encKey = Crypto::sha256(init.mid(8, 32) + secret);
     const QByteArray encIv = init.mid(40, 16);
@@ -202,7 +272,7 @@ void MtprotoTransport::sendObfuscatedInit()
 
     QByteArray out = init.left(56);
     out += encrypted.mid(56, 8);
-    m_socket->write(out);
+    m_socket->write(m_fakeTls ? FakeTls::wrap(out) : out);
 }
 
 void MtprotoTransport::writeStream(const QByteArray &data)
@@ -210,7 +280,9 @@ void MtprotoTransport::writeStream(const QByteArray &data)
     if (!m_obfuscated) { m_socket->write(data); return; }
     QByteArray copy(data);
     m_enc.apply(copy);
-    m_socket->write(copy);
+    // The TLS records go on the outside: the obfuscated keystream runs continuously underneath
+    // and knows nothing about where one record ends.
+    m_socket->write(m_fakeTls ? FakeTls::wrap(copy) : copy);
 }
 
 int MtprotoTransport::unpaddedLength(const QByteArray &frame)
@@ -331,8 +403,19 @@ void MtprotoTransport::onReadyRead()
         m_inbuf.append(m_socket->readAll());
         processSocks();
         if (!m_open || m_socks != SocksReady) return;   // still negotiating, or it failed
+    } else if (m_fakeTls && !m_tlsReady) {
+        // Still pretending to do a TLS handshake: these bytes are records, not the stream.
+        m_inbuf.append(m_socket->readAll());
+        if (!processTlsHandshake()) return;             // incomplete, or it failed and closed
     } else {
         QByteArray chunk = m_socket->readAll();
+        if (m_fakeTls) {
+            // Strip the record headers first; the keystream underneath runs continuously and
+            // does not line up with record boundaries.
+            QByteArray payload;
+            if (!m_tlsReader.feed(chunk, &payload)) { fail(tr("the proxy sent a malformed TLS record")); return; }
+            chunk = payload;
+        }
         if (m_obfuscated) m_dec.apply(chunk);
         m_inbuf.append(chunk);
     }

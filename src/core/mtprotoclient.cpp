@@ -65,6 +65,9 @@ void MtprotoClient::connectToDc(const QString &host, int port, int dcId, const A
     delete m_session;
     m_session = key.isValid() ? new MtprotoSession(key) : 0;
     m_connectionInitialised = false;
+    // An existing auth key remembers how far the phone's clock is out, measured against the
+    // server last time. The FakeTLS handshake needs that or a stale clock gets us rejected.
+    if (key.isValid()) m_transport->setTimeOffset(key.timeOffset);
     m_transport->connectToHost(host, port, dcId);
 }
 
@@ -76,6 +79,11 @@ void MtprotoClient::setProxy(const QNetworkProxy &proxy)
 void MtprotoClient::setObfuscation(const QByteArray &secret)
 {
     m_transport->setObfuscation(secret);
+}
+
+void MtprotoClient::setTimeOffset(int seconds)
+{
+    m_transport->setTimeOffset(seconds);
 }
 
 void MtprotoClient::close()

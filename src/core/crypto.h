@@ -16,6 +16,7 @@ namespace Crypto
     QByteArray sha1(const QByteArray &data);
     QByteArray sha256(const QByteArray &data);
     QByteArray sha512(const QByteArray &data);
+    QByteArray hmacSha256(const QByteArray &key, const QByteArray &data);
     QByteArray hmacSha512(const QByteArray &key, const QByteArray &data);
     /// PBKDF2-HMAC-SHA512 (RFC 2898).
     QByteArray pbkdf2Sha512(const QByteArray &password, const QByteArray &salt, int iterations, int outputLength);

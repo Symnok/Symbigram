@@ -27,6 +27,7 @@ HEADERS += \
     $$PWD/src/core/inflate.h \
     $$PWD/src/core/telegramservers.h \
     $$PWD/src/core/dh.h \
+    $$PWD/src/core/faketls.h \
     $$PWD/src/core/mtprototransport.h \
     $$PWD/src/core/authkeyhandshake.h \
     $$PWD/src/core/mtprotosession.h \
@@ -55,6 +56,7 @@ SOURCES += \
     $$PWD/src/core/inflate.cpp \
     $$PWD/src/core/telegramservers.cpp \
     $$PWD/src/core/dh.cpp \
+    $$PWD/src/core/faketls.cpp \
     $$PWD/src/core/mtprototransport.cpp \
     $$PWD/src/core/authkeyhandshake.cpp \
     $$PWD/src/core/mtprotosession.cpp \
