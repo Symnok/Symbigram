@@ -11,8 +11,10 @@
 //      already about one grid cell. Reading that means touching ~10 KB instead of ~3 MB, with a
 //      decode to match. Anything without one (screenshots, downloads, PNGs) falls back to a
 //      scaled read, which libjpeg can do cheaply by DCT scaling.
-//   2. The result is written to C:/Data/Symbigram/thumbs, so opening the picker a second time
-//      costs one small file read per cell and nothing else.
+//   2. The result is written to cacheDir() - E:/Symbigram/thumbs by preference - so opening the
+//      picker a second time costs one small file read per cell and nothing else. That cache
+//      deliberately survives "Clear cache": rebuilding it for a full card is exactly the slow
+//      thing it exists to avoid, and it can be emptied by hand when space is short.
 //
 // All of it runs in this worker thread. The platform's own thumbnail server was the other option,
 // but it belongs to the same media subsystem that made MGFetch hang (see imagepicker.h), and this
@@ -36,8 +38,19 @@ public:
     explicit Thumbnailer(QObject *parent = 0);
     ~Thumbnailer();
 
-    /// Where thumbnails live. Part of the app's own cache, so clearCache() empties it.
+    /// Where thumbnails live: E:/Symbigram/thumbs when that drive is fitted, otherwise
+    /// C:/Symbigram/thumbs. Never C:/Data/Symbigram, which is unreachable to a file manager even
+    /// on a rooted phone - and since "Clear cache" leaves thumbnails alone on purpose, emptying
+    /// this by hand has to be possible. Decided once per run.
     static QString cacheDir();
+    /// The pre-1.0.103 location, cleaned up once at startup.
+    static QString legacyCacheDir();
+    /// Every folder thumbnails may occupy: the one in use, the other candidate (the fallback can
+    /// differ between runs if a card comes and goes) and the pre-1.0.103 location. The image
+    /// picker must exclude all of them from its scan - E:/Symbigram/thumbs sits inside a folder
+    /// the picker searches, so listing it would make the cache feed on itself.
+    static QStringList allCacheDirs();
+    static void discardLegacyCache();
     static qint64 cacheBytes();
     static qint64 clearCache();
 

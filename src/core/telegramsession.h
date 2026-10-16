@@ -53,7 +53,14 @@ public:
     /// Opens the link: with a signed-in session it syncs, otherwise it starts the QR login.
     void connectToServer();
     /// Route all connections through a SOCKS5 proxy (or none when host is empty).
-    void setProxy(bool enabled, const QString &host, int port, const QString &user, const QString &pass);
+    /// Where a datacenter link actually connects: the datacenter itself, or the MTProto proxy
+    /// standing in for all of them.
+    QString dialHost(int dcId) const;
+    int dialPort() const;
+
+    /// SOCKS5 host/port/credentials, plus an optional MTProto proxy secret (empty for none).
+    void setProxy(bool enabled, const QString &host, int port, const QString &user,
+                  const QString &pass, const QByteArray &mtprotoSecret = QByteArray());
     void disconnectFromServer();
 
     // -- login --
@@ -379,6 +386,9 @@ private:
     bool m_signedIn;
     TgUpdateState m_updateState;
     QNetworkProxy m_proxy;
+    QByteArray m_mtprotoSecret;
+    QString m_mtprotoHost;      // set only for an MTProto proxy: what every link dials
+    int m_mtprotoPort;
     bool m_stateDirty;
 
     // login

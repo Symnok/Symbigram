@@ -989,6 +989,21 @@ TgMessage TgApi::readMessage(const TlObject &m)
         return t;
     }
     t.text = m.str("message");
+
+    // Hidden links: the visible text is words, the entity carries the URL. This is how a channel
+    // post publishes a link behind prose, so without it such a link does not exist as far as the
+    // reader is concerned. Other entity kinds (bold, code, mentions) are not needed here.
+    const QVariantList entities = m.vec("entities");
+    for (int i = 0; i < entities.size(); ++i) {
+        const TlObject e = TlSchema::toObject(entities.at(i));
+        if (e.ctor() != Tl::MessageEntityTextUrl) continue;
+        TgTextLink link;
+        link.offset = e.intOr("offset");
+        link.length = e.intOr("length");
+        link.url = e.str("url");
+        if (link.length > 0 && link.offset >= 0 && !link.url.isEmpty()) t.textLinks << link;
+    }
+
     t.editDate = m.intOr("edit_date");
     t.viaBot = m.has("via_bot_id");
     if (m.has("media")) {
@@ -1021,6 +1036,19 @@ TgMessage TgApi::readShortMessage(const TlObject &u, qint64 selfId)
     m.out = u.flag("flags", 1);
     m.mentioned = u.flag("flags", 4);
     m.text = u.str("message");
+
+    // The same hidden links, for the lightweight 1:1 / small-group update form.
+    const QVariantList shortEntities = u.vec("entities");
+    for (int i = 0; i < shortEntities.size(); ++i) {
+        const TlObject e = TlSchema::toObject(shortEntities.at(i));
+        if (e.ctor() != Tl::MessageEntityTextUrl) continue;
+        TgTextLink link;
+        link.offset = e.intOr("offset");
+        link.length = e.intOr("length");
+        link.url = e.str("url");
+        if (link.length > 0 && link.offset >= 0 && !link.url.isEmpty()) m.textLinks << link;
+    }
+
     m.viaBot = u.has("via_bot_id");
     if (u.ctor() == Tl::UpdateShortChatMessage) {
         m.fromId = u.longOr("from_id");

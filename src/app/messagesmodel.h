@@ -76,7 +76,10 @@ public:
         SecretRemainingRole,// seconds left before it self-destructs (-1 = none)
         VoicePlayingRole,   // true while this voice message is playing
         PreviewLoadedRole,  // photo: the inline image (not just the blurred placeholder) is loaded
-        ReactionsRole       // [{ emoticon, icon, count, chosen }] for the reaction chips
+        ReactionsRole,      // [{ emoticon, icon, count, chosen }] for the reaction chips
+        BodyHtmlRole,       // the body as rich text, with every tappable target already anchored
+        LinkCountRole,      // how many of them there are
+        LinkTargetsRole     // those targets as plain URLs, in order
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -120,6 +123,14 @@ public:
     /// figure counts them and clearing the cache removes them. Files the user saved or opened
     /// ("Save to phone", "Open") sit in the same folder under their real names and are NEVER
     /// touched - only these fixed, app-made names are.
+    /// The message body as rich text: HTML-escaped, with anchors around plain URLs, @mentions
+    /// and - the reason this lives in C++ rather than QML - the hidden links carried as message
+    /// entities. Entity offsets index the ORIGINAL text, so escaping first (as the QML version
+    /// did) shifts every one of them; this does both in a single pass. `targets` receives each
+    /// anchor's URL in order. Public so it can be tested directly.
+    static QString buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
+                                 QStringList *targets);
+
     static qint64 scratchBytes(const QString &chosenFolder);
     static qint64 clearScratch(const QString &chosenFolder);
     /// Opens one topic of a forum supergroup: its messages (via getReplies) with sending routed

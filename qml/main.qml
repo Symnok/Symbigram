@@ -115,6 +115,11 @@ PageStackWindow {
                 window.openChat(peerKey)
             }
         }
+        onProxyLinkOffered: {
+            proxyLinkDialog.target = target
+            proxyLinkDialog.mtproto = mtproto
+            proxyLinkDialog.open()
+        }
         onOpenChatRequested: {
             if (app.state != "ready") return
             if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
@@ -155,6 +160,20 @@ PageStackWindow {
             else if (step == 13) app.takeScreenshot("about")
             else if (step == 14) Qt.quit()
         }
+    }
+
+    // A proxy link tapped in a chat. Confirmed rather than applied on the tap: it reroutes every
+    // connection through someone else's server and reconnects the session.
+    QueryDialog {
+        id: proxyLinkDialog
+        property string target: ""
+        property bool mtproto: true
+        titleText: qsTr("Use this proxy?")
+        message: mtproto ? qsTr("Route Symbigram through the MTProto proxy %1? This reconnects.").arg(target)
+                         : qsTr("Route Symbigram through the SOCKS5 proxy %1? This reconnects.").arg(target)
+        acceptButtonText: qsTr("Use it")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: app.acceptProxyLink()
     }
 
     InfoBanner {

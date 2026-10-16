@@ -40,6 +40,7 @@ ImagePicker::ImagePicker(QObject *parent)
     roles[PathRole] = "path";
     roles[UrlRole] = "url";
     roles[ThumbRole] = "thumb";
+    roles[ThumbFailedRole] = "thumbFailed";
     roles[NameRole] = "name";
     roles[FolderRole] = "folder";
     setRoleNames(roles);
@@ -69,6 +70,7 @@ QVariant ImagePicker::data(const QModelIndex &index, int role) const
     case UrlRole: return QUrl::fromLocalFile(e.path).toString();
     case ThumbRole: return e.thumb.isEmpty() ? QString()
                                              : QUrl::fromLocalFile(e.thumb).toString();
+    case ThumbFailedRole: return e.failed;
     case NameRole: return e.name;
     case FolderRole: return e.folder;
     default: return QVariant();
@@ -100,14 +102,25 @@ void ImagePicker::requestThumb(int row, int edge)
 
 void ImagePicker::thumbReady(const QString &imagePath, const QString &thumbPath)
 {
-    if (thumbPath.isEmpty()) return;   // unreadable picture; the cell keeps its placeholder
     for (int i = 0; i < m_rows.size(); ++i) {
         if (m_rows.at(i).path != imagePath) continue;
-        m_rows[i].thumb = thumbPath;
+        // An empty path means it could not be made - an unreadable picture, or nowhere to write
+        // the cache (a card pulled mid-session). Recorded rather than ignored, so the cell shows
+        // a placeholder instead of spinning for ever.
+        if (thumbPath.isEmpty()) m_rows[i].failed = true;
+        else m_rows[i].thumb = thumbPath;
         const QModelIndex idx = index(i);
         emit dataChanged(idx, idx);
         return;
     }
+}
+
+bool ImagePicker::excluded(const QString &dir) const
+{
+    const QString clean = QDir::cleanPath(QDir(dir).absolutePath());
+    for (int i = 0; i < m_excluded.size(); ++i)
+        if (clean.compare(m_excluded.at(i), Qt::CaseInsensitive) == 0) return true;
+    return false;
 }
 
 void ImagePicker::rescan()
@@ -118,6 +131,11 @@ void ImagePicker::rescan()
     m_todo.clear();
     m_dirsVisited = 0;
 
+    m_excluded.clear();
+    const QStringList caches = Thumbnailer::allCacheDirs();
+    for (int i = 0; i < caches.size(); ++i)
+        m_excluded << QDir::cleanPath(QDir(caches.at(i)).absolutePath());
+
     // Every drive the phone currently has. QDir::drives() already reports only what is mounted,
     // so a removed card simply contributes nothing - no special case needed.
     const QFileInfoList drives = QDir::drives();
@@ -125,7 +143,7 @@ void ImagePicker::rescan()
         const QString root = drives.at(d).absolutePath();   // "C:/", "E:/", ...
         for (int f = 0; f < int(sizeof(KFolders) / sizeof(KFolders[0])); ++f) {
             const QString candidate = root + QLatin1String(KFolders[f]);
-            if (!QFileInfo(candidate).isDir()) continue;
+            if (!QFileInfo(candidate).isDir() || excluded(candidate)) continue;
             Dir dir;
             dir.path = candidate;
             dir.depth = 0;
@@ -160,6 +178,7 @@ void ImagePicker::scanSlice()
         const QFileInfo &fi = files.at(i);
         if (fi.size() <= 0) continue;
         Entry e;
+        e.failed = false;
         e.path = fi.absoluteFilePath();
         e.name = fi.fileName();
         e.folder = fi.absoluteDir().dirName();
@@ -171,6 +190,7 @@ void ImagePicker::scanSlice()
     if (dir.depth < KMaxDepth) {
         const QFileInfoList subs = d.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable);
         for (int i = 0; i < subs.size(); ++i) {
+            if (excluded(subs.at(i).absoluteFilePath())) continue;
             Dir sub;
             sub.path = subs.at(i).absoluteFilePath();
             sub.depth = dir.depth + 1;

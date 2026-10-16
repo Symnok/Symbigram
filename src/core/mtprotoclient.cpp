@@ -57,7 +57,7 @@ int MtprotoClient::timeOffset() const { return m_session ? m_session->timeOffset
 
 // -- connecting -------------------------------------------------------------------------------------------
 
-void MtprotoClient::connectToDc(const QString &host, int port, const AuthKey &key)
+void MtprotoClient::connectToDc(const QString &host, int port, int dcId, const AuthKey &key)
 {
     close();
     m_host = host;
@@ -65,12 +65,17 @@ void MtprotoClient::connectToDc(const QString &host, int port, const AuthKey &ke
     delete m_session;
     m_session = key.isValid() ? new MtprotoSession(key) : 0;
     m_connectionInitialised = false;
-    m_transport->connectToHost(host, port);
+    m_transport->connectToHost(host, port, dcId);
 }
 
 void MtprotoClient::setProxy(const QNetworkProxy &proxy)
 {
     m_transport->setProxy(proxy);
+}
+
+void MtprotoClient::setObfuscation(const QByteArray &secret)
+{
+    m_transport->setObfuscation(secret);
 }
 
 void MtprotoClient::close()

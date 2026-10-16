@@ -130,6 +130,9 @@ namespace Tl
     const quint32 MessagesReadDiscussion = 0xf731a9f4;    // mark a forum topic read
     const quint32 ContactsBlock = 0x2e2e8734;             // block a user
     const quint32 MessagesSendReaction = 0xd30d78d4;      // react to a message
+    // A link whose visible text is not the URL (what a channel post uses to hide a link behind
+    // words). messageEntityTextUrl#76a6d327 offset:int length:int url:string
+    const quint32 MessageEntityTextUrl = 0x76a6d327;
     const quint32 ReactionEmoji = 0x1b2286b8;             // a plain-emoji reaction
     const quint32 UpdateMessageReactions = 0x1e297bfa;    // someone's reaction changed
     const quint32 MessagesMessages = 0x1d73e7ea;

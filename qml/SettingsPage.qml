@@ -13,7 +13,8 @@ Page {
     QueryDialog {
         id: clearCacheDialog
         titleText: qsTr("Clear cache")
-        message: qsTr("Delete the %1 of downloaded media held on the phone? It will be fetched again when needed.").arg(app.cacheSize)
+        // One literal, not a concatenation: lupdate cannot extract a joined string.
+        message: qsTr("Delete the %1 held on the phone? This clears the media cache and the files downloaded into the Symbigram folders. Installed language packs are kept.").arg(app.cacheSize)
         acceptButtonText: qsTr("Clear")
         rejectButtonText: qsTr("Cancel")
         onAccepted: app.clearCache()
@@ -85,27 +86,76 @@ Page {
 
     CommonDialog {
         id: proxyDialog
-        titleText: qsTr("SOCKS5 proxy")
+        titleText: qsTr("Proxy")
         buttonTexts: [qsTr("Save"), qsTr("Cancel")]
+        // 0 = SOCKS5, 1 = MTProto. Kept here rather than read from app.proxyKind directly so the
+        // dialog can be switched back and forth before anything is saved.
+        property int kind: 0
         content: Column {
             width: parent.width
             spacing: platformStyle.paddingMedium
             anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
+
+            Label { text: qsTr("Type"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            ButtonRow {
+                width: parent.width
+                checkedButton: proxyDialog.kind == 1 ? mtprotoKindButton : socksKindButton
+                Button { id: socksKindButton; text: qsTr("SOCKS5"); onClicked: proxyDialog.kind = 0 }
+                Button { id: mtprotoKindButton; text: qsTr("MTProto"); onClicked: proxyDialog.kind = 1 }
+            }
+
             Label { text: qsTr("Server"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
             TextField { id: proxyHostField; width: parent.width; placeholderText: qsTr("host or IP"); inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
             Label { text: qsTr("Port"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyPortField; width: parent.width; placeholderText: "1080"; inputMethodHints: Qt.ImhDigitsOnly }
-            Label { text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
-            Label { text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
+            TextField { id: proxyPortField; width: parent.width; placeholderText: proxyDialog.kind == 1 ? "443" : "1080"; inputMethodHints: Qt.ImhDigitsOnly }
+
+            // SOCKS5 credentials.
+            Label { visible: proxyDialog.kind == 0; text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { visible: proxyDialog.kind == 0; id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+            Label { visible: proxyDialog.kind == 0; text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField { visible: proxyDialog.kind == 0; id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
+
+            // MTProto secret.
+            Label { visible: proxyDialog.kind == 1; text: qsTr("Secret"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
+            TextField {
+                visible: proxyDialog.kind == 1
+                id: proxySecretField
+                width: parent.width
+                placeholderText: qsTr("32 or 34 hex characters")
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+            }
+            Label {
+                visible: proxyDialog.kind == 1
+                width: parent.width
+                wrapMode: Text.WordWrap
+                color: platformStyle.colorNormalMid
+                font.pixelSize: platformStyle.fontSizeSmall
+                text: qsTr("Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.")
+            }
+            Button {
+                visible: proxyDialog.kind == 1
+                width: parent.width
+                text: qsTr("Use link")
+                onClicked: if (app.applyProxyLink(proxySecretField.text)) { proxyDialog.load(); proxyDialog.close() }
+            }
         }
-        onButtonClicked: if (index == 0) app.saveProxy(true, proxyHostField.text, proxyPortField.text, proxyUserField.text, proxyPassField.text)
+        onButtonClicked: {
+            if (index != 0) return
+            if (proxyDialog.kind == 1 && proxySecretField.text.indexOf("://") >= 0) {
+                // A link left in the Secret field is almost certainly meant as one.
+                if (app.applyProxyLink(proxySecretField.text)) return
+            }
+            app.saveProxy(true, proxyHostField.text, proxyPortField.text,
+                          proxyUserField.text, proxyPassField.text,
+                          proxyDialog.kind, proxySecretField.text)
+        }
         function load() {
+            proxyDialog.kind = app.proxyKind
             proxyHostField.text = app.proxyHost
             proxyPortField.text = app.proxyPort
             proxyUserField.text = app.proxyUser
             proxyPassField.text = app.proxyPass
+            proxySecretField.text = app.proxySecret
         }
     }
 
@@ -184,7 +234,7 @@ Page {
                 ListItemText {
                     anchors { left: proxyItem.paddingItem.left; right: proxySwitch.left; verticalCenter: parent.verticalCenter }
                     role: "Title"
-                    text: qsTr("SOCKS5 proxy")
+                    text: qsTr("Proxy")
                     wrapMode: Text.Wrap
                 }
                 Switch {
@@ -205,7 +255,9 @@ Page {
                     ListItemText { width: parent.width; role: "Title"; text: qsTr("Proxy server") }
                     Label {
                         width: parent.width
-                        text: app.proxyHost != "" ? (app.proxyHost + ":" + app.proxyPort) : qsTr("not set")
+                        text: app.proxyHost == "" ? qsTr("not set")
+                              : (app.proxyHost + ":" + app.proxyPort
+                                 + (app.proxyKind == 1 ? qsTr(" (MTProto)") : qsTr(" (SOCKS5)")))
                         color: "white"
                         font.pixelSize: platformStyle.fontSizeSmall
                         elide: Text.ElideRight
@@ -219,7 +271,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("Route the connection through a SOCKS5 proxy. Changing it reconnects.")
+                text: qsTr("Route the connection through a SOCKS5 or MTProto proxy. Changing it reconnects.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 
@@ -307,13 +359,30 @@ Page {
                     ListItemText { width: parent.width; role: "Title"; text: qsTr("Clear cache") }
                     Label {
                         width: parent.width
-                        text: qsTr("Downloaded media held on the phone: %1").arg(app.cacheSize)
+                        text: qsTr("Cached media and downloaded files: %1").arg(app.cacheSize)
                         color: "white"
                         font.pixelSize: platformStyle.fontSizeSmall
                         elide: Text.ElideMiddle
                     }
                 }
                 onClicked: clearCacheDialog.open()
+            }
+
+            // Read-only: the thumbnails are not part of Clear cache, so the path is shown for
+            // anyone who needs the space back and wants to empty the folder themselves.
+            ListItem {
+                id: thumbsItem
+                enabled: false
+                Column {
+                    anchors { left: thumbsItem.paddingItem.left; right: thumbsItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Image thumbnails") }
+                    ListItemText {
+                        width: parent.width
+                        role: "SubTitle"
+                        text: app.thumbnailCacheInfo
+                        wrapMode: Text.WrapAnywhere
+                    }
+                }
             }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge

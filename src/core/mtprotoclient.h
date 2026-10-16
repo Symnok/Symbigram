@@ -48,10 +48,14 @@ public:
 
     void setInfo(const ClientInfo &info) { m_info = info; }
     void setProxy(const QNetworkProxy &proxy);
+    /// MTProto proxy secret; empty for none. See MtprotoTransport::setObfuscation.
+    void setObfuscation(const QByteArray &secret);
     const ClientInfo &info() const { return m_info; }
 
     /// Connects and, without a valid key, negotiates one. connected() follows.
-    void connectToDc(const QString &host, int port, const AuthKey &key = AuthKey());
+    /// `dcId` is passed to an MTProto proxy, which needs to know which datacenter to
+    /// open; it is ignored on a direct or SOCKS5 connection.
+    void connectToDc(const QString &host, int port, int dcId, const AuthKey &key = AuthKey());
     void close();
     bool isReady() const;
     AuthKey authKey() const;

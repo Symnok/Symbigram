@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QImage>
 #include <QImageReader>
+#include <QStringList>
 #include <QTransform>
 
 namespace
@@ -53,6 +54,9 @@ Thumbnailer::Thumbnailer(QObject *parent)
     : QThread(parent)
     , m_stop(false)
 {
+    // Settle the cache path here, on the GUI thread, so run() cannot race the static that
+    // remembers it.
+    cacheDir();
 }
 
 Thumbnailer::~Thumbnailer()
@@ -63,11 +67,65 @@ Thumbnailer::~Thumbnailer()
 
 QString Thumbnailer::cacheDir()
 {
+    // Decided once per run and then remembered: if a card were inserted or pulled mid-session a
+    // recomputed path would orphan everything cached so far. Thumbnailer's constructor calls this
+    // from the GUI thread so the worker never races to initialise it.
+    static QString chosen;
+    if (!chosen.isEmpty()) return chosen;
+
+#ifdef Q_OS_SYMBIAN
+    // Mass memory first, phone memory only as a fallback - and NOT C:/Data/Symbigram, which no
+    // file manager can reach even on a rooted phone. Clear cache deliberately leaves thumbnails
+    // alone (regenerating them for a full card is the slow thing this cache exists to avoid), so
+    // the one place they must never live is a folder the user cannot empty by hand.
+    // Decided by whether the folder can actually be created, not merely by whether the drive is
+    // listed: on a phone where E: IS the removable card, a drive that exists at boot can be gone
+    // later, and a cache we cannot write is worse than one on the small drive.
+    const QString preferred = QLatin1String("E:/Symbigram/thumbs");
+    const QString fallback = QLatin1String("C:/Symbigram/thumbs");
+    chosen = QDir().mkpath(preferred) ? preferred : fallback;
+    QDir().mkpath(chosen);
+#else
+    chosen = QDir::homePath() + QLatin1String("/.symbigram/thumbs");
+#endif
+    return chosen;
+}
+
+QString Thumbnailer::legacyCacheDir()
+{
 #ifdef Q_OS_SYMBIAN
     return QLatin1String("C:/Data/Symbigram/thumbs");
 #else
-    return QDir::homePath() + QLatin1String("/.symbigram/thumbs");
+    return QString();
 #endif
+}
+
+QStringList Thumbnailer::allCacheDirs()
+{
+    QStringList dirs;
+#ifdef Q_OS_SYMBIAN
+    dirs << QLatin1String("E:/Symbigram/thumbs")
+         << QLatin1String("C:/Symbigram/thumbs")
+         << QLatin1String("C:/Data/Symbigram/thumbs");
+#else
+    dirs << cacheDir();
+#endif
+    if (!dirs.contains(cacheDir())) dirs << cacheDir();
+    return dirs;
+}
+
+void Thumbnailer::discardLegacyCache()
+{
+    // Where v1.0.100-1.0.102 put thumbnails. Left behind it would be a pile of files on the
+    // smallest drive that the user has no way to delete, so it goes once, quietly.
+    const QString old = legacyCacheDir();
+    if (old.isEmpty() || old == cacheDir()) return;
+    QDir dir(old);
+    if (!dir.exists()) return;
+    const QFileInfoList files = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::System);
+    for (int i = 0; i < files.size(); ++i) QFile::remove(files.at(i).absoluteFilePath());
+    dir.cdUp();
+    dir.rmdir(QLatin1String("thumbs"));
 }
 
 QString Thumbnailer::thumbPathFor(const QString &imagePath)

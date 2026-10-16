@@ -99,6 +99,10 @@ namespace
     const char *const KeyProxyPort = "proxy/port";
     const char *const KeyProxyUser = "proxy/user";
     const char *const KeyProxyPass = "proxy/pass";
+    // 0 = SOCKS5, 1 = MTProto proxy. The two share host/port; MTProto uses a secret instead of
+    // a username and password.
+    const char *const KeyProxyKind = "proxy/kind";
+    const char *const KeyProxySecret = "proxy/secret";
     const int ReconnectMinMs = 5000;
     const int ReconnectMaxMs = 60000;
 
@@ -111,7 +115,7 @@ namespace
 AppController::AppController(QObject *parent)
     : QObject(parent),
       m_settings(QLatin1String("Symbigram"), QLatin1String("Symbigram")),
-      m_netMgr(0), m_netSession(0), m_view(0), m_linkMsgId(0),
+      m_netMgr(0), m_netSession(0), m_view(0), m_linkMsgId(0), m_pendingProxyMtproto(false),
       m_state(QLatin1String("starting")), m_busy(false), m_wantOnline(false), m_everOnline(false),
       m_reconnectDelay(ReconnectMinMs), m_checkingPassword(false), m_loginMethod(QLatin1String("qr")), m_codeBusy(false), m_foreground(true)
 {
@@ -140,8 +144,10 @@ AppController::AppController(QObject *parent)
     m_topics = new TopicsModel(m_session, this);
     m_contacts = new PhoneBook(this);
     m_imagePicker = new ImagePicker(this);
+    Thumbnailer::discardLegacyCache();   // thumbnails used to sit in the unreachable C:/Data
     applyDownloadFolder();
-    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
+    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass(),
+                        proxyKind() == 1 ? decodeProxySecret(proxySecret()) : QByteArray());
 
     m_recorder = new VoiceRecorder(this);
     connect(m_recorder, SIGNAL(started()), this, SIGNAL(recordingChanged()));
@@ -196,6 +202,54 @@ AppController::~AppController()
     if (m_netSession) m_netSession->close();
 }
 
+namespace
+{
+    /// Adds up, and optionally deletes, every file under `dir`, recursing - except inside a
+    /// directory listed in `keep`. Returns the bytes counted or freed.
+    ///
+    /// `keep` is what makes this safe to point at C:/Data/Symbigram: the installed language
+    /// add-on packs live in its translations subfolder and must survive a cache clear, and the
+    /// picker's thumbnails are accounted for separately so they would otherwise be counted twice.
+    qint64 sweepFolder(const QString &dir, const QStringList &keep, bool remove)
+    {
+        const QDir d(dir);
+        if (!d.exists()) return 0;
+        const QString here = QDir::cleanPath(d.absolutePath());
+        for (int i = 0; i < keep.size(); ++i)
+            if (here.compare(keep.at(i), Qt::CaseInsensitive) == 0) return 0;
+
+        qint64 total = 0;
+        const QFileInfoList entries =
+            d.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+        for (int i = 0; i < entries.size(); ++i) {
+            const QFileInfo &fi = entries.at(i);
+            if (fi.isDir()) {
+                total += sweepFolder(fi.absoluteFilePath(), keep, remove);
+                continue;
+            }
+            const qint64 size = fi.size();
+            if (!remove) { total += size; continue; }
+            if (QFile::remove(fi.absoluteFilePath())) total += size;
+        }
+        return total;
+    }
+}
+
+qint64 AppController::sweepDownloadFolders(bool remove) const
+{
+    // The folders Symbigram downloads into, on whichever drives are actually fitted - a phone
+    // with no memory card simply contributes fewer of them.
+    QStringList keep;
+    keep << QDir::cleanPath(QDir(translationsDir()).absolutePath());
+    keep << QDir::cleanPath(QDir(Thumbnailer::cacheDir()).absolutePath());
+
+    qint64 total = 0;
+    const QStringList drives = presentDriveLetters();
+    for (int i = 0; i < drives.size(); ++i)
+        total += sweepFolder(folderForDrive(drives.at(i)), keep, remove);
+    return total;
+}
+
 QString AppController::dataDir()
 {
     QString base = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -248,11 +302,22 @@ void AppController::setNotice(const QString &n)
 void AppController::clearNotice() { setNotice(QString()); }
 void AppController::onNotice(const QString &text) { setNotice(text); }
 
+QString AppController::thumbnailCacheInfo() const
+{
+    // Shown so the folder can be found and emptied by hand; the app never clears it.
+    const qint64 b = Thumbnailer::cacheBytes();
+    const QString size = b >= 1048576 ? tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1)
+                       : (b >= 1024 ? tr("%1 KB").arg(int(b / 1024)) : tr("%1 B").arg(b));
+    return tr("%1 in %2").arg(size, QDir::toNativeSeparators(Thumbnailer::cacheDir()));
+}
+
 QString AppController::cacheSize() const
 {
     // Counts the scratch too, so the figure matches what "Clear cache" actually frees.
+    // Thumbnails are deliberately NOT included: Clear cache leaves them alone, and this figure
+    // has to match what it frees. They are reported on their own row instead.
     qint64 b = (m_media ? m_media->cacheBytes() : 0) + MessagesModel::scratchBytes(m_downloadPath)
-             + Thumbnailer::cacheBytes();
+             + sweepDownloadFolders(false);
     if (b >= 1048576) return tr("%1 MB").arg(double(b) / 1048576.0, 0, 'f', 1);
     if (b >= 1024) return tr("%1 KB").arg(int(b / 1024));
     return tr("%1 B").arg(b);
@@ -263,8 +328,11 @@ void AppController::clearCache()
     if (!m_media) return;
     // The private cache, plus our own scratch copies that have to sit in a public folder.
     // Anything the user saved or opened keeps its real name and is left alone.
+    // The picker's thumbnails are not touched - rebuilding them for a full card is the slow
+    // thing they exist to prevent. sweepDownloadFolders() excludes their folder for that reason,
+    // and Settings shows where to empty it by hand.
     qint64 freed = m_media->clearCache() + MessagesModel::clearScratch(m_downloadPath)
-                 + Thumbnailer::clearCache();   // the image picker's thumbnails
+                 + sweepDownloadFolders(true);
     QString human = freed >= 1048576 ? tr("%1 MB").arg(double(freed) / 1048576.0, 0, 'f', 1)
                   : (freed >= 1024 ? tr("%1 KB").arg(int(freed / 1024)) : tr("%1 B").arg(freed));
     setNotice(tr("Cache cleared (%1 freed).").arg(human));
@@ -639,16 +707,124 @@ QString AppController::proxyHost() const { return m_settings.value(QLatin1String
 QString AppController::proxyPort() const { return m_settings.value(QLatin1String(KeyProxyPort)).toString(); }
 QString AppController::proxyUser() const { return m_settings.value(QLatin1String(KeyProxyUser)).toString(); }
 QString AppController::proxyPass() const { return m_settings.value(QLatin1String(KeyProxyPass)).toString(); }
+int AppController::proxyKind() const { return m_settings.value(QLatin1String(KeyProxyKind), 0).toInt(); }
+QString AppController::proxySecret() const { return m_settings.value(QLatin1String(KeyProxySecret)).toString(); }
 
-void AppController::saveProxy(bool enabled, const QString &host, const QString &port, const QString &user, const QString &pass)
+QByteArray AppController::decodeProxySecret(const QString &text)
+{
+    // Secrets are published as hex, and sometimes (mostly for FakeTLS) as base64url. Accept both
+    // and let the transport judge the length: 16 bytes plain, 17 with a "dd"/"ee" mode byte.
+    QString t = text.trimmed();
+    t.remove(QLatin1Char(' '));
+    if (t.isEmpty()) return QByteArray();
+
+    bool hex = (t.size() % 2) == 0;
+    for (int i = 0; hex && i < t.size(); ++i) {
+        const QChar c = t.at(i).toLower();
+        hex = (c >= QLatin1Char('0') && c <= QLatin1Char('9')) || (c >= QLatin1Char('a') && c <= QLatin1Char('f'));
+    }
+    if (hex) return QByteArray::fromHex(t.toLatin1());
+
+    QString b64 = t;
+    b64.replace(QLatin1Char('-'), QLatin1Char('+')).replace(QLatin1Char('_'), QLatin1Char('/'));
+    while (b64.size() % 4) b64 += QLatin1Char('=');
+    return QByteArray::fromBase64(b64.toLatin1());
+}
+
+void AppController::saveProxy(bool enabled, const QString &host, const QString &port, const QString &user,
+                             const QString &pass, int kind, const QString &secret)
 {
     m_settings.setValue(QLatin1String(KeyProxyEnabled), enabled);
     m_settings.setValue(QLatin1String(KeyProxyHost), host.trimmed());
     m_settings.setValue(QLatin1String(KeyProxyPort), port.trimmed());
     m_settings.setValue(QLatin1String(KeyProxyUser), user);
     m_settings.setValue(QLatin1String(KeyProxyPass), pass);
+    m_settings.setValue(QLatin1String(KeyProxyKind), kind);
+    m_settings.setValue(QLatin1String(KeyProxySecret), secret.trimmed());
     applyProxy();
     emit settingsChanged();
+}
+
+bool AppController::parseProxyLink(const QString &link, QString *error)
+{
+    // Accepts the forms shared in proxy channels: tg://proxy?..., https://t.me/proxy?... and the
+    // SOCKS5 equivalents (tg://socks, t.me/socks). The secret may be hex or base64url.
+    const QString text = link.trimmed();
+    const bool looksProxy = text.contains(QLatin1String("proxy"), Qt::CaseInsensitive)
+                         || text.contains(QLatin1String("socks"), Qt::CaseInsensitive);
+    if (text.indexOf(QLatin1Char('?')) < 0 || !looksProxy) {
+        if (error) *error = tr("That does not look like a proxy link.");
+        return false;
+    }
+
+    const QUrl url(text);
+    const QString server = url.queryItemValue(QLatin1String("server"));
+    const QString port = url.queryItemValue(QLatin1String("port"));
+    const QString secret = url.queryItemValue(QLatin1String("secret"));
+    if (server.isEmpty() || port.isEmpty()) {
+        if (error) *error = tr("The link is missing the server or port.");
+        return false;
+    }
+
+    if (secret.isEmpty()) {
+        // No secret: a SOCKS5 link.
+        m_pendingProxyMtproto = false;
+        m_pendingProxyServer = server;
+        m_pendingProxyPort = port;
+        m_pendingProxySecret.clear();
+        m_pendingProxyUser = url.queryItemValue(QLatin1String("user"));
+        m_pendingProxyPass = url.queryItemValue(QLatin1String("pass"));
+        return true;
+    }
+
+    const QByteArray raw = decodeProxySecret(secret);
+    // A FakeTLS secret is 0xee + 16 bytes + the proxy's domain, so it runs well past 17 bytes;
+    // testing for exactly 17 would reject a real one with a nonsense complaint about its length.
+    if (raw.size() >= 17 && uchar(raw.at(0)) == 0xee) {
+        if (error) *error = tr("This proxy needs FakeTLS, which Symbigram cannot do yet.");
+        return false;
+    }
+    const bool padded = (raw.size() == 17 && uchar(raw.at(0)) == 0xdd);
+    if (raw.size() != 16 && !padded) {
+        if (error) *error = tr("That secret is not a valid length.");
+        return false;
+    }
+
+    m_pendingProxyMtproto = true;
+    m_pendingProxyServer = server;
+    m_pendingProxyPort = port;
+    m_pendingProxySecret = secret.trimmed();
+    m_pendingProxyUser.clear();
+    m_pendingProxyPass.clear();
+    return true;
+}
+
+bool AppController::applyProxyLink(const QString &link)
+{
+    // The Settings route: the user is already in the proxy dialog, so this applies at once.
+    QString error;
+    if (!parseProxyLink(link, &error)) { setNotice(error); return false; }
+    acceptProxyLink();
+    return true;
+}
+
+bool AppController::offerProxyLink(const QString &link)
+{
+    // The tapped-in-a-chat route. Switching proxy reroutes everything through a stranger's
+    // server and reconnects, so it is confirmed first rather than applied on a tap.
+    QString error;
+    if (!parseProxyLink(link, &error)) { setNotice(error); return true; }   // handled, just refused
+    emit proxyLinkOffered(QString::fromLatin1("%1:%2").arg(m_pendingProxyServer, m_pendingProxyPort),
+                          m_pendingProxyMtproto);
+    return true;
+}
+
+void AppController::acceptProxyLink()
+{
+    if (m_pendingProxyServer.isEmpty()) return;
+    saveProxy(true, m_pendingProxyServer, m_pendingProxyPort, m_pendingProxyUser, m_pendingProxyPass,
+              m_pendingProxyMtproto ? 1 : 0, m_pendingProxySecret);
+    setNotice(tr("Proxy set to %1:%2.").arg(m_pendingProxyServer, m_pendingProxyPort));
 }
 
 void AppController::setProxyEnabled(bool on)
@@ -660,12 +836,10 @@ void AppController::setProxyEnabled(bool on)
 
 void AppController::applyProxy()
 {
-    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass());
-
-    m_recorder = new VoiceRecorder(this);
-    connect(m_recorder, SIGNAL(started()), this, SIGNAL(recordingChanged()));
-    connect(m_recorder, SIGNAL(recorded(QString,int,QByteArray)), this, SLOT(onRecorded(QString,int,QByteArray)));
-    connect(m_recorder, SIGNAL(failed(QString)), this, SLOT(onRecordFailed(QString)));
+    // The secret only travels when the MTProto kind is selected, so switching back to SOCKS5
+    // does not quietly keep obfuscating.
+    m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass(),
+                        proxyKind() == 1 ? decodeProxySecret(proxySecret()) : QByteArray());
     // Reconnect so the change takes effect on a live connection.
     bool wasConnected = m_session->state() != TelegramSession::Disconnected;
     if (wasConnected) m_session->disconnectFromServer();
@@ -990,6 +1164,10 @@ void AppController::addLocalContact(const QString &firstName, const QString &las
 bool AppController::openInternalLink(const QString &url)
 {
     QString rest = url.trimmed();
+    // tg://proxy and tg://socks never reach the username logic below.
+    if (rest.startsWith(QLatin1String("tg://proxy"), Qt::CaseInsensitive)
+        || rest.startsWith(QLatin1String("tg://socks"), Qt::CaseInsensitive))
+        return offerProxyLink(rest);
     if (rest.startsWith(QLatin1String("https://"), Qt::CaseInsensitive)) rest = rest.mid(8);
     else if (rest.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) rest = rest.mid(7);
     if (rest.startsWith(QLatin1String("www."), Qt::CaseInsensitive)) rest = rest.mid(4);
@@ -1025,6 +1203,12 @@ bool AppController::openInternalLink(const QString &url)
         emit openMessageRequested(known.key(), msgId);
         return true;
     }
+
+    // A proxy link shared in a channel is worth acting on rather than handing to the browser,
+    // which can do nothing useful with it on this phone.
+    if (name.compare(QLatin1String("proxy"), Qt::CaseInsensitive) == 0
+        || name.compare(QLatin1String("socks"), Qt::CaseInsensitive) == 0)
+        return offerProxyLink(url);
 
     // Private invites (t.me/+hash, /joinchat/) and the special links are not usernames and we
     // cannot resolve them - let the browser deal with those.

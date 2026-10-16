@@ -40,6 +40,7 @@ public:
         PathRole = Qt::UserRole + 1,   ///< native path, for sendFile
         UrlRole,                       ///< file:/// URL of the full picture
         ThumbRole,                     ///< file:/// URL of the cached thumbnail, "" until ready
+        ThumbFailedRole,               ///< the thumbnail could not be made; stop waiting for it
         NameRole,
         FolderRole
     };
@@ -77,6 +78,7 @@ private:
         QString name;
         QString folder;
         QString thumb;    ///< empty until the thumbnailer has one
+        bool failed;      ///< unreadable picture, or nowhere to write the cache
         uint modified;
     };
 
@@ -87,11 +89,16 @@ private:
     };
 
     void finish();
+    /// True for a directory the scan must not enter. The thumbnail cache lives under
+    /// <drive>/Symbigram/thumbs, which is inside a folder the scan searches - without this the
+    /// cache would list itself, and every visit would thumbnail its own thumbnails.
+    bool excluded(const QString &dir) const;
     static bool newerFirst(const Entry &a, const Entry &b) { return a.modified > b.modified; }
 
     QList<Entry> m_rows;      ///< published, sorted newest first
     QList<Entry> m_found;     ///< accumulated during the scan, unsorted
     QList<Dir> m_todo;        ///< directories still to visit
+    QStringList m_excluded;   ///< cleaned absolute paths the scan skips
     QTimer *m_timer;
     Thumbnailer *m_thumbs;
     bool m_scanning;

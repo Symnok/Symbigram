@@ -205,3 +205,63 @@ QByteArray Crypto::aesIgeDecrypt(const QByteArray &data, const QByteArray &key32
     }
     return output;
 }
+
+// -- AES-256-CTR -------------------------------------------------------------------------------
+//
+// One continuous keystream for the life of a connection. The counter is a big-endian 128-bit
+// integer, incremented once per 16-byte block, and `offset` remembers how far into the current
+// block the stream has been consumed - a 3-byte write followed by a 5-byte write must produce the
+// same bytes as one 8-byte write, because the proxy on the other end makes no distinction.
+
+struct AesCtr::Private
+{
+    Aes256 *aes;
+    uchar counter[16];
+    uchar stream[16];
+    int offset;          // 0..15; 16 means "no keystream block in hand"
+
+    Private() : aes(0), offset(16) { memset(counter, 0, 16); memset(stream, 0, 16); }
+    ~Private() { delete aes; }
+};
+
+AesCtr::AesCtr()
+    : d(new Private)
+{
+}
+
+AesCtr::~AesCtr()
+{
+    delete d;
+}
+
+void AesCtr::init(const QByteArray &key32, const QByteArray &iv16)
+{
+    delete d->aes;
+    d->aes = 0;
+    d->offset = 16;
+    memset(d->stream, 0, 16);
+    if (key32.size() != 32 || iv16.size() != 16) return;
+    d->aes = new Aes256(key32);
+    memcpy(d->counter, iv16.constData(), 16);
+}
+
+bool AesCtr::isReady() const
+{
+    return d->aes != 0;
+}
+
+void AesCtr::apply(char *data, int size)
+{
+    if (!d->aes || size <= 0) return;
+    uchar *p = reinterpret_cast<uchar *>(data);
+    for (int i = 0; i < size; ++i) {
+        if (d->offset == 16) {
+            d->aes->encrypt(d->counter, d->stream);
+            // Big-endian increment, so the carry walks from the last byte.
+            for (int j = 15; j >= 0; --j)
+                if (++d->counter[j] != 0) break;
+            d->offset = 0;
+        }
+        p[i] ^= d->stream[d->offset++];
+    }
+}

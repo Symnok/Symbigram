@@ -97,6 +97,16 @@ struct TgMedia
 };
 
 /// One message, reduced to what a text-only client displays.
+/// A link whose visible text differs from its target (messageEntityTextUrl). Offsets and lengths
+/// are in UTF-16 code units, which is exactly how QString indexes - no conversion needed.
+struct TgTextLink
+{
+    TgTextLink() : offset(0), length(0) {}
+    int offset;
+    int length;
+    QString url;
+};
+
 struct TgMessage
 {
     TgMessage() : id(0), date(0), out(false), fromId(0), replyToId(0), topicId(0), viaBot(false), service(false), mentioned(false), editDate(0) {}
@@ -115,6 +125,7 @@ struct TgMessage
     bool mentioned;
     int editDate;
     QString forwardedFrom;
+    QList<TgTextLink> textLinks;   ///< hidden links; plain URLs in the text need no entity
     TgMedia media;
 };
 

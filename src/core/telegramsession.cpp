@@ -34,6 +34,7 @@ int TelegramSession::unixNow() { return int(QDateTime::currentDateTime().toTime_
 
 TelegramSession::TelegramSession(QObject *parent)
     : QObject(parent), m_moved(0), m_srp(0), m_state(Disconnected), m_dcId(TelegramServers::DefaultDc), m_signedIn(false),
+      m_mtprotoPort(0),
       m_stateDirty(false), m_qrExpires(0), m_passwordNeeded(false), m_movedDc(0), m_loggingOut(false),
       m_codeNeeded(false), m_codeLength(0), m_selfId(0),
       m_archiveHasMore(false), m_archiveLoaded(false), m_dialogsHaveMore(false), m_dialogsLoading(false),
@@ -198,19 +199,45 @@ void TelegramSession::connectToServer()
     m_client->setInfo(m_info);
     setState(Connecting);
     emit log(QString::fromLatin1("connecting to dc%1 (%2 key)").arg(m_dcId).arg(m_authKey.isValid() ? QLatin1String("stored") : QLatin1String("new")));
-    m_client->connectToDc(TelegramServers::hostFor(m_dcId), TelegramServers::DefaultPort, m_authKey);
+    m_client->connectToDc(dialHost(m_dcId), dialPort(), m_dcId, m_authKey);
 }
 
-void TelegramSession::setProxy(bool enabled, const QString &host, int port, const QString &user, const QString &pass)
+QString TelegramSession::dialHost(int dcId) const
 {
-    if (enabled && !host.isEmpty())
+    // With an MTProto proxy configured, every datacenter is reached through it; the dcId still
+    // travels, in the obfuscation init, so the proxy knows where to relay.
+    return m_mtprotoHost.isEmpty() ? TelegramServers::hostFor(dcId) : m_mtprotoHost;
+}
+
+int TelegramSession::dialPort() const
+{
+    return m_mtprotoHost.isEmpty() ? TelegramServers::DefaultPort : m_mtprotoPort;
+}
+
+void TelegramSession::setProxy(bool enabled, const QString &host, int port, const QString &user, const QString &pass,
+                               const QByteArray &mtprotoSecret)
+{
+    // An MTProto proxy is NOT a tunnel we negotiate through - it IS the server we dial. We open a
+    // plain TCP connection to it and name the datacenter we want inside the obfuscation init, and
+    // it relays. So there is no SOCKS5 handshake in that case: setting one here made the transport
+    // greet an MTProxy with a SOCKS5 greeting it never answers, and the connection just timed out.
+    const bool mtproto = enabled && !host.isEmpty() && !mtprotoSecret.isEmpty();
+    if (enabled && !host.isEmpty() && !mtproto)
         m_proxy = QNetworkProxy(QNetworkProxy::Socks5Proxy, host, quint16(port), user, pass);
     else
         m_proxy = QNetworkProxy(QNetworkProxy::NoProxy);
+
+    m_mtprotoSecret = enabled ? mtprotoSecret : QByteArray();
+    m_mtprotoHost = mtproto ? host : QString();
+    m_mtprotoPort = mtproto ? port : 0;
     m_client->setProxy(m_proxy);
-    if (m_moved) m_moved->setProxy(m_proxy);
+    m_client->setObfuscation(m_mtprotoSecret);
+    if (m_moved) { m_moved->setProxy(m_proxy); m_moved->setObfuscation(m_mtprotoSecret); }
     for (QHash<int, DcLink>::const_iterator it = m_dcLinks.constBegin(); it != m_dcLinks.constEnd(); ++it)
-        if (it.value().client) it.value().client->setProxy(m_proxy);
+        if (it.value().client) {
+            it.value().client->setProxy(m_proxy);
+            it.value().client->setObfuscation(m_mtprotoSecret);
+        }
 }
 
 void TelegramSession::disconnectFromServer()
@@ -399,12 +426,13 @@ void TelegramSession::handleLoginStep(const TgQrLoginStep &step, bool fromMovedD
         m_moved = new MtprotoClient(this);
         m_moved->setInfo(m_info);
         m_moved->setProxy(m_proxy);
+        m_moved->setObfuscation(m_mtprotoSecret);
         connect(m_moved, SIGNAL(connected()), this, SLOT(onMovedConnected()));
         connect(m_moved, SIGNAL(disconnected(QString)), this, SLOT(onMovedDisconnected(QString)));
         connect(m_moved, SIGNAL(rpcResult(quint64,QByteArray)), this, SLOT(onRpcResult(quint64,QByteArray)));
         connect(m_moved, SIGNAL(rpcError(quint64,int,QString)), this, SLOT(onRpcError(quint64,int,QString)));
         connect(m_moved, SIGNAL(log(QString)), this, SIGNAL(log(QString)));
-        m_moved->connectToDc(TelegramServers::hostFor(step.dcId), TelegramServers::DefaultPort);
+        m_moved->connectToDc(dialHost(step.dcId), dialPort(), step.dcId);
         break;
     }
 
@@ -1960,6 +1988,7 @@ MtprotoClient *TelegramSession::clientForDc(int dcId)
     link.client = new MtprotoClient(this);
     link.client->setInfo(m_info);
     link.client->setProxy(m_proxy);
+    link.client->setObfuscation(m_mtprotoSecret);
     link.client->setProperty("dcId", dcId);
     connect(link.client, SIGNAL(connected()), this, SLOT(onDcConnected()));
     connect(link.client, SIGNAL(disconnected(QString)), this, SLOT(onDcDisconnected(QString)));
@@ -1968,7 +1997,7 @@ MtprotoClient *TelegramSession::clientForDc(int dcId)
     connect(link.client, SIGNAL(log(QString)), this, SIGNAL(log(QString)));
     m_dcLinks.insert(dcId, link);
     emit log(QString::fromLatin1("opening dc%1 for files (%2 key)").arg(dcId).arg(m_dcKeys.contains(dcId) ? QLatin1String("stored") : QLatin1String("new")));
-    link.client->connectToDc(TelegramServers::hostFor(dcId), TelegramServers::DefaultPort, m_dcKeys.value(dcId));
+    link.client->connectToDc(dialHost(dcId), dialPort(), dcId, m_dcKeys.value(dcId));
     return link.client;
 }
 

@@ -66,12 +66,15 @@ class AppController : public QObject
     Q_PROPERTY(QStringList downloadDrives READ downloadDrives NOTIFY settingsChanged)
     Q_PROPERTY(int downloadDriveIndex READ downloadDriveIndex WRITE setDownloadDriveIndex NOTIFY settingsChanged)
     Q_PROPERTY(QString downloadFolder READ downloadFolder NOTIFY settingsChanged)
+    Q_PROPERTY(QString thumbnailCacheInfo READ thumbnailCacheInfo NOTIFY cacheChanged)
     Q_PROPERTY(bool downloadCustom READ downloadCustom NOTIFY settingsChanged)
     Q_PROPERTY(bool proxyEnabled READ proxyEnabled NOTIFY settingsChanged)
     Q_PROPERTY(QString proxyHost READ proxyHost NOTIFY settingsChanged)
     Q_PROPERTY(QString proxyPort READ proxyPort NOTIFY settingsChanged)
     Q_PROPERTY(QString proxyUser READ proxyUser NOTIFY settingsChanged)
     Q_PROPERTY(QString proxyPass READ proxyPass NOTIFY settingsChanged)
+    Q_PROPERTY(int proxyKind READ proxyKind NOTIFY settingsChanged)
+    Q_PROPERTY(QString proxySecret READ proxySecret NOTIFY settingsChanged)
     Q_PROPERTY(QString myName READ myName NOTIFY selfChanged)
     Q_PROPERTY(QString mySubtitle READ mySubtitle NOTIFY selfChanged)
     Q_PROPERTY(ChatsModel *chats READ chats CONSTANT)
@@ -160,6 +163,9 @@ public:
     QString proxyPort() const;
     QString proxyUser() const;
     QString proxyPass() const;
+    /// 0 = SOCKS5, 1 = MTProto proxy.
+    int proxyKind() const;
+    QString proxySecret() const;
     QString myName() const;
     QString mySubtitle() const;
     ChatsModel *chats() const { return m_chats; }
@@ -170,7 +176,9 @@ public:
     /// True when the peer is a forum supergroup (its chat opens as a topic list).
     Q_INVOKABLE bool isForum(const QString &peerKey) const;
     QString notice() const { return m_notice; }
-    QString cacheSize() const;                     // human-readable size of the media cache
+    QString cacheSize() const;                              // human-readable size of the media cache
+    /// Size and location of the picker thumbnails, which Clear cache leaves alone.
+    QString thumbnailCacheInfo() const;
     bool autotest() const;
     QString autotestPeer() const;
     bool autotestFolder() const;
@@ -226,8 +234,20 @@ public slots:
     void startSecretChat(const QString &peerKey);
     /// Opens a native folder picker so the user can choose any download folder.
     void chooseDownloadFolder();
-    /// Store SOCKS5 proxy settings, apply them, and reconnect so they take effect.
-    void saveProxy(bool enabled, const QString &host, const QString &port, const QString &user, const QString &pass);
+    /// Store the proxy settings, apply them, and reconnect so they take effect. `kind` is
+    /// 0 for SOCKS5 or 1 for an MTProto proxy, whose `secret` is hex or base64url.
+    void saveProxy(bool enabled, const QString &host, const QString &port, const QString &user,
+                    const QString &pass, int kind, const QString &secret);
+    /// Fills the proxy settings from a shared tg://proxy or t.me/proxy link and applies them at
+    /// once - for the Settings dialog, where the intent is already explicit. Reports what went
+    /// wrong through the notice banner and returns false.
+    bool applyProxyLink(const QString &link);
+    /// The same link tapped in a chat: asks first (proxyLinkOffered) instead of applying, because
+    /// it reroutes every connection through someone else's server. Returns true when the link was
+    /// a proxy link at all, handled or refused.
+    bool offerProxyLink(const QString &link);
+    /// Applies the link last offered. Called from the confirmation dialog.
+    void acceptProxyLink();
     void setProxyEnabled(bool on);
     void openUrl(const QString &url);
     void copyText(const QString &text);
@@ -248,6 +268,8 @@ signals:
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
+    /// A proxy link was tapped: `target` is "server:port", `mtproto` picks the wording.
+    void proxyLinkOffered(const QString &target, bool mtproto);
     /// A t.me link that points at one message: open peerKey and jump to msgId.
     void openMessageRequested(const QString &peerKey, int msgId);
     void peerSearchChanged();                         // the forward-picker search list changed
@@ -286,6 +308,15 @@ private:
     static QStringList presentDriveLetters();      // among C:, E:, F: which exist
     static QString folderForDrive(const QString &drive);
     void applyDownloadFolder();                    // create it + hand it to the chat model
+    /// A hex or base64url secret as bytes; empty when it is neither.
+    static QByteArray decodeProxySecret(const QString &text);
+    /// Pulls server/port/secret (or SOCKS5 credentials) out of a proxy link into the m_pending*
+    /// members. False with a reason in `error` when the link is unusable.
+    bool parseProxyLink(const QString &link, QString *error);
+    /// Totals (remove == false) or deletes (true) the contents of the Symbigram
+    /// download folder on every fitted drive. The language add-on packs and the
+    /// picker thumbnails are excluded; see the .cpp.
+    qint64 sweepDownloadFolders(bool remove) const;
     void applyProxy();                             // push current settings to the session + reconnect
 
     QSettings m_settings;
@@ -307,6 +338,13 @@ private:
     QVariantList m_peerSearchResults;   // forward-picker: local chats + server people
     QString m_peerSearchQuery;          // the query the current results are for (drops stale replies)
     int m_linkMsgId;                    // message a pending t.me link resolve should jump to
+    // The proxy link awaiting confirmation (see offerProxyLink).
+    QString m_pendingProxyServer;
+    QString m_pendingProxyPort;
+    QString m_pendingProxySecret;
+    QString m_pendingProxyUser;
+    QString m_pendingProxyPass;
+    bool m_pendingProxyMtproto;
     QString m_state;
     bool m_busy;
     QString m_loginError;

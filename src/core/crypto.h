@@ -35,4 +35,34 @@ namespace Crypto
     bool constantTimeEquals(const QByteArray &a, const QByteArray &b);
 }
 
+/// AES-256 in CTR mode, as one continuous keystream across many calls - what an MTProto proxy
+/// wraps the whole TCP stream in (see mtprototransport.cpp). Deliberately stateful: the counter
+/// and the position inside the current keystream block carry over, so a packet boundary is not a
+/// block boundary. One object per direction per connection; not copyable, and not thread-safe.
+///
+/// CTR needs only the forward direction of the cipher, which is why encrypting and decrypting are
+/// the same call. The key schedule is built once, in the constructor's wake, rather than per
+/// block: the stream covers every byte on the wire, including file downloads.
+class AesCtr
+{
+public:
+    AesCtr();
+    ~AesCtr();
+
+    /// 32-byte key, 16-byte initial counter block. Safe to call again to restart a connection.
+    void init(const QByteArray &key32, const QByteArray &iv16);
+    bool isReady() const;
+
+    /// XORs `size` bytes in place with the keystream, advancing it.
+    void apply(char *data, int size);
+    void apply(QByteArray &data) { apply(data.data(), data.size()); }
+
+private:
+    struct Private;
+    Private *d;
+
+    AesCtr(const AesCtr &);               // not copyable: the keystream position is unique
+    AesCtr &operator=(const AesCtr &);
+};
+
 #endif // CRYPTO_H

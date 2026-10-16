@@ -1,6 +1,8 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "messagesmodel.h"
+
+#include <QRegExp>
 #include "chatsmodel.h"
 #include "mediacache.h"
 #include "voiceplayer.h"
@@ -111,6 +113,9 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
     roles[BodyRole] = "body";
+    roles[BodyHtmlRole] = "bodyHtml";
+    roles[LinkCountRole] = "linkCount";
+    roles[LinkTargetsRole] = "linkTargets";
     roles[NoteRole] = "note";
     roles[OutRole] = "out";
     roles[SenderRole] = "sender";
@@ -202,6 +207,85 @@ QString MessagesModel::dateText(int unixTime)
     return d.toString(QLatin1String("d MMMM yyyy"));
 }
 
+
+namespace
+{
+    QString escapeHtml(const QString &text)
+    {
+        QString out = text;
+        out.replace(QLatin1Char('&'), QLatin1String("&amp;"));
+        out.replace(QLatin1Char('<'), QLatin1String("&lt;"));
+        out.replace(QLatin1Char('>'), QLatin1String("&gt;"));
+        return out;
+    }
+
+    QString anchor(const QString &href, const QString &shown)
+    {
+        return QLatin1String("<a href=") + QLatin1Char('\"') + escapeHtml(href) + QLatin1Char('\"')
+             + QLatin1String("><font color=") + QLatin1Char('\"') + QLatin1String("#8fd1ff")
+             + QLatin1Char('\"') + QLatin1Char('>') + shown + QLatin1String("</font></a>");
+    }
+
+    /// Anchors the plain URLs and @mentions inside one stretch of ordinary text. An @name becomes
+    /// a t.me link so it goes through the same "open it inside Symbigram" path as a real link.
+    QString linkifyPlain(const QString &text, QStringList *targets)
+    {
+        static QRegExp re(QLatin1String("(https?://|www\\.)[^\\s<]+|(^|[\\s(\\[])@([A-Za-z][A-Za-z0-9_]{4,31})"));
+        QString out;
+        int pos = 0;
+        while (pos < text.size()) {
+            const int at = re.indexIn(text, pos);
+            if (at < 0) break;
+            const QString whole = re.cap(0);
+            const QString mention = re.cap(3);
+            out += escapeHtml(text.mid(pos, at - pos));
+            if (!mention.isEmpty()) {
+                // cap(2) is the single character before the @, which is not part of the link.
+                out += escapeHtml(re.cap(2));
+                const QString href = QLatin1String("https://t.me/") + mention;
+                out += anchor(href, escapeHtml(QLatin1Char('@') + mention));
+                if (targets) *targets << href;
+            } else {
+                const QString href = whole.startsWith(QLatin1String("http"))
+                                   ? whole : QLatin1String("http://") + whole;
+                out += anchor(href, escapeHtml(whole));
+                if (targets) *targets << href;
+            }
+            pos = at + whole.size();
+        }
+        out += escapeHtml(text.mid(pos));
+        return out;
+    }
+}
+
+QString MessagesModel::buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
+                                     QStringList *targets)
+{
+    if (links.isEmpty()) return linkifyPlain(text, targets);
+
+    // Entity offsets index the original text, so it is walked in order and only the stretches
+    // between entities get the plain-URL treatment.
+    QList<TgTextLink> sorted = links;
+    for (int i = 1; i < sorted.size(); ++i)               // small lists; insertion sort is plenty
+        for (int j = i; j > 0 && sorted.at(j).offset < sorted.at(j - 1).offset; --j)
+            sorted.swap(j, j - 1);
+
+    QString out;
+    int pos = 0;
+    for (int i = 0; i < sorted.size(); ++i) {
+        const TgTextLink &l = sorted.at(i);
+        if (l.offset < pos || l.offset > text.size()) continue;          // overlapping or past the end
+        const int len = qMin(l.length, text.size() - l.offset);
+        if (len <= 0) continue;
+        out += linkifyPlain(text.mid(pos, l.offset - pos), targets);
+        out += anchor(l.url, escapeHtml(text.mid(l.offset, len)));
+        if (targets) *targets << l.url;
+        pos = l.offset + len;
+    }
+    out += linkifyPlain(text.mid(pos), targets);
+    return out;
+}
+
 QVariant MessagesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= m_rows.size()) return QVariant();
@@ -210,6 +294,17 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case MsgIdRole: return m.id;
     case BodyRole: return stripEmoji(m.text);
+    case BodyHtmlRole: return buildBodyHtml(stripEmoji(m.text), m.textLinks, 0);
+    case LinkCountRole: {
+        QStringList targets;
+        buildBodyHtml(stripEmoji(m.text), m.textLinks, &targets);
+        return targets.size();
+    }
+    case LinkTargetsRole: {
+        QStringList targets;
+        buildBodyHtml(stripEmoji(m.text), m.textLinks, &targets);
+        return targets;
+    }
     case NoteRole: return stripEmoji(m.note);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);

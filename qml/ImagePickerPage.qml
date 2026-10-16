@@ -80,11 +80,11 @@ Page {
 
                 // Delegates exist only for cells in or near view, so this asks for exactly the
                 // thumbnails that are needed, in the order they are revealed.
-                Component.onCompleted: if (model.thumb == "") app.imagePicker.requestThumb(index, grid.cellWidth)
+                Component.onCompleted: if (model.thumb == "" && !model.thumbFailed) app.imagePicker.requestThumb(index, grid.cellWidth)
 
                 BusyIndicator {
                     anchors.centerIn: parent
-                    running: model.thumb == "" || thumb.status == Image.Loading
+                    running: (model.thumb == "" && !model.thumbFailed) || thumb.status == Image.Loading
                     visible: running
                     width: platformStyle.graphicSizeSmall
                     height: platformStyle.graphicSizeSmall
@@ -93,7 +93,7 @@ Page {
                 // A picture the phone cannot decode should not look like an empty cell.
                 Label {
                     anchors.centerIn: parent
-                    visible: thumb.status == Image.Error
+                    visible: model.thumbFailed || thumb.status == Image.Error
                     text: "?"
                     color: platformStyle.colorNormalMid
                 }
