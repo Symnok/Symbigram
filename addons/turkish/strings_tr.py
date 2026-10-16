@@ -5,6 +5,10 @@
 # fallback: when the application gains new strings this file can lag behind without breaking
 # anything. Rebuild the pack with addons/turkish/build.py after changing it.
 TR = {
+"hex or base64, from the proxy link": "proxy bağlantısından, hex veya base64",
+"the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "proxy TLS ile yanıt vermedi - anahtar yanlış ya da bu bir FakeTLS proxy değil",
+"the proxy failed its TLS check - wrong secret, or the phone's clock is off": "proxy TLS denetimini geçemedi - anahtar yanlış ya da telefonun saati bozuk",
+"the proxy sent a malformed TLS record": "proxy bozuk bir TLS kaydı gönderdi",
 "Proxy": "Proxy",
 "Type": "Tür",
 "Secret": "Gizli anahtar",

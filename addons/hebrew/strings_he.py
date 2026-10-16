@@ -7,6 +7,10 @@
 #
 # Moved out of tools/translate.py when Hebrew became an add-on, so this is now the only copy.
 TABLE = {
+"hex or base64, from the proxy link": "hex או base64, מתוך קישור הפרוקסי",
+"the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "הפרוקסי לא ענה ב-TLS - סוד שגוי, או שאינו פרוקסי FakeTLS",
+"the proxy failed its TLS check - wrong secret, or the phone's clock is off": "הפרוקסי נכשל בבדיקת ה-TLS - סוד שגוי, או שהשעון של הטלפון אינו מדויק",
+"the proxy sent a malformed TLS record": "הפרוקסי שלח רשומת TLS פגומה",
 "Proxy": "פרוקסי",
 "Type": "סוג",
 "Secret": "סוד",

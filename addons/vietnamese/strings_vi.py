@@ -7,6 +7,10 @@
 #
 # Moved out of tools/translate.py when Vietnamese became an add-on, so this is now the only copy.
 TABLE = {
+"hex or base64, from the proxy link": "hex hoặc base64, lấy từ liên kết proxy",
+"the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "proxy không trả lời bằng TLS - sai khóa bí mật, hoặc đây không phải proxy FakeTLS",
+"the proxy failed its TLS check - wrong secret, or the phone's clock is off": "proxy không qua được kiểm tra TLS - sai khóa bí mật, hoặc đồng hồ điện thoại bị sai",
+"the proxy sent a malformed TLS record": "proxy đã gửi một bản ghi TLS hỏng",
 "Proxy": "Proxy",
 "Type": "Loại",
 "Secret": "Khóa bí mật",

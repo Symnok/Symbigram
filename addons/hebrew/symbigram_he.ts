@@ -69,9 +69,9 @@
     <message>
         <location filename="../../src/app/appcontroller.cpp" line="355" />
         <location filename="../../src/app/appcontroller.cpp" line="668" />
-        <location filename="../../src/app/appcontroller.cpp" line="1148" />
-        <location filename="../../src/app/appcontroller.cpp" line="1228" />
-        <location filename="../../src/app/appcontroller.cpp" line="1348" />
+        <location filename="../../src/app/appcontroller.cpp" line="1145" />
+        <location filename="../../src/app/appcontroller.cpp" line="1225" />
+        <location filename="../../src/app/appcontroller.cpp" line="1345" />
         <source>Not connected.</source>
         <translation>לא מחובר.</translation>
     </message>
@@ -253,138 +253,133 @@
         <translation>בקישור חסר השרת או הפורט.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="784" />
-        <source>This proxy needs FakeTLS, which Symbigram cannot do yet.</source>
-        <translation>הפרוקסי הזה דורש FakeTLS, ש-Symbigram עדיין אינו תומך בו.</translation>
-    </message>
-    <message>
-        <location filename="../../src/app/appcontroller.cpp" line="789" />
+        <location filename="../../src/app/appcontroller.cpp" line="786" />
         <source>That secret is not a valid length.</source>
         <translation>אורך הסוד אינו תקין.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="827" />
+        <location filename="../../src/app/appcontroller.cpp" line="824" />
         <source>Proxy set to %1:%2.</source>
         <translation>הפרוקסי הוגדר ל-%1:%2.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="955" />
+        <location filename="../../src/app/appcontroller.cpp" line="952" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>החיבור אבד: %1. מתחבר מחדש...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="956" />
+        <location filename="../../src/app/appcontroller.cpp" line="953" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>החיבור נכשל: %1. מנסה שוב...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1061" />
+        <location filename="../../src/app/appcontroller.cpp" line="1058" />
         <source>Enter the password.</source>
         <translation>הזינו את הסיסמה.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1086" />
+        <location filename="../../src/app/appcontroller.cpp" line="1083" />
         <source>Enter your phone number.</source>
         <translation>הזינו את מספר הטלפון שלכם.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1096" />
+        <location filename="../../src/app/appcontroller.cpp" line="1093" />
         <source>Enter the code.</source>
         <translation>הזינו את הקוד.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1158" />
+        <location filename="../../src/app/appcontroller.cpp" line="1155" />
         <source>Added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1158" />
+        <location filename="../../src/app/appcontroller.cpp" line="1155" />
         <source>%1 added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1202" />
+        <location filename="../../src/app/appcontroller.cpp" line="1199" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1229" />
+        <location filename="../../src/app/appcontroller.cpp" line="1226" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1303" />
+        <location filename="../../src/app/appcontroller.cpp" line="1300" />
         <source>Secret chats can only be started with a person.</source>
         <translation>ניתן להתחיל צ'אטים סודיים רק עם אדם.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1305" />
+        <location filename="../../src/app/appcontroller.cpp" line="1302" />
         <source>Starting a secret chat...</source>
         <translation>מתחיל צ'אט סודי...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1312" />
+        <location filename="../../src/app/appcontroller.cpp" line="1309" />
         <source>Someone wants to start a secret chat.</source>
         <translation>מישהו רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1313" />
+        <location filename="../../src/app/appcontroller.cpp" line="1310" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 רוצה להתחיל צ'אט סודי.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1315" />
-        <location filename="../../src/app/appcontroller.cpp" line="1336" />
+        <location filename="../../src/app/appcontroller.cpp" line="1312" />
+        <location filename="../../src/app/appcontroller.cpp" line="1333" />
         <source>Secret chat</source>
         <translation>צ'אט סודי</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1315" />
+        <location filename="../../src/app/appcontroller.cpp" line="1312" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 רוצה להתחיל צ'אט סודי</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1322" />
+        <location filename="../../src/app/appcontroller.cpp" line="1319" />
         <source>Secret chat is ready.</source>
         <translation>הצ'אט הסודי מוכן.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1336" />
+        <location filename="../../src/app/appcontroller.cpp" line="1333" />
         <source>Encrypted message</source>
         <translation>הודעה מוצפנת</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1350" />
+        <location filename="../../src/app/appcontroller.cpp" line="1347" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>תמונות (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1350" />
+        <location filename="../../src/app/appcontroller.cpp" line="1347" />
         <source>All files (*)</source>
         <translation>כל הקבצים (*)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1351" />
+        <location filename="../../src/app/appcontroller.cpp" line="1348" />
         <source>Choose an image</source>
         <translation>בחירת תמונה</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1351" />
+        <location filename="../../src/app/appcontroller.cpp" line="1348" />
         <source>Choose a file</source>
         <translation>בחירת קובץ</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1359" />
+        <location filename="../../src/app/appcontroller.cpp" line="1356" />
         <source>Sending the image...</source>
         <translation>שולח את התמונה...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1359" />
+        <location filename="../../src/app/appcontroller.cpp" line="1356" />
         <source>Sending the file...</source>
         <translation>שולח את הקובץ...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1370" />
+        <location filename="../../src/app/appcontroller.cpp" line="1367" />
         <source>Copied.</source>
         <translation>הועתק.</translation>
     </message>
@@ -1544,12 +1539,12 @@
 <context>
     <name>MtprotoClient</name>
     <message>
-        <location filename="../../src/core/mtprotoclient.cpp" line="118" />
+        <location filename="../../src/core/mtprotoclient.cpp" line="126" />
         <source>key exchange failed: %1</source>
         <translation>החלפת המפתחות נכשלה: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprotoclient.cpp" line="254" />
+        <location filename="../../src/core/mtprotoclient.cpp" line="262" />
         <source>no response from the server</source>
         <translation>אין תגובה מהשרת</translation>
     </message>
@@ -1557,52 +1552,63 @@
 <context>
     <name>MtprotoTransport</name>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="83" />
-        <source>this proxy needs FakeTLS (an "ee" secret), which is not supported yet</source>
-        <translation>הפרוקסי הזה דורש FakeTLS (סוד ee), שעדיין אינו נתמך</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="84" />
+        <location filename="../../src/core/mtprototransport.cpp" line="97" />
         <source>the proxy secret must be 32 or 34 hex characters</source>
         <translation>הסוד של הפרוקסי חייב להיות 32 או 34 תווים הקסדצימליים</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="170" />
+        <location filename="../../src/core/mtprototransport.cpp" line="192" />
+        <source>the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy</source>
+        <translation>הפרוקסי לא ענה ב-TLS - סוד שגוי, או שאינו פרוקסי FakeTLS</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="201" />
+        <source>the proxy failed its TLS check - wrong secret, or the phone's clock is off</source>
+        <translation>הפרוקסי נכשל בבדיקת ה-TLS - סוד שגוי, או שהשעון של הטלפון אינו מדויק</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="217" />
+        <location filename="../../src/core/mtprototransport.cpp" line="416" />
+        <source>the proxy sent a malformed TLS record</source>
+        <translation>הפרוקסי שלח רשומת TLS פגומה</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="240" />
         <source>could not generate the proxy handshake</source>
         <translation>לא ניתן היה ליצור את לחיצת היד של הפרוקסי</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="185" />
+        <location filename="../../src/core/mtprototransport.cpp" line="255" />
         <source>could not set up proxy encryption</source>
         <translation>לא ניתן היה להגדיר הצפנה לפרוקסי</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="288" />
+        <location filename="../../src/core/mtprototransport.cpp" line="360" />
         <source>the proxy refused our authentication method</source>
         <translation>הפרוקסי דחה את שיטת האימות שלנו</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="293" />
+        <location filename="../../src/core/mtprototransport.cpp" line="365" />
         <source>proxy authentication failed - check the username and password</source>
         <translation>אימות הפרוקסי נכשל — בדקו את שם המשתמש והסיסמה</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="303" />
+        <location filename="../../src/core/mtprototransport.cpp" line="375" />
         <source>the proxy sent a malformed reply</source>
         <translation>הפרוקסי שלח תגובה פגומה</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="306" />
+        <location filename="../../src/core/mtprototransport.cpp" line="378" />
         <source>the proxy could not reach the server (%1)</source>
         <translation>הפרוקסי לא הצליח להגיע לשרת (%1)</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="370" />
+        <location filename="../../src/core/mtprototransport.cpp" line="453" />
         <source>connection closed</source>
         <translation>החיבור נסגר</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="375" />
+        <location filename="../../src/core/mtprototransport.cpp" line="458" />
         <source>connection timed out</source>
         <translation>תם הזמן הקצוב לחיבור</translation>
     </message>
@@ -1750,7 +1756,7 @@
     <name>SettingsPage</name>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="15" />
-        <location filename="../../qml/SettingsPage.qml" line="359" />
+        <location filename="../../qml/SettingsPage.qml" line="382" />
         <source>Clear cache</source>
         <translation>ניקוי המטמון</translation>
     </message>
@@ -1767,20 +1773,20 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="25" />
-        <location filename="../../qml/SettingsPage.qml" line="428" />
+        <location filename="../../qml/SettingsPage.qml" line="451" />
         <source>App language</source>
         <translation>שפת היישום</translation>
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="36" />
-        <location filename="../../qml/SettingsPage.qml" line="166" />
-        <location filename="../../qml/SettingsPage.qml" line="167" />
+        <location filename="../../qml/SettingsPage.qml" line="189" />
+        <location filename="../../qml/SettingsPage.qml" line="190" />
         <source>System default</source>
         <translation>ברירת המחדל של המערכת</translation>
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="51" />
-        <location filename="../../qml/SettingsPage.qml" line="283" />
+        <location filename="../../qml/SettingsPage.qml" line="306" />
         <source>Save downloads to</source>
         <translation>שמירת הורדות אל</translation>
     </message>
@@ -1791,13 +1797,13 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="75" />
-        <location filename="../../qml/SettingsPage.qml" line="309" />
+        <location filename="../../qml/SettingsPage.qml" line="332" />
         <source>Image preview</source>
         <translation type="unfinished" />
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="82" />
-        <location filename="../../qml/SettingsPage.qml" line="325" />
+        <location filename="../../qml/SettingsPage.qml" line="348" />
         <source>Font size</source>
         <translation type="unfinished" />
     </message>
@@ -1808,7 +1814,7 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="89" />
-        <location filename="../../qml/SettingsPage.qml" line="237" />
+        <location filename="../../qml/SettingsPage.qml" line="260" />
         <source>Proxy</source>
         <translation>פרוקסי</translation>
     </message>
@@ -1818,162 +1824,162 @@
         <translation>שמירה</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="99" />
+        <location filename="../../qml/SettingsPage.qml" line="118" />
         <source>Type</source>
         <translation>סוג</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="103" />
+        <location filename="../../qml/SettingsPage.qml" line="122" />
         <source>SOCKS5</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="104" />
+        <location filename="../../qml/SettingsPage.qml" line="123" />
         <source>MTProto</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="107" />
+        <location filename="../../qml/SettingsPage.qml" line="126" />
         <source>Server</source>
         <translation>שרת</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="108" />
+        <location filename="../../qml/SettingsPage.qml" line="127" />
         <source>host or IP</source>
         <translation>מארח או IP</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="109" />
+        <location filename="../../qml/SettingsPage.qml" line="128" />
         <source>Port</source>
         <translation>יציאה</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="113" />
+        <location filename="../../qml/SettingsPage.qml" line="132" />
         <source>Username (optional)</source>
         <translation>שם משתמש (רשות)</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="115" />
+        <location filename="../../qml/SettingsPage.qml" line="134" />
         <source>Password (optional)</source>
         <translation>סיסמה (רשות)</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="119" />
+        <location filename="../../qml/SettingsPage.qml" line="138" />
         <source>Secret</source>
         <translation>סוד</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="124" />
-        <source>32 or 34 hex characters</source>
-        <translation>32 או 34 תווים הקסדצימליים</translation>
-    </message>
-    <message>
-        <location filename="../../qml/SettingsPage.qml" line="133" />
+        <location filename="../../qml/SettingsPage.qml" line="152" />
         <source>Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.</source>
         <translation>או הדביקו קישור tg://proxy או t.me/proxy שלם בשדה הסוד והקישו על השתמש בקישור.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="138" />
+        <location filename="../../qml/SettingsPage.qml" line="157" />
         <source>Use link</source>
         <translation>השתמש בקישור</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="173" />
+        <location filename="../../qml/SettingsPage.qml" line="196" />
         <source>Settings</source>
         <translation>הגדרות</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="190" />
+        <location filename="../../qml/SettingsPage.qml" line="213" />
         <source>Notifications</source>
         <translation>התראות</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="194" />
+        <location filename="../../qml/SettingsPage.qml" line="217" />
         <source>Popup: %1, Sound: %2, Vibration: %3</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="198" />
+        <location filename="../../qml/SettingsPage.qml" line="221" />
         <source>Off</source>
         <translation>כבוי</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="212" />
+        <location filename="../../qml/SettingsPage.qml" line="235" />
         <source>Popup, sound and vibration for messages that arrive while another application is in front.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="221" />
+        <location filename="../../qml/SettingsPage.qml" line="244" />
         <source>Connect on start</source>
         <translation>התחברות בעת ההפעלה</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="255" />
+        <location filename="../../qml/SettingsPage.qml" line="278" />
         <source>Proxy server</source>
         <translation>שרת פרוקסי</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="258" />
+        <location filename="../../qml/SettingsPage.qml" line="281" />
         <source>not set</source>
         <translation>לא הוגדר</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="260" />
+        <location filename="../../qml/SettingsPage.qml" line="283" />
         <source> (MTProto)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="260" />
+        <location filename="../../qml/SettingsPage.qml" line="283" />
         <source> (SOCKS5)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="274" />
+        <location filename="../../qml/SettingsPage.qml" line="297" />
         <source>Route the connection through a SOCKS5 or MTProto proxy. Changing it reconnects.</source>
         <translation>לנתב את החיבור דרך פרוקסי SOCKS5 או MTProto. שינוי גורם לחיבור מחדש.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="362" />
+        <location filename="../../qml/SettingsPage.qml" line="385" />
         <source>Cached media and downloaded files: %1</source>
         <translation>מדיה במחסן וקבצים שהורדו: %1</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="378" />
+        <location filename="../../qml/SettingsPage.qml" line="401" />
         <source>Image thumbnails</source>
         <translation>תמונות ממוזערות</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="300" />
+        <location filename="../../qml/SettingsPage.qml" line="323" />
         <source>Saved photos and files go here. Pick a drive, or "Choose folder..." for any folder.</source>
         <translation>תמונות וקבצים שנשמרו יגיעו לכאן. בחרו כונן, או «בחירת תיקייה...» לכל תיקייה שהיא.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="342" />
+        <location filename="../../qml/SettingsPage.qml" line="143" />
+        <source>hex or base64, from the proxy link</source>
+        <translation>hex או base64, מתוך קישור הפרוקסי</translation>
+    </message>
+    <message>
+        <location filename="../../qml/SettingsPage.qml" line="365" />
         <source>The size of the message text in chats. Small is the original size.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="351" />
+        <location filename="../../qml/SettingsPage.qml" line="374" />
         <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="393" />
+        <location filename="../../qml/SettingsPage.qml" line="416" />
         <source>The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.</source>
         <translation>המחסן הפרטי של האפליקציה לתמונות, לתמונות פרופיל ולקבצים שהורדו, וגם עותקי העבודה שלה. ניקוי פשוט יוריד אותם מחדש לפי הצורך. קבצים ששמרתם או פתחתם בעצמכם לא ייגעו.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="402" />
+        <location filename="../../qml/SettingsPage.qml" line="425" />
         <source>Keep a log</source>
         <translation>שמירת יומן</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="419" />
+        <location filename="../../qml/SettingsPage.qml" line="442" />
         <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
         <translation>כבוי כברירת מחדל. הפעילו רק כדי לאסוף יומן אבחון (מוצג בעמוד «אודות») כשמשהו משתבש.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="450" />
+        <location filename="../../qml/SettingsPage.qml" line="473" />
         <source>Takes effect after the app is restarted.</source>
         <translation>ייכנס לתוקף לאחר הפעלה מחדש של היישום.</translation>
     </message>
@@ -1982,231 +1988,231 @@
     <name>TelegramSession</name>
     <message>
         <location filename="../../src/core/telegramsession.cpp" line="156" />
-        <location filename="../../src/core/telegramsession.cpp" line="280" />
-        <location filename="../../src/core/telegramsession.cpp" line="554" />
-        <location filename="../../src/core/telegramsession.cpp" line="560" />
-        <location filename="../../src/core/telegramsession.cpp" line="1125" />
-        <location filename="../../src/core/telegramsession.cpp" line="1586" />
+        <location filename="../../src/core/telegramsession.cpp" line="281" />
+        <location filename="../../src/core/telegramsession.cpp" line="556" />
+        <location filename="../../src/core/telegramsession.cpp" line="562" />
+        <location filename="../../src/core/telegramsession.cpp" line="1127" />
+        <location filename="../../src/core/telegramsession.cpp" line="1588" />
         <source>Signed out.</source>
         <translation>התנתקתם.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="251" />
-        <location filename="../../src/core/telegramsession.cpp" line="878" />
-        <location filename="../../src/core/telegramsession.cpp" line="2183" />
-        <location filename="../../src/core/telegramsession.cpp" line="2211" />
+        <location filename="../../src/core/telegramsession.cpp" line="252" />
+        <location filename="../../src/core/telegramsession.cpp" line="880" />
+        <location filename="../../src/core/telegramsession.cpp" line="2186" />
+        <location filename="../../src/core/telegramsession.cpp" line="2214" />
         <source>Not connected.</source>
         <translation>לא מחובר.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="352" />
+        <location filename="../../src/core/telegramsession.cpp" line="353" />
         <source>Enter a valid phone number, with the country code.</source>
         <translation>הזינו מספר טלפון תקין, עם קידומת המדינה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="368" />
-        <location filename="../../src/core/telegramsession.cpp" line="1576" />
+        <location filename="../../src/core/telegramsession.cpp" line="369" />
+        <location filename="../../src/core/telegramsession.cpp" line="1578" />
         <source>Enter the code.</source>
         <translation>הזינו את הקוד.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="500" />
+        <location filename="../../src/core/telegramsession.cpp" line="502" />
         <source>Enter the password.</source>
         <translation>הזינו את הסיסמה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="877" />
+        <location filename="../../src/core/telegramsession.cpp" line="879" />
         <source>Enter a username, a phone number or a name.</source>
         <translation>הזינו שם משתמש, מספר טלפון או שם.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="946" />
-        <location filename="../../src/core/telegramsession.cpp" line="978" />
+        <location filename="../../src/core/telegramsession.cpp" line="948" />
+        <location filename="../../src/core/telegramsession.cpp" line="980" />
         <source>That folder no longer exists.</source>
         <translation>התיקייה הזו כבר אינה קיימת.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1088" />
+        <location filename="../../src/core/telegramsession.cpp" line="1090" />
         <source>This account has no password set.</source>
         <translation>לחשבון זה לא הוגדרה סיסמה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1089" />
+        <location filename="../../src/core/telegramsession.cpp" line="1091" />
         <source>Unsupported password method.</source>
         <translation>שיטת סיסמה לא נתמכת.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1118" />
-        <location filename="../../src/core/telegramsession.cpp" line="1578" />
+        <location filename="../../src/core/telegramsession.cpp" line="1120" />
+        <location filename="../../src/core/telegramsession.cpp" line="1580" />
         <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
         <translation>אין חשבון טלגרם שמשתמש במספר זה. הרשמה אינה נתמכת כאן.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1316" />
+        <location filename="../../src/core/telegramsession.cpp" line="1318" />
         <source>User blocked.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1384" />
+        <location filename="../../src/core/telegramsession.cpp" line="1386" />
         <source>the server rejected a part of the file</source>
         <translation>השרת דחה חלק מהקובץ</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1407" />
+        <location filename="../../src/core/telegramsession.cpp" line="1409" />
         <source>the file is served from a CDN, which is not supported</source>
         <translation>הקובץ מוגש מ-CDN, שאינו נתמך</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1408" />
+        <location filename="../../src/core/telegramsession.cpp" line="1410" />
         <source>unexpected reply</source>
         <translation>תגובה בלתי צפויה</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1411" />
+        <location filename="../../src/core/telegramsession.cpp" line="1413" />
         <source>could not write the file</source>
         <translation>לא ניתן היה לכתוב את הקובץ</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1438" />
-        <location filename="../../src/core/telegramsession.cpp" line="1447" />
-        <location filename="../../src/core/telegramsession.cpp" line="1635" />
+        <location filename="../../src/core/telegramsession.cpp" line="1440" />
+        <location filename="../../src/core/telegramsession.cpp" line="1449" />
+        <location filename="../../src/core/telegramsession.cpp" line="1637" />
         <source>Nobody found.</source>
         <translation>לא נמצא אף אחד.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1508" />
+        <location filename="../../src/core/telegramsession.cpp" line="1510" />
         <source>The session was ended (%1). Please sign in again.</source>
         <translation>ההפעלה הסתיימה (%1). אנא היכנסו שוב.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1545" />
+        <location filename="../../src/core/telegramsession.cpp" line="1547" />
         <source>Wrong password.</source>
         <translation>סיסמה שגויה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1546" />
-        <location filename="../../src/core/telegramsession.cpp" line="1555" />
-        <location filename="../../src/core/telegramsession.cpp" line="1580" />
+        <location filename="../../src/core/telegramsession.cpp" line="1548" />
+        <location filename="../../src/core/telegramsession.cpp" line="1557" />
+        <location filename="../../src/core/telegramsession.cpp" line="1582" />
         <source>Too many attempts. Wait %1 seconds.</source>
         <translation>יותר מדי ניסיונות. המתינו %1 שניות.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1556" />
+        <location filename="../../src/core/telegramsession.cpp" line="1558" />
         <source>That phone number is not valid.</source>
         <translation>מספר הטלפון הזה אינו תקין.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1557" />
+        <location filename="../../src/core/telegramsession.cpp" line="1559" />
         <source>That phone number is banned from Telegram.</source>
         <translation>מספר הטלפון הזה חסום בטלגרם.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1558" />
+        <location filename="../../src/core/telegramsession.cpp" line="1560" />
         <source>Too many codes requested for this number. Try again later.</source>
         <translation>התבקשו יותר מדי קודים למספר זה. נסו שוב מאוחר יותר.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1559" />
+        <location filename="../../src/core/telegramsession.cpp" line="1561" />
         <source>Too many attempts. Try again later.</source>
         <translation>יותר מדי ניסיונות. נסו שוב מאוחר יותר.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1560" />
+        <location filename="../../src/core/telegramsession.cpp" line="1562" />
         <source>This build's Telegram API key was rejected.</source>
         <translation>מפתח ה-API של טלגרם בגרסה זו נדחה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1572" />
+        <location filename="../../src/core/telegramsession.cpp" line="1574" />
         <source>Wrong code. Check it and try again.</source>
         <translation>קוד שגוי. בדקו אותו ונסו שוב.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1574" />
+        <location filename="../../src/core/telegramsession.cpp" line="1576" />
         <source>The code expired. Request a new one.</source>
         <translation>הקוד פג. בקשו קוד חדש.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1591" />
+        <location filename="../../src/core/telegramsession.cpp" line="1593" />
         <source>Could not load the chat list: %1</source>
         <translation>לא ניתן היה לטעון את רשימת הצ'אטים: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1646" />
+        <location filename="../../src/core/telegramsession.cpp" line="1648" />
         <source>Could not start the secret chat: %1</source>
         <translation>לא ניתן היה להתחיל את הצ'אט הסודי: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1649" />
+        <location filename="../../src/core/telegramsession.cpp" line="1651" />
         <source>Could not accept the secret chat: %1</source>
         <translation>לא ניתן היה לקבל את הצ'אט הסודי: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1670" />
+        <location filename="../../src/core/telegramsession.cpp" line="1672" />
         <source>Could not edit the message: %1</source>
         <translation>לא ניתן היה לערוך את ההודעה: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1673" />
+        <location filename="../../src/core/telegramsession.cpp" line="1675" />
         <source>Could not forward the message: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1677" />
+        <location filename="../../src/core/telegramsession.cpp" line="1679" />
         <source>That reaction is not allowed in this chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1679" />
+        <location filename="../../src/core/telegramsession.cpp" line="1681" />
         <source>Could not react: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1682" />
+        <location filename="../../src/core/telegramsession.cpp" line="1684" />
         <source>Could not block the user: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1691" />
+        <location filename="../../src/core/telegramsession.cpp" line="1693" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
         <translation>בתיקייה זו חייב להישאר לפחות צ'אט אחד, ולכן הצ'אט נשאר גם בה.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1693" />
+        <location filename="../../src/core/telegramsession.cpp" line="1695" />
         <source>Could not change the folder: %1</source>
         <translation>לא ניתן היה לשנות את התיקייה: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2060" />
+        <location filename="../../src/core/telegramsession.cpp" line="2063" />
         <source>could not create the file</source>
         <translation>לא ניתן היה ליצור את הקובץ</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2135" />
+        <location filename="../../src/core/telegramsession.cpp" line="2138" />
         <source>the file is empty</source>
         <translation>הקובץ ריק</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2168" />
+        <location filename="../../src/core/telegramsession.cpp" line="2171" />
         <source>could not read the file</source>
         <translation>לא ניתן היה לקרוא את הקובץ</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2179" />
+        <location filename="../../src/core/telegramsession.cpp" line="2182" />
         <source>the file is too large</source>
         <translation>הקובץ גדול מדי</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2203" />
+        <location filename="../../src/core/telegramsession.cpp" line="2206" />
         <source>could not read the recording</source>
         <translation>לא ניתן היה לקרוא את ההקלטה</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2344" />
+        <location filename="../../src/core/telegramsession.cpp" line="2347" />
         <source>Secret chats can only be opened with a person.</source>
         <translation>ניתן לפתוח צ'אטים סודיים רק עם אדם.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2394" />
+        <location filename="../../src/core/telegramsession.cpp" line="2397" />
         <source>The secret chat is not ready.</source>
         <translation>הצ'אט הסודי אינו מוכן.</translation>
     </message>

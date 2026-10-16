@@ -69,9 +69,9 @@
     <message>
         <location filename="../../src/app/appcontroller.cpp" line="355" />
         <location filename="../../src/app/appcontroller.cpp" line="668" />
-        <location filename="../../src/app/appcontroller.cpp" line="1148" />
-        <location filename="../../src/app/appcontroller.cpp" line="1228" />
-        <location filename="../../src/app/appcontroller.cpp" line="1348" />
+        <location filename="../../src/app/appcontroller.cpp" line="1145" />
+        <location filename="../../src/app/appcontroller.cpp" line="1225" />
+        <location filename="../../src/app/appcontroller.cpp" line="1345" />
         <source>Not connected.</source>
         <translation>Chưa kết nối.</translation>
     </message>
@@ -253,138 +253,133 @@
         <translation>Liên kết thiếu máy chủ hoặc cổng.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="784" />
-        <source>This proxy needs FakeTLS, which Symbigram cannot do yet.</source>
-        <translation>Proxy này cần FakeTLS, Symbigram chưa làm được.</translation>
-    </message>
-    <message>
-        <location filename="../../src/app/appcontroller.cpp" line="789" />
+        <location filename="../../src/app/appcontroller.cpp" line="786" />
         <source>That secret is not a valid length.</source>
         <translation>Độ dài của khóa bí mật không hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="827" />
+        <location filename="../../src/app/appcontroller.cpp" line="824" />
         <source>Proxy set to %1:%2.</source>
         <translation>Đã đặt proxy thành %1:%2.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="955" />
+        <location filename="../../src/app/appcontroller.cpp" line="952" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>Mất kết nối: %1. Đang kết nối lại...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="956" />
+        <location filename="../../src/app/appcontroller.cpp" line="953" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Kết nối thất bại: %1. Đang thử lại...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1061" />
+        <location filename="../../src/app/appcontroller.cpp" line="1058" />
         <source>Enter the password.</source>
         <translation>Nhập mật khẩu.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1086" />
+        <location filename="../../src/app/appcontroller.cpp" line="1083" />
         <source>Enter your phone number.</source>
         <translation>Nhập số điện thoại của bạn.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1096" />
+        <location filename="../../src/app/appcontroller.cpp" line="1093" />
         <source>Enter the code.</source>
         <translation>Nhập mã.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1158" />
+        <location filename="../../src/app/appcontroller.cpp" line="1155" />
         <source>Added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1158" />
+        <location filename="../../src/app/appcontroller.cpp" line="1155" />
         <source>%1 added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1202" />
+        <location filename="../../src/app/appcontroller.cpp" line="1199" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1229" />
+        <location filename="../../src/app/appcontroller.cpp" line="1226" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1303" />
+        <location filename="../../src/app/appcontroller.cpp" line="1300" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Chỉ có thể bắt đầu trò chuyện bí mật với một người.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1305" />
+        <location filename="../../src/app/appcontroller.cpp" line="1302" />
         <source>Starting a secret chat...</source>
         <translation>Đang bắt đầu trò chuyện bí mật...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1312" />
+        <location filename="../../src/app/appcontroller.cpp" line="1309" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Ai đó muốn bắt đầu trò chuyện bí mật.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1313" />
+        <location filename="../../src/app/appcontroller.cpp" line="1310" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 muốn bắt đầu trò chuyện bí mật.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1315" />
-        <location filename="../../src/app/appcontroller.cpp" line="1336" />
+        <location filename="../../src/app/appcontroller.cpp" line="1312" />
+        <location filename="../../src/app/appcontroller.cpp" line="1333" />
         <source>Secret chat</source>
         <translation>Trò chuyện bí mật</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1315" />
+        <location filename="../../src/app/appcontroller.cpp" line="1312" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 muốn bắt đầu trò chuyện bí mật</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1322" />
+        <location filename="../../src/app/appcontroller.cpp" line="1319" />
         <source>Secret chat is ready.</source>
         <translation>Trò chuyện bí mật đã sẵn sàng.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1336" />
+        <location filename="../../src/app/appcontroller.cpp" line="1333" />
         <source>Encrypted message</source>
         <translation>Tin nhắn được mã hóa</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1350" />
+        <location filename="../../src/app/appcontroller.cpp" line="1347" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Hình ảnh (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1350" />
+        <location filename="../../src/app/appcontroller.cpp" line="1347" />
         <source>All files (*)</source>
         <translation>Tất cả tệp (*)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1351" />
+        <location filename="../../src/app/appcontroller.cpp" line="1348" />
         <source>Choose an image</source>
         <translation>Chọn một hình ảnh</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1351" />
+        <location filename="../../src/app/appcontroller.cpp" line="1348" />
         <source>Choose a file</source>
         <translation>Chọn một tệp</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1359" />
+        <location filename="../../src/app/appcontroller.cpp" line="1356" />
         <source>Sending the image...</source>
         <translation>Đang gửi hình ảnh...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1359" />
+        <location filename="../../src/app/appcontroller.cpp" line="1356" />
         <source>Sending the file...</source>
         <translation>Đang gửi tệp...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1370" />
+        <location filename="../../src/app/appcontroller.cpp" line="1367" />
         <source>Copied.</source>
         <translation>Đã sao chép.</translation>
     </message>
@@ -1544,12 +1539,12 @@
 <context>
     <name>MtprotoClient</name>
     <message>
-        <location filename="../../src/core/mtprotoclient.cpp" line="118" />
+        <location filename="../../src/core/mtprotoclient.cpp" line="126" />
         <source>key exchange failed: %1</source>
         <translation>trao đổi khóa thất bại: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprotoclient.cpp" line="254" />
+        <location filename="../../src/core/mtprotoclient.cpp" line="262" />
         <source>no response from the server</source>
         <translation>máy chủ không phản hồi</translation>
     </message>
@@ -1557,52 +1552,63 @@
 <context>
     <name>MtprotoTransport</name>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="83" />
-        <source>this proxy needs FakeTLS (an "ee" secret), which is not supported yet</source>
-        <translation>proxy này cần FakeTLS (khóa ee), hiện chưa được hỗ trợ</translation>
-    </message>
-    <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="84" />
+        <location filename="../../src/core/mtprototransport.cpp" line="97" />
         <source>the proxy secret must be 32 or 34 hex characters</source>
         <translation>khóa bí mật của proxy phải có 32 hoặc 34 ký tự thập lục phân</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="170" />
+        <location filename="../../src/core/mtprototransport.cpp" line="192" />
+        <source>the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy</source>
+        <translation>proxy không trả lời bằng TLS - sai khóa bí mật, hoặc đây không phải proxy FakeTLS</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="201" />
+        <source>the proxy failed its TLS check - wrong secret, or the phone's clock is off</source>
+        <translation>proxy không qua được kiểm tra TLS - sai khóa bí mật, hoặc đồng hồ điện thoại bị sai</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="217" />
+        <location filename="../../src/core/mtprototransport.cpp" line="416" />
+        <source>the proxy sent a malformed TLS record</source>
+        <translation>proxy đã gửi một bản ghi TLS hỏng</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/mtprototransport.cpp" line="240" />
         <source>could not generate the proxy handshake</source>
         <translation>không tạo được bắt tay với proxy</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="185" />
+        <location filename="../../src/core/mtprototransport.cpp" line="255" />
         <source>could not set up proxy encryption</source>
         <translation>không thiết lập được mã hóa cho proxy</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="288" />
+        <location filename="../../src/core/mtprototransport.cpp" line="360" />
         <source>the proxy refused our authentication method</source>
         <translation>proxy đã từ chối phương thức xác thực của chúng tôi</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="293" />
+        <location filename="../../src/core/mtprototransport.cpp" line="365" />
         <source>proxy authentication failed - check the username and password</source>
         <translation>xác thực proxy thất bại — kiểm tra tên người dùng và mật khẩu</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="303" />
+        <location filename="../../src/core/mtprototransport.cpp" line="375" />
         <source>the proxy sent a malformed reply</source>
         <translation>proxy đã gửi phản hồi không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="306" />
+        <location filename="../../src/core/mtprototransport.cpp" line="378" />
         <source>the proxy could not reach the server (%1)</source>
         <translation>proxy không thể kết nối đến máy chủ (%1)</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="370" />
+        <location filename="../../src/core/mtprototransport.cpp" line="453" />
         <source>connection closed</source>
         <translation>kết nối đã đóng</translation>
     </message>
     <message>
-        <location filename="../../src/core/mtprototransport.cpp" line="375" />
+        <location filename="../../src/core/mtprototransport.cpp" line="458" />
         <source>connection timed out</source>
         <translation>kết nối quá thời gian chờ</translation>
     </message>
@@ -1750,7 +1756,7 @@
     <name>SettingsPage</name>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="15" />
-        <location filename="../../qml/SettingsPage.qml" line="359" />
+        <location filename="../../qml/SettingsPage.qml" line="382" />
         <source>Clear cache</source>
         <translation>Xóa bộ nhớ đệm</translation>
     </message>
@@ -1767,20 +1773,20 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="25" />
-        <location filename="../../qml/SettingsPage.qml" line="428" />
+        <location filename="../../qml/SettingsPage.qml" line="451" />
         <source>App language</source>
         <translation>Ngôn ngữ ứng dụng</translation>
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="36" />
-        <location filename="../../qml/SettingsPage.qml" line="166" />
-        <location filename="../../qml/SettingsPage.qml" line="167" />
+        <location filename="../../qml/SettingsPage.qml" line="189" />
+        <location filename="../../qml/SettingsPage.qml" line="190" />
         <source>System default</source>
         <translation>Theo hệ thống</translation>
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="51" />
-        <location filename="../../qml/SettingsPage.qml" line="283" />
+        <location filename="../../qml/SettingsPage.qml" line="306" />
         <source>Save downloads to</source>
         <translation>Lưu tải xuống vào</translation>
     </message>
@@ -1791,13 +1797,13 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="75" />
-        <location filename="../../qml/SettingsPage.qml" line="309" />
+        <location filename="../../qml/SettingsPage.qml" line="332" />
         <source>Image preview</source>
         <translation type="unfinished" />
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="82" />
-        <location filename="../../qml/SettingsPage.qml" line="325" />
+        <location filename="../../qml/SettingsPage.qml" line="348" />
         <source>Font size</source>
         <translation type="unfinished" />
     </message>
@@ -1808,7 +1814,7 @@
     </message>
     <message>
         <location filename="../../qml/SettingsPage.qml" line="89" />
-        <location filename="../../qml/SettingsPage.qml" line="237" />
+        <location filename="../../qml/SettingsPage.qml" line="260" />
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
@@ -1818,162 +1824,162 @@
         <translation>Lưu</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="99" />
+        <location filename="../../qml/SettingsPage.qml" line="118" />
         <source>Type</source>
         <translation>Loại</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="103" />
+        <location filename="../../qml/SettingsPage.qml" line="122" />
         <source>SOCKS5</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="104" />
+        <location filename="../../qml/SettingsPage.qml" line="123" />
         <source>MTProto</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="107" />
+        <location filename="../../qml/SettingsPage.qml" line="126" />
         <source>Server</source>
         <translation>Máy chủ</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="108" />
+        <location filename="../../qml/SettingsPage.qml" line="127" />
         <source>host or IP</source>
         <translation>máy chủ hoặc IP</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="109" />
+        <location filename="../../qml/SettingsPage.qml" line="128" />
         <source>Port</source>
         <translation>Cổng</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="113" />
+        <location filename="../../qml/SettingsPage.qml" line="132" />
         <source>Username (optional)</source>
         <translation>Tên người dùng (tùy chọn)</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="115" />
+        <location filename="../../qml/SettingsPage.qml" line="134" />
         <source>Password (optional)</source>
         <translation>Mật khẩu (tùy chọn)</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="119" />
+        <location filename="../../qml/SettingsPage.qml" line="138" />
         <source>Secret</source>
         <translation>Khóa bí mật</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="124" />
-        <source>32 or 34 hex characters</source>
-        <translation>32 hoặc 34 ký tự thập lục phân</translation>
-    </message>
-    <message>
-        <location filename="../../qml/SettingsPage.qml" line="133" />
+        <location filename="../../qml/SettingsPage.qml" line="152" />
         <source>Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.</source>
         <translation>Hoặc dán cả liên kết tg://proxy hay t.me/proxy vào ô Khóa bí mật rồi nhấn Dùng liên kết.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="138" />
+        <location filename="../../qml/SettingsPage.qml" line="157" />
         <source>Use link</source>
         <translation>Dùng liên kết</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="173" />
+        <location filename="../../qml/SettingsPage.qml" line="196" />
         <source>Settings</source>
         <translation>Cài đặt</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="190" />
+        <location filename="../../qml/SettingsPage.qml" line="213" />
         <source>Notifications</source>
         <translation>Thông báo</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="194" />
+        <location filename="../../qml/SettingsPage.qml" line="217" />
         <source>Popup: %1, Sound: %2, Vibration: %3</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="198" />
+        <location filename="../../qml/SettingsPage.qml" line="221" />
         <source>Off</source>
         <translation>Tắt</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="212" />
+        <location filename="../../qml/SettingsPage.qml" line="235" />
         <source>Popup, sound and vibration for messages that arrive while another application is in front.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="221" />
+        <location filename="../../qml/SettingsPage.qml" line="244" />
         <source>Connect on start</source>
         <translation>Kết nối khi khởi động</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="255" />
+        <location filename="../../qml/SettingsPage.qml" line="278" />
         <source>Proxy server</source>
         <translation>Máy chủ proxy</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="258" />
+        <location filename="../../qml/SettingsPage.qml" line="281" />
         <source>not set</source>
         <translation>chưa đặt</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="260" />
+        <location filename="../../qml/SettingsPage.qml" line="283" />
         <source> (MTProto)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="260" />
+        <location filename="../../qml/SettingsPage.qml" line="283" />
         <source> (SOCKS5)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="274" />
+        <location filename="../../qml/SettingsPage.qml" line="297" />
         <source>Route the connection through a SOCKS5 or MTProto proxy. Changing it reconnects.</source>
         <translation>Định tuyến kết nối qua proxy SOCKS5 hoặc MTProto. Thay đổi sẽ kết nối lại.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="362" />
+        <location filename="../../qml/SettingsPage.qml" line="385" />
         <source>Cached media and downloaded files: %1</source>
         <translation>Phương tiện trong bộ nhớ đệm và tệp đã tải: %1</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="378" />
+        <location filename="../../qml/SettingsPage.qml" line="401" />
         <source>Image thumbnails</source>
         <translation>Ảnh thu nhỏ</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="300" />
+        <location filename="../../qml/SettingsPage.qml" line="323" />
         <source>Saved photos and files go here. Pick a drive, or "Choose folder..." for any folder.</source>
         <translation>Ảnh và tệp đã lưu sẽ vào đây. Chọn một ổ đĩa, hoặc «Chọn thư mục...» cho thư mục bất kỳ.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="342" />
+        <location filename="../../qml/SettingsPage.qml" line="143" />
+        <source>hex or base64, from the proxy link</source>
+        <translation>hex hoặc base64, lấy từ liên kết proxy</translation>
+    </message>
+    <message>
+        <location filename="../../qml/SettingsPage.qml" line="365" />
         <source>The size of the message text in chats. Small is the original size.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="351" />
+        <location filename="../../qml/SettingsPage.qml" line="374" />
         <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="393" />
+        <location filename="../../qml/SettingsPage.qml" line="416" />
         <source>The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.</source>
         <translation>Kho riêng của ứng dụng chứa ảnh, ảnh đại diện và tệp đã tải, cùng các bản tạm của nó. Dọn đi thì sẽ tải lại khi cần. Những tệp bạn tự lưu hoặc tự mở sẽ không bị ảnh hưởng.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="402" />
+        <location filename="../../qml/SettingsPage.qml" line="425" />
         <source>Keep a log</source>
         <translation>Ghi nhật ký</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="419" />
+        <location filename="../../qml/SettingsPage.qml" line="442" />
         <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
         <translation>Mặc định tắt. Chỉ bật để thu thập nhật ký chẩn đoán (hiển thị ở trang «Giới thiệu») khi có sự cố.</translation>
     </message>
     <message>
-        <location filename="../../qml/SettingsPage.qml" line="450" />
+        <location filename="../../qml/SettingsPage.qml" line="473" />
         <source>Takes effect after the app is restarted.</source>
         <translation>Có hiệu lực sau khi khởi động lại ứng dụng.</translation>
     </message>
@@ -1982,231 +1988,231 @@
     <name>TelegramSession</name>
     <message>
         <location filename="../../src/core/telegramsession.cpp" line="156" />
-        <location filename="../../src/core/telegramsession.cpp" line="280" />
-        <location filename="../../src/core/telegramsession.cpp" line="554" />
-        <location filename="../../src/core/telegramsession.cpp" line="560" />
-        <location filename="../../src/core/telegramsession.cpp" line="1125" />
-        <location filename="../../src/core/telegramsession.cpp" line="1586" />
+        <location filename="../../src/core/telegramsession.cpp" line="281" />
+        <location filename="../../src/core/telegramsession.cpp" line="556" />
+        <location filename="../../src/core/telegramsession.cpp" line="562" />
+        <location filename="../../src/core/telegramsession.cpp" line="1127" />
+        <location filename="../../src/core/telegramsession.cpp" line="1588" />
         <source>Signed out.</source>
         <translation>Đã đăng xuất.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="251" />
-        <location filename="../../src/core/telegramsession.cpp" line="878" />
-        <location filename="../../src/core/telegramsession.cpp" line="2183" />
-        <location filename="../../src/core/telegramsession.cpp" line="2211" />
+        <location filename="../../src/core/telegramsession.cpp" line="252" />
+        <location filename="../../src/core/telegramsession.cpp" line="880" />
+        <location filename="../../src/core/telegramsession.cpp" line="2186" />
+        <location filename="../../src/core/telegramsession.cpp" line="2214" />
         <source>Not connected.</source>
         <translation>Chưa kết nối.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="352" />
+        <location filename="../../src/core/telegramsession.cpp" line="353" />
         <source>Enter a valid phone number, with the country code.</source>
         <translation>Nhập một số điện thoại hợp lệ, kèm mã quốc gia.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="368" />
-        <location filename="../../src/core/telegramsession.cpp" line="1576" />
+        <location filename="../../src/core/telegramsession.cpp" line="369" />
+        <location filename="../../src/core/telegramsession.cpp" line="1578" />
         <source>Enter the code.</source>
         <translation>Nhập mã.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="500" />
+        <location filename="../../src/core/telegramsession.cpp" line="502" />
         <source>Enter the password.</source>
         <translation>Nhập mật khẩu.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="877" />
+        <location filename="../../src/core/telegramsession.cpp" line="879" />
         <source>Enter a username, a phone number or a name.</source>
         <translation>Nhập tên người dùng, số điện thoại hoặc tên.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="946" />
-        <location filename="../../src/core/telegramsession.cpp" line="978" />
+        <location filename="../../src/core/telegramsession.cpp" line="948" />
+        <location filename="../../src/core/telegramsession.cpp" line="980" />
         <source>That folder no longer exists.</source>
         <translation>Thư mục đó không còn tồn tại.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1088" />
+        <location filename="../../src/core/telegramsession.cpp" line="1090" />
         <source>This account has no password set.</source>
         <translation>Tài khoản này chưa đặt mật khẩu.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1089" />
+        <location filename="../../src/core/telegramsession.cpp" line="1091" />
         <source>Unsupported password method.</source>
         <translation>Phương thức mật khẩu không được hỗ trợ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1118" />
-        <location filename="../../src/core/telegramsession.cpp" line="1578" />
+        <location filename="../../src/core/telegramsession.cpp" line="1120" />
+        <location filename="../../src/core/telegramsession.cpp" line="1580" />
         <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
         <translation>Không có tài khoản Telegram nào dùng số này. Đăng ký không được hỗ trợ ở đây.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1316" />
+        <location filename="../../src/core/telegramsession.cpp" line="1318" />
         <source>User blocked.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1384" />
+        <location filename="../../src/core/telegramsession.cpp" line="1386" />
         <source>the server rejected a part of the file</source>
         <translation>máy chủ đã từ chối một phần của tệp</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1407" />
+        <location filename="../../src/core/telegramsession.cpp" line="1409" />
         <source>the file is served from a CDN, which is not supported</source>
         <translation>tệp được phục vụ từ CDN, điều này không được hỗ trợ</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1408" />
+        <location filename="../../src/core/telegramsession.cpp" line="1410" />
         <source>unexpected reply</source>
         <translation>phản hồi không mong đợi</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1411" />
+        <location filename="../../src/core/telegramsession.cpp" line="1413" />
         <source>could not write the file</source>
         <translation>không thể ghi tệp</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1438" />
-        <location filename="../../src/core/telegramsession.cpp" line="1447" />
-        <location filename="../../src/core/telegramsession.cpp" line="1635" />
+        <location filename="../../src/core/telegramsession.cpp" line="1440" />
+        <location filename="../../src/core/telegramsession.cpp" line="1449" />
+        <location filename="../../src/core/telegramsession.cpp" line="1637" />
         <source>Nobody found.</source>
         <translation>Không tìm thấy ai.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1508" />
+        <location filename="../../src/core/telegramsession.cpp" line="1510" />
         <source>The session was ended (%1). Please sign in again.</source>
         <translation>Phiên đã kết thúc (%1). Vui lòng đăng nhập lại.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1545" />
+        <location filename="../../src/core/telegramsession.cpp" line="1547" />
         <source>Wrong password.</source>
         <translation>Sai mật khẩu.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1546" />
-        <location filename="../../src/core/telegramsession.cpp" line="1555" />
-        <location filename="../../src/core/telegramsession.cpp" line="1580" />
+        <location filename="../../src/core/telegramsession.cpp" line="1548" />
+        <location filename="../../src/core/telegramsession.cpp" line="1557" />
+        <location filename="../../src/core/telegramsession.cpp" line="1582" />
         <source>Too many attempts. Wait %1 seconds.</source>
         <translation>Quá nhiều lần thử. Chờ %1 giây.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1556" />
+        <location filename="../../src/core/telegramsession.cpp" line="1558" />
         <source>That phone number is not valid.</source>
         <translation>Số điện thoại đó không hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1557" />
+        <location filename="../../src/core/telegramsession.cpp" line="1559" />
         <source>That phone number is banned from Telegram.</source>
         <translation>Số điện thoại đó bị cấm khỏi Telegram.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1558" />
+        <location filename="../../src/core/telegramsession.cpp" line="1560" />
         <source>Too many codes requested for this number. Try again later.</source>
         <translation>Đã yêu cầu quá nhiều mã cho số này. Thử lại sau.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1559" />
+        <location filename="../../src/core/telegramsession.cpp" line="1561" />
         <source>Too many attempts. Try again later.</source>
         <translation>Quá nhiều lần thử. Thử lại sau.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1560" />
+        <location filename="../../src/core/telegramsession.cpp" line="1562" />
         <source>This build's Telegram API key was rejected.</source>
         <translation>Khóa API Telegram của bản dựng này bị từ chối.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1572" />
+        <location filename="../../src/core/telegramsession.cpp" line="1574" />
         <source>Wrong code. Check it and try again.</source>
         <translation>Sai mã. Kiểm tra và thử lại.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1574" />
+        <location filename="../../src/core/telegramsession.cpp" line="1576" />
         <source>The code expired. Request a new one.</source>
         <translation>Mã đã hết hạn. Yêu cầu mã mới.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1591" />
+        <location filename="../../src/core/telegramsession.cpp" line="1593" />
         <source>Could not load the chat list: %1</source>
         <translation>Không thể tải danh sách trò chuyện: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1646" />
+        <location filename="../../src/core/telegramsession.cpp" line="1648" />
         <source>Could not start the secret chat: %1</source>
         <translation>Không thể bắt đầu trò chuyện bí mật: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1649" />
+        <location filename="../../src/core/telegramsession.cpp" line="1651" />
         <source>Could not accept the secret chat: %1</source>
         <translation>Không thể chấp nhận trò chuyện bí mật: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1670" />
+        <location filename="../../src/core/telegramsession.cpp" line="1672" />
         <source>Could not edit the message: %1</source>
         <translation>Không thể sửa tin nhắn: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1673" />
+        <location filename="../../src/core/telegramsession.cpp" line="1675" />
         <source>Could not forward the message: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1677" />
+        <location filename="../../src/core/telegramsession.cpp" line="1679" />
         <source>That reaction is not allowed in this chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1679" />
+        <location filename="../../src/core/telegramsession.cpp" line="1681" />
         <source>Could not react: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1682" />
+        <location filename="../../src/core/telegramsession.cpp" line="1684" />
         <source>Could not block the user: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1691" />
+        <location filename="../../src/core/telegramsession.cpp" line="1693" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
         <translation>Thư mục đó phải giữ ít nhất một cuộc trò chuyện, nên cuộc trò chuyện vẫn ở trong đó.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1693" />
+        <location filename="../../src/core/telegramsession.cpp" line="1695" />
         <source>Could not change the folder: %1</source>
         <translation>Không thể đổi thư mục: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2060" />
+        <location filename="../../src/core/telegramsession.cpp" line="2063" />
         <source>could not create the file</source>
         <translation>không thể tạo tệp</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2135" />
+        <location filename="../../src/core/telegramsession.cpp" line="2138" />
         <source>the file is empty</source>
         <translation>tệp trống</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2168" />
+        <location filename="../../src/core/telegramsession.cpp" line="2171" />
         <source>could not read the file</source>
         <translation>không thể đọc tệp</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2179" />
+        <location filename="../../src/core/telegramsession.cpp" line="2182" />
         <source>the file is too large</source>
         <translation>tệp quá lớn</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2203" />
+        <location filename="../../src/core/telegramsession.cpp" line="2206" />
         <source>could not read the recording</source>
         <translation>không thể đọc bản ghi</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2344" />
+        <location filename="../../src/core/telegramsession.cpp" line="2347" />
         <source>Secret chats can only be opened with a person.</source>
         <translation>Chỉ có thể mở trò chuyện bí mật với một người.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2394" />
+        <location filename="../../src/core/telegramsession.cpp" line="2397" />
         <source>The secret chat is not ready.</source>
         <translation>Trò chuyện bí mật chưa sẵn sàng.</translation>
     </message>

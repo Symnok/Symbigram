@@ -14,6 +14,9 @@ qrc_*.cpp
 ui_*.h
 Makefile*
 *.sis
+# ...but the language packs are the deliverable, not a build artefact: a few KB each,
+# and anyone cloning this needs them without a Symbian SDK to rebuild with.
+!addons/*/symbigram_*.sis
 *.sisx
 *_installer.sis
 *_template.pkg
