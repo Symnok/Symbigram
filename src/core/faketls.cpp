@@ -12,8 +12,11 @@ namespace
     const uchar KApplicationData = 0x17;
 
     // A TLS record's length is 16 bits, and 2^14 is the limit the specification sets for the
-    // plaintext of one record - what real implementations emit, so what we emit too.
+    // plaintext of one record - the most a server may send us in one.
     const int KMaxRecord = 16384;
+
+    // What we send in one record: TDLib's MAX_TLS_PACKET_LENGTH (TcpTransport.h).
+    const int KMaxSendRecord = 2878;
 
     // The digest sits at offset 11 of the hello (and of the server's reply blob): 5 bytes of
     // record header, 4 of handshake header, 2 of legacy version.
@@ -217,26 +220,13 @@ bool FakeTls::verifyServerHello(const QByteArray &key16, const QByteArray &clien
     return Crypto::constantTimeEquals(mine, theirs);
 }
 
-QByteArray FakeTls::streamTail(const QByteArray &response)
-{
-    // Everything after the last record header: the first bytes of the obfuscated stream, which
-    // the proxy sends glued to its handshake.
-    int pos = 3;
-    if (response.size() < pos + 2) return QByteArray();
-    const int helloLen = (int(uchar(response.at(pos))) << 8) | int(uchar(response.at(pos + 1)));
-    pos += 2 + helloLen + 9;
-    if (response.size() < pos + 2) return QByteArray();
-    const int dataLen = (int(uchar(response.at(pos))) << 8) | int(uchar(response.at(pos + 1)));
-    pos += 2;
-    return response.mid(pos, dataLen);
-}
-
-QByteArray FakeTls::wrap(const QByteArray &payload)
+QByteArray FakeTls::wrap(const QByteArray &payload, bool first)
 {
     QByteArray out;
+    if (first) out.append("\x14\x03\x03\x00\x01\x01", 6);    // ChangeCipherSpec
     int off = 0;
     while (off < payload.size()) {
-        const int take = qMin(KMaxRecord, payload.size() - off);
+        const int take = qMin(KMaxSendRecord, payload.size() - off);
         out.append(char(KApplicationData));
         u16(out, 0x0303);
         u16(out, take);

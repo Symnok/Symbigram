@@ -43,7 +43,7 @@ namespace
 MtprotoTransport::MtprotoTransport(QObject *parent)
     : QObject(parent), m_tagSent(false), m_open(false), m_useProxy(false), m_socks(SocksNone)
     , m_targetPort(0), m_dcId(0), m_obfuscated(false), m_padded(false)
-    , m_fakeTls(false), m_tlsReady(false), m_timeOffset(0)
+    , m_fakeTls(false), m_tlsReady(false), m_tlsFirstRecord(true), m_timeOffset(0)
 {
     m_socket = new QTcpSocket(this);
     connect(m_socket, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -75,6 +75,7 @@ void MtprotoTransport::connectToHost(const QString &host, int port, int dcId)
     m_tlsDomain.clear();
     m_tlsDigest.clear();
     m_tlsReader.reset();
+    m_tlsFirstRecord = true;
     m_proxyKey.clear();
     if (m_secret.size() == 16) {
         m_obfuscated = true;
@@ -203,16 +204,18 @@ bool MtprotoTransport::processTlsHandshake()
     }
     m_tlsReady = true;
 
-    // The handshake's last record already carries the first of the obfuscated stream, and
-    // anything buffered behind it is further records.
-    const QByteArray tail = FakeTls::streamTail(response);
+    // The application-data record that ends the handshake is filler - random bytes from a real
+    // proxy - and NOT the start of the stream: TDLib (TlsInit::wait_hello_response) discards it
+    // with the rest of the reply. Decrypting it would put the keystream out of step, and the
+    // first real packet would then read as garbage. Only what is buffered behind the handshake
+    // is stream, in further records.
     const QByteArray rest = m_inbuf;
     m_inbuf.clear();
 
     beginStream();                                      // the init now goes inside records
     if (!m_open) return false;
 
-    QByteArray stream = tail;
+    QByteArray stream;
     if (!rest.isEmpty() && !m_tlsReader.feed(rest, &stream)) {
         fail(tr("the proxy sent a malformed TLS record"));
         return false;
@@ -272,7 +275,7 @@ void MtprotoTransport::sendObfuscatedInit()
 
     QByteArray out = init.left(56);
     out += encrypted.mid(56, 8);
-    m_socket->write(m_fakeTls ? FakeTls::wrap(out) : out);
+    m_socket->write(m_fakeTls ? tlsWrap(out) : out);
 }
 
 void MtprotoTransport::writeStream(const QByteArray &data)
@@ -282,7 +285,16 @@ void MtprotoTransport::writeStream(const QByteArray &data)
     m_enc.apply(copy);
     // The TLS records go on the outside: the obfuscated keystream runs continuously underneath
     // and knows nothing about where one record ends.
-    m_socket->write(m_fakeTls ? FakeTls::wrap(copy) : copy);
+    m_socket->write(m_fakeTls ? tlsWrap(copy) : copy);
+}
+
+QByteArray MtprotoTransport::tlsWrap(const QByteArray &data)
+{
+    // The first record we send after the handshake is preceded by a ChangeCipherSpec of our own,
+    // as TDLib's ObfuscatedTransport::do_write_tls does.
+    const QByteArray wrapped = FakeTls::wrap(data, m_tlsFirstRecord);
+    m_tlsFirstRecord = false;
+    return wrapped;
 }
 
 int MtprotoTransport::unpaddedLength(const QByteArray &frame)

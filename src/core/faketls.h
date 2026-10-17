@@ -13,9 +13,11 @@
 //   - digest = HMAC-SHA256(secret, whole hello with that field zeroed), written back at 11;
 //   - digest[28..32] ^= the unix time, as a little-endian int32 - which is why the phone's clock
 //     matters (see Transport::setTimeOffset);
-//   - the client sends NO ChangeCipherSpec of its own;
 //   - the server answers with a ServerHello record, a ChangeCipherSpec and an application-data
-//     record, and its own 32 bytes at offset 11 of that whole blob authenticate it.
+//     record, and its own 32 bytes at offset 11 of that whole blob authenticate it. That
+//     application-data record is FILLER (random bytes from a real proxy) and is discarded;
+//   - the client's first record afterwards is preceded by a ChangeCipherSpec of its own
+//     (TcpTransport.cpp, do_write_tls), and its records are cut at 2878 bytes.
 #ifndef FAKETLS_H
 #define FAKETLS_H
 
@@ -40,12 +42,9 @@ namespace FakeTls
     bool verifyServerHello(const QByteArray &key16, const QByteArray &clientDigest,
                            const QByteArray &response);
 
-    /// The application-data payload carried by a complete handshake blob - the first bytes of the
-    /// obfuscated stream, which arrive glued to the handshake.
-    QByteArray streamTail(const QByteArray &response);
-
-    /// Wraps a payload in application-data records, splitting at the TLS record limit.
-    QByteArray wrap(const QByteArray &payload);
+    /// Wraps a payload in application-data records of at most 2878 bytes, as TDLib cuts them.
+    /// `first` puts the client's one-off ChangeCipherSpec in front.
+    QByteArray wrap(const QByteArray &payload, bool first);
 
     /// Pulls application-data payloads out of a record stream. Records split across TCP reads,
     /// so the leftover is kept between calls.

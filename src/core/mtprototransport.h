@@ -76,6 +76,8 @@ private:
     /// Writes into the MTProto stream, encrypting first when obfuscated. SOCKS5 bytes must not
     /// go through here.
     void writeStream(const QByteArray &data);
+    /// FakeTLS records around outgoing stream bytes, with the one-off ChangeCipherSpec in front.
+    QByteArray tlsWrap(const QByteArray &data);
     /// The payload length inside a padded-intermediate frame. The length prefix counts 0-15
     /// random padding bytes and the transport gives no way to tell them apart, so the MTProto
     /// message has to say where it ends; see the .cpp.
@@ -107,6 +109,7 @@ private:
     // FakeTLS ("ee"): the obfuscated stream above rides inside TLS application-data records.
     bool m_fakeTls;
     bool m_tlsReady;          // the fake handshake is done; records carry the stream
+    bool m_tlsFirstRecord;    // our ChangeCipherSpec has not gone out yet
     QByteArray m_tlsDomain;   // the SNI the secret named
     QByteArray m_tlsDigest;   // our ClientHello digest, needed to check the server's reply
     FakeTls::RecordReader m_tlsReader;
