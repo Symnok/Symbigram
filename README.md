@@ -18,6 +18,9 @@ clear history / delete messages, and Symbian notifications (discreet popup, vibr
 stay quiet. Attachments are shown as notes ("[photo]", "[voice message 0:12]", "[file: ...]"),
 not downloaded. English, Russian and Ukrainian.
 
+Symbigram installer also published in the Anna/Belle app store, Wunderland Store:
+https://ovi.wunderwungiel.pl/item/708 (as of 17 October 2026 the version there is 1.0.79).
+
 ## Layout
 
 - `src/core/` - the protocol, pure QtCore + QtNetwork, shared with the desktop harness:
