@@ -1082,15 +1082,9 @@
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/LoginPage.qml" line="99" />
+        <location filename="../qml/LoginPage.qml" line="75" />
         <source>Telegram for Symbian</source>
         <translation>Telegram для Symbian</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="31" />
-        <location filename="../qml/LoginPage.qml" line="38" />
-        <source>SOCKS5 proxy</source>
-        <translation>SOCKS5-прокси</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="27" />
@@ -1099,9 +1093,14 @@
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="27" />
-        <location filename="../qml/LoginPage.qml" line="168" />
+        <location filename="../qml/LoginPage.qml" line="144" />
         <source>Sign in with phone number</source>
         <translation>Войти по номеру телефона</translation>
+    </message>
+    <message>
+        <location filename="../qml/LoginPage.qml" line="31" />
+        <source>Proxy</source>
+        <translation>Прокси</translation>
     </message>
     <message>
         <location filename="../qml/LoginPage.qml" line="32" />
@@ -1109,173 +1108,128 @@
         <translation>Переподключиться</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="39" />
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="39" />
-        <source>Enable</source>
-        <translation>Включить</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="39" />
-        <source>Cancel</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="39" />
-        <source>Off</source>
-        <translation>Выкл.</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="44" />
-        <source>Server</source>
-        <translation>Сервер</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="45" />
-        <source>host or IP</source>
-        <translation>хост или IP</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="46" />
-        <source>Port</source>
-        <translation>Порт</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="48" />
-        <source>Username (optional)</source>
-        <translation>Имя пользователя (необязательно)</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="50" />
-        <source>Password (optional)</source>
-        <translation>Пароль (необязательно)</translation>
-    </message>
-    <message>
-        <location filename="../qml/LoginPage.qml" line="140" />
+        <location filename="../qml/LoginPage.qml" line="116" />
         <source>No connection through the proxy. Check the proxy or tap Reconnect.</source>
         <translation>Нет соединения через прокси. Проверьте прокси или нажмите «Переподключиться».</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="141" />
+        <location filename="../qml/LoginPage.qml" line="117" />
         <source>No connection. Tap Reconnect, or set up a proxy if Telegram is blocked.</source>
         <translation>Нет соединения. Нажмите «Переподключиться» или настройте прокси, если Telegram заблокирован.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="145" />
+        <location filename="../qml/LoginPage.qml" line="121" />
         <source>Proxy: %1</source>
         <translation>Прокси: %1</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="145" />
+        <location filename="../qml/LoginPage.qml" line="121" />
         <source>on</source>
         <translation>вкл</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="145" />
+        <location filename="../qml/LoginPage.qml" line="121" />
         <source>Set up proxy</source>
         <translation>Настроить прокси</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="156" />
+        <location filename="../qml/LoginPage.qml" line="132" />
         <source>The code renews in %1 s</source>
         <translation>Код обновится через %1 с</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="163" />
+        <location filename="../qml/LoginPage.qml" line="139" />
         <source>Open Telegram on a phone or PC where you are signed in: Settings &gt; Devices &gt; Link Desktop Device, and scan this code.</source>
         <translation>Откройте Telegram на телефоне или ПК, где вы уже вошли: Настройки &gt; Устройства &gt; Подключить устройство, и отсканируйте этот код.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="177" />
+        <location filename="../qml/LoginPage.qml" line="153" />
         <source>Phone number</source>
         <translation>Номер телефона</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="181" />
+        <location filename="../qml/LoginPage.qml" line="157" />
         <source>+1 555 123 4567</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="192" />
+        <location filename="../qml/LoginPage.qml" line="168" />
         <source>Include the country code. Telegram will send a login code to this number.</source>
         <translation>Укажите код страны. Telegram пришлёт на этот номер код для входа.</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="196" />
+        <location filename="../qml/LoginPage.qml" line="172" />
         <source>requesting...</source>
         <translation>запрос...</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="196" />
+        <location filename="../qml/LoginPage.qml" line="172" />
         <source>send code</source>
         <translation>отправить код</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="202" />
+        <location filename="../qml/LoginPage.qml" line="178" />
         <source>Use QR code instead</source>
         <translation>Использовать QR-код</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="215" />
+        <location filename="../qml/LoginPage.qml" line="191" />
         <source>Enter the code sent to %1</source>
         <translation>Введите код, отправленный на %1</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="221" />
+        <location filename="../qml/LoginPage.qml" line="197" />
         <source>code</source>
         <translation>код</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="229" />
+        <location filename="../qml/LoginPage.qml" line="205" />
         <source>signing in...</source>
         <translation>вход...</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="238" />
+        <location filename="../qml/LoginPage.qml" line="214" />
         <source>Resend code</source>
         <translation>Отправить код снова</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="244" />
+        <location filename="../qml/LoginPage.qml" line="220" />
         <source>Change number</source>
         <translation>Изменить номер</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="256" />
+        <location filename="../qml/LoginPage.qml" line="232" />
         <source>Two-step verification password</source>
         <translation>Пароль двухэтапной проверки</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="262" />
+        <location filename="../qml/LoginPage.qml" line="238" />
         <source>hint: %1</source>
         <translation>подсказка: %1</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="262" />
+        <location filename="../qml/LoginPage.qml" line="238" />
         <source>password</source>
         <translation>пароль</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="267" />
+        <location filename="../qml/LoginPage.qml" line="243" />
         <source>show password</source>
         <translation>показать пароль</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="270" />
+        <location filename="../qml/LoginPage.qml" line="246" />
         <source>checking...</source>
         <translation>проверка...</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="229" />
-        <location filename="../qml/LoginPage.qml" line="270" />
+        <location filename="../qml/LoginPage.qml" line="205" />
+        <location filename="../qml/LoginPage.qml" line="246" />
         <source>sign in</source>
         <translation>войти</translation>
     </message>
     <message>
-        <location filename="../qml/LoginPage.qml" line="300" />
+        <location filename="../qml/LoginPage.qml" line="276" />
         <source>Symbigram talks MTProto 2.0 straight to Telegram's servers: the encryption key is made on this phone and never leaves it. The session shows up under Devices in Telegram, where it can be ended at any time.</source>
         <translation>Symbigram говорит с серверами Telegram напрямую по MTProto 2.0: ключ шифрования создаётся на этом телефоне и никогда его не покидает. Сеанс виден в разделе «Устройства» в Telegram, где его можно завершить в любой момент.</translation>
     </message>
@@ -1552,63 +1506,63 @@
 <context>
     <name>MtprotoTransport</name>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="97" />
+        <location filename="../src/core/mtprototransport.cpp" line="98" />
         <source>the proxy secret must be 32 or 34 hex characters</source>
         <translation>секрет прокси должен содержать 32 или 34 шестнадцатеричных символа</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="192" />
+        <location filename="../src/core/mtprototransport.cpp" line="193" />
         <source>the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy</source>
         <translation>прокси ответил не по TLS - неверный секрет или это не FakeTLS-прокси</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="201" />
+        <location filename="../src/core/mtprototransport.cpp" line="202" />
         <source>the proxy failed its TLS check - wrong secret, or the phone's clock is off</source>
         <translation>прокси не прошёл проверку TLS - неверный секрет или сбиты часы телефона</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="217" />
-        <location filename="../src/core/mtprototransport.cpp" line="416" />
+        <location filename="../src/core/mtprototransport.cpp" line="220" />
+        <location filename="../src/core/mtprototransport.cpp" line="428" />
         <source>the proxy sent a malformed TLS record</source>
         <translation>прокси отправил некорректную TLS-запись</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="240" />
+        <location filename="../src/core/mtprototransport.cpp" line="243" />
         <source>could not generate the proxy handshake</source>
         <translation>не удалось сформировать рукопожатие прокси</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="255" />
+        <location filename="../src/core/mtprototransport.cpp" line="258" />
         <source>could not set up proxy encryption</source>
         <translation>не удалось настроить шифрование прокси</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="360" />
+        <location filename="../src/core/mtprototransport.cpp" line="372" />
         <source>the proxy refused our authentication method</source>
         <translation>прокси отклонил метод аутентификации</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="365" />
+        <location filename="../src/core/mtprototransport.cpp" line="377" />
         <source>proxy authentication failed - check the username and password</source>
         <translation>ошибка аутентификации прокси — проверьте имя пользователя и пароль</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="375" />
+        <location filename="../src/core/mtprototransport.cpp" line="387" />
         <source>the proxy sent a malformed reply</source>
         <translation>прокси прислал некорректный ответ</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="378" />
+        <location filename="../src/core/mtprototransport.cpp" line="390" />
         <source>the proxy could not reach the server (%1)</source>
         <translation>прокси не смог подключиться к серверу (%1)</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="453" />
+        <location filename="../src/core/mtprototransport.cpp" line="465" />
         <source>connection closed</source>
         <translation>соединение закрыто</translation>
     </message>
     <message>
-        <location filename="../src/core/mtprototransport.cpp" line="458" />
+        <location filename="../src/core/mtprototransport.cpp" line="470" />
         <source>connection timed out</source>
         <translation>время ожидания соединения истекло</translation>
     </message>
@@ -1753,23 +1707,113 @@
     </message>
 </context>
 <context>
+    <name>ProxyDialog</name>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="24" />
+        <source>Proxy</source>
+        <translation>Прокси</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <location filename="../qml/ProxyDialog.qml" line="26" />
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <source>Enable</source>
+        <translation>Включить</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <location filename="../qml/ProxyDialog.qml" line="26" />
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <source>Off</source>
+        <translation>Выкл.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="49" />
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="53" />
+        <source>SOCKS5</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="54" />
+        <source>MTProto</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="57" />
+        <source>Server</source>
+        <translation>Сервер</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="61" />
+        <source>host or IP</source>
+        <translation>хост или IP</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="64" />
+        <source>Port</source>
+        <translation>Порт</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="73" />
+        <source>Username (optional)</source>
+        <translation>Имя пользователя (необязательно)</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="75" />
+        <source>Password (optional)</source>
+        <translation>Пароль (необязательно)</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="79" />
+        <source>Secret</source>
+        <translation>Секрет</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="84" />
+        <source>hex or base64, from the proxy link</source>
+        <translation>hex или base64, из ссылки прокси</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="93" />
+        <source>Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.</source>
+        <translation>Или вставьте целую ссылку tg://proxy или t.me/proxy в поле «Секрет» и нажмите «Использовать ссылку».</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyDialog.qml" line="98" />
+        <source>Use link</source>
+        <translation>Использовать ссылку</translation>
+    </message>
+</context>
+<context>
     <name>SettingsPage</name>
     <message>
         <location filename="../qml/SettingsPage.qml" line="25" />
-        <location filename="../qml/SettingsPage.qml" line="428" />
+        <location filename="../qml/SettingsPage.qml" line="356" />
         <source>App language</source>
         <translation>Язык приложения</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="36" />
-        <location filename="../qml/SettingsPage.qml" line="166" />
-        <location filename="../qml/SettingsPage.qml" line="167" />
+        <location filename="../qml/SettingsPage.qml" line="94" />
+        <location filename="../qml/SettingsPage.qml" line="95" />
         <source>System default</source>
         <translation>Как в системе</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="51" />
-        <location filename="../qml/SettingsPage.qml" line="283" />
+        <location filename="../qml/SettingsPage.qml" line="211" />
         <source>Save downloads to</source>
         <translation>Сохранять загрузки в</translation>
     </message>
@@ -1779,19 +1823,13 @@
         <translation>Выбрать папку...</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="90" />
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
         <location filename="../qml/SettingsPage.qml" line="19" />
-        <location filename="../qml/SettingsPage.qml" line="90" />
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="15" />
-        <location filename="../qml/SettingsPage.qml" line="359" />
+        <location filename="../qml/SettingsPage.qml" line="287" />
         <source>Clear cache</source>
         <translation>Очистить кэш</translation>
     </message>
@@ -1802,134 +1840,78 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="75" />
-        <location filename="../qml/SettingsPage.qml" line="309" />
+        <location filename="../qml/SettingsPage.qml" line="237" />
         <source>Image preview</source>
         <translation type="unfinished" />
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="82" />
-        <location filename="../qml/SettingsPage.qml" line="325" />
+        <location filename="../qml/SettingsPage.qml" line="253" />
         <source>Font size</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="89" />
-        <location filename="../qml/SettingsPage.qml" line="237" />
+        <location filename="../qml/SettingsPage.qml" line="165" />
         <source>Proxy</source>
         <translation>Прокси</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="99" />
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="103" />
-        <source>SOCKS5</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="104" />
-        <source>MTProto</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="107" />
-        <source>Server</source>
-        <translation>Сервер</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="108" />
-        <source>host or IP</source>
-        <translation>хост или IP</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="109" />
-        <source>Port</source>
-        <translation>Порт</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="113" />
-        <source>Username (optional)</source>
-        <translation>Имя пользователя (необязательно)</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="115" />
-        <source>Password (optional)</source>
-        <translation>Пароль (необязательно)</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="119" />
-        <source>Secret</source>
-        <translation>Секрет</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="133" />
-        <source>Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.</source>
-        <translation>Или вставьте целую ссылку tg://proxy или t.me/proxy в поле «Секрет» и нажмите «Использовать ссылку».</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="138" />
-        <source>Use link</source>
-        <translation>Использовать ссылку</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="173" />
+        <location filename="../qml/SettingsPage.qml" line="101" />
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="190" />
+        <location filename="../qml/SettingsPage.qml" line="118" />
         <source>Notifications</source>
         <translation>Уведомления</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="194" />
+        <location filename="../qml/SettingsPage.qml" line="122" />
         <source>Popup: %1, Sound: %2, Vibration: %3</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="198" />
+        <location filename="../qml/SettingsPage.qml" line="126" />
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="212" />
+        <location filename="../qml/SettingsPage.qml" line="140" />
         <source>Popup, sound and vibration for messages that arrive while another application is in front.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="260" />
+        <location filename="../qml/SettingsPage.qml" line="188" />
         <source> (MTProto)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="260" />
+        <location filename="../qml/SettingsPage.qml" line="188" />
         <source> (SOCKS5)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="274" />
+        <location filename="../qml/SettingsPage.qml" line="202" />
         <source>Route the connection through a SOCKS5 or MTProto proxy. Changing it reconnects.</source>
         <translation>Направлять соединение через прокси SOCKS5 или MTProto. Изменение вызывает переподключение.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="362" />
+        <location filename="../qml/SettingsPage.qml" line="290" />
         <source>Cached media and downloaded files: %1</source>
         <translation>Кэш медиа и загруженные файлы: %1</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="378" />
+        <location filename="../qml/SettingsPage.qml" line="306" />
         <source>Image thumbnails</source>
         <translation>Миниатюры изображений</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="393" />
+        <location filename="../qml/SettingsPage.qml" line="321" />
         <source>The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="221" />
+        <location filename="../qml/SettingsPage.qml" line="149" />
         <source>Connect on start</source>
         <translation>Подключаться при запуске</translation>
     </message>
@@ -1939,47 +1921,42 @@
         <translation>Удалить %1, занятые на телефоне? Будут очищены кэш медиа и файлы, загруженные в папки Symbigram. Установленные языковые пакеты сохраняются.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="124" />
-        <source>hex or base64, from the proxy link</source>
-        <translation>hex или base64, из ссылки прокси</translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="255" />
+        <location filename="../qml/SettingsPage.qml" line="183" />
         <source>Proxy server</source>
         <translation>Сервер прокси</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="258" />
+        <location filename="../qml/SettingsPage.qml" line="186" />
         <source>not set</source>
         <translation>не задан</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="300" />
+        <location filename="../qml/SettingsPage.qml" line="228" />
         <source>Saved photos and files go here. Pick a drive, or "Choose folder..." for any folder.</source>
         <translation>Сюда сохраняются фото и файлы. Выберите диск или «Выбрать папку...» для любой папки.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="342" />
+        <location filename="../qml/SettingsPage.qml" line="270" />
         <source>The size of the message text in chats. Small is the original size.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="351" />
+        <location filename="../qml/SettingsPage.qml" line="279" />
         <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="402" />
+        <location filename="../qml/SettingsPage.qml" line="330" />
         <source>Keep a log</source>
         <translation>Вести журнал</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="419" />
+        <location filename="../qml/SettingsPage.qml" line="347" />
         <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
         <translation>По умолчанию выключено. Включайте только для сбора диагностического журнала (виден на странице «О программе»), когда что-то идёт не так.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="450" />
+        <location filename="../qml/SettingsPage.qml" line="378" />
         <source>Takes effect after the app is restarted.</source>
         <translation>Вступает в силу после перезапуска приложения.</translation>
     </message>

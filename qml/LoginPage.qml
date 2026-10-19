@@ -28,39 +28,15 @@ Page {
                 visible: !app.passwordNeeded
                 onClicked: app.loginMethod == "phone" ? app.useQrLogin() : app.usePhoneLogin()
             }
-            MenuItem { text: qsTr("SOCKS5 proxy"); onClicked: { proxyDialog.load(); proxyDialog.open() } }
+            MenuItem { text: qsTr("Proxy"); onClicked: { proxyDialog.load(); proxyDialog.open() } }
             MenuItem { text: qsTr("Reconnect"); onClicked: app.reconnect() }
         }
     }
 
-    CommonDialog {
-        id: proxyDialog
-        titleText: qsTr("SOCKS5 proxy")
-        buttonTexts: [app.proxyEnabled ? qsTr("Save") : qsTr("Enable"), qsTr("Cancel"), qsTr("Off")]
-        content: Column {
-            width: parent.width
-            spacing: platformStyle.paddingMedium
-            anchors { left: parent.left; right: parent.right; margins: platformStyle.paddingLarge }
-            Label { text: qsTr("Server"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyHostField; width: parent.width; placeholderText: qsTr("host or IP"); inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
-            Label { text: qsTr("Port"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyPortField; width: parent.width; placeholderText: "1080"; inputMethodHints: Qt.ImhDigitsOnly }
-            Label { text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
-            Label { text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-            TextField { id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
-        }
-        onButtonClicked: {
-            if (index == 0) app.saveProxy(true, proxyHostField.text, proxyPortField.text, proxyUserField.text, proxyPassField.text)
-            else if (index == 2) app.setProxyEnabled(false)
-        }
-        function load() {
-            proxyHostField.text = app.proxyHost
-            proxyPortField.text = app.proxyPort
-            proxyUserField.text = app.proxyUser
-            proxyPassField.text = app.proxyPass
-        }
-    }
+    // The same dialog Settings uses: SOCKS5 or MTProto, with the secret and the
+    // "paste a proxy link" shortcut. This screen is where a blocked user ends up, so it
+    // is the last place that should offer SOCKS5 only.
+    ProxyDialog { id: proxyDialog; showOff: true; maxHeight: page.height }
 
     // seconds left on the code, for the countdown under it
     Timer {
