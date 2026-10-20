@@ -62,6 +62,7 @@ public:
         ReadRole,
         ServiceRole,
         ForwardedRole,
+        ForwardedKeyRole,   // the original sender as a peer key, when it is addressable
         ReplyRole,
         EditedRole,
         MediaKindRole,      // "", "photo", "video", "voice", "audio", "sticker", "gif", "document"

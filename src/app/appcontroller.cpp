@@ -1158,6 +1158,19 @@ void AppController::addLocalContact(const QString &firstName, const QString &las
     }
 }
 
+void AppController::openPeer(const QString &peerKey)
+{
+    const TgPeer want = TgPeer::fromKey(peerKey);
+    const TgPeer known = m_session->peers().withHash(want);
+    // A basic group is addressed by id alone; a user or channel needs the access hash, and
+    // without it there is no way to reach them - Telegram ids are not addresses by themselves.
+    if (known.kind != TgPeer::Chat && known.accessHash == 0) {
+        setNotice(tr("That chat is not in your list."));
+        return;
+    }
+    emit openChatRequested(known.key());
+}
+
 bool AppController::openInternalLink(const QString &url)
 {
     QString rest = url.trimmed();

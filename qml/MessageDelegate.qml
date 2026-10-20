@@ -127,10 +127,21 @@ Item {
                     text: qsTr("Forwarded from %1").arg(model.forwarded)
                     font.italic: true
                     font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
-                    color: "#b8d8f0"
+                    // Shown in the link colour when the original sender can actually be opened.
+                    // Someone who forwards with their account hidden gives only a name, and then
+                    // there is nothing to tap.
+                    color: model.forwardedKey != "" ? "#8fd1ff" : "#b8d8f0"
                     width: parent.width
                     horizontalAlignment: Text.AlignLeft
                     elide: Text.ElideRight
+
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: model.forwardedKey != ""
+                        onClicked: app.openPeer(model.forwardedKey)
+                        // The bubble's own long-press menu must still work through this.
+                        onPressAndHold: root.pressAndHold()
+                    }
                 }
                 Label {
                     id: replyLabel

@@ -211,6 +211,9 @@ public slots:
     /// A t.me/<username> link: resolve it and open that chat inside Symbigram. Returns false when
     /// the URL is not an internal Telegram link (the caller should hand it to the browser).
     Q_INVOKABLE bool openInternalLink(const QString &url);
+    /// Opens a chat with a peer we already know - used by the tappable "Forwarded from" name.
+    /// Says so politely when the peer cannot be addressed (no access hash for it).
+    Q_INVOKABLE void openPeer(const QString &peerKey);
     /// Saves a phonebook entry for a Telegram username (its Web Address becomes t.me/<name>).
     Q_INVOKABLE void addLocalContact(const QString &firstName, const QString &lastName,
                                      const QString &phone, const QString &url);

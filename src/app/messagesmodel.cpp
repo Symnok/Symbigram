@@ -127,6 +127,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[ReadRole] = "read";
     roles[ServiceRole] = "service";
     roles[ForwardedRole] = "forwarded";
+    roles[ForwardedKeyRole] = "forwardedKey";
     roles[ReplyRole] = "reply";
     roles[EditedRole] = "edited";
     roles[MediaKindRole] = "mediaKind";
@@ -316,6 +317,10 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     case FailedRole: return r.failed;
     case ReadRole: return m.out && !r.pending && m.id > 0 && m.id <= m_readOutboxMaxId;
     case ServiceRole: return m.service;
+    case ForwardedKeyRole:
+        // A key only when the sender is addressable. Someone who forwards with their account
+        // hidden gives a bare name instead, and there is nothing to open.
+        return m.forwardedFrom.contains(QLatin1Char(':')) ? m.forwardedFrom : QString();
     case ForwardedRole: {
         if (m.forwardedFrom.isEmpty()) return QString();
         if (m.forwardedFrom.contains(QLatin1Char(':'))) return m_session->peers().title(TgPeer::fromKey(m.forwardedFrom));

@@ -20,6 +20,10 @@ CommonDialog {
     property bool showOff: false
     /// The height to cap the scrolling content at - normally the page's own height.
     property int maxHeight: 400
+    /// maxHeight as it was when the dialog opened. The virtual keyboard SHRINKS the page, so a
+    /// height recomputed from it collapsed to nothing the moment a field was tapped - the field
+    /// appeared to vanish. Captured once in load(), before the keyboard can interfere.
+    property int capturedHeight: 400
 
     titleText: qsTr("Proxy")
     buttonTexts: showOff ? [app.proxyEnabled ? qsTr("Save") : qsTr("Enable"), qsTr("Cancel"), qsTr("Off")]
@@ -27,8 +31,11 @@ CommonDialog {
 
     content: Item {
         width: parent.width
-        height: Math.min(proxyColumn.height + platformStyle.paddingLarge * 2,
-                         dialog.maxHeight - platformStyle.graphicSizeLarge * 3)
+        // Never smaller than a few rows, whatever the arithmetic says: a collapsed content item
+        // shows nothing at all, which is worse than a dialog that has to be scrolled.
+        height: Math.max(platformStyle.graphicSizeLarge * 3,
+                         Math.min(proxyColumn.height + platformStyle.paddingLarge * 2,
+                                  dialog.capturedHeight - platformStyle.graphicSizeLarge * 3))
 
         Flickable {
             id: proxyFlick
@@ -38,6 +45,16 @@ CommonDialog {
             clip: true
             flickableDirection: Flickable.VerticalFlick
             boundsBehavior: Flickable.StopAtBounds
+
+            /// Scrolls a field into view when it takes focus. With the keyboard up only part of
+            /// the dialog is visible, and the field being typed into has to be that part.
+            function ensureVisible(item) {
+                if (!item) return
+                var top = item.mapToItem(proxyColumn, 0, 0).y
+                var bottom = top + item.height
+                if (top < contentY) contentY = top
+                else if (bottom > contentY + height) contentY = bottom - height
+            }
 
             Column {
                 id: proxyColumn
@@ -57,6 +74,7 @@ CommonDialog {
                 Label { text: qsTr("Server"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
                 TextField {
                     id: proxyHostField
+                    onActiveFocusChanged: if (activeFocus) proxyFlick.ensureVisible(this)
                     width: parent.width
                     placeholderText: qsTr("host or IP")
                     inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
@@ -64,6 +82,7 @@ CommonDialog {
                 Label { text: qsTr("Port"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
                 TextField {
                     id: proxyPortField
+                    onActiveFocusChanged: if (activeFocus) proxyFlick.ensureVisible(this)
                     width: parent.width
                     placeholderText: dialog.kind == 1 ? "443" : "1080"
                     inputMethodHints: Qt.ImhDigitsOnly
@@ -71,15 +90,16 @@ CommonDialog {
 
                 // SOCKS5 credentials.
                 Label { visible: dialog.kind == 0; text: qsTr("Username (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-                TextField { visible: dialog.kind == 0; id: proxyUserField; width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
+                TextField { visible: dialog.kind == 0; id: proxyUserField; onActiveFocusChanged: if (activeFocus) proxyFlick.ensureVisible(this); width: parent.width; inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText }
                 Label { visible: dialog.kind == 0; text: qsTr("Password (optional)"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
-                TextField { visible: dialog.kind == 0; id: proxyPassField; width: parent.width; echoMode: TextInput.Password }
+                TextField { visible: dialog.kind == 0; id: proxyPassField; onActiveFocusChanged: if (activeFocus) proxyFlick.ensureVisible(this); width: parent.width; echoMode: TextInput.Password }
 
                 // MTProto secret.
                 Label { visible: dialog.kind == 1; text: qsTr("Secret"); color: "white"; font.pixelSize: platformStyle.fontSizeSmall }
                 TextField {
                     visible: dialog.kind == 1
                     id: proxySecretField
+                    onActiveFocusChanged: if (activeFocus) proxyFlick.ensureVisible(this)
                     width: parent.width
                     placeholderText: qsTr("hex or base64, from the proxy link")
                     inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
@@ -119,6 +139,7 @@ CommonDialog {
     }
 
     function load() {
+        dialog.capturedHeight = dialog.maxHeight
         dialog.kind = app.proxyKind
         proxyHostField.text = app.proxyHost
         proxyPortField.text = app.proxyPort
