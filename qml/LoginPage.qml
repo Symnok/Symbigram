@@ -28,7 +28,7 @@ Page {
                 visible: !app.passwordNeeded
                 onClicked: app.loginMethod == "phone" ? app.useQrLogin() : app.usePhoneLogin()
             }
-            MenuItem { text: qsTr("Proxy"); onClicked: { proxyDialog.load(); proxyDialog.open() } }
+            MenuItem { text: qsTr("Proxy"); onClicked: pageStack.push(proxyPage) }
             MenuItem { text: qsTr("Reconnect"); onClicked: app.reconnect() }
         }
     }
@@ -36,7 +36,7 @@ Page {
     // The same dialog Settings uses: SOCKS5 or MTProto, with the secret and the
     // "paste a proxy link" shortcut. This screen is where a blocked user ends up, so it
     // is the last place that should offer SOCKS5 only.
-    ProxyDialog { id: proxyDialog; showOff: true; maxHeight: page.height }
+    Component { id: proxyPage; ProxyPage { showOff: true } }
 
     // seconds left on the code, for the countdown under it
     Timer {
@@ -119,7 +119,7 @@ Page {
                     Button {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: app.proxyEnabled ? qsTr("Proxy: %1").arg(app.proxyHost != "" ? app.proxyHost : qsTr("on")) : qsTr("Set up proxy")
-                        onClicked: { proxyDialog.load(); proxyDialog.open() }
+                        onClicked: pageStack.push(proxyPage)
                     }
                 }
             }

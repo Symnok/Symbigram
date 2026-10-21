@@ -1380,6 +1380,11 @@ void AppController::copyText(const QString &text)
     setNotice(tr("Copied."));
 }
 
+QString AppController::clipboardText() const
+{
+    return QApplication::clipboard()->text();
+}
+
 void AppController::appendLog(const QString &line)
 {
     if (!loggingEnabled) return;

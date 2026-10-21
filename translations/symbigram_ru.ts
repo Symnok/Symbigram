@@ -39,8 +39,8 @@
         <location filename="../src/app/appcontroller.cpp" line="355" />
         <location filename="../src/app/appcontroller.cpp" line="668" />
         <location filename="../src/app/appcontroller.cpp" line="1145" />
-        <location filename="../src/app/appcontroller.cpp" line="1225" />
-        <location filename="../src/app/appcontroller.cpp" line="1345" />
+        <location filename="../src/app/appcontroller.cpp" line="1238" />
+        <location filename="../src/app/appcontroller.cpp" line="1358" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
@@ -298,88 +298,89 @@
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1199" />
+        <location filename="../src/app/appcontroller.cpp" line="1168" />
+        <location filename="../src/app/appcontroller.cpp" line="1212" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1226" />
+        <location filename="../src/app/appcontroller.cpp" line="1239" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1300" />
+        <location filename="../src/app/appcontroller.cpp" line="1313" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Секретные чаты можно начинать только с человеком.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1302" />
+        <location filename="../src/app/appcontroller.cpp" line="1315" />
         <source>Starting a secret chat...</source>
         <translation>Создание секретного чата...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1309" />
+        <location filename="../src/app/appcontroller.cpp" line="1322" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Кто-то хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1310" />
+        <location filename="../src/app/appcontroller.cpp" line="1323" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1312" />
-        <location filename="../src/app/appcontroller.cpp" line="1333" />
+        <location filename="../src/app/appcontroller.cpp" line="1325" />
+        <location filename="../src/app/appcontroller.cpp" line="1346" />
         <source>Secret chat</source>
         <translation>Секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1312" />
+        <location filename="../src/app/appcontroller.cpp" line="1325" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 хочет начать секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1319" />
+        <location filename="../src/app/appcontroller.cpp" line="1332" />
         <source>Secret chat is ready.</source>
         <translation>Секретный чат готов.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1333" />
+        <location filename="../src/app/appcontroller.cpp" line="1346" />
         <source>Encrypted message</source>
         <translation>Зашифрованное сообщение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1347" />
+        <location filename="../src/app/appcontroller.cpp" line="1360" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Изображения (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1347" />
+        <location filename="../src/app/appcontroller.cpp" line="1360" />
         <source>All files (*)</source>
         <translation>Все файлы (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1348" />
+        <location filename="../src/app/appcontroller.cpp" line="1361" />
         <source>Choose an image</source>
         <translation>Выберите изображение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1348" />
+        <location filename="../src/app/appcontroller.cpp" line="1361" />
         <source>Choose a file</source>
         <translation>Выберите файл</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1356" />
+        <location filename="../src/app/appcontroller.cpp" line="1369" />
         <source>Sending the image...</source>
         <translation>Отправка изображения...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1356" />
+        <location filename="../src/app/appcontroller.cpp" line="1369" />
         <source>Sending the file...</source>
         <translation>Отправка файла...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1367" />
+        <location filename="../src/app/appcontroller.cpp" line="1380" />
         <source>Copied.</source>
         <translation>Скопировано.</translation>
     </message>
@@ -1242,77 +1243,77 @@
         <translation>Переслано от %1</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="181" />
+        <location filename="../qml/MessageDelegate.qml" line="206" />
         <source>Tap to load</source>
         <translation>Нажмите, чтобы загрузить</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="189" />
+        <location filename="../qml/MessageDelegate.qml" line="217" />
         <source>Failed - tap to retry</source>
         <translation>Ошибка — нажмите, чтобы повторить</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="231" />
+        <location filename="../qml/MessageDelegate.qml" line="259" />
         <source>Voice message</source>
         <translation>Голосовое сообщение</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="232" />
+        <location filename="../qml/MessageDelegate.qml" line="260" />
         <source>Video</source>
         <translation>Видео</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="240" />
+        <location filename="../qml/MessageDelegate.qml" line="268" />
         <source>playing... tap to stop</source>
         <translation>воспроизведение... нажмите, чтобы остановить</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="241" />
+        <location filename="../qml/MessageDelegate.qml" line="269" />
         <source>loading %1%</source>
         <translation>загрузка %1%</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="241" />
+        <location filename="../qml/MessageDelegate.qml" line="269" />
         <source>tap to play</source>
         <translation>нажмите, чтобы воспроизвести</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="243" />
+        <location filename="../qml/MessageDelegate.qml" line="271" />
         <source>buffering %1%... opening player</source>
         <translation>буферизация %1%... открываю плеер</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="243" />
+        <location filename="../qml/MessageDelegate.qml" line="271" />
         <source>tap to play in player</source>
         <translation>нажмите, чтобы открыть в плеере</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="244" />
+        <location filename="../qml/MessageDelegate.qml" line="272" />
         <source>tap to open</source>
         <translation>нажмите, чтобы открыть</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="244" />
+        <location filename="../qml/MessageDelegate.qml" line="272" />
         <source>downloading %1%</source>
         <translation>загрузка %1%</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="244" />
+        <location filename="../qml/MessageDelegate.qml" line="272" />
         <source>tap to download</source>
         <translation>нажмите, чтобы скачать</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="267" />
+        <location filename="../qml/MessageDelegate.qml" line="295" />
         <source>GIF file</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="274" />
+        <location filename="../qml/MessageDelegate.qml" line="302" />
         <source>not supported</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="383" />
+        <location filename="../qml/MessageDelegate.qml" line="411" />
         <source>edited</source>
         <translation>изменено</translation>
     </message>
@@ -1320,172 +1321,172 @@
 <context>
     <name>MessagesModel</name>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="205" />
+        <location filename="../src/app/messagesmodel.cpp" line="206" />
         <source>Today</source>
         <translation>Сегодня</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="206" />
+        <location filename="../src/app/messagesmodel.cpp" line="207" />
         <source>Yesterday</source>
         <translation>Вчера</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1360" />
+        <location filename="../src/app/messagesmodel.cpp" line="1365" />
         <source>reply</source>
         <translation>ответ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1362" />
+        <location filename="../src/app/messagesmodel.cpp" line="1367" />
         <source>You</source>
         <translation>Вы</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="384" />
+        <location filename="../src/app/messagesmodel.cpp" line="389" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="385" />
+        <location filename="../src/app/messagesmodel.cpp" line="390" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="386" />
+        <location filename="../src/app/messagesmodel.cpp" line="391" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="485" />
+        <location filename="../src/app/messagesmodel.cpp" line="490" />
         <source>Can't forward to a secret chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="573" />
+        <location filename="../src/app/messagesmodel.cpp" line="578" />
         <source>Could not save the file to %1</source>
         <translation>Не удалось сохранить файл в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="618" />
+        <location filename="../src/app/messagesmodel.cpp" line="623" />
         <source>Could not open the file.</source>
         <translation>Не удалось открыть файл.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="759" />
+        <location filename="../src/app/messagesmodel.cpp" line="764" />
         <source>Could not play this audio: %1</source>
         <translation>Не удалось воспроизвести аудио: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="883" />
+        <location filename="../src/app/messagesmodel.cpp" line="888" />
         <source>online</source>
         <translation>в сети</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="887" />
+        <location filename="../src/app/messagesmodel.cpp" line="892" />
         <source>last seen at %1</source>
         <translation>был(а) в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="888" />
+        <location filename="../src/app/messagesmodel.cpp" line="893" />
         <source>last seen yesterday at %1</source>
         <translation>был(а) вчера в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="889" />
+        <location filename="../src/app/messagesmodel.cpp" line="894" />
         <source>last seen %1</source>
         <translation>был(а) %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="891" />
+        <location filename="../src/app/messagesmodel.cpp" line="896" />
         <source>last seen recently</source>
         <translation>был(а) недавно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="892" />
+        <location filename="../src/app/messagesmodel.cpp" line="897" />
         <source>last seen within a week</source>
         <translation>был(а) на этой неделе</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="893" />
+        <location filename="../src/app/messagesmodel.cpp" line="898" />
         <source>last seen within a month</source>
         <translation>был(а) в этом месяце</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="894" />
+        <location filename="../src/app/messagesmodel.cpp" line="899" />
         <source>last seen a long time ago</source>
         <translation>был(а) давно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="909" />
+        <location filename="../src/app/messagesmodel.cpp" line="914" />
         <source>wants to start a secret chat</source>
         <translation>хочет начать секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="910" />
+        <location filename="../src/app/messagesmodel.cpp" line="915" />
         <source>waiting to be accepted...</source>
         <translation>ожидает подтверждения...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="911" />
+        <location filename="../src/app/messagesmodel.cpp" line="916" />
         <source>end-to-end encrypted, self-destruct %1s</source>
         <translation>сквозное шифрование, самоуничтожение %1с</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="912" />
+        <location filename="../src/app/messagesmodel.cpp" line="917" />
         <source>end-to-end encrypted</source>
         <translation>сквозное шифрование</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="918" />
+        <location filename="../src/app/messagesmodel.cpp" line="923" />
         <source>%1 is typing...</source>
         <translation>%1 печатает...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="919" />
+        <location filename="../src/app/messagesmodel.cpp" line="924" />
         <source>typing...</source>
         <translation>печатает...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="923" />
+        <location filename="../src/app/messagesmodel.cpp" line="928" />
         <source>bot</source>
         <translation>бот</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="924" />
+        <location filename="../src/app/messagesmodel.cpp" line="929" />
         <source>Saved Messages</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="927" />
+        <location filename="../src/app/messagesmodel.cpp" line="932" />
         <source>channel, %1 subscribers</source>
         <translation>канал, подписчиков: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="927" />
+        <location filename="../src/app/messagesmodel.cpp" line="932" />
         <source>channel</source>
         <translation>канал</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="928" />
+        <location filename="../src/app/messagesmodel.cpp" line="933" />
         <source>%1 members</source>
         <translation>участников: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="928" />
+        <location filename="../src/app/messagesmodel.cpp" line="933" />
         <source>group</source>
         <translation>группа</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1373" />
+        <location filename="../src/app/messagesmodel.cpp" line="1378" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1442" />
+        <location filename="../src/app/messagesmodel.cpp" line="1447" />
         <source>photo</source>
         <translation>фото</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1458" />
+        <location filename="../src/app/messagesmodel.cpp" line="1463" />
         <source>The message was not sent: %1</source>
         <translation>Сообщение не отправлено: %1</translation>
     </message>
@@ -1707,113 +1708,121 @@
     </message>
 </context>
 <context>
-    <name>ProxyDialog</name>
+    <name>ProxyPage</name>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="24" />
-        <source>Proxy</source>
-        <translation>Прокси</translation>
-    </message>
-    <message>
-        <location filename="../qml/ProxyDialog.qml" line="25" />
-        <location filename="../qml/ProxyDialog.qml" line="26" />
+        <location filename="../qml/ProxyPage.qml" line="26" />
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <location filename="../qml/ProxyPage.qml" line="26" />
         <source>Enable</source>
         <translation>Включить</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="25" />
-        <location filename="../qml/ProxyDialog.qml" line="26" />
-        <source>Cancel</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location filename="../qml/ProxyDialog.qml" line="25" />
+        <location filename="../qml/ProxyPage.qml" line="30" />
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="49" />
+        <location filename="../qml/ProxyPage.qml" line="63" />
+        <source>Proxy</source>
+        <translation>Прокси</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyPage.qml" line="68" />
+        <source>on - %1</source>
+        <translation>вкл. - %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyPage.qml" line="68" />
+        <source>off</source>
+        <translation>выкл.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyPage.qml" line="98" />
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="53" />
+        <location filename="../qml/ProxyPage.qml" line="102" />
         <source>SOCKS5</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="54" />
+        <location filename="../qml/ProxyPage.qml" line="103" />
         <source>MTProto</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="57" />
+        <location filename="../qml/ProxyPage.qml" line="106" />
         <source>Server</source>
         <translation>Сервер</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="61" />
+        <location filename="../qml/ProxyPage.qml" line="110" />
         <source>host or IP</source>
         <translation>хост или IP</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="64" />
+        <location filename="../qml/ProxyPage.qml" line="115" />
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="73" />
+        <location filename="../qml/ProxyPage.qml" line="125" />
         <source>Username (optional)</source>
         <translation>Имя пользователя (необязательно)</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="75" />
+        <location filename="../qml/ProxyPage.qml" line="133" />
         <source>Password (optional)</source>
         <translation>Пароль (необязательно)</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="79" />
+        <location filename="../qml/ProxyPage.qml" line="143" />
         <source>Secret</source>
         <translation>Секрет</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="84" />
+        <location filename="../qml/ProxyPage.qml" line="148" />
         <source>hex or base64, from the proxy link</source>
         <translation>hex или base64, из ссылки прокси</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="93" />
-        <source>Or paste a whole tg://proxy or t.me/proxy link into Secret and tap Use link.</source>
-        <translation>Или вставьте целую ссылку tg://proxy или t.me/proxy в поле «Секрет» и нажмите «Использовать ссылку».</translation>
+        <location filename="../qml/ProxyPage.qml" line="161" />
+        <source>Paste</source>
+        <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../qml/ProxyDialog.qml" line="98" />
+        <location filename="../qml/ProxyPage.qml" line="166" />
         <source>Use link</source>
         <translation>Использовать ссылку</translation>
+    </message>
+    <message>
+        <location filename="../qml/ProxyPage.qml" line="176" />
+        <source>Paste a whole tg://proxy or t.me/proxy link and tap Use link, or type the secret on its own and tap Save.</source>
+        <translation>Вставьте целую ссылку tg://proxy или t.me/proxy и нажмите «Использовать ссылку», либо введите только секрет и нажмите «Сохранить».</translation>
     </message>
 </context>
 <context>
     <name>SettingsPage</name>
     <message>
         <location filename="../qml/SettingsPage.qml" line="25" />
-        <location filename="../qml/SettingsPage.qml" line="356" />
+        <location filename="../qml/SettingsPage.qml" line="357" />
         <source>App language</source>
         <translation>Язык приложения</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="36" />
-        <location filename="../qml/SettingsPage.qml" line="94" />
         <location filename="../qml/SettingsPage.qml" line="95" />
+        <location filename="../qml/SettingsPage.qml" line="96" />
         <source>System default</source>
         <translation>Как в системе</translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="51" />
-        <location filename="../qml/SettingsPage.qml" line="211" />
+        <location filename="../qml/SettingsPage.qml" line="212" />
         <source>Save downloads to</source>
         <translation>Сохранять загрузки в</translation>
     </message>
@@ -1829,7 +1838,7 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="15" />
-        <location filename="../qml/SettingsPage.qml" line="287" />
+        <location filename="../qml/SettingsPage.qml" line="288" />
         <source>Clear cache</source>
         <translation>Очистить кэш</translation>
     </message>
@@ -1840,78 +1849,78 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="75" />
-        <location filename="../qml/SettingsPage.qml" line="237" />
+        <location filename="../qml/SettingsPage.qml" line="238" />
         <source>Image preview</source>
         <translation type="unfinished" />
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="82" />
-        <location filename="../qml/SettingsPage.qml" line="253" />
+        <location filename="../qml/SettingsPage.qml" line="254" />
         <source>Font size</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="165" />
+        <location filename="../qml/SettingsPage.qml" line="166" />
         <source>Proxy</source>
         <translation>Прокси</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="101" />
+        <location filename="../qml/SettingsPage.qml" line="102" />
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="118" />
+        <location filename="../qml/SettingsPage.qml" line="119" />
         <source>Notifications</source>
         <translation>Уведомления</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="122" />
+        <location filename="../qml/SettingsPage.qml" line="123" />
         <source>Popup: %1, Sound: %2, Vibration: %3</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="126" />
+        <location filename="../qml/SettingsPage.qml" line="127" />
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="140" />
+        <location filename="../qml/SettingsPage.qml" line="141" />
         <source>Popup, sound and vibration for messages that arrive while another application is in front.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="188" />
+        <location filename="../qml/SettingsPage.qml" line="189" />
         <source> (MTProto)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="188" />
+        <location filename="../qml/SettingsPage.qml" line="189" />
         <source> (SOCKS5)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="202" />
+        <location filename="../qml/SettingsPage.qml" line="203" />
         <source>Route the connection through a SOCKS5 or MTProto proxy. Changing it reconnects.</source>
         <translation>Направлять соединение через прокси SOCKS5 или MTProto. Изменение вызывает переподключение.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="290" />
+        <location filename="../qml/SettingsPage.qml" line="291" />
         <source>Cached media and downloaded files: %1</source>
         <translation>Кэш медиа и загруженные файлы: %1</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="306" />
+        <location filename="../qml/SettingsPage.qml" line="307" />
         <source>Image thumbnails</source>
         <translation>Миниатюры изображений</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="321" />
+        <location filename="../qml/SettingsPage.qml" line="322" />
         <source>The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="149" />
+        <location filename="../qml/SettingsPage.qml" line="150" />
         <source>Connect on start</source>
         <translation>Подключаться при запуске</translation>
     </message>
@@ -1921,42 +1930,42 @@
         <translation>Удалить %1, занятые на телефоне? Будут очищены кэш медиа и файлы, загруженные в папки Symbigram. Установленные языковые пакеты сохраняются.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="183" />
+        <location filename="../qml/SettingsPage.qml" line="184" />
         <source>Proxy server</source>
         <translation>Сервер прокси</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="186" />
+        <location filename="../qml/SettingsPage.qml" line="187" />
         <source>not set</source>
         <translation>не задан</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="228" />
+        <location filename="../qml/SettingsPage.qml" line="229" />
         <source>Saved photos and files go here. Pick a drive, or "Choose folder..." for any folder.</source>
         <translation>Сюда сохраняются фото и файлы. Выберите диск или «Выбрать папку...» для любой папки.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="270" />
+        <location filename="../qml/SettingsPage.qml" line="271" />
         <source>The size of the message text in chats. Small is the original size.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="279" />
+        <location filename="../qml/SettingsPage.qml" line="280" />
         <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="330" />
+        <location filename="../qml/SettingsPage.qml" line="331" />
         <source>Keep a log</source>
         <translation>Вести журнал</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="347" />
+        <location filename="../qml/SettingsPage.qml" line="348" />
         <source>Off by default. Turn it on only to collect a diagnostic log (shown on the About page) when something goes wrong.</source>
         <translation>По умолчанию выключено. Включайте только для сбора диагностического журнала (виден на странице «О программе»), когда что-то идёт не так.</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="378" />
+        <location filename="../qml/SettingsPage.qml" line="379" />
         <source>Takes effect after the app is restarted.</source>
         <translation>Вступает в силу после перезапуска приложения.</translation>
     </message>

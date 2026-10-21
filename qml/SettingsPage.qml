@@ -84,8 +84,9 @@ Page {
         onAccepted: if (selectedIndex >= 0) app.fontSize = selectedIndex
     }
 
-    // Shared with the login screen, which needs the same MTProto fields.
-    ProxyDialog { id: proxyDialog; maxHeight: page.height }
+    // A page, not a dialog: a text field inside a CommonDialog cannot be pasted into on this
+    // platform. Shared with the login screen, which needs the same MTProto fields.
+    Component { id: proxyPage; ProxyPage {} }
 
     function languageName() {
         var list = app.availableLanguages()
@@ -191,7 +192,7 @@ Page {
                         elide: Text.ElideRight
                     }
                 }
-                onClicked: { proxyDialog.load(); proxyDialog.open() }
+                onClicked: pageStack.push(proxyPage)
             }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge

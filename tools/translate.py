@@ -13,6 +13,10 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RU = {
+"Paste": "Вставить",
+"on - %1": "вкл. - %1",
+"off": "выкл.",
+"Paste a whole tg://proxy or t.me/proxy link and tap Use link, or type the secret on its own and tap Save.": "Вставьте целую ссылку tg://proxy или t.me/proxy и нажмите «Использовать ссылку», либо введите только секрет и нажмите «Сохранить».",
 "hex or base64, from the proxy link": "hex или base64, из ссылки прокси",
 "the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "прокси ответил не по TLS - неверный секрет или это не FakeTLS-прокси",
 "the proxy failed its TLS check - wrong secret, or the phone's clock is off": "прокси не прошёл проверку TLS - неверный секрет или сбиты часы телефона",
@@ -399,6 +403,10 @@ RU = {
 }
 
 UK = {
+"Paste": "Вставити",
+"on - %1": "увімк. - %1",
+"off": "вимк.",
+"Paste a whole tg://proxy or t.me/proxy link and tap Use link, or type the secret on its own and tap Save.": "Вставте повне посилання tg://proxy чи t.me/proxy і натисніть «Використати посилання», або введіть лише секрет і натисніть «Зберегти».",
 "hex or base64, from the proxy link": "hex або base64, з посилання проксі",
 "the proxy did not answer with TLS - wrong secret, or not a FakeTLS proxy": "проксі відповів не по TLS - неправильний секрет або це не FakeTLS-проксі",
 "the proxy failed its TLS check - wrong secret, or the phone's clock is off": "проксі не пройшов перевірку TLS - неправильний секрет або збитий годинник телефону",

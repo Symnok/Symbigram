@@ -7,7 +7,7 @@
         <file>qml/MessageDelegate.qml</file>
         <file>qml/NotificationsPage.qml</file>
         <file>qml/SettingsPage.qml</file>
-        <file>qml/ProxyDialog.qml</file>
+        <file>qml/ProxyPage.qml</file>
         <file>qml/ContactsPage.qml</file>
         <file>qml/ImagePickerPage.qml</file>
         <file>qml/NewContactPage.qml</file>

@@ -254,6 +254,9 @@ public slots:
     void setProxyEnabled(bool on);
     void openUrl(const QString &url);
     void copyText(const QString &text);
+    /// The clipboard's text, for an explicit Paste button where the platform's own
+    /// paste bubble is awkward to reach.
+    Q_INVOKABLE QString clipboardText() const;
     void clearNotice();
     /// Desktop testing: screenshots of the pages (SGM_SHOT_DIR).
     void takeScreenshot(const QString &name);

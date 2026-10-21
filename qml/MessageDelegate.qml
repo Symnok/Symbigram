@@ -160,7 +160,15 @@ Item {
                     visible: isPhoto
                     property real maxW: maxBubbleWidth - 2 * platformStyle.paddingMedium
                     property real ar: (model.mediaWidth > 0 && model.mediaHeight > 0) ? (model.mediaHeight / model.mediaWidth) : 0.75
-                    property real shownWidth: image.status == Image.Ready ? Math.min(maxW, image.sourceSize.width, 260) : Math.min(maxW, 200)
+                    // Telegram's inline placeholder thumbnail can be only a couple of dozen pixels
+                    // wide. Sizing the block to that collapsed it to a stamp and left the
+                    // "Tap to load" chip hanging off both sides, clipped by the screen edge - so
+                    // there is a floor as well as a ceiling.
+                    property real minW: Math.min(maxW, 140)
+                    property real naturalWidth: image.status == Image.Ready
+                                              ? Math.min(maxW, image.sourceSize.width, 260)
+                                              : Math.min(maxW, 200)
+                    property real shownWidth: Math.max(minW, naturalWidth)
                     width: shownWidth
                     height: shownWidth * (image.status == Image.Ready ? (image.sourceSize.height / image.sourceSize.width) : ar)
                     Rectangle { anchors.fill: parent; radius: 6; color: "#20000000"; visible: image.status != Image.Ready }
@@ -180,15 +188,21 @@ Item {
                     }
                     // a "tap to load" chip while only the blurred placeholder is shown (Thumbnail mode)
                     Rectangle {
+                        id: tapChip
                         anchors.centerIn: parent
                         visible: isPhoto && !model.previewLoaded && model.mediaState != "loading" && model.mediaState != "failed"
-                        width: tapHint.width + 2 * platformStyle.paddingMedium
-                        height: tapHint.height + platformStyle.paddingSmall
+                        // Never wider than the block it sits on, so it cannot spill outside the
+                        // bubble - at the largest font setting the text alone can exceed it.
+                        width: Math.min(photo.width - platformStyle.paddingSmall,
+                                        tapHint.implicitWidth + 2 * platformStyle.paddingMedium)
+                        height: tapHint.implicitHeight + platformStyle.paddingSmall
                         radius: height / 2
                         color: "#99000000"
                         Label {
                             id: tapHint
                             anchors.centerIn: parent
+                            width: Math.min(implicitWidth, tapChip.width - 2 * platformStyle.paddingMedium)
+                            elide: Text.ElideRight
                             text: qsTr("Tap to load")
                             color: "white"
                             font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
@@ -197,6 +211,9 @@ Item {
                     Label {
                         anchors.centerIn: parent
                         visible: model.mediaState == "failed"
+                        width: Math.min(implicitWidth, photo.width - platformStyle.paddingSmall)
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Failed - tap to retry")
                         color: "#ff9b9b"
                         font.pixelSize: (platformStyle.fontSizeSmall * root.fontScale)
