@@ -135,9 +135,9 @@ public:
     bool notifications() const { return popupMode() || soundMode() || vibrationMode(); }
     bool groupNotifications() const;
     void setGroupNotifications(bool on);
-    int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full
+    int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full, 2 = None
     void setImagePreview(int mode);
-    Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full"]
+    Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full", "None"]
     /// Where add-on language packs install their .qm files. A pack dropped here is picked up
     /// without rebuilding the application.
     static QString translationsDir();

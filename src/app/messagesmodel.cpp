@@ -176,7 +176,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
-      m_autoPreview(false), m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
+      m_previewMode(0), m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -528,15 +528,20 @@ void MessagesModel::prepareMedia(Row &r)
     if (m.kind == TgMedia::Photo || m.kind == TgMedia::Sticker) {
         // An instant blurred placeholder, then the small "show" size fetched automatically - it is
         // the inline thumbnail only.
-        QString stripped = m_media->strippedThumbFile(m);
+        // "None" shows nothing until asked - not even the blurred placeholder that comes free
+        // with the message, since decoding one per photo is work this phone would rather not do
+        // in a busy channel.
+        const bool showPlaceholder = (m_previewMode != 2);
+        QString stripped = showPlaceholder ? m_media->strippedThumbFile(m) : QString();
         if (!stripped.isEmpty()) r.thumbPath = stripped;
         QString cached = m_media->cachedFile(m, m.sizeType);
         if (!cached.isEmpty()) {
             r.thumbPath = cached;
             r.showLoaded = true;
-        } else if (m_autoPreview || m.kind == TgMedia::Sticker) {
-            // Full preview (or a sticker, always shown): fetch the "show" size now. In Thumbnail mode
-            // a normal photo is left as the blurred placeholder until the user taps (loadPreview).
+        } else if (m_previewMode == 1 || (m.kind == TgMedia::Sticker && m_previewMode != 2)) {
+            // Full preview (or a sticker, which is normally always shown): fetch the "show" size
+            // now. In Thumbnail mode a photo waits as the blurred placeholder until the user taps
+            // (loadPreview); in None mode nothing is fetched at all, stickers included.
             r.awaitKey = m_media->fetch(m, m.sizeType);
             r.mediaLoading = true;
         }

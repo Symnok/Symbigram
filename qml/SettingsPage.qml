@@ -277,7 +277,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.")
+                text: qsTr("Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. None shows no picture at all until you tap. Video previews are never loaded automatically. None of this changes what Save downloads.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

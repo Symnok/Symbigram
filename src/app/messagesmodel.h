@@ -178,7 +178,9 @@ public:
     Q_INVOKABLE void loadPreview(int row);
     /// Image Preview setting: true = fetch and show photo previews automatically (Full), false =
     /// show only the blurred placeholder until tapped (Thumbnail). Does not affect Save/Open.
-    void setAutoPreview(bool full) { m_autoPreview = full; }
+    /// 0 = Thumbnail (the blurred placeholder that rides along with the message, no fetch),
+    /// 1 = Full (fetch the shown size up front), 2 = None (nothing at all until tapped).
+    void setPreviewMode(int mode) { m_previewMode = mode; }
     /// Photos: fetch the size to save and copy it out. Documents/video/etc.: fetch the
     /// whole file. Drives MediaStateRole/MediaProgressRole for the row.
     Q_INVOKABLE void downloadMedia(int row);
@@ -313,7 +315,7 @@ private:
     int m_jumpToId;                         // message to position at once that page arrives (0 = none)
     int m_topicId;                          // forum topic being viewed (0 = whole chat / not a forum)
     QString m_topicTitle;                   // the open topic's title (header)
-    bool m_autoPreview;                     // Image Preview = Full (auto-load photos) vs Thumbnail
+    int m_previewMode;                      // Image preview: 0 Thumbnail, 1 Full, 2 None
     int m_openInboxMax;                     // readInboxMaxId captured when the chat opened (for unread)
     int m_openUnread;                       // unreadCount captured when the chat opened
 };

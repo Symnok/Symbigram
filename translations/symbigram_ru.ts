@@ -37,10 +37,10 @@
     <name>AppController</name>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="355" />
-        <location filename="../src/app/appcontroller.cpp" line="668" />
-        <location filename="../src/app/appcontroller.cpp" line="1145" />
-        <location filename="../src/app/appcontroller.cpp" line="1238" />
-        <location filename="../src/app/appcontroller.cpp" line="1358" />
+        <location filename="../src/app/appcontroller.cpp" line="674" />
+        <location filename="../src/app/appcontroller.cpp" line="1151" />
+        <location filename="../src/app/appcontroller.cpp" line="1244" />
+        <location filename="../src/app/appcontroller.cpp" line="1364" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
@@ -133,7 +133,7 @@
     </message>
     <message>
         <location filename="../src/app/appcontroller.cpp" line="431" />
-        <location filename="../src/app/appcontroller.cpp" line="544" />
+        <location filename="../src/app/appcontroller.cpp" line="550" />
         <source>Medium</source>
         <translation type="unfinished" />
     </message>
@@ -183,204 +183,209 @@
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="544" />
+        <location filename="../src/app/appcontroller.cpp" line="550" />
         <source>Extra small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="544" />
+        <location filename="../src/app/appcontroller.cpp" line="550" />
         <source>Small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="545" />
+        <location filename="../src/app/appcontroller.cpp" line="551" />
         <source>Large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="545" />
+        <location filename="../src/app/appcontroller.cpp" line="551" />
         <source>Extra large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="554" />
+        <location filename="../src/app/appcontroller.cpp" line="560" />
         <source>Thumbnail</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="554" />
+        <location filename="../src/app/appcontroller.cpp" line="560" />
         <source>Full</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="593" />
+        <location filename="../src/app/appcontroller.cpp" line="560" />
+        <source>None</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="599" />
         <source>Phone memory</source>
         <translation>Память телефона</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="594" />
+        <location filename="../src/app/appcontroller.cpp" line="600" />
         <source>Mass memory</source>
         <translation>Массовая память</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="595" />
+        <location filename="../src/app/appcontroller.cpp" line="601" />
         <source>Memory card</source>
         <translation>Карта памяти</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="641" />
+        <location filename="../src/app/appcontroller.cpp" line="647" />
         <source>Choose download folder</source>
         <translation>Выберите папку загрузок</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="670" />
+        <location filename="../src/app/appcontroller.cpp" line="676" />
         <source>Cannot record a voice message here.</source>
         <translation>Здесь нельзя записать голосовое сообщение.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="693" />
+        <location filename="../src/app/appcontroller.cpp" line="699" />
         <source>Sending the voice message...</source>
         <translation>Отправка голосового сообщения...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="756" />
+        <location filename="../src/app/appcontroller.cpp" line="762" />
         <source>That does not look like a proxy link.</source>
         <translation>Это не похоже на ссылку прокси.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="786" />
+        <location filename="../src/app/appcontroller.cpp" line="792" />
         <source>That secret is not a valid length.</source>
         <translation>Неверная длина секрета.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="765" />
+        <location filename="../src/app/appcontroller.cpp" line="771" />
         <source>The link is missing the server or port.</source>
         <translation>В ссылке нет сервера или порта.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="824" />
+        <location filename="../src/app/appcontroller.cpp" line="830" />
         <source>Proxy set to %1:%2.</source>
         <translation>Прокси задан: %1:%2.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="952" />
+        <location filename="../src/app/appcontroller.cpp" line="958" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>Соединение потеряно: %1. Переподключение...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="953" />
+        <location filename="../src/app/appcontroller.cpp" line="959" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Не удалось подключиться: %1. Повтор...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1058" />
+        <location filename="../src/app/appcontroller.cpp" line="1064" />
         <source>Enter the password.</source>
         <translation>Введите пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1083" />
+        <location filename="../src/app/appcontroller.cpp" line="1089" />
         <source>Enter your phone number.</source>
         <translation>Введите номер телефона.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1093" />
+        <location filename="../src/app/appcontroller.cpp" line="1099" />
         <source>Enter the code.</source>
         <translation>Введите код.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1155" />
+        <location filename="../src/app/appcontroller.cpp" line="1161" />
         <source>Added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1155" />
+        <location filename="../src/app/appcontroller.cpp" line="1161" />
         <source>%1 added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1168" />
-        <location filename="../src/app/appcontroller.cpp" line="1212" />
+        <location filename="../src/app/appcontroller.cpp" line="1174" />
+        <location filename="../src/app/appcontroller.cpp" line="1218" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1239" />
+        <location filename="../src/app/appcontroller.cpp" line="1245" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1313" />
+        <location filename="../src/app/appcontroller.cpp" line="1319" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Секретные чаты можно начинать только с человеком.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1315" />
+        <location filename="../src/app/appcontroller.cpp" line="1321" />
         <source>Starting a secret chat...</source>
         <translation>Создание секретного чата...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1322" />
+        <location filename="../src/app/appcontroller.cpp" line="1328" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Кто-то хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1323" />
+        <location filename="../src/app/appcontroller.cpp" line="1329" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 хочет начать секретный чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1325" />
-        <location filename="../src/app/appcontroller.cpp" line="1346" />
+        <location filename="../src/app/appcontroller.cpp" line="1331" />
+        <location filename="../src/app/appcontroller.cpp" line="1352" />
         <source>Secret chat</source>
         <translation>Секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1325" />
+        <location filename="../src/app/appcontroller.cpp" line="1331" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 хочет начать секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1332" />
+        <location filename="../src/app/appcontroller.cpp" line="1338" />
         <source>Secret chat is ready.</source>
         <translation>Секретный чат готов.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1346" />
+        <location filename="../src/app/appcontroller.cpp" line="1352" />
         <source>Encrypted message</source>
         <translation>Зашифрованное сообщение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1360" />
+        <location filename="../src/app/appcontroller.cpp" line="1366" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Изображения (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1360" />
+        <location filename="../src/app/appcontroller.cpp" line="1366" />
         <source>All files (*)</source>
         <translation>Все файлы (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1361" />
+        <location filename="../src/app/appcontroller.cpp" line="1367" />
         <source>Choose an image</source>
         <translation>Выберите изображение</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1361" />
+        <location filename="../src/app/appcontroller.cpp" line="1367" />
         <source>Choose a file</source>
         <translation>Выберите файл</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1369" />
+        <location filename="../src/app/appcontroller.cpp" line="1375" />
         <source>Sending the image...</source>
         <translation>Отправка изображения...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1369" />
+        <location filename="../src/app/appcontroller.cpp" line="1375" />
         <source>Sending the file...</source>
         <translation>Отправка файла...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1380" />
+        <location filename="../src/app/appcontroller.cpp" line="1386" />
         <source>Copied.</source>
         <translation>Скопировано.</translation>
     </message>
@@ -1321,172 +1326,172 @@
 <context>
     <name>MessagesModel</name>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="206" />
+        <location filename="../src/app/messagesmodel.cpp" line="274" />
         <source>Today</source>
         <translation>Сегодня</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="207" />
+        <location filename="../src/app/messagesmodel.cpp" line="275" />
         <source>Yesterday</source>
         <translation>Вчера</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1365" />
+        <location filename="../src/app/messagesmodel.cpp" line="1501" />
         <source>reply</source>
         <translation>ответ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1367" />
+        <location filename="../src/app/messagesmodel.cpp" line="1503" />
         <source>You</source>
         <translation>Вы</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="389" />
+        <location filename="../src/app/messagesmodel.cpp" line="512" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="390" />
+        <location filename="../src/app/messagesmodel.cpp" line="513" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="391" />
+        <location filename="../src/app/messagesmodel.cpp" line="514" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="490" />
+        <location filename="../src/app/messagesmodel.cpp" line="626" />
         <source>Can't forward to a secret chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="578" />
+        <location filename="../src/app/messagesmodel.cpp" line="714" />
         <source>Could not save the file to %1</source>
         <translation>Не удалось сохранить файл в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="623" />
+        <location filename="../src/app/messagesmodel.cpp" line="759" />
         <source>Could not open the file.</source>
         <translation>Не удалось открыть файл.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="764" />
+        <location filename="../src/app/messagesmodel.cpp" line="900" />
         <source>Could not play this audio: %1</source>
         <translation>Не удалось воспроизвести аудио: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="888" />
+        <location filename="../src/app/messagesmodel.cpp" line="1024" />
         <source>online</source>
         <translation>в сети</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="892" />
+        <location filename="../src/app/messagesmodel.cpp" line="1028" />
         <source>last seen at %1</source>
         <translation>был(а) в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="893" />
+        <location filename="../src/app/messagesmodel.cpp" line="1029" />
         <source>last seen yesterday at %1</source>
         <translation>был(а) вчера в %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="894" />
+        <location filename="../src/app/messagesmodel.cpp" line="1030" />
         <source>last seen %1</source>
         <translation>был(а) %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="896" />
+        <location filename="../src/app/messagesmodel.cpp" line="1032" />
         <source>last seen recently</source>
         <translation>был(а) недавно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="897" />
+        <location filename="../src/app/messagesmodel.cpp" line="1033" />
         <source>last seen within a week</source>
         <translation>был(а) на этой неделе</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="898" />
+        <location filename="../src/app/messagesmodel.cpp" line="1034" />
         <source>last seen within a month</source>
         <translation>был(а) в этом месяце</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="899" />
+        <location filename="../src/app/messagesmodel.cpp" line="1035" />
         <source>last seen a long time ago</source>
         <translation>был(а) давно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="914" />
+        <location filename="../src/app/messagesmodel.cpp" line="1050" />
         <source>wants to start a secret chat</source>
         <translation>хочет начать секретный чат</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="915" />
+        <location filename="../src/app/messagesmodel.cpp" line="1051" />
         <source>waiting to be accepted...</source>
         <translation>ожидает подтверждения...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="916" />
+        <location filename="../src/app/messagesmodel.cpp" line="1052" />
         <source>end-to-end encrypted, self-destruct %1s</source>
         <translation>сквозное шифрование, самоуничтожение %1с</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="917" />
+        <location filename="../src/app/messagesmodel.cpp" line="1053" />
         <source>end-to-end encrypted</source>
         <translation>сквозное шифрование</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="923" />
+        <location filename="../src/app/messagesmodel.cpp" line="1059" />
         <source>%1 is typing...</source>
         <translation>%1 печатает...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="924" />
+        <location filename="../src/app/messagesmodel.cpp" line="1060" />
         <source>typing...</source>
         <translation>печатает...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="928" />
+        <location filename="../src/app/messagesmodel.cpp" line="1064" />
         <source>bot</source>
         <translation>бот</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="929" />
+        <location filename="../src/app/messagesmodel.cpp" line="1065" />
         <source>Saved Messages</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="932" />
+        <location filename="../src/app/messagesmodel.cpp" line="1068" />
         <source>channel, %1 subscribers</source>
         <translation>канал, подписчиков: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="932" />
+        <location filename="../src/app/messagesmodel.cpp" line="1068" />
         <source>channel</source>
         <translation>канал</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="933" />
+        <location filename="../src/app/messagesmodel.cpp" line="1069" />
         <source>%1 members</source>
         <translation>участников: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="933" />
+        <location filename="../src/app/messagesmodel.cpp" line="1069" />
         <source>group</source>
         <translation>группа</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1378" />
+        <location filename="../src/app/messagesmodel.cpp" line="1514" />
         <source>Not connected.</source>
         <translation>Нет соединения.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1447" />
+        <location filename="../src/app/messagesmodel.cpp" line="1583" />
         <source>photo</source>
         <translation>фото</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1463" />
+        <location filename="../src/app/messagesmodel.cpp" line="1599" />
         <source>The message was not sent: %1</source>
         <translation>Сообщение не отправлено: %1</translation>
     </message>
@@ -1905,6 +1910,11 @@
         <translation>Направлять соединение через прокси SOCKS5 или MTProto. Изменение вызывает переподключение.</translation>
     </message>
     <message>
+        <location filename="../qml/SettingsPage.qml" line="280" />
+        <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. None shows no picture at all until you tap. Video previews are never loaded automatically. None of this changes what Save downloads.</source>
+        <translation>«Миниатюра» показывает маленькое размытое превью, пока вы не нажмёте на фото (экономит трафик). «Полное» загружает превью фотографий автоматически. «Нет» не показывает изображение вообще, пока вы не нажмёте. Превью видео никогда не загружаются автоматически. На то, что скачивает «Сохранить», это не влияет.</translation>
+    </message>
+    <message>
         <location filename="../qml/SettingsPage.qml" line="291" />
         <source>Cached media and downloaded files: %1</source>
         <translation>Кэш медиа и загруженные файлы: %1</translation>
@@ -1947,11 +1957,6 @@
     <message>
         <location filename="../qml/SettingsPage.qml" line="271" />
         <source>The size of the message text in chats. Small is the original size.</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="280" />
-        <source>Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. Neither changes what Save downloads.</source>
         <translation type="unfinished" />
     </message>
     <message>

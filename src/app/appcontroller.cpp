@@ -140,7 +140,7 @@ AppController::AppController(QObject *parent)
     m_media->setDirectory(dataDir() + QLatin1String("/media"));
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
-    m_chat->setAutoPreview(imagePreview() == 1);   // Image Preview: Full auto-loads, Thumbnail waits for a tap
+    m_chat->setPreviewMode(imagePreview());   // 0 Thumbnail (default), 1 Full, 2 None
     m_topics = new TopicsModel(m_session, this);
     m_contacts = new PhoneBook(this);
     m_imagePicker = new ImagePicker(this);
@@ -468,12 +468,18 @@ void AppController::setGroupNotifications(bool on) { m_settings.setValue(QLatin1
 
 // Image Preview: 0 = Thumbnail (show the blurred placeholder, load a photo on tap), 1 = Full
 // (fetch and show photo previews automatically). Does not change what Save/Open download.
-int AppController::imagePreview() const { return m_settings.value(QLatin1String(KeyImagePreview), 0).toInt() == 1 ? 1 : 0; }
+int AppController::imagePreview() const
+{
+    // 0 stays Thumbnail so an existing setting keeps its meaning; None was added as 2 rather
+    // than inserted at the front, which would have silently switched everyone over to it.
+    const int v = m_settings.value(QLatin1String(KeyImagePreview), 0).toInt();
+    return (v >= 0 && v <= 2) ? v : 0;
+}
 void AppController::setImagePreview(int mode)
 {
     if (mode == imagePreview()) return;
-    m_settings.setValue(QLatin1String(KeyImagePreview), mode == 1 ? 1 : 0);
-    if (m_chat) m_chat->setAutoPreview(mode == 1);
+    m_settings.setValue(QLatin1String(KeyImagePreview), (mode >= 0 && mode <= 2) ? mode : 0);
+    if (m_chat) m_chat->setPreviewMode(imagePreview());
     emit settingsChanged();
 }
 QString AppController::translationsDir()
@@ -551,7 +557,7 @@ qreal AppController::fontScale() const
     return scale[fontSize()];
 }
 
-QStringList AppController::imagePreviewNames() const { return QStringList() << tr("Thumbnail") << tr("Full"); }
+QStringList AppController::imagePreviewNames() const { return QStringList() << tr("Thumbnail") << tr("Full") << tr("None"); }
 bool AppController::autoConnect() const { return m_settings.value(QLatin1String(KeyAutoConnect), true).toBool(); }
 void AppController::setAutoConnect(bool on) { m_settings.setValue(QLatin1String(KeyAutoConnect), on); emit settingsChanged(); }
 bool AppController::logging() const { return m_settings.value(QLatin1String(KeyLogging), false).toBool(); }

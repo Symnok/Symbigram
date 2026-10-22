@@ -13,6 +13,8 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RU = {
+"None": "Нет",
+"Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. None shows no picture at all until you tap. Video previews are never loaded automatically. None of this changes what Save downloads.": "«Миниатюра» показывает маленькое размытое превью, пока вы не нажмёте на фото (экономит трафик). «Полное» загружает превью фотографий автоматически. «Нет» не показывает изображение вообще, пока вы не нажмёте. Превью видео никогда не загружаются автоматически. На то, что скачивает «Сохранить», это не влияет.",
 "Paste": "Вставить",
 "on - %1": "вкл. - %1",
 "off": "выкл.",
@@ -403,6 +405,8 @@ RU = {
 }
 
 UK = {
+"None": "Немає",
+"Thumbnail shows a small blurred preview until you tap a photo to load it (saves data). Full loads photo previews automatically. None shows no picture at all until you tap. Video previews are never loaded automatically. None of this changes what Save downloads.": "«Мініатюра» показує маленьке розмите прев'ю, доки ви не натиснете на фото (економить трафік). «Повне» завантажує прев'ю фотографій автоматично. «Немає» не показує зображення взагалі, доки ви не натиснете. Прев'ю відео ніколи не завантажуються автоматично. На те, що завантажує «Зберегти», це не впливає.",
 "Paste": "Вставити",
 "on - %1": "увімк. - %1",
 "off": "вимк.",
