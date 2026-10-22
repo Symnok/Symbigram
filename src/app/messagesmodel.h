@@ -129,6 +129,13 @@ public:
     /// entities. Entity offsets index the ORIGINAL text, so escaping first (as the QML version
     /// did) shifts every one of them; this does both in a single pass. `targets` receives each
     /// anchor's URL in order. Public so it can be tested directly.
+    /// The message text as it should be shown: emoji removed (this phone has no glyphs for
+    /// them) and the extra blank lines that removal leaves behind collapsed. `outLinks` receives
+    /// the hidden-link entities with their offsets moved to match - they index the ORIGINAL text,
+    /// so anything that shortens it must carry them along or the anchors land on the wrong words.
+    static QString cleanBody(const QString &text, const QList<TgTextLink> &links,
+                             QList<TgTextLink> *outLinks);
+
     static QString buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
                                  QStringList *targets);
 

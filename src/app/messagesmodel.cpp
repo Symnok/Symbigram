@@ -88,19 +88,87 @@ namespace
             || c == 0x20E3;                     // combining enclosing keycap
     }
 
-    QString stripEmoji(const QString &s)
+    /// Copies `text`, keeping only the UTF-16 units marked in `keep`, and fills `map` so that
+    /// map[i] is where original unit i has moved to. Every transformation below is expressed this
+    /// way because message entities carry UTF-16 offsets into the ORIGINAL text: delete anything
+    /// without recording where the rest went and every hidden link lands on the wrong words.
+    QString applyKeep(const QString &text, const QVector<bool> &keep, QVector<int> *map)
     {
-        if (s.isEmpty()) return s;
-        QVector<uint> in = s.toUcs4();
-        bool any = false;
-        for (int i = 0; i < in.size(); ++i) if (isEmojiCodePoint(in.at(i))) { any = true; break; }
-        if (!any) return s;
         QString out;
-        for (int i = 0; i < in.size(); ++i) {
-            uint c = in.at(i);
-            if (!isEmojiCodePoint(c)) out += QString::fromUcs4(&c, 1);
+        map->resize(text.size() + 1);
+        (*map)[0] = 0;
+        for (int i = 0; i < text.size(); ++i) {
+            if (keep.at(i)) out += text.at(i);
+            (*map)[i + 1] = out.size();
         }
-        return out.trimmed();   // trim the ends but keep newlines/structure intact
+        return out;
+    }
+
+    /// Which units survive emoji removal. A surrogate pair is judged as one code point and both
+    /// of its units go together.
+    QVector<bool> keepAfterEmoji(const QString &s)
+    {
+        QVector<bool> keep(s.size(), true);
+        int i = 0;
+        while (i < s.size()) {
+            uint cp = s.at(i).unicode();
+            int units = 1;
+            if (s.at(i).isHighSurrogate() && i + 1 < s.size() && s.at(i + 1).isLowSurrogate()) {
+                cp = QChar::surrogateToUcs4(s.at(i), s.at(i + 1));
+                units = 2;
+            }
+            if (isEmojiCodePoint(cp))
+                for (int k = 0; k < units; ++k) keep[i + k] = false;
+            i += units;
+        }
+        return keep;
+    }
+
+    /// Which units survive blank-line collapsing. Removing emoji empties any line that held only
+    /// one, so a post with an emoji bullet between paragraphs grows a run of blank lines that the
+    /// author never wrote. Runs of more than one blank line are reduced to one; a single blank
+    /// line is deliberate and is left alone.
+    QVector<bool> keepAfterBlankLines(const QString &s)
+    {
+        QVector<bool> keep(s.size(), true);
+        int i = 0;
+        while (i < s.size()) {
+            if (s.at(i) != QLatin1Char('\n')) { ++i; continue; }
+            // Measure the run: newlines separated by nothing but spaces and tabs.
+            int end = i;
+            int newlines = 0;
+            int j = i;
+            while (j < s.size()) {
+                const QChar c = s.at(j);
+                if (c == QLatin1Char('\n')) { ++newlines; end = j; ++j; }
+                else if (c == QLatin1Char(' ') || c == QLatin1Char('\t')) ++j;
+                else break;
+            }
+            if (newlines > 2) {
+                // Keep the first two newlines (one blank line); drop everything else in the run.
+                int kept = 0;
+                for (int k = i; k <= end; ++k) {
+                    if (s.at(k) == QLatin1Char('\n') && kept < 2) { ++kept; continue; }
+                    keep[k] = false;
+                }
+            }
+            i = end + 1;
+        }
+        return keep;
+    }
+
+    /// Replaces characters that merely LOOK like ASCII with the ASCII itself. A CJK input method
+    /// produces fullwidth punctuation - U+FF08 for "(", U+FF1A for ":" and so on - which this
+    /// phone has no glyph for, so a line beginning with one opens with an empty box instead.
+    /// Substitution, not deletion: one unit in, one unit out, so entity offsets are untouched.
+    void foldLookalikes(QString &s)
+    {
+        for (int i = 0; i < s.size(); ++i) {
+            const ushort c = s.at(i).unicode();
+            if (c >= 0xFF01 && c <= 0xFF5E) s[i] = QChar(ushort(c - 0xFEE0));  // fullwidth ASCII
+            else if (c == 0x3000) s[i] = QLatin1Char(' ');                     // ideographic space
+            else if (c == 0x00A0) s[i] = QLatin1Char(' ');                     // no-break space
+        }
     }
 }
 
@@ -217,6 +285,9 @@ namespace
         out.replace(QLatin1Char('&'), QLatin1String("&amp;"));
         out.replace(QLatin1Char('<'), QLatin1String("&lt;"));
         out.replace(QLatin1Char('>'), QLatin1String("&gt;"));
+        // The body is handed to QML as rich text, where a newline is just whitespace and
+        // collapses. Every line break in every message disappeared without this.
+        out.replace(QLatin1Char('\n'), QLatin1String("<br>"));
         return out;
     }
 
@@ -259,6 +330,50 @@ namespace
     }
 }
 
+QString MessagesModel::cleanBody(const QString &text, const QList<TgTextLink> &links,
+                                 QList<TgTextLink> *outLinks)
+{
+    if (outLinks) outLinks->clear();
+    if (text.isEmpty()) return text;
+
+    // Two passes, each recording where the text moved, then composed - so an entity offset taken
+    // against the original still points at the same words afterwards.
+    QVector<int> map1;
+    const QString afterEmoji = applyKeep(text, keepAfterEmoji(text), &map1);
+    QVector<int> map2;
+    QString out = applyKeep(afterEmoji, keepAfterBlankLines(afterEmoji), &map2);
+
+    // Trailing whitespace goes; leading whitespace would shift every offset, so it is counted
+    // rather than simply trimmed away.
+    int lead = 0;
+    while (lead < out.size() && out.at(lead).isSpace()) ++lead;
+    int tail = out.size();
+    while (tail > lead && out.at(tail - 1).isSpace()) --tail;
+
+    // Same length in, same length out, so this happens before the offsets are remapped and
+    // costs them nothing.
+    foldLookalikes(out);
+
+    if (outLinks) {
+        for (int i = 0; i < links.size(); ++i) {
+            const TgTextLink &l = links.at(i);
+            const int from = qBound(0, l.offset, text.size());
+            const int to = qBound(from, l.offset + l.length, text.size());
+            int a = map2.value(map1.value(from, 0), 0) - lead;
+            int b = map2.value(map1.value(to, 0), 0) - lead;
+            a = qBound(0, a, tail - lead);
+            b = qBound(a, b, tail - lead);
+            if (b <= a) continue;                       // the whole span was emoji; nothing to link
+            TgTextLink moved;
+            moved.offset = a;
+            moved.length = b - a;
+            moved.url = l.url;
+            *outLinks << moved;
+        }
+    }
+    return out.mid(lead, tail - lead);
+}
+
 QString MessagesModel::buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
                                      QStringList *targets)
 {
@@ -294,19 +409,27 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     const TgMessage &m = r.m;
     switch (role) {
     case MsgIdRole: return m.id;
-    case BodyRole: return stripEmoji(m.text);
-    case BodyHtmlRole: return buildBodyHtml(stripEmoji(m.text), m.textLinks, 0);
+    case BodyRole: return cleanBody(m.text, QList<TgTextLink>(), 0);
+    case BodyHtmlRole: {
+        QList<TgTextLink> links;
+        const QString body = cleanBody(m.text, m.textLinks, &links);
+        return buildBodyHtml(body, links, 0);
+    }
     case LinkCountRole: {
         QStringList targets;
-        buildBodyHtml(stripEmoji(m.text), m.textLinks, &targets);
+        QList<TgTextLink> links;
+        const QString body = cleanBody(m.text, m.textLinks, &links);
+        buildBodyHtml(body, links, &targets);
         return targets.size();
     }
     case LinkTargetsRole: {
         QStringList targets;
-        buildBodyHtml(stripEmoji(m.text), m.textLinks, &targets);
+        QList<TgTextLink> links;
+        const QString body = cleanBody(m.text, m.textLinks, &links);
+        buildBodyHtml(body, links, &targets);
         return targets;
     }
-    case NoteRole: return stripEmoji(m.note);   // e.g. a poll's "poll: <question>" text
+    case NoteRole: return cleanBody(m.note, QList<TgTextLink>(), 0);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);
     case TimeTextRole: return timeText(m.date);
@@ -430,10 +553,18 @@ void MessagesModel::prepareMedia(Row &r)
     } else {
         // Videos/documents carry a thumbnail; show it if there is one, but do not fetch
         // the (large) file until asked.
+        //
+        // A VIDEO's still is fetched only on demand. Scrolling a channel full of videos used to
+        // pull a preview for every one of them in the background, and those stills are large
+        // enough to dominate the traffic on a phone. Nothing is lost by waiting: the row carries
+        // a play button that downloads the video itself, which is what someone who wants to watch
+        // it taps anyway. GIFs are included because they are not rendered at all - their still
+        // would be fetched only to sit behind a "not supported" placeholder.
+        const bool previewOnDemand = (m.kind == TgMedia::Video || m.kind == TgMedia::Gif);
         if (!m.thumbSizeType.isEmpty()) {
             QString cached = m_media->cachedFile(m, m.thumbSizeType);
-            if (!cached.isEmpty()) r.thumbPath = cached;
-            else m_media->fetch(m, m.thumbSizeType);
+            if (!cached.isEmpty()) r.thumbPath = cached;        // already here: free to show
+            else if (!previewOnDemand) m_media->fetch(m, m.thumbSizeType);
         }
         QString full = m_media->cachedFile(m, QString());
         if (!full.isEmpty()) r.fullPath = full;
@@ -1365,7 +1496,7 @@ QString MessagesModel::replySnippet(int msgId) const
     if (row < 0) return tr("reply");
     const TgMessage &to = m_rows.at(row).m;
     QString who = to.out ? tr("You") : m_session->peers().userName(to.fromId);
-    QString text = to.text.isEmpty() ? to.note : stripEmoji(to.text);
+    QString text = to.text.isEmpty() ? to.note : cleanBody(to.text, QList<TgTextLink>(), 0);
     return who + QLatin1String(": ") + text.simplified().left(60);
 }
 
