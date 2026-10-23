@@ -123,10 +123,13 @@ bool SecretChat::finishAsCreator(int chatId, qint64 accessHash, qint64 adminId, 
 
 QByteArray SecretChat::keyHash() const
 {
-    // What the two sides compare: SHA1(key)[0:16] followed by SHA256(key)[0:20] on modern
-    // layers. Layer 73 uses the first 16 bytes of SHA1(key) plus SHA256; we return a stable
-    // digest of the key for the verification screen.
-    return Crypto::sha256(m_key);
+    // The key fingerprint the official clients show, so the two screens can actually be compared:
+    // the first 128 bits of SHA1(auth_key), then the first 128 bits of SHA256(auth_key) - 32
+    // bytes in all (core.telegram.org/api/end-to-end, "Key Visualization"; the SHA256 half was
+    // added with layer 46). Returning SHA256 alone looked plausible and was not comparable with
+    // anything: its 32 bytes are the official display's second half followed by 16 bytes no other
+    // client shows.
+    return Crypto::sha1(m_key).left(16) + Crypto::sha256(m_key).left(16);
 }
 
 // -- message encryption ----------------------------------------------------------------------------------
