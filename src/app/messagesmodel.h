@@ -15,6 +15,7 @@ class VoicePlayer;
 #include <QAbstractListModel>
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QTime>
 #include <QVariantMap>
 
@@ -245,7 +246,7 @@ private slots:
 private:
     struct Row
     {
-        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), showLoaded(false), progress(0), ttl(0), expiresAt(0) {}
+        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), showLoaded(false), progress(0), ttl(0), expiresAt(0), bodyValid(false) {}
         TgMessage m;
         qint64 randomId;      // outgoing: for matching the send result
         bool pending;
@@ -259,7 +260,24 @@ private:
         int progress;
         int ttl;              // secret self-destruct seconds (0 = none)
         int expiresAt;        // unix time it self-destructs (0 = not started)
+
+        // The rendered body, kept so it is built once per message instead of once per binding.
+        // The delegate reads bodyHtml, linkCount and linkTargets, and QML re-evaluates those on
+        // every dataChanged - so each of them used to re-run cleanBody AND buildBodyHtml, three
+        // regex passes and four vector allocations per message, every time. A slower phone
+        // (Nokia 700) froze on a chat full of links where a faster one (808) coped.
+        //
+        // Keyed on the text it was built from: a row's message is reassigned in a dozen places
+        // and none of them has to remember to invalidate this.
+        mutable bool bodyValid;
+        mutable QString bodySrc;
+        mutable QString bodyPlain;
+        mutable QString bodyHtml;
+        mutable QStringList bodyTargets;
     };
+
+    /// Fills a row's rendered-body cache if it is missing or stale.
+    void ensureBody(const Row &r) const;
     void prepareMedia(Row &r);
     void openSecret(int id);
     void startVoice(int row);
