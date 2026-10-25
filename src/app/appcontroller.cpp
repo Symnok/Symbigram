@@ -108,6 +108,7 @@ namespace
 
     QStringList &logLines() { static QStringList lines; return lines; }
     AppController *logOwner = 0;
+    QFile *logFile = 0;   // the on-disk copy; see openLogFile
     // Whether the About-page log ring is collected at all (a setting; see setLogging).
     bool loggingEnabled = false;
 }
@@ -194,6 +195,7 @@ AppController::AppController(QObject *parent)
     qApp->installEventFilter(this);
     logOwner = this;
     loggingEnabled = logging();
+    openLogFile(loggingEnabled);   // so a run that freezes still leaves its log on disk
 }
 
 AppController::~AppController()
@@ -565,8 +567,29 @@ void AppController::setLogging(bool on)
 {
     m_settings.setValue(QLatin1String(KeyLogging), on);
     loggingEnabled = on;
+    openLogFile(on);
     if (!on) { logLines().clear(); emit logChanged(); }   // stop collecting and empty the ring
     emit settingsChanged();
+}
+
+void AppController::openLogFile(bool on)
+{
+    if (logFile) { logFile->close(); delete logFile; logFile = 0; }
+    if (!on) return;
+    logFile = new QFile(logFilePath());
+    // Truncated on each run: one session's worth is what gets sent, and an ever-growing file on
+    // a phone is its own problem.
+    if (!logFile->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        delete logFile;
+        logFile = 0;
+        return;
+    }
+    QTextStream out(logFile);
+    out << QLatin1String("Symbigram ") << QLatin1String(SGM_STR(APP_VERSION))
+        << QLatin1String(" log started ")
+        << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
+    out.flush();
+    logFile->flush();
 }
 
 // -- download folder (Settings: which drive receives saved files) ----------------------------------
@@ -1391,12 +1414,36 @@ QString AppController::clipboardText() const
     return QApplication::clipboard()->text();
 }
 
+QString AppController::logFilePath()
+{
+    // Somewhere a file manager can reach, like the thumbnails: the point of this file is to be
+    // read after something has gone wrong, and C:/private is not reachable even on a rooted
+    // phone. Same preference as Thumbnailer::cacheDir - mass memory first.
+#ifdef Q_OS_SYMBIAN
+    if (QDir().mkpath(QLatin1String("E:/Symbigram"))) return QLatin1String("E:/Symbigram/log.txt");
+    QDir().mkpath(QLatin1String("C:/Symbigram"));
+    return QLatin1String("C:/Symbigram/log.txt");
+#else
+    return QDir::homePath() + QLatin1String("/.symbigram/log.txt");
+#endif
+}
+
 void AppController::appendLog(const QString &line)
 {
     if (!loggingEnabled) return;
+    const QString stamped = QDateTime::currentDateTime().toString(QLatin1String("HH:mm:ss ")) + line;
     QStringList &lines = logLines();
-    lines.append(QDateTime::currentDateTime().toString(QLatin1String("HH:mm:ss ")) + line);
+    lines.append(stamped);
     while (lines.size() > 40) lines.removeFirst();
+
+    // Also to disk, opened once and FLUSHED EVERY LINE. The ring in memory is lost when the app
+    // is killed or the phone wedges - which is exactly when the last few lines matter most.
+    if (logFile) {
+        QTextStream out(logFile);
+        out << stamped << endl;
+        out.flush();
+        logFile->flush();
+    }
     if (logOwner) emit logOwner->logChanged();
 }
 

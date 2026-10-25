@@ -1,6 +1,7 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "tgapi.h"
+#include "textsafety.h"
 #include "tlconstructors.h"
 #include "tlwriter.h"
 
@@ -59,7 +60,11 @@ TgPeer TgPeerCache::withHash(const TgPeer &p) const
 
 QString TgPeerCache::title(const TgPeer &p) const
 {
-    if (m_infos.contains(p.key())) return m_infos.value(p.key()).title;
+    // Capped here as well as where names are absorbed: a cache persisted by an older build still
+    // holds whatever arrived then, and one stacked-mark name is enough to wedge the font server.
+    // The check short-circuits on the first pass for names without marks, which is nearly all.
+    if (m_infos.contains(p.key()))
+        return TextSafety::limitCombiningMarks(m_infos.value(p.key()).title);
     return (p.kind == TgPeer::User ? TgApi::tr("user %1") : TgApi::tr("chat %1")).arg(p.id);
 }
 
@@ -89,8 +94,11 @@ void TgPeerCache::absorbUser(const TlObject &u)
     }
     // A "min" user (flags.20) carries incomplete fields; keep what a full one gave us.
     bool min = u.flag("flags", 20);
-    if (u.has("first_name") || !min) info.firstName = u.str("first_name");
-    if (u.has("last_name") || !min) info.lastName = u.str("last_name");
+    // Capped here, at the one point every name enters the app: a display name may carry
+    // unlimited combining marks, and stacking dozens of them can take down Symbian's
+    // shared font server - the whole phone, not just us. See textsafety.h.
+    if (u.has("first_name") || !min) info.firstName = TextSafety::limitCombiningMarks(u.str("first_name"));
+    if (u.has("last_name") || !min) info.lastName = TextSafety::limitCombiningMarks(u.str("last_name"));
     if (u.has("username")) info.username = u.str("username");
     if (u.has("phone")) info.phone = u.str("phone");
     info.isSelf = u.flag("flags", 10);
@@ -127,7 +135,8 @@ void TgPeerCache::absorbChat(const TlObject &c)
     if (peer.accessHash == 0 || (min && info.peer.accessHash != 0)) peer.accessHash = info.peer.accessHash;
     info.peer = peer;
     QString title = c.str("title");
-    info.title = title.isEmpty() ? TgApi::tr("chat %1").arg(id) : title;
+    info.title = title.isEmpty() ? TgApi::tr("chat %1").arg(id)
+                                 : TextSafety::limitCombiningMarks(title);
     info.username = c.str("username");
     info.membersCount = c.intOr("participants_count", info.membersCount);
     info.isBroadcast = channel && c.flag("flags", 5) && !c.flag("flags", 8);

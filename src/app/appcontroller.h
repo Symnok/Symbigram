@@ -9,6 +9,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QDir>
 #include <QString>
 #include <QStringList>
 
@@ -153,6 +154,7 @@ public:
     void setAutoConnect(bool on);
     bool logging() const;
     void setLogging(bool on);
+    static void openLogFile(bool on);
     QStringList downloadDrives() const;            // friendly labels of the present drives
     int downloadDriveIndex() const;                // index into downloadDrives()
     void setDownloadDriveIndex(int index);
@@ -184,6 +186,10 @@ public:
     bool autotestFolder() const;
     QString logTail() const;
     static void appendLog(const QString &line);
+    /// Where the on-disk log is written when "Keep a log" is on - a reachable folder, since its
+    /// whole purpose is to be read after a crash or a freeze.
+    static QString logFilePath();
+    Q_INVOKABLE QString logLocation() const { return QDir::toNativeSeparators(logFilePath()); }
 
     /// Opens the network, then connects with the saved session or shows the QR page.
     void start();

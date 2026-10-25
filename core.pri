@@ -28,6 +28,7 @@ HEADERS += \
     $$PWD/src/core/telegramservers.h \
     $$PWD/src/core/dh.h \
     $$PWD/src/core/faketls.h \
+    $$PWD/src/core/textsafety.h \
     $$PWD/src/core/mtprototransport.h \
     $$PWD/src/core/authkeyhandshake.h \
     $$PWD/src/core/mtprotosession.h \
@@ -57,6 +58,7 @@ SOURCES += \
     $$PWD/src/core/telegramservers.cpp \
     $$PWD/src/core/dh.cpp \
     $$PWD/src/core/faketls.cpp \
+    $$PWD/src/core/textsafety.cpp \
     $$PWD/src/core/mtprototransport.cpp \
     $$PWD/src/core/authkeyhandshake.cpp \
     $$PWD/src/core/mtprotosession.cpp \

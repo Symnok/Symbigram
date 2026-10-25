@@ -339,6 +339,18 @@ Page {
                 }
                 onClicked: logSwitch.checked = !logSwitch.checked
             }
+
+            // Where to find it after the fact - the whole point of writing it to disk is that it
+            // survives a crash or a freeze, when the in-app view is gone with the app.
+            Label {
+                visible: app.logging
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.WrapAnywhere
+                color: platformStyle.colorNormalMid
+                font.pixelSize: platformStyle.fontSizeSmall
+                text: qsTr("Also written to %1, so it survives a freeze or a restart.").arg(app.logLocation())
+            }
             Label {
                 width: parent.width - 2 * platformStyle.paddingLarge
                 x: platformStyle.paddingLarge

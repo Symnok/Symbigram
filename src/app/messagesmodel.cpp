@@ -2,6 +2,8 @@
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "messagesmodel.h"
 
+#include "textsafety.h"
+
 #include <QRegExp>
 #include "chatsmodel.h"
 #include "mediacache.h"
@@ -354,6 +356,22 @@ QString MessagesModel::cleanBody(const QString &text, const QList<TgTextLink> &l
     // costs them nothing.
     foldLookalikes(out);
 
+    // Stacked combining marks ("Zalgo") can wedge Symbian's font server, so a message body gets
+    // the same cap as a name. This one CAN shorten the text, so it runs before the offsets are
+    // remapped below - map2 is rebuilt against the result.
+    const QString capped = TextSafety::limitCombiningMarks(out);
+    if (capped.size() != out.size()) {
+        QVector<bool> keep(out.size(), true);
+        int wrote = 0;
+        for (int i = 0, j = 0; i < out.size(); ++i) {
+            if (j < capped.size() && out.at(i) == capped.at(j)) { ++j; ++wrote; }
+            else keep[i] = false;
+        }
+        QVector<int> map3;
+        out = applyKeep(out, keep, &map3);
+        for (int i = 0; i < map2.size(); ++i) map2[i] = map3.value(map2.at(i), 0);
+    }
+
     if (outLinks) {
         for (int i = 0; i < links.size(); ++i) {
             const TgTextLink &l = links.at(i);
@@ -402,6 +420,17 @@ QString MessagesModel::buildBodyHtml(const QString &text, const QList<TgTextLink
     return out;
 }
 
+void MessagesModel::ensureBody(const Row &r) const
+{
+    if (r.bodyValid && r.bodySrc == r.m.text) return;
+    QList<TgTextLink> links;
+    r.bodyPlain = cleanBody(r.m.text, r.m.textLinks, &links);
+    r.bodyTargets.clear();
+    r.bodyHtml = buildBodyHtml(r.bodyPlain, links, &r.bodyTargets);
+    r.bodySrc = r.m.text;
+    r.bodyValid = true;
+}
+
 QVariant MessagesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= m_rows.size()) return QVariant();
@@ -409,26 +438,10 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     const TgMessage &m = r.m;
     switch (role) {
     case MsgIdRole: return m.id;
-    case BodyRole: return cleanBody(m.text, QList<TgTextLink>(), 0);
-    case BodyHtmlRole: {
-        QList<TgTextLink> links;
-        const QString body = cleanBody(m.text, m.textLinks, &links);
-        return buildBodyHtml(body, links, 0);
-    }
-    case LinkCountRole: {
-        QStringList targets;
-        QList<TgTextLink> links;
-        const QString body = cleanBody(m.text, m.textLinks, &links);
-        buildBodyHtml(body, links, &targets);
-        return targets.size();
-    }
-    case LinkTargetsRole: {
-        QStringList targets;
-        QList<TgTextLink> links;
-        const QString body = cleanBody(m.text, m.textLinks, &links);
-        buildBodyHtml(body, links, &targets);
-        return targets;
-    }
+    case BodyRole: ensureBody(r); return r.bodyPlain;
+    case BodyHtmlRole: ensureBody(r); return r.bodyHtml;
+    case LinkCountRole: ensureBody(r); return r.bodyTargets.size();
+    case LinkTargetsRole: ensureBody(r); return r.bodyTargets;
     case NoteRole: return cleanBody(m.note, QList<TgTextLink>(), 0);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);
