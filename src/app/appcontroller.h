@@ -320,6 +320,10 @@ private:
     static QStringList presentDriveLetters();      // among C:, E:, F: which exist
     static QString folderForDrive(const QString &drive);
     void applyDownloadFolder();                    // create it + hand it to the chat model
+    /// Points the thumbnailer at <cache folder>/thumbnails. Called by applyDownloadFolder, so
+    /// the thumbnails follow the cache folder wherever the user puts it; it must run before the
+    /// first Thumbnailer is built, because building one settles the path for the rest of the run.
+    void applyThumbnailFolder();
     /// A hex or base64url secret as bytes; empty when it is neither.
     static QByteArray decodeProxySecret(const QString &text);
     /// Pulls server/port/secret (or SOCKS5 credentials) out of a proxy link into the m_pending*

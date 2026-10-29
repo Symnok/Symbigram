@@ -23,6 +23,14 @@
 namespace
 {
     const int HistoryPage = 30;
+
+    // Opening a chat with unread messages fetches a window around the unread boundary instead of
+    // the newest page: UnreadContext messages of already-read context above the mark, so the
+    // first new message has something to sit under, and UnreadForward new ones below it. Without
+    // this the jump-to-unread below can only find a boundary that happens to fall inside the
+    // newest HistoryPage, so a chat with more unread than that silently opens at the end.
+    const int UnreadContext = 10;
+    const int UnreadForward = 50;
     const int TypingIdleMs = 5000;
     const int PeerTypingMs = 6000;
     int now() { return int(QDateTime::currentDateTime().toTime_t()); }
@@ -175,7 +183,8 @@ namespace
 }
 
 MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent)
-    : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_readOutboxMaxId(0),
+    : QAbstractListModel(parent), m_session(session), m_media(media), m_loading(false), m_hasOlder(false), m_hasNewer(false), m_pendingNewer(false),
+      m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
       m_previewMode(0), m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
@@ -264,9 +273,18 @@ int MessagesModel::rowCount(const QModelIndex &parent) const
     return parent.isValid() ? 0 : m_rows.size();
 }
 
-QString MessagesModel::timeText(int unixTime)
+QString MessagesModel::timeText(int unixTime, bool withDate)
 {
-    return QDateTime::fromTime_t(unixTime).toString(QLatin1String("HH:mm"));
+    const QDateTime t = QDateTime::fromTime_t(unixTime);
+    if (!withDate) return t.toString(QLatin1String("HH:mm"));
+    // In a group or a channel a message is usually read long after it was posted, and the day
+    // separator it belongs under has often scrolled out of sight by then - so the time on its own
+    // says nothing about when it was written. The year is only worth the width when it is not
+    // this one. Month names come from the system locale, like the separators above.
+    const QDate d = t.date();
+    if (d.year() == QDate::currentDate().year())
+        return t.toString(QLatin1String("d MMM, HH:mm"));
+    return t.toString(QLatin1String("d MMM yyyy, HH:mm"));
 }
 
 QString MessagesModel::dateText(int unixTime)
@@ -445,7 +463,9 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     case NoteRole: return cleanBody(m.note, QList<TgTextLink>(), 0);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);
-    case TimeTextRole: return timeText(m.date);
+    // Groups and channels carry the date as well: see timeText. 1:1 and secret chats keep the
+    // bare time, where the conversation is short enough for the separators to do the job.
+    case TimeTextRole: return timeText(m.date, m_peer.isGroup());
     case DateTextRole: return dateText(m.date);
     case ShowDateRole: return index.row() == 0
         || QDateTime::fromTime_t(m_rows.at(index.row() - 1).m.date).date() != QDateTime::fromTime_t(m.date).date();
@@ -1118,13 +1138,23 @@ void MessagesModel::open(const QString &peerKey)
     m_error.clear();
     m_loading = true;
     m_hasOlder = false;
+    m_hasNewer = false;
+    m_pendingNewer = false;
     m_initialLoad = true;
     m_jumpToId = 0;
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
     emit loadingChanged();
-    m_session->loadHistory(m_peer, 0, HistoryPage);
+    if (m_openUnread > 0 && m_openInboxMax > 0) {
+        // A window around the last-read message. A negative add_offset is what makes getHistory
+        // return messages NEWER than offset_id, so this spans UnreadForward above the boundary
+        // down to UnreadContext below it; the first unread message is the one just above it.
+        m_session->loadHistory(m_peer, m_openInboxMax, UnreadContext + 1 + UnreadForward,
+                               -UnreadForward);
+    } else {
+        m_session->loadHistory(m_peer, 0, HistoryPage);   // all read: the newest page, as before
+    }
 }
 
 void MessagesModel::openAt(const QString &peerKey, int msgId)
@@ -1142,6 +1172,8 @@ void MessagesModel::openAt(const QString &peerKey, int msgId)
     m_readOutboxMaxId = od.readOutboxMaxId;
     m_openInboxMax = 0;       // we are jumping to a specific message, not to the unread mark
     m_openUnread = 0;
+    m_hasNewer = false;
+    m_pendingNewer = false;
     endResetModel();
     m_error.clear();
     m_loading = true;
@@ -1169,6 +1201,8 @@ void MessagesModel::openTopic(const QString &peerKey, int topicId, const QString
     m_readOutboxMaxId = m_session->dialog(m_peer).readOutboxMaxId;
     m_openInboxMax = 0;                // per-topic unread isn't tracked in this first version
     m_openUnread = 0;
+    m_hasNewer = false;
+    m_pendingNewer = false;
     endResetModel();
     m_error.clear();
     m_loading = true;
@@ -1233,12 +1267,65 @@ void MessagesModel::close()
     m_rows.clear();
     endResetModel();
     m_loading = false;
+    m_hasNewer = false;
+    m_pendingNewer = false;
     if (m_replyToId) { m_replyToId = 0; emit replyChanged(); }
     if (m_editId) { m_editId = 0; emit editChanged(); }
     emit chatChanged();
     emit peerChanged();
     emit countChanged();
     emit loadingChanged();
+}
+
+void MessagesModel::updateHasNewer()
+{
+    // Judged against the dialog's newest message rather than against the page size: a short page
+    // from the server does not mean we have reached the end of the chat.
+    bool newer = false;
+    if (!m_peer.isNull() && !m_topicId && !m_secretId && !m_rows.isEmpty()) {
+        int newest = 0;
+        for (int i = m_rows.size() - 1; i >= 0; --i)
+            if (m_rows.at(i).m.id > 0) { newest = m_rows.at(i).m.id; break; }
+        const TgDialog d = m_session->dialog(m_peer);
+        newer = newest > 0 && d.topMessageId > newest;
+    }
+    if (newer == m_hasNewer) return;
+    m_hasNewer = newer;
+    emit loadingChanged();
+}
+
+void MessagesModel::jumpToEnd()
+{
+    if (m_peer.isNull() || m_secretId || m_topicId || !m_hasNewer) return;
+    beginResetModel();
+    m_rows.clear();
+    endResetModel();
+    m_openUnread = 0;        // the end is what was asked for, not the unread mark
+    m_openInboxMax = 0;
+    m_hasOlder = false;
+    m_hasNewer = false;
+    m_pendingNewer = false;
+    m_initialLoad = true;
+    m_jumpToId = 0;
+    m_loading = true;
+    emit countChanged();
+    emit loadingChanged();
+    m_session->loadHistory(m_peer, 0, HistoryPage);
+}
+
+void MessagesModel::loadNewer()
+{
+    if (m_peer.isNull() || m_loading || !m_hasNewer || m_rows.isEmpty()) return;
+    int newest = 0;
+    for (int i = m_rows.size() - 1; i >= 0; --i)
+        if (m_rows.at(i).m.id > 0) { newest = m_rows.at(i).m.id; break; }
+    if (!newest) return;
+    m_loading = true;
+    m_pendingNewer = true;
+    emit loadingChanged();
+    // offset_id with add_offset = -limit asks for exactly the page ABOVE `newest` and nothing
+    // below it, so the page lands next to what is already loaded with no gap and no overlap.
+    m_session->loadHistory(m_peer, newest, UnreadForward, -UnreadForward);
 }
 
 void MessagesModel::loadOlder()
@@ -1258,9 +1345,13 @@ void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &
 {
     if (peer != m_peer) return;
     const bool initial = m_initialLoad;
+    const bool forward = m_pendingNewer;
     m_initialLoad = false;
+    m_pendingNewer = false;
     m_loading = false;
-    m_hasOlder = more;
+    // `more` reports whether the server had more to give going BACKWARDS, so a forward page says
+    // nothing about older messages and must not overwrite what we already know.
+    if (!forward) m_hasOlder = more;
     // The server sends newest first; the model keeps oldest first. New rows go before
     // whatever is already there (an older page) or replace the empty start.
     QList<Row> rows;
@@ -1272,11 +1363,25 @@ void MessagesModel::onHistoryLoaded(const TgPeer &peer, const QList<TgMessage> &
         rows.append(r);
     }
     if (!rows.isEmpty()) {
-        beginInsertRows(QModelIndex(), 0, rows.size() - 1);
-        for (int i = rows.size() - 1; i >= 0; --i) m_rows.prepend(rows.at(i));
+        if (forward) {
+            // A forward page belongs after what is loaded, in the same oldest-first order.
+            beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size() + rows.size() - 1);
+            for (int i = 0; i < rows.size(); ++i) m_rows.append(rows.at(i));
+        } else {
+            beginInsertRows(QModelIndex(), 0, rows.size() - 1);
+            for (int i = rows.size() - 1; i >= 0; --i) m_rows.prepend(rows.at(i));
+        }
         endInsertRows();
         emit countChanged();
-        if (initial) {
+    }
+    // Before any of the signals below: the view positions itself on initialLoaded, and the
+    // "Newer messages" footer has to exist by then or the jump lands a footer's height out.
+    // Also runs when a forward page came back empty, which is how the footer goes away.
+    updateHasNewer();
+    if (!rows.isEmpty()) {
+        if (forward) {
+            emit newerAppended(rows.size());
+        } else if (initial) {
             // First page: go to the linked message if we came from one, else to the first unread.
             int target = -1;
             if (m_jumpToId > 0) { target = rowById(m_jumpToId); m_jumpToId = 0; }
@@ -1312,6 +1417,11 @@ void MessagesModel::markRead()
     if (maxId <= 0) return;
     if (m_topicId) { m_session->markTopicRead(m_peer, m_topicId, maxId); return; }
     TgDialog d = m_session->dialog(m_peer);
+    // The loaded window can stop well short of the newest message now that a chat opens on its
+    // unread boundary. Entering a chat still clears it, so mark up to the dialog's top message
+    // rather than up to whatever happens to be on screen - otherwise the badge would survive the
+    // visit and bring the user straight back to the same place.
+    if (d.topMessageId > maxId) maxId = d.topMessageId;
     if (d.unreadCount > 0 || maxId > d.readInboxMaxId) m_session->markRead(m_peer, maxId);
 }
 
@@ -1327,6 +1437,11 @@ void MessagesModel::onMessageReceived(const TgMessage &m)
         if (!inTopic) return;
     }
     if (rowById(m.id) >= 0) return;
+    // While the window still stops short of the newest message, an arrival must not be appended:
+    // it would sit directly under a much older message, and the next forward page would then land
+    // after it, out of order. The "Newer messages" footer already says there is more to come, and
+    // walking forward - or sending, which jumps to the end first - closes the gap.
+    if (m_hasNewer) return;
     // Our own send echoed back through updates while its result is pending: tie it to
     // the pending row by text rather than showing it twice.
     if (m.out) {
@@ -1386,6 +1501,9 @@ void MessagesModel::send(const QString &text)
 {
     QString t = text.trimmed();
     if (t.isEmpty()) return;
+    // A sent message is appended to the end, so the end has to be loaded: without this it would
+    // drop into the gap below the window and sit next to a much older message.
+    if (m_hasNewer) jumpToEnd();
     if (m_secretId) { m_session->sendSecretText(m_secretId, t); return; }  // the echo appends the row
     if (m_peer.isNull()) return;
     if (m_typingSent) { m_typingSent = false; m_typingTimer->stop(); }
@@ -1580,6 +1698,7 @@ void MessagesModel::onMessageSent(const TgPeer &peer, qint64 randomId, const TgM
 void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto, const QString &caption)
 {
     if (m_peer.isNull()) return;
+    if (m_hasNewer) jumpToEnd();   // same as send(): the pending row goes at the end
     Row r;
     r.m.peer = m_peer;
     r.m.out = true;

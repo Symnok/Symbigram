@@ -55,6 +55,7 @@ Page {
             // Jump back to the newest message (and resume following new arrivals).
             MenuItem { text: qsTr("Skip to bottom"); onClicked: list.scrollToEnd() }
             MenuItem { text: chat.hasOlder ? qsTr("Load older messages") : qsTr("Reload"); visible: !chat.isSecret; onClicked: chat.hasOlder ? chat.loadOlder() : reopen() }
+            MenuItem { text: qsTr("Go to latest messages"); visible: chat.hasNewer; onClicked: chat.jumpToEnd() }
             MenuItem { text: chat.peerMuted ? qsTr("Unmute") : qsTr("Mute"); visible: !chat.isSecret; onClicked: chat.setMuted(!chat.peerMuted) }
             MenuItem { text: qsTr("Mark as read"); visible: !chat.isSecret; onClicked: chat.markRead() }
             MenuItem {
@@ -463,6 +464,21 @@ Page {
                 anchors.centerIn: parent
                 running: chat.loading
                 visible: running
+            }
+        }
+
+        // The chat opens on its first unread message rather than at the end, so there is usually
+        // history below as well as above. "Latest" is the way out for someone who does not want
+        // to walk through a few hundred messages fifty at a time.
+        footer: Item {
+            width: list.width
+            height: chat.hasNewer ? platformStyle.graphicSizeMedium + platformStyle.paddingLarge : 0
+            Row {
+                anchors.centerIn: parent
+                spacing: platformStyle.paddingMedium
+                visible: chat.hasNewer && !chat.loading
+                Button { text: qsTr("Newer messages"); onClicked: chat.loadNewer() }
+                Button { text: qsTr("Latest"); onClicked: chat.jumpToEnd() }
             }
         }
 

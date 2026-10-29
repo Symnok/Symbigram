@@ -296,9 +296,18 @@ Page {
                 }
                 onClicked: clearCacheDialog.open()
             }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.")
+            }
 
-            // Read-only: the thumbnails are not part of Clear cache, so the path is shown for
-            // anyone who needs the space back and wants to empty the folder themselves.
+            // Read-only, but the path is spelled out: the thumbnails are not part of Clear cache,
+            // so anyone who needs the space back has to be able to find the folder and empty it
+            // themselves. Where it is follows "Save downloads to" above.
             ListItem {
                 id: thumbsItem
                 enabled: false
@@ -319,7 +328,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: qsTr("The app's private store of downloaded photos, avatars and files, plus its own scratch copies. Clearing it just re-downloads on demand. Files you saved or opened yourself are left alone.")
+                text: qsTr("Small copies of your photos, so the gallery grid opens quickly. They sit in a thumbnails folder inside the cache folder above, and move with it if you change it. Clear cache leaves them alone - delete the folder by hand when you need the space.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
 

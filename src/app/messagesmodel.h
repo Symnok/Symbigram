@@ -39,6 +39,7 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool hasOlder READ hasOlder NOTIFY loadingChanged)
+    Q_PROPERTY(bool hasNewer READ hasNewer NOTIFY loadingChanged)
     Q_PROPERTY(QString error READ error NOTIFY loadingChanged)
     Q_PROPERTY(bool isSecret READ isSecret NOTIFY chatChanged)
     Q_PROPERTY(int secretState READ secretState NOTIFY peerChanged)      // 0 by-me, 1 to-me, 2 ready
@@ -106,6 +107,9 @@ public:
     QString avatar() const;
     bool loading() const { return m_loading; }
     bool hasOlder() const { return m_hasOlder; }
+    /// True when the loaded window stops short of the newest message - the normal state after
+    /// opening a chat on its unread boundary.
+    bool hasNewer() const { return m_hasNewer; }
     QString error() const { return m_error; }
 
     Q_INVOKABLE void open(const QString &peerKey);
@@ -160,6 +164,13 @@ public:
     bool editing() const { return m_editId != 0; }
     Q_INVOKABLE void retry(int row);
     Q_INVOKABLE void loadOlder();
+    /// The next page forward, towards the newest message. The counterpart of loadOlder, needed
+    /// because the chat no longer always opens at the end.
+    Q_INVOKABLE void loadNewer();
+    /// Throws the loaded window away and reloads the newest page. The way out of a chat opened
+    /// on its unread boundary, and what sending a message does first - a sent message has to be
+    /// visible, and it can only be appended once the end is actually loaded.
+    Q_INVOKABLE void jumpToEnd();
     Q_INVOKABLE void markRead();
     Q_INVOKABLE QVariantMap get(int row) const;
     /// Called by the composer as the text changes: drives the typing notification.
@@ -209,6 +220,7 @@ signals:
     void loadingChanged();
     void messageAppended();
     void olderPrepended(int count);
+    void newerAppended(int count);
     void sendFailed(const QString &error);
     void mediaSaved(const QString &path);   // a file was copied out; path is where
     void replyChanged();
@@ -278,6 +290,8 @@ private:
 
     /// Fills a row's rendered-body cache if it is missing or stale.
     void ensureBody(const Row &r) const;
+    /// Recomputes hasNewer from the dialog's newest message id.
+    void updateHasNewer();
     void prepareMedia(Row &r);
     void openSecret(int id);
     void startVoice(int row);
@@ -296,7 +310,7 @@ private:
     int rowByRandomId(qint64 randomId) const;
     QString replySnippet(int msgId) const;   // "Name: text" preview of the replied-to message
     void sendRow(int row);
-    static QString timeText(int unixTime);
+    static QString timeText(int unixTime, bool withDate = false);
     static QString dateText(int unixTime);
     QString lastSeenText(const TgPeerInfo &info) const;
 
@@ -319,6 +333,8 @@ private:
     QList<Row> m_rows;
     bool m_loading;
     bool m_hasOlder;
+    bool m_hasNewer;                        // the window stops short of the newest message
+    bool m_pendingNewer;                    // the page in flight is a forward one (append, not prepend)
     QString m_error;
     int m_readOutboxMaxId;
     QTimer *m_typingTimer;

@@ -144,9 +144,11 @@ AppController::AppController(QObject *parent)
     m_chat->setPreviewMode(imagePreview());   // 0 Thumbnail (default), 1 Full, 2 None
     m_topics = new TopicsModel(m_session, this);
     m_contacts = new PhoneBook(this);
+    // Before the picker: applyDownloadFolder settles where thumbnails go, and building the
+    // first Thumbnailer fixes that path for the rest of the run.
+    applyDownloadFolder();
     m_imagePicker = new ImagePicker(this);
     Thumbnailer::discardLegacyCache();   // thumbnails used to sit in the unreachable C:/Data
-    applyDownloadFolder();
     m_session->setProxy(proxyEnabled(), proxyHost(), proxyPort().toInt(), proxyUser(), proxyPass(),
                         proxyKind() == 1 ? decodeProxySecret(proxySecret()) : QByteArray());
 
@@ -613,6 +615,15 @@ QString AppController::folderForDrive(const QString &drive)
     return drive + QLatin1String("/Symbigram");
 }
 
+void AppController::applyThumbnailFolder()
+{
+    // A subfolder of the cache folder, so there is one setting rather than two that can disagree:
+    // move the cache and the thumbnails move with it. Clear cache still spares them - sweepFolder
+    // skips any directory in its keep list, and cacheDir() is on it.
+    if (m_downloadPath.isEmpty()) return;
+    Thumbnailer::setCacheDir(m_downloadPath + QLatin1String("/thumbnails"));
+}
+
 QStringList AppController::downloadDrives() const
 {
     QStringList letters = presentDriveLetters();
@@ -685,6 +696,7 @@ void AppController::applyDownloadFolder()
     QDir().mkpath(chosen);
     m_downloadPath = chosen;
     if (m_chat) m_chat->setDownloadFolder(chosen);
+    applyThumbnailFolder();
 }
 
 // -- voice recording -------------------------------------------------------------------------------

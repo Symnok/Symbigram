@@ -38,6 +38,15 @@ namespace
         return big ? quint16((a << 8) | b) : quint16((b << 8) | a);
     }
 
+    /// The remembered cache path, behind a function-local static rather than a file-level one:
+    /// it is read on the worker thread and written on the GUI thread before that thread exists,
+    /// and Qt 4.7 on GCCE is old enough that initialisation order is worth not relying on.
+    QString &dirRef()
+    {
+        static QString d;
+        return d;
+    }
+
     quint32 tiffU32(const QByteArray &d, int base, bool big, int off)
     {
         if (base + off + 4 > d.size() || base + off < 0) return 0;
@@ -65,30 +74,73 @@ Thumbnailer::~Thumbnailer()
     wait();
 }
 
-QString Thumbnailer::cacheDir()
+QString Thumbnailer::folderForDrive(const QString &drive)
 {
-    // Decided once per run and then remembered: if a card were inserted or pulled mid-session a
-    // recomputed path would orphan everything cached so far. Thumbnailer's constructor calls this
-    // from the GUI thread so the worker never races to initialise it.
-    static QString chosen;
-    if (!chosen.isEmpty()) return chosen;
+    return drive + QLatin1String("/Symbigram/thumbnails");
+}
 
+QString Thumbnailer::defaultCacheDir()
+{
 #ifdef Q_OS_SYMBIAN
-    // Mass memory first, phone memory only as a fallback - and NOT C:/Data/Symbigram, which no
-    // file manager can reach even on a rooted phone. Clear cache deliberately leaves thumbnails
-    // alone (regenerating them for a full card is the slow thing this cache exists to avoid), so
-    // the one place they must never live is a folder the user cannot empty by hand.
-    // Decided by whether the folder can actually be created, not merely by whether the drive is
+    // Judged by whether the folder can actually be created, not merely by whether the drive is
     // listed: on a phone where E: IS the removable card, a drive that exists at boot can be gone
     // later, and a cache we cannot write is worse than one on the small drive.
-    const QString preferred = QLatin1String("E:/Symbigram/thumbs");
-    const QString fallback = QLatin1String("C:/Symbigram/thumbs");
-    chosen = QDir().mkpath(preferred) ? preferred : fallback;
-    QDir().mkpath(chosen);
+    //
+    // Mass memory first, phone memory last. This is only the stand-in until AppController hands
+    // over the real path, which is <cache folder>/thumbnails.
+    const char *const cands[] = { "E:", "F:", "C:" };
+    for (int i = 0; i < 3; ++i) {
+        const QString d = QLatin1String(cands[i]);
+        if (QDir().mkpath(folderForDrive(d))) return folderForDrive(d);
+    }
+    return folderForDrive(QLatin1String("C:"));
 #else
-    chosen = QDir::homePath() + QLatin1String("/.symbigram/thumbs");
+    return QDir::homePath() + QLatin1String("/.symbigram/thumbnails");
 #endif
-    return chosen;
+}
+
+QString Thumbnailer::cacheDir()
+{
+    // Settled once per run and then remembered: if a card were inserted or pulled mid-session a
+    // recomputed path would orphan everything cached so far. Thumbnailer's constructor calls this
+    // from the GUI thread so the worker never races to initialise it.
+    QString &d = dirRef();
+    if (!d.isEmpty()) return d;
+    d = defaultCacheDir();
+    QDir().mkpath(d);
+    adoptOldFolderName(d);
+    return d;
+}
+
+void Thumbnailer::setCacheDir(const QString &dir)
+{
+    const QString wanted = dir.trimmed().isEmpty()
+        ? defaultCacheDir()
+        : QDir::cleanPath(QDir::fromNativeSeparators(dir.trimmed()));
+    QString &d = dirRef();
+    if (wanted == d) return;
+    d = wanted;
+    QDir().mkpath(d);
+    adoptOldFolderName(d);
+}
+
+void Thumbnailer::adoptOldFolderName(const QString &dir)
+{
+    // Up to 1.0.128 the folder was called "thumbs". It is "thumbnails" now that the path is a
+    // setting the user picks and reads back. Renaming rather than starting empty keeps a full
+    // card's worth of work that would otherwise be rebuilt one slow scroll at a time, and leaves
+    // nothing behind on the drive for the user to wonder about.
+    const QString tail = QLatin1String("/thumbnails");
+    if (!dir.endsWith(tail)) return;
+    const QString old = dir.left(dir.size() - 10) + QLatin1String("thumbs");
+    if (!QDir(old).exists()) return;
+    QDir probe(dir);
+    // Only when there is nothing to lose on the new side - otherwise both hold real thumbnails
+    // and merging them is not worth the risk of a half-finished move.
+    if (!probe.entryInfoList(QDir::Files | QDir::Hidden | QDir::System).isEmpty()) return;
+    probe.cdUp();
+    probe.rmdir(QLatin1String("thumbnails"));
+    if (!QDir().rename(old, dir)) QDir().mkpath(dir);
 }
 
 QString Thumbnailer::legacyCacheDir()
@@ -102,14 +154,18 @@ QString Thumbnailer::legacyCacheDir()
 
 QStringList Thumbnailer::allCacheDirs()
 {
+    // Not behind Q_OS_SYMBIAN, although these are phone paths: a list that only exists on the
+    // device is a list nothing can check, and a missing entry shows up not as a crash but as a
+    // cache quietly feeding on itself. Off the phone the extra names simply never match.
     QStringList dirs;
-#ifdef Q_OS_SYMBIAN
-    dirs << QLatin1String("E:/Symbigram/thumbs")
-         << QLatin1String("C:/Symbigram/thumbs")
-         << QLatin1String("C:/Data/Symbigram/thumbs");
-#else
-    dirs << cacheDir();
-#endif
+    const char *const drives[] = { "C:", "E:", "F:" };
+    for (int i = 0; i < 3; ++i) {
+        const QString d = QLatin1String(drives[i]);
+        dirs << folderForDrive(d)
+             << d + QLatin1String("/Symbigram/thumbs");          // the name used up to 1.0.128
+    }
+    dirs << QLatin1String("C:/Data/Symbigram/thumbs")            // pre-1.0.103
+         << QLatin1String("C:/Data/Symbigram/thumbnails");
     if (!dirs.contains(cacheDir())) dirs << cacheDir();
     return dirs;
 }
