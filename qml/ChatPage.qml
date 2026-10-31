@@ -616,10 +616,20 @@ Page {
         TextArea {
             id: composer
             visible: !chat.peerIsChannel && !app.recording
+            // Most of what looks like empty space beside this field is padding INSIDE the
+            // controls next to it - a ToolButton's box is close to twice the width of the glyph
+            // it draws - plus the width the row reserves for "Send" even while the narrower
+            // record circle stands in its place. The field now reaches halfway into the padding
+            // on the left and takes back the reserved slack on the right: wider, without
+            // crowding either icon or swallowing the whole row.
+            //
+            // The right edge stays anchored to sendButton even while that button is hidden, so
+            // the field does not change width the moment the first character is typed.
             anchors {
                 left: attachButton.visible ? attachButton.right : parent.left
-                leftMargin: platformStyle.paddingSmall
-                right: sendButton.left; rightMargin: platformStyle.paddingSmall
+                leftMargin: attachButton.visible ? -platformStyle.paddingMedium
+                                                 : platformStyle.paddingSmall
+                right: sendButton.left; rightMargin: platformStyle.paddingSmall / 2
                 verticalCenter: parent.verticalCenter
             }
             placeholderText: page.pendingFile != "" ? qsTr("add a caption") : (chat.isSecret ? qsTr("encrypted message") : qsTr("message"))
@@ -635,7 +645,9 @@ Page {
             id: sendButton
             visible: !chat.peerIsChannel && !app.recording && (composer.text.length > 0 || page.pendingFile != "")
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
-            width: Math.max(80, implicitWidth)
+            // A floor for the tap target, not a reservation: the 80 held the field back
+            // by whatever "Send" did not need.
+            width: Math.max(64, implicitWidth)
             text: chat.editing ? qsTr("Save") : qsTr("Send")
             enabled: (composer.text.length > 0 || page.pendingFile != "") && chat.peerKey != "" && app.connection == "online" && (!chat.isSecret || chat.secretState == 2)
             onClicked: page.sendMessage()
@@ -644,7 +656,9 @@ Page {
         Rectangle {
             id: micButton
             visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && composer.text.length == 0 && page.pendingFile == ""
-            anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
+            // Centred on the Send button rather than on the screen edge: the two share
+            // one slot, so the field keeps its width whichever of them is showing.
+            anchors { horizontalCenter: sendButton.horizontalCenter; verticalCenter: parent.verticalCenter }
             width: 56; height: 56; radius: 28
             color: micMouse.pressed ? "#3d5a80" : "#2f4a66"
             enabled: app.connection == "online"
