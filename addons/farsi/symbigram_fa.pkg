@@ -1,0 +1,16 @@
+; Symbigram Persian (Farsi) language pack (add-on).
+;
+; Installs one .qm into the folder Symbigram scans for add-on languages. No executable, no
+; capabilities - it is a data-only package, so a self-signed certificate is enough.
+;
+; Persian is right to left; nothing here declares that. main.cpp reads the direction from
+; QLocale("fa"), so installing this pack is what mirrors the UI.
+&EN
+
+; name, package UID, version, TYPE=SA
+#{"Symbigram Farsi"}, (0xE4B1C2D7), 1, 0, 0, TYPE=SA
+
+%{"Symnok"}
+:"Symnok"
+
+"symbigram_fa.qm" - "C:\Data\Symbigram\translations\symbigram_fa.qm"
