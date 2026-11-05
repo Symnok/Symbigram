@@ -3,12 +3,22 @@
 //
 // One message: date separator, sender (in groups), forwarded/reply lines, the attachment
 // (a photo shown inline, or a file row with a download/save control) and/or text, time and
-// delivery marks. Outgoing on the right, incoming on the left, service messages centred.
+// delivery marks. Outgoing on the right, incoming on the left, service messages centred - in
+// every language, including the right-to-left ones (see LayoutMirroring below).
 import QtQuick 1.1
 import com.nokia.symbian 1.1
 
 Item {
     id: root
+    // main.qml mirrors the whole UI for a right-to-left language, and that is right for toolbars,
+    // menus and the composer - but NOT for the message bubbles. Which side a bubble sits on means
+    // "mine" or "theirs", not which way the script runs, so mirroring it swaps the two: a Persian
+    // user sees everyone else's messages on the right and their own on the left. Telegram itself
+    // keeps incoming left / outgoing right in Persian, Arabic and Hebrew. Turning mirroring off
+    // here also keeps the inner layout (sender line, time row, the AlignLeft pins below) exactly
+    // as it is in English - one flag instead of a direction test on every anchor in this file.
+    LayoutMirroring.enabled: false
+    LayoutMirroring.childrenInherit: true
     signal pressAndHold
     // tapping a ready image opens the viewer; a file row's button downloads / saves / opens
     signal openImage(string path, int row)

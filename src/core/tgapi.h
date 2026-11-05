@@ -112,6 +112,9 @@ public:
     static QByteArray deleteHistory(const TgPeer &peer, bool justClear, bool revoke = false);
     static QByteArray deleteChatUser(qint64 chatId, bool revoke);          // leave a basic group
     static QByteArray leaveChannel(const TgPeer &channel);
+    static QByteArray joinChannel(const TgPeer &channel);                  // public channel or supergroup
+    static QByteArray checkChatInvite(const QString &inviteHash);           // what a t.me/+hash points at
+    static QByteArray importChatInvite(const QString &inviteHash);          // join by that link
     static QByteArray editPeerFolders(const TgPeer &peer, int folderId);   // 1 = archive, 0 = main
     static QByteArray updateDialogFilter(const QByteArray &filter, int id);
     static QByteArray deleteMessages(const TgPeer &peer, const QList<int> &ids, bool revoke);
@@ -152,6 +155,8 @@ public:
     /// A folderPeer's peer key + its folder id (from updateFolderPeers).
     static QString folderPeerKey(const TlObject &folderPeer, int &folderId);
     static TgHistoryPage readHistory(const TlObject &response, TgPeerCache &cache);
+    /// A messages.checkChatInvite reply: the preview, or an already-joined chat.
+    static TgInvite readInvite(const TlObject &response, TgPeerCache &cache);
     static TgPeer readPeer(const TlObject &peer);
     static QString describeMedia(const TlObject &media);
     /// The attachment of a MessageMedia (photo or document), or an invalid TgMedia.
@@ -167,6 +172,9 @@ public:
     static bool looksLikePhone(const QString &value);
     static QString normalisePhone(const QString &value);
     static QString normaliseUsername(const QString &value);
+    /// The hash of a private invite link - "t.me/+AbCd", "t.me/joinchat/AbCd",
+    /// "tg://join?invite=AbCd" - or an empty string when it is not one of those.
+    static QString inviteHash(const QString &link);
     /// Base64 with the URL-safe alphabet and no padding (tg://login).
     static QString base64Url(const QByteArray &data);
 };

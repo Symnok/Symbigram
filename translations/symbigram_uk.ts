@@ -36,356 +36,398 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="359" />
-        <location filename="../src/app/appcontroller.cpp" line="709" />
-        <location filename="../src/app/appcontroller.cpp" line="1186" />
-        <location filename="../src/app/appcontroller.cpp" line="1279" />
-        <location filename="../src/app/appcontroller.cpp" line="1399" />
+        <location filename="../src/app/appcontroller.cpp" line="362" />
+        <location filename="../src/app/appcontroller.cpp" line="712" />
+        <location filename="../src/app/appcontroller.cpp" line="1189" />
+        <location filename="../src/app/appcontroller.cpp" line="1201" />
+        <location filename="../src/app/appcontroller.cpp" line="1308" />
+        <location filename="../src/app/appcontroller.cpp" line="1325" />
+        <location filename="../src/app/appcontroller.cpp" line="1445" />
         <source>Not connected.</source>
         <translation>Немає з'єднання.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="360" />
+        <location filename="../src/app/appcontroller.cpp" line="363" />
         <source>Connecting...</source>
         <translation>Підключення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="360" />
+        <location filename="../src/app/appcontroller.cpp" line="363" />
         <source>Connecting and creating the encryption key...</source>
         <translation>Підключення та створення ключа шифрування...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="362" />
+        <location filename="../src/app/appcontroller.cpp" line="365" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>Перевірка пароля (це займе кілька секунд)...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="363" />
+        <location filename="../src/app/appcontroller.cpp" line="366" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>У цього облікового запису ввімкнено двоетапну перевірку. Введіть пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="368" />
+        <location filename="../src/app/appcontroller.cpp" line="371" />
         <source>Requesting a sign-in code...</source>
         <translation>Запит коду для входу...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="368" />
+        <location filename="../src/app/appcontroller.cpp" line="371" />
         <source>Waiting for the code to be scanned...</source>
         <translation>Очікування сканування коду...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="365" />
-        <location filename="../src/app/appcontroller.cpp" line="369" />
+        <location filename="../src/app/appcontroller.cpp" line="368" />
+        <location filename="../src/app/appcontroller.cpp" line="372" />
         <source>Signing in...</source>
         <translation>Вхід...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="313" />
-        <location filename="../src/app/appcontroller.cpp" line="325" />
-        <location filename="../src/app/appcontroller.cpp" line="340" />
+        <location filename="../src/app/appcontroller.cpp" line="316" />
+        <location filename="../src/app/appcontroller.cpp" line="328" />
+        <location filename="../src/app/appcontroller.cpp" line="343" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="314" />
-        <location filename="../src/app/appcontroller.cpp" line="326" />
-        <location filename="../src/app/appcontroller.cpp" line="341" />
+        <location filename="../src/app/appcontroller.cpp" line="317" />
+        <location filename="../src/app/appcontroller.cpp" line="329" />
+        <location filename="../src/app/appcontroller.cpp" line="344" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="314" />
-        <location filename="../src/app/appcontroller.cpp" line="327" />
-        <location filename="../src/app/appcontroller.cpp" line="341" />
+        <location filename="../src/app/appcontroller.cpp" line="317" />
+        <location filename="../src/app/appcontroller.cpp" line="330" />
+        <location filename="../src/app/appcontroller.cpp" line="344" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="315" />
+        <location filename="../src/app/appcontroller.cpp" line="318" />
         <source>%1 in %2</source>
         <translation>%1 у %2</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="342" />
+        <location filename="../src/app/appcontroller.cpp" line="345" />
         <source>Cache cleared (%1 freed).</source>
         <translation>Кеш очищено (звільнено %1).</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="365" />
+        <location filename="../src/app/appcontroller.cpp" line="368" />
         <source>Enter the code Telegram sent to %1.</source>
         <translation>Введіть код, який Telegram надіслав на %1.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="366" />
+        <location filename="../src/app/appcontroller.cpp" line="369" />
         <source>Requesting a code...</source>
         <translation>Запит коду...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="366" />
+        <location filename="../src/app/appcontroller.cpp" line="369" />
         <source>Enter your phone number, with the country code, to get a code.</source>
         <translation>Введіть номер телефону з кодом країни, щоб отримати код.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="435" />
+        <location filename="../src/app/appcontroller.cpp" line="438" />
         <source>Low</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="435" />
-        <location filename="../src/app/appcontroller.cpp" line="554" />
+        <location filename="../src/app/appcontroller.cpp" line="438" />
+        <location filename="../src/app/appcontroller.cpp" line="557" />
         <source>Medium</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="435" />
+        <location filename="../src/app/appcontroller.cpp" line="438" />
         <source>Loud</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="454" />
+        <location filename="../src/app/appcontroller.cpp" line="457" />
         <source>Short (0.4 s)</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="454" />
+        <location filename="../src/app/appcontroller.cpp" line="457" />
         <source>1 second</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="454" />
+        <location filename="../src/app/appcontroller.cpp" line="457" />
         <source>2 seconds</source>
         <translation type="unfinished">30 секунд {2 ?}</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="455" />
+        <location filename="../src/app/appcontroller.cpp" line="458" />
         <source>3 seconds</source>
         <translation type="unfinished">30 секунд {3 ?}</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="455" />
+        <location filename="../src/app/appcontroller.cpp" line="458" />
         <source>5 seconds</source>
         <translation>5 секунд</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="467" />
+        <location filename="../src/app/appcontroller.cpp" line="470" />
         <source>Off</source>
         <translation>Вимк.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="467" />
+        <location filename="../src/app/appcontroller.cpp" line="470" />
         <source>First message only</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="467" />
+        <location filename="../src/app/appcontroller.cpp" line="470" />
         <source>Every message</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="554" />
+        <location filename="../src/app/appcontroller.cpp" line="557" />
         <source>Extra small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="554" />
+        <location filename="../src/app/appcontroller.cpp" line="557" />
         <source>Small</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="555" />
+        <location filename="../src/app/appcontroller.cpp" line="558" />
         <source>Large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="555" />
+        <location filename="../src/app/appcontroller.cpp" line="558" />
         <source>Extra large</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="564" />
+        <location filename="../src/app/appcontroller.cpp" line="567" />
         <source>Thumbnail</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="564" />
+        <location filename="../src/app/appcontroller.cpp" line="567" />
         <source>Full</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="564" />
+        <location filename="../src/app/appcontroller.cpp" line="567" />
         <source>None</source>
         <translation>Немає</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="633" />
+        <location filename="../src/app/appcontroller.cpp" line="636" />
         <source>Phone memory</source>
         <translation>Пам'ять телефону</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="634" />
+        <location filename="../src/app/appcontroller.cpp" line="637" />
         <source>Mass memory</source>
         <translation>Масова пам'ять</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="635" />
+        <location filename="../src/app/appcontroller.cpp" line="638" />
         <source>Memory card</source>
         <translation>Картка пам'яті</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="681" />
+        <location filename="../src/app/appcontroller.cpp" line="684" />
         <source>Choose download folder</source>
         <translation>Виберіть теку завантажень</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="711" />
+        <location filename="../src/app/appcontroller.cpp" line="714" />
         <source>Cannot record a voice message here.</source>
         <translation>Тут не можна записати голосове повідомлення.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="734" />
+        <location filename="../src/app/appcontroller.cpp" line="737" />
         <source>Sending the voice message...</source>
         <translation>Надсилання голосового повідомлення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="797" />
+        <location filename="../src/app/appcontroller.cpp" line="800" />
         <source>That does not look like a proxy link.</source>
         <translation>Це не схоже на посилання проксі.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="827" />
+        <location filename="../src/app/appcontroller.cpp" line="830" />
         <source>That secret is not a valid length.</source>
         <translation>Неправильна довжина секрету.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="806" />
+        <location filename="../src/app/appcontroller.cpp" line="809" />
         <source>The link is missing the server or port.</source>
         <translation>У посиланні немає сервера або порту.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="865" />
+        <location filename="../src/app/appcontroller.cpp" line="868" />
         <source>Proxy set to %1:%2.</source>
         <translation>Проксі встановлено: %1:%2.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="993" />
+        <location filename="../src/app/appcontroller.cpp" line="996" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>З'єднання втрачено: %1. Перепідключення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="994" />
+        <location filename="../src/app/appcontroller.cpp" line="997" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>Не вдалося підключитися: %1. Повтор...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1099" />
+        <location filename="../src/app/appcontroller.cpp" line="1102" />
         <source>Enter the password.</source>
         <translation>Введіть пароль.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1124" />
+        <location filename="../src/app/appcontroller.cpp" line="1127" />
         <source>Enter your phone number.</source>
         <translation>Введіть номер телефону.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1134" />
+        <location filename="../src/app/appcontroller.cpp" line="1137" />
         <source>Enter the code.</source>
         <translation>Введіть код.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1196" />
+        <location filename="../src/app/appcontroller.cpp" line="1212" />
+        <source>Channel</source>
+        <translation>Канал</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1212" />
+        <source>Group</source>
+        <translation>Група</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1213" />
+        <source>%1 members</source>
+        <translation>учасників: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1214" />
+        <source>An admin has to approve new members.</source>
+        <translation>Нових учасників мусить схвалити адміністратор.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1221" />
+        <source>Joined.</source>
+        <translation>Ви приєднались.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1221" />
+        <source>Joined %1.</source>
+        <translation>Ви приєднались до %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1227" />
+        <source>Left.</source>
+        <translation>Ви вийшли.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1227" />
+        <source>Left %1.</source>
+        <translation>Ви вийшли з %1.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/appcontroller.cpp" line="1235" />
         <source>Added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1196" />
+        <location filename="../src/app/appcontroller.cpp" line="1235" />
         <source>%1 added to Contacts.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1209" />
-        <location filename="../src/app/appcontroller.cpp" line="1253" />
+        <location filename="../src/app/appcontroller.cpp" line="1248" />
+        <location filename="../src/app/appcontroller.cpp" line="1292" />
         <source>That chat is not in your list.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1280" />
+        <location filename="../src/app/appcontroller.cpp" line="1326" />
         <source>Opening @%1...</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1354" />
+        <location filename="../src/app/appcontroller.cpp" line="1400" />
         <source>Secret chats can only be started with a person.</source>
         <translation>Секретні чати можна починати лише з людиною.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1356" />
+        <location filename="../src/app/appcontroller.cpp" line="1402" />
         <source>Starting a secret chat...</source>
         <translation>Створення секретного чату...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1363" />
+        <location filename="../src/app/appcontroller.cpp" line="1409" />
         <source>Someone wants to start a secret chat.</source>
         <translation>Хтось хоче почати секретний чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1364" />
+        <location filename="../src/app/appcontroller.cpp" line="1410" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 хоче почати секретний чат.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1366" />
-        <location filename="../src/app/appcontroller.cpp" line="1387" />
+        <location filename="../src/app/appcontroller.cpp" line="1412" />
+        <location filename="../src/app/appcontroller.cpp" line="1433" />
         <source>Secret chat</source>
         <translation>Секретний чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1366" />
+        <location filename="../src/app/appcontroller.cpp" line="1412" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 хоче почати секретний чат</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1373" />
+        <location filename="../src/app/appcontroller.cpp" line="1419" />
         <source>Secret chat is ready.</source>
         <translation>Секретний чат готовий.</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1387" />
+        <location filename="../src/app/appcontroller.cpp" line="1433" />
         <source>Encrypted message</source>
         <translation>Зашифроване повідомлення</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1401" />
+        <location filename="../src/app/appcontroller.cpp" line="1447" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>Зображення (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1401" />
+        <location filename="../src/app/appcontroller.cpp" line="1447" />
         <source>All files (*)</source>
         <translation>Усі файли (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1402" />
+        <location filename="../src/app/appcontroller.cpp" line="1448" />
         <source>Choose an image</source>
         <translation>Виберіть зображення</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1402" />
+        <location filename="../src/app/appcontroller.cpp" line="1448" />
         <source>Choose a file</source>
         <translation>Виберіть файл</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1410" />
+        <location filename="../src/app/appcontroller.cpp" line="1456" />
         <source>Sending the image...</source>
         <translation>Надсилання зображення...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1410" />
+        <location filename="../src/app/appcontroller.cpp" line="1456" />
         <source>Sending the file...</source>
         <translation>Надсилання файлу...</translation>
     </message>
     <message>
-        <location filename="../src/app/appcontroller.cpp" line="1421" />
+        <location filename="../src/app/appcontroller.cpp" line="1467" />
         <source>Copied.</source>
         <translation>Скопійовано.</translation>
     </message>
@@ -429,112 +471,118 @@
     </message>
     <message>
         <location filename="../qml/ChatPage.qml" line="79" />
-        <location filename="../qml/ChatPage.qml" line="214" />
+        <location filename="../qml/ChatPage.qml" line="232" />
         <source>Self-destruct timer</source>
         <translation>Таймер самознищення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="84" />
-        <location filename="../qml/ChatPage.qml" line="204" />
+        <location filename="../qml/ChatPage.qml" line="89" />
+        <location filename="../qml/ChatPage.qml" line="222" />
         <source>Delete secret chat</source>
         <translation>Видалити секретний чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="197" />
+        <location filename="../qml/ChatPage.qml" line="102" />
+        <source>Leave "%1"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.</source>
+        <translation>Відписатися від «%1»? Ви перестанете отримувати його публікації, і він зникне зі списку чатів. Якщо він публічний, потім можна підписатися знову.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="215" />
         <source>Saved</source>
         <translation>Збережено</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="198" />
+        <location filename="../qml/ChatPage.qml" line="216" />
         <source>File saved to: %1</source>
         <translation>Файл збережено: %1</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="199" />
+        <location filename="../qml/ChatPage.qml" line="217" />
         <source>OK</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="205" />
+        <location filename="../qml/ChatPage.qml" line="223" />
         <source>End this secret chat? Its messages, which live only on this device, will be removed here.</source>
         <translation>Завершити цей секретний чат? Його повідомлення, що зберігаються лише на цьому пристрої, будуть видалені тут.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="206" />
+        <location filename="../qml/ChatPage.qml" line="224" />
         <source>Delete</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="107" />
-        <location filename="../qml/ChatPage.qml" line="146" />
-        <location filename="../qml/ChatPage.qml" line="207" />
-        <location filename="../qml/ChatPage.qml" line="684" />
+        <location filename="../qml/ChatPage.qml" line="105" />
+        <location filename="../qml/ChatPage.qml" line="125" />
+        <location filename="../qml/ChatPage.qml" line="164" />
+        <location filename="../qml/ChatPage.qml" line="225" />
+        <location filename="../qml/ChatPage.qml" line="732" />
         <source>Cancel</source>
         <translation>Скасувати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>Off</source>
         <translation>Вимк.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>5 seconds</source>
         <translation>5 секунд</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>30 seconds</source>
         <translation>30 секунд</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>1 minute</source>
         <translation>1 хвилина</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>1 hour</source>
         <translation>1 година</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>1 day</source>
         <translation>1 день</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="216" />
+        <location filename="../qml/ChatPage.qml" line="234" />
         <source>1 week</source>
         <translation>1 тиждень</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="223" />
+        <location filename="../qml/ChatPage.qml" line="241" />
         <source>Encryption key</source>
         <translation>Ключ шифрування</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="237" />
+        <location filename="../qml/ChatPage.qml" line="255" />
         <source>If this key matches on both phones, no one is intercepting the chat. Compare it with %1 in person or over a trusted channel.</source>
         <translation>Якщо цей ключ збігається на обох телефонах, чат ніхто не перехоплює. Порівняйте його з %1 особисто або надійним каналом.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="552" />
+        <location filename="../qml/ChatPage.qml" line="570" />
         <source>Image</source>
         <translation>Зображення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="293" />
-        <location filename="../qml/ChatPage.qml" line="552" />
+        <location filename="../qml/ChatPage.qml" line="311" />
+        <location filename="../qml/ChatPage.qml" line="570" />
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="625" />
+        <location filename="../qml/ChatPage.qml" line="669" />
         <source>add a caption</source>
         <translation>додайте підпис</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="303" />
+        <location filename="../qml/ChatPage.qml" line="321" />
         <source>Reply</source>
         <translation>Відповісти</translation>
     </message>
@@ -554,196 +602,225 @@
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="96" />
+        <location filename="../qml/ChatPage.qml" line="84" />
+        <location filename="../qml/ChatPage.qml" line="100" />
+        <location filename="../qml/ChatPage.qml" line="104" />
+        <source>Leave channel</source>
+        <translation>Відписатися</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="84" />
+        <location filename="../qml/ChatPage.qml" line="100" />
+        <location filename="../qml/ChatPage.qml" line="104" />
+        <source>Leave group</source>
+        <translation>Вийти з групи</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="103" />
+        <source>Leave "%1"? You will stop receiving its messages. Rejoining needs an invite link.</source>
+        <translation>Вийти з «%1»? Ви перестанете отримувати повідомлення. Для повернення потрібне посилання-запрошення.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="114" />
         <source>Forwarded to %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="106" />
-        <location filename="../qml/ChatPage.qml" line="333" />
+        <location filename="../qml/ChatPage.qml" line="124" />
+        <location filename="../qml/ChatPage.qml" line="351" />
         <source>React</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="145" />
+        <location filename="../qml/ChatPage.qml" line="163" />
         <source>Forward to</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="156" />
+        <location filename="../qml/ChatPage.qml" line="174" />
         <source>search chats and people</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="176" />
+        <location filename="../qml/ChatPage.qml" line="194" />
         <source>not in your chats</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="291" />
+        <location filename="../qml/ChatPage.qml" line="309" />
         <source>Image from Gallery (Slow)</source>
         <translation>Зображення з галереї (повільно)</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="292" />
+        <location filename="../qml/ChatPage.qml" line="310" />
         <source>Image from File System</source>
         <translation>Зображення з файлової системи</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="308" />
+        <location filename="../qml/ChatPage.qml" line="326" />
         <source>Forward</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="313" />
+        <location filename="../qml/ChatPage.qml" line="331" />
         <source>Edit</source>
         <translation>Змінити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="323" />
+        <location filename="../qml/ChatPage.qml" line="341" />
         <source>Save to phone</source>
         <translation>Зберегти в телефон</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="328" />
+        <location filename="../qml/ChatPage.qml" line="346" />
         <source>Open</source>
         <translation>Відкрити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="338" />
+        <location filename="../qml/ChatPage.qml" line="356" />
         <source>Copy link</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="343" />
+        <location filename="../qml/ChatPage.qml" line="361" />
         <source>Copy text</source>
         <translation>Скопіювати текст</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="348" />
+        <location filename="../qml/ChatPage.qml" line="366" />
         <source>Retry</source>
         <translation>Повторити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="353" />
+        <location filename="../qml/ChatPage.qml" line="371" />
         <source>Delete for me</source>
         <translation>Видалити в мене</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="358" />
+        <location filename="../qml/ChatPage.qml" line="376" />
         <source>Delete for everyone</source>
         <translation>Видалити в усіх</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="403" />
+        <location filename="../qml/ChatPage.qml" line="421" />
         <source>connecting...</source>
         <translation>підключення...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="403" />
+        <location filename="../qml/ChatPage.qml" line="421" />
         <source>offline</source>
         <translation>не в мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="405" />
+        <location filename="../qml/ChatPage.qml" line="423" />
         <source>online</source>
         <translation>у мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="428" />
+        <location filename="../qml/ChatPage.qml" line="446" />
         <source>%1 wants to start an end-to-end encrypted chat.</source>
         <translation>%1 хоче почати наскрізно зашифрований чат.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="429" />
+        <location filename="../qml/ChatPage.qml" line="447" />
         <source>Waiting for the other side to come online and accept...</source>
         <translation>Очікування, поки співрозмовник вийде в мережу та прийме запит...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="434" />
+        <location filename="../qml/ChatPage.qml" line="452" />
         <source>Accept</source>
         <translation>Прийняти</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="435" />
+        <location filename="../qml/ChatPage.qml" line="453" />
         <source>Decline</source>
         <translation>Відхилити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="438" />
+        <location filename="../qml/ChatPage.qml" line="456" />
         <source>Cancel request</source>
         <translation>Скасувати запит</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="460" />
+        <location filename="../qml/ChatPage.qml" line="478" />
         <source>Older messages</source>
         <translation>Старіші повідомлення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="480" />
+        <location filename="../qml/ChatPage.qml" line="498" />
         <source>Newer messages</source>
         <translation>Новіші</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="481" />
+        <location filename="../qml/ChatPage.qml" line="499" />
         <source>Latest</source>
         <translation>У кінець</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="534" />
+        <location filename="../qml/ChatPage.qml" line="552" />
         <source>Could not load the messages: %1</source>
         <translation>Не вдалося завантажити повідомлення: %1</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="534" />
+        <location filename="../qml/ChatPage.qml" line="552" />
         <source>No messages yet.</source>
         <translation>Повідомлень поки немає.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="581" />
+        <location filename="../qml/ChatPage.qml" line="599" />
         <source>Replying to</source>
         <translation>Відповідь на</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="581" />
+        <location filename="../qml/ChatPage.qml" line="599" />
         <source>Editing message</source>
         <translation>Редагування повідомлення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="582" />
+        <location filename="../qml/ChatPage.qml" line="600" />
         <source>edit the text, then tap Save</source>
         <translation>змініть текст і натисніть «Зберегти»</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="606" />
+        <location filename="../qml/ChatPage.qml" line="630" />
+        <source>Join channel</source>
+        <translation>Підписатися</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="630" />
+        <source>Join group</source>
+        <translation>Приєднатися</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatPage.qml" line="640" />
         <source>channel - only its admins can post</source>
         <translation>канал — писати можуть лише його адміністратори</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="625" />
+        <location filename="../qml/ChatPage.qml" line="669" />
         <source>message</source>
         <translation>повідомлення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="625" />
+        <location filename="../qml/ChatPage.qml" line="669" />
         <source>encrypted message</source>
         <translation>зашифроване повідомлення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="639" />
-        <location filename="../qml/ChatPage.qml" line="679" />
+        <location filename="../qml/ChatPage.qml" line="685" />
+        <location filename="../qml/ChatPage.qml" line="727" />
         <source>Send</source>
         <translation>Надіслати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="639" />
-        <location filename="../qml/ChatPage.qml" line="752" />
+        <location filename="../qml/ChatPage.qml" line="685" />
+        <location filename="../qml/ChatPage.qml" line="800" />
         <source>Save</source>
         <translation>Зберегти</translation>
     </message>
     <message>
-        <location filename="../qml/ChatPage.qml" line="224" />
-        <location filename="../qml/ChatPage.qml" line="755" />
+        <location filename="../qml/ChatPage.qml" line="242" />
+        <location filename="../qml/ChatPage.qml" line="803" />
         <source>Close</source>
         <translation>Закрити</translation>
     </message>
@@ -751,53 +828,53 @@
 <context>
     <name>ChatsModel</name>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="108" />
-        <location filename="../src/app/chatsmodel.cpp" line="118" />
+        <location filename="../src/app/chatsmodel.cpp" line="110" />
+        <location filename="../src/app/chatsmodel.cpp" line="120" />
         <source>All chats</source>
         <translation>Усі чати</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="111" />
+        <location filename="../src/app/chatsmodel.cpp" line="113" />
         <source>Archive</source>
         <translation>Архів</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="155" />
+        <location filename="../src/app/chatsmodel.cpp" line="157" />
         <source>Yesterday</source>
         <translation>Вчора</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="176" />
+        <location filename="../src/app/chatsmodel.cpp" line="178" />
         <source>%1 is typing...</source>
         <translation>%1 друкує...</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="177" />
+        <location filename="../src/app/chatsmodel.cpp" line="179" />
         <source>typing...</source>
         <translation>друкує...</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="181" />
+        <location filename="../src/app/chatsmodel.cpp" line="183" />
         <source>You: %1</source>
         <translation>Ви: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="212" />
+        <location filename="../src/app/chatsmodel.cpp" line="216" />
         <source>Secret chat</source>
         <translation>Секретний чат</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="217" />
+        <location filename="../src/app/chatsmodel.cpp" line="221" />
         <source>wants to start a secret chat</source>
         <translation>хоче почати секретний чат</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="218" />
+        <location filename="../src/app/chatsmodel.cpp" line="222" />
         <source>waiting to be accepted...</source>
         <translation>очікує підтвердження...</translation>
     </message>
     <message>
-        <location filename="../src/app/chatsmodel.cpp" line="219" />
+        <location filename="../src/app/chatsmodel.cpp" line="223" />
         <source>secret chat</source>
         <translation>секретний чат</translation>
     </message>
@@ -845,8 +922,9 @@
         <location filename="../qml/ChatsPage.qml" line="75" />
         <location filename="../qml/ChatsPage.qml" line="82" />
         <location filename="../qml/ChatsPage.qml" line="110" />
-        <location filename="../qml/ChatsPage.qml" line="179" />
-        <location filename="../qml/ChatsPage.qml" line="239" />
+        <location filename="../qml/ChatsPage.qml" line="196" />
+        <location filename="../qml/ChatsPage.qml" line="205" />
+        <location filename="../qml/ChatsPage.qml" line="265" />
         <source>Cancel</source>
         <translation>Скасувати</translation>
     </message>
@@ -872,7 +950,7 @@
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="107" />
-        <location filename="../qml/ChatsPage.qml" line="157" />
+        <location filename="../qml/ChatsPage.qml" line="158" />
         <source>Clear history</source>
         <translation>Очистити історію</translation>
     </message>
@@ -883,86 +961,105 @@
     </message>
     <message>
         <location filename="../qml/ChatsPage.qml" line="109" />
-        <location filename="../qml/ChatsPage.qml" line="238" />
+        <location filename="../qml/ChatsPage.qml" line="264" />
         <source>Delete</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="120" />
+        <location filename="../qml/ChatsPage.qml" line="121" />
         <source>Unmute</source>
         <translation>Увімкнути сповіщення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="120" />
+        <location filename="../qml/ChatsPage.qml" line="121" />
         <source>Mute</source>
         <translation>Вимкнути сповіщення</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="127" />
+        <location filename="../qml/ChatsPage.qml" line="128" />
         <source>Mute all topics</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="132" />
+        <location filename="../qml/ChatsPage.qml" line="133" />
         <source>Unmute all topics</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="137" />
+        <location filename="../qml/ChatsPage.qml" line="138" />
         <source>Block user</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="142" />
+        <location filename="../qml/ChatsPage.qml" line="143" />
         <source>Mark all as read</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="147" />
+        <location filename="../qml/ChatsPage.qml" line="148" />
         <source>Unarchive chat</source>
         <translation>Розархівувати чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="147" />
+        <location filename="../qml/ChatsPage.qml" line="148" />
         <source>Archive chat</source>
         <translation>Архівувати чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="152" />
-        <location filename="../qml/ChatsPage.qml" line="200" />
+        <location filename="../qml/ChatsPage.qml" line="153" />
+        <location filename="../qml/ChatsPage.qml" line="226" />
         <source>Move to folder</source>
         <translation>Перемістити в теку</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="162" />
-        <location filename="../qml/ChatsPage.qml" line="178" />
+        <location filename="../qml/ChatsPage.qml" line="165" />
+        <location filename="../qml/ChatsPage.qml" line="191" />
+        <location filename="../qml/ChatsPage.qml" line="195" />
+        <source>Leave channel</source>
+        <translation>Відписатися</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="165" />
+        <location filename="../qml/ChatsPage.qml" line="191" />
+        <location filename="../qml/ChatsPage.qml" line="195" />
+        <source>Leave group</source>
+        <translation>Вийти з групи</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="174" />
+        <location filename="../qml/ChatsPage.qml" line="204" />
         <source>Delete chat</source>
         <translation>Видалити чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="167" />
-        <location filename="../qml/ChatsPage.qml" line="236" />
+        <location filename="../qml/ChatsPage.qml" line="179" />
+        <location filename="../qml/ChatsPage.qml" line="262" />
         <source>Delete secret chat</source>
         <translation>Видалити секретний чат</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="223" />
+        <location filename="../qml/ChatsPage.qml" line="194" />
+        <source>Leave "%1"? You will stop receiving its messages. Rejoining needs an invite link.</source>
+        <translation>Вийти з «%1»? Ви перестанете отримувати повідомлення. Для повернення потрібне посилання-запрошення.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="249" />
         <source>All chats (no folder)</source>
         <translation>Усі чати (без теки)</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="237" />
+        <location filename="../qml/ChatsPage.qml" line="263" />
         <source>End the secret chat with "%1"? Its messages live only on this device and will be removed here.</source>
         <translation>Завершити секретний чат з «%1»? Його повідомлення зберігаються лише на цьому пристрої та будуть видалені тут.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="269" />
+        <location filename="../qml/ChatsPage.qml" line="295" />
         <source>online</source>
         <translation>у мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="268" />
-        <location filename="../qml/ChatsPage.qml" line="270" />
+        <location filename="../qml/ChatsPage.qml" line="294" />
+        <location filename="../qml/ChatsPage.qml" line="296" />
         <source>connecting...</source>
         <translation>підключення...</translation>
     </message>
@@ -973,73 +1070,78 @@
         <translation>Теки</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="179" />
+        <location filename="../qml/ChatsPage.qml" line="193" />
+        <source>Leave "%1"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.</source>
+        <translation>Відписатися від «%1»? Ви перестанете отримувати його публікації, і він зникне зі списку чатів. Якщо він публічний, потім можна підписатися знову.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ChatsPage.qml" line="205" />
         <source>Myself</source>
         <translation>У мене</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="179" />
+        <location filename="../qml/ChatsPage.qml" line="205" />
         <source>All</source>
         <translation>У всіх</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="188" />
+        <location filename="../qml/ChatsPage.qml" line="214" />
         <source>Delete the chat "%1"? "All" also removes it for the other side.</source>
         <translation>Видалити чат «%1»? «У всіх» також видалить його у співрозмовника.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="268" />
-        <location filename="../qml/ChatsPage.qml" line="270" />
+        <location filename="../qml/ChatsPage.qml" line="294" />
+        <location filename="../qml/ChatsPage.qml" line="296" />
         <source>offline</source>
         <translation>не в мережі</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="268" />
+        <location filename="../qml/ChatsPage.qml" line="294" />
         <source>tap to switch folder</source>
         <translation>натисніть, щоб змінити теку</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="296" />
+        <location filename="../qml/ChatsPage.qml" line="322" />
         <source>All chats</source>
         <translation>Усі чати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="335" />
+        <location filename="../qml/ChatsPage.qml" line="361" />
         <source>loading...</source>
         <translation>завантаження...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="335" />
+        <location filename="../qml/ChatsPage.qml" line="361" />
         <source>Older chats</source>
         <translation>Старіші чати</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="481" />
+        <location filename="../qml/ChatsPage.qml" line="507" />
         <source>Loading chats...</source>
         <translation>Завантаження чатів...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="482" />
+        <location filename="../qml/ChatsPage.qml" line="508" />
         <source>The archive is empty.</source>
         <translation>Архів порожній.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="483" />
+        <location filename="../qml/ChatsPage.qml" line="509" />
         <source>No chats in this folder.</source>
         <translation>У цій теці немає чатів.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="484" />
+        <location filename="../qml/ChatsPage.qml" line="510" />
         <source>No chats yet. Tap + to find someone.</source>
         <translation>Чатів поки немає. Натисніть +, щоб знайти співрозмовника.</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="480" />
+        <location filename="../qml/ChatsPage.qml" line="506" />
         <source>Connecting...</source>
         <translation>Підключення...</translation>
     </message>
     <message>
-        <location filename="../qml/ChatsPage.qml" line="480" />
+        <location filename="../qml/ChatsPage.qml" line="506" />
         <source>Offline. Use the menu to connect.</source>
         <translation>Не в мережі. Підключіться через меню.</translation>
     </message>
@@ -1258,82 +1360,82 @@
 <context>
     <name>MessageDelegate</name>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="127" />
+        <location filename="../qml/MessageDelegate.qml" line="137" />
         <source>Forwarded from %1</source>
         <translation>Переслано від %1</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="206" />
+        <location filename="../qml/MessageDelegate.qml" line="216" />
         <source>Tap to load</source>
         <translation>Натисніть, щоб завантажити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="217" />
+        <location filename="../qml/MessageDelegate.qml" line="227" />
         <source>Failed - tap to retry</source>
         <translation>Помилка — натисніть, щоб повторити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="259" />
+        <location filename="../qml/MessageDelegate.qml" line="269" />
         <source>Voice message</source>
         <translation>Голосове повідомлення</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="260" />
+        <location filename="../qml/MessageDelegate.qml" line="270" />
         <source>Video</source>
         <translation>Відео</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="268" />
+        <location filename="../qml/MessageDelegate.qml" line="278" />
         <source>playing... tap to stop</source>
         <translation>відтворення... натисніть, щоб зупинити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="269" />
+        <location filename="../qml/MessageDelegate.qml" line="279" />
         <source>loading %1%</source>
         <translation>завантаження %1%</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="269" />
+        <location filename="../qml/MessageDelegate.qml" line="279" />
         <source>tap to play</source>
         <translation>натисніть, щоб відтворити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="271" />
+        <location filename="../qml/MessageDelegate.qml" line="281" />
         <source>buffering %1%... opening player</source>
         <translation>буферизація %1%... відкриваю плеєр</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="271" />
+        <location filename="../qml/MessageDelegate.qml" line="281" />
         <source>tap to play in player</source>
         <translation>натисніть, щоб відкрити у плеєрі</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="272" />
+        <location filename="../qml/MessageDelegate.qml" line="282" />
         <source>tap to open</source>
         <translation>натисніть, щоб відкрити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="272" />
+        <location filename="../qml/MessageDelegate.qml" line="282" />
         <source>downloading %1%</source>
         <translation>завантаження %1%</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="272" />
+        <location filename="../qml/MessageDelegate.qml" line="282" />
         <source>tap to download</source>
         <translation>натисніть, щоб завантажити</translation>
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="295" />
+        <location filename="../qml/MessageDelegate.qml" line="305" />
         <source>GIF file</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="302" />
+        <location filename="../qml/MessageDelegate.qml" line="312" />
         <source>not supported</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../qml/MessageDelegate.qml" line="411" />
+        <location filename="../qml/MessageDelegate.qml" line="421" />
         <source>edited</source>
         <translation>змінено</translation>
     </message>
@@ -1341,172 +1443,172 @@
 <context>
     <name>MessagesModel</name>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="285" />
+        <location filename="../src/app/messagesmodel.cpp" line="294" />
         <source>Today</source>
         <translation>Сьогодні</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="286" />
+        <location filename="../src/app/messagesmodel.cpp" line="295" />
         <source>Yesterday</source>
         <translation>Вчора</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1621" />
+        <location filename="../src/app/messagesmodel.cpp" line="1662" />
         <source>reply</source>
         <translation>відповідь</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1623" />
+        <location filename="../src/app/messagesmodel.cpp" line="1664" />
         <source>You</source>
         <translation>Ви</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="534" />
+        <location filename="../src/app/messagesmodel.cpp" line="545" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="535" />
+        <location filename="../src/app/messagesmodel.cpp" line="546" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="536" />
+        <location filename="../src/app/messagesmodel.cpp" line="547" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="648" />
+        <location filename="../src/app/messagesmodel.cpp" line="659" />
         <source>Can't forward to a secret chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="736" />
+        <location filename="../src/app/messagesmodel.cpp" line="747" />
         <source>Could not save the file to %1</source>
         <translation>Не вдалося зберегти файл у %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="781" />
+        <location filename="../src/app/messagesmodel.cpp" line="792" />
         <source>Could not open the file.</source>
         <translation>Не вдалося відкрити файл.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="922" />
+        <location filename="../src/app/messagesmodel.cpp" line="933" />
         <source>Could not play this audio: %1</source>
         <translation>Не вдалося відтворити аудіо: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1046" />
+        <location filename="../src/app/messagesmodel.cpp" line="1087" />
         <source>online</source>
         <translation>у мережі</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1050" />
+        <location filename="../src/app/messagesmodel.cpp" line="1091" />
         <source>last seen at %1</source>
         <translation>був(ла) о %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1051" />
+        <location filename="../src/app/messagesmodel.cpp" line="1092" />
         <source>last seen yesterday at %1</source>
         <translation>був(ла) вчора о %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1052" />
+        <location filename="../src/app/messagesmodel.cpp" line="1093" />
         <source>last seen %1</source>
         <translation>був(ла) %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1054" />
+        <location filename="../src/app/messagesmodel.cpp" line="1095" />
         <source>last seen recently</source>
         <translation>був(ла) нещодавно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1055" />
+        <location filename="../src/app/messagesmodel.cpp" line="1096" />
         <source>last seen within a week</source>
         <translation>був(ла) цього тижня</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1056" />
+        <location filename="../src/app/messagesmodel.cpp" line="1097" />
         <source>last seen within a month</source>
         <translation>був(ла) цього місяця</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1057" />
+        <location filename="../src/app/messagesmodel.cpp" line="1098" />
         <source>last seen a long time ago</source>
         <translation>був(ла) давно</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1072" />
+        <location filename="../src/app/messagesmodel.cpp" line="1113" />
         <source>wants to start a secret chat</source>
         <translation>хоче почати секретний чат</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1073" />
+        <location filename="../src/app/messagesmodel.cpp" line="1114" />
         <source>waiting to be accepted...</source>
         <translation>очікує підтвердження...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1074" />
+        <location filename="../src/app/messagesmodel.cpp" line="1115" />
         <source>end-to-end encrypted, self-destruct %1s</source>
         <translation>наскрізне шифрування, самознищення %1с</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1075" />
+        <location filename="../src/app/messagesmodel.cpp" line="1116" />
         <source>end-to-end encrypted</source>
         <translation>наскрізне шифрування</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1081" />
+        <location filename="../src/app/messagesmodel.cpp" line="1122" />
         <source>%1 is typing...</source>
         <translation>%1 друкує...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1082" />
+        <location filename="../src/app/messagesmodel.cpp" line="1123" />
         <source>typing...</source>
         <translation>друкує...</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1086" />
+        <location filename="../src/app/messagesmodel.cpp" line="1127" />
         <source>bot</source>
         <translation>бот</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1087" />
+        <location filename="../src/app/messagesmodel.cpp" line="1128" />
         <source>Saved Messages</source>
         <translation>Збережене</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1090" />
+        <location filename="../src/app/messagesmodel.cpp" line="1131" />
         <source>channel, %1 subscribers</source>
         <translation>канал, підписників: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1090" />
+        <location filename="../src/app/messagesmodel.cpp" line="1131" />
         <source>channel</source>
         <translation>канал</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1091" />
+        <location filename="../src/app/messagesmodel.cpp" line="1132" />
         <source>%1 members</source>
         <translation>учасників: %1</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1091" />
+        <location filename="../src/app/messagesmodel.cpp" line="1132" />
         <source>group</source>
         <translation>група</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1634" />
+        <location filename="../src/app/messagesmodel.cpp" line="1675" />
         <source>Not connected.</source>
         <translation>Немає з'єднання.</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1704" />
+        <location filename="../src/app/messagesmodel.cpp" line="1745" />
         <source>photo</source>
         <translation>фото</translation>
     </message>
     <message>
-        <location filename="../src/app/messagesmodel.cpp" line="1720" />
+        <location filename="../src/app/messagesmodel.cpp" line="1761" />
         <source>The message was not sent: %1</source>
         <translation>Повідомлення не надіслано: %1</translation>
     </message>
@@ -2007,8 +2109,8 @@
         <location filename="../src/core/telegramsession.cpp" line="281" />
         <location filename="../src/core/telegramsession.cpp" line="556" />
         <location filename="../src/core/telegramsession.cpp" line="562" />
-        <location filename="../src/core/telegramsession.cpp" line="1127" />
-        <location filename="../src/core/telegramsession.cpp" line="1588" />
+        <location filename="../src/core/telegramsession.cpp" line="1172" />
+        <location filename="../src/core/telegramsession.cpp" line="1680" />
         <source>Signed out.</source>
         <translation>Вихід виконано.</translation>
     </message>
@@ -2025,8 +2127,10 @@
     <message>
         <location filename="../src/core/telegramsession.cpp" line="252" />
         <location filename="../src/core/telegramsession.cpp" line="880" />
-        <location filename="../src/core/telegramsession.cpp" line="2186" />
-        <location filename="../src/core/telegramsession.cpp" line="2214" />
+        <location filename="../src/core/telegramsession.cpp" line="931" />
+        <location filename="../src/core/telegramsession.cpp" line="940" />
+        <location filename="../src/core/telegramsession.cpp" line="2311" />
+        <location filename="../src/core/telegramsession.cpp" line="2339" />
         <source>Not connected.</source>
         <translation>Немає з'єднання.</translation>
     </message>
@@ -2037,198 +2141,260 @@
     </message>
     <message>
         <location filename="../src/core/telegramsession.cpp" line="369" />
-        <location filename="../src/core/telegramsession.cpp" line="1578" />
+        <location filename="../src/core/telegramsession.cpp" line="1670" />
         <source>Enter the code.</source>
         <translation>Введіть код.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="948" />
-        <location filename="../src/core/telegramsession.cpp" line="980" />
+        <location filename="../src/core/telegramsession.cpp" line="907" />
+        <source>This group can only be joined through an invite link.</source>
+        <translation>До цієї групи можна приєднатися лише за посиланням-запрошенням.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="910" />
+        <source>That chat is not in your list.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="993" />
+        <location filename="../src/core/telegramsession.cpp" line="1025" />
         <source>That folder no longer exists.</source>
         <translation>Цієї теки більше немає.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1090" />
+        <location filename="../src/core/telegramsession.cpp" line="1135" />
         <source>This account has no password set.</source>
         <translation>У цього облікового запису немає пароля.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1091" />
+        <location filename="../src/core/telegramsession.cpp" line="1136" />
         <source>Unsupported password method.</source>
         <translation>Непідтримуваний спосіб перевірки пароля.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1120" />
-        <location filename="../src/core/telegramsession.cpp" line="1580" />
+        <location filename="../src/core/telegramsession.cpp" line="1165" />
+        <location filename="../src/core/telegramsession.cpp" line="1672" />
         <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
         <translation>До цього номера не прив'язано акаунт Telegram. Реєстрація тут не підтримується.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1318" />
+        <location filename="../src/core/telegramsession.cpp" line="1410" />
         <source>User blocked.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1386" />
+        <location filename="../src/core/telegramsession.cpp" line="1478" />
         <source>the server rejected a part of the file</source>
         <translation>сервер відхилив частину файлу</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1409" />
+        <location filename="../src/core/telegramsession.cpp" line="1501" />
         <source>the file is served from a CDN, which is not supported</source>
         <translation>файл роздається через CDN, що не підтримується</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1410" />
+        <location filename="../src/core/telegramsession.cpp" line="1502" />
         <source>unexpected reply</source>
         <translation>неочікувана відповідь</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1413" />
+        <location filename="../src/core/telegramsession.cpp" line="1505" />
         <source>could not write the file</source>
         <translation>не вдалося записати файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1440" />
-        <location filename="../src/core/telegramsession.cpp" line="1449" />
-        <location filename="../src/core/telegramsession.cpp" line="1637" />
+        <location filename="../src/core/telegramsession.cpp" line="1532" />
+        <location filename="../src/core/telegramsession.cpp" line="1541" />
+        <location filename="../src/core/telegramsession.cpp" line="1729" />
         <source>Nobody found.</source>
         <translation>Нікого не знайдено.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1510" />
+        <location filename="../src/core/telegramsession.cpp" line="1602" />
         <source>The session was ended (%1). Please sign in again.</source>
         <translation>Сеанс завершено (%1). Увійдіть знову.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1547" />
+        <location filename="../src/core/telegramsession.cpp" line="1639" />
         <source>Wrong password.</source>
         <translation>Неправильний пароль.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1548" />
-        <location filename="../src/core/telegramsession.cpp" line="1557" />
-        <location filename="../src/core/telegramsession.cpp" line="1582" />
+        <location filename="../src/core/telegramsession.cpp" line="1640" />
+        <location filename="../src/core/telegramsession.cpp" line="1649" />
+        <location filename="../src/core/telegramsession.cpp" line="1674" />
         <source>Too many attempts. Wait %1 seconds.</source>
         <translation>Забагато спроб. Зачекайте %1 с.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1558" />
+        <location filename="../src/core/telegramsession.cpp" line="1650" />
         <source>That phone number is not valid.</source>
         <translation>Цей номер телефону недійсний.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1559" />
+        <location filename="../src/core/telegramsession.cpp" line="1651" />
         <source>That phone number is banned from Telegram.</source>
         <translation>Цей номер заблоковано в Telegram.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1560" />
+        <location filename="../src/core/telegramsession.cpp" line="1652" />
         <source>Too many codes requested for this number. Try again later.</source>
         <translation>Забагато запитів коду для цього номера. Спробуйте пізніше.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1561" />
+        <location filename="../src/core/telegramsession.cpp" line="1653" />
         <source>Too many attempts. Try again later.</source>
         <translation>Забагато спроб. Спробуйте пізніше.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1562" />
+        <location filename="../src/core/telegramsession.cpp" line="1654" />
         <source>This build's Telegram API key was rejected.</source>
         <translation>Ключ API Telegram цієї збірки відхилено.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1574" />
+        <location filename="../src/core/telegramsession.cpp" line="1666" />
         <source>Wrong code. Check it and try again.</source>
         <translation>Невірний код. Перевірте та спробуйте знову.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1576" />
+        <location filename="../src/core/telegramsession.cpp" line="1668" />
         <source>The code expired. Request a new one.</source>
         <translation>Код застарів. Запросіть новий.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1593" />
+        <location filename="../src/core/telegramsession.cpp" line="1685" />
         <source>Could not load the chat list: %1</source>
         <translation>Не вдалося завантажити список чатів: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1648" />
+        <location filename="../src/core/telegramsession.cpp" line="1740" />
         <source>Could not start the secret chat: %1</source>
         <translation>Не вдалося почати секретний чат: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1651" />
+        <location filename="../src/core/telegramsession.cpp" line="1743" />
         <source>Could not accept the secret chat: %1</source>
         <translation>Не вдалося прийняти секретний чат: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1672" />
+        <location filename="../src/core/telegramsession.cpp" line="1764" />
         <source>Could not edit the message: %1</source>
         <translation>Не вдалося змінити повідомлення: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1675" />
+        <location filename="../src/core/telegramsession.cpp" line="1767" />
         <source>Could not forward the message: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1679" />
+        <location filename="../src/core/telegramsession.cpp" line="1771" />
         <source>That reaction is not allowed in this chat.</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1681" />
+        <location filename="../src/core/telegramsession.cpp" line="1773" />
         <source>Could not react: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1684" />
+        <location filename="../src/core/telegramsession.cpp" line="1776" />
         <source>Could not block the user: %1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1693" />
+        <location filename="../src/core/telegramsession.cpp" line="1784" />
+        <source>Request sent. You will join once an admin approves it.</source>
+        <translation>Заявку надіслано. Ви приєднаєтеся, коли її схвалить адміністратор.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1786" />
+        <source>You are already a member.</source>
+        <translation>Ви вже учасник.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1788" />
+        <location filename="../src/core/telegramsession.cpp" line="1805" />
+        <source>That invite link has expired.</source>
+        <translation>Термін дії посилання сплив.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1790" />
+        <location filename="../src/core/telegramsession.cpp" line="1807" />
+        <source>That invite link is not valid.</source>
+        <translation>Це посилання-запрошення недійсне.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1792" />
+        <source>You have joined too many groups and channels.</source>
+        <translation>Ви приєдналися до занадто багатьох груп і каналів.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1794" />
+        <source>That group is full.</source>
+        <translation>Група заповнена.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1796" />
+        <source>Your request to join is still waiting for approval.</source>
+        <translation>Ваша заявка ще чекає на схвалення.</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1798" />
+        <source>Could not join: %1</source>
+        <translation>Не вдалося приєднатися: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1801" />
+        <source>Could not leave: %1</source>
+        <translation>Не вдалося вийти: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1809" />
+        <source>Could not read that invite link: %1</source>
+        <translation>Не вдалося перевірити посилання: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/core/telegramsession.cpp" line="1818" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
         <translation>У теці має лишатися хоча б один чат, тож чат залишиться і в ній.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="1695" />
+        <location filename="../src/core/telegramsession.cpp" line="1820" />
         <source>Could not change the folder: %1</source>
         <translation>Не вдалося змінити теку: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2063" />
+        <location filename="../src/core/telegramsession.cpp" line="2188" />
         <source>could not create the file</source>
         <translation>не вдалося створити файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2138" />
+        <location filename="../src/core/telegramsession.cpp" line="2263" />
         <source>the file is empty</source>
         <translation>файл порожній</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2171" />
+        <location filename="../src/core/telegramsession.cpp" line="2296" />
         <source>could not read the file</source>
         <translation>не вдалося прочитати файл</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2182" />
+        <location filename="../src/core/telegramsession.cpp" line="2307" />
         <source>the file is too large</source>
         <translation>файл завеликий</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2206" />
+        <location filename="../src/core/telegramsession.cpp" line="2331" />
         <source>could not read the recording</source>
         <translation>не вдалося прочитати запис</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2347" />
+        <location filename="../src/core/telegramsession.cpp" line="2472" />
         <source>Secret chats can only be opened with a person.</source>
         <translation>Секретні чати можна відкривати лише з людиною.</translation>
     </message>
     <message>
-        <location filename="../src/core/telegramsession.cpp" line="2397" />
+        <location filename="../src/core/telegramsession.cpp" line="2522" />
         <source>The secret chat is not ready.</source>
         <translation>Секретний чат не готовий.</translation>
     </message>
@@ -2254,203 +2420,203 @@
         <translation>видалений обліковий запис</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="777" />
-        <location filename="../src/core/tgapi.cpp" line="818" />
+        <location filename="../src/core/tgapi.cpp" line="810" />
+        <location filename="../src/core/tgapi.cpp" line="851" />
         <source>video</source>
         <translation>відео</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="777" />
+        <location filename="../src/core/tgapi.cpp" line="810" />
         <source>photo</source>
         <translation>фото</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="782" />
+        <location filename="../src/core/tgapi.cpp" line="815" />
         <source>location %1, %2</source>
         <translation>геопозиція %1, %2</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="783" />
+        <location filename="../src/core/tgapi.cpp" line="816" />
         <source>location</source>
         <translation>геопозиція</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="785" />
+        <location filename="../src/core/tgapi.cpp" line="818" />
         <source>location: %1</source>
         <translation>місце: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="786" />
+        <location filename="../src/core/tgapi.cpp" line="819" />
         <source>contact: %1 %2 %3</source>
         <translation>контакт: %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="791" />
+        <location filename="../src/core/tgapi.cpp" line="824" />
         <source>poll: %1</source>
         <translation>опитування: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="793" />
+        <location filename="../src/core/tgapi.cpp" line="826" />
         <source>dice: %1</source>
         <translation>кубик: %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="794" />
+        <location filename="../src/core/tgapi.cpp" line="827" />
         <source>game</source>
         <translation>гра</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="795" />
+        <location filename="../src/core/tgapi.cpp" line="828" />
         <source>invoice</source>
         <translation>рахунок</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="796" />
+        <location filename="../src/core/tgapi.cpp" line="829" />
         <source>story</source>
         <translation>історія</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="799" />
+        <location filename="../src/core/tgapi.cpp" line="832" />
         <source>file</source>
         <translation>файл</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="814" />
+        <location filename="../src/core/tgapi.cpp" line="847" />
         <source>sticker</source>
         <translation>стікер</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="814" />
+        <location filename="../src/core/tgapi.cpp" line="847" />
         <source>sticker %1</source>
         <translation>стікер %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="815" />
+        <location filename="../src/core/tgapi.cpp" line="848" />
         <source>voice message %1</source>
         <translation>голосове повідомлення %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="815" />
+        <location filename="../src/core/tgapi.cpp" line="848" />
         <source>voice message</source>
         <translation>голосове повідомлення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="816" />
+        <location filename="../src/core/tgapi.cpp" line="849" />
         <source>video message %1</source>
         <translation>відеоповідомлення %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="816" />
+        <location filename="../src/core/tgapi.cpp" line="849" />
         <source>video message</source>
         <translation>відеоповідомлення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="817" />
+        <location filename="../src/core/tgapi.cpp" line="850" />
         <source>GIF</source>
         <translation>GIF</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="818" />
+        <location filename="../src/core/tgapi.cpp" line="851" />
         <source>video %1</source>
         <translation>відео %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="819" />
+        <location filename="../src/core/tgapi.cpp" line="852" />
         <source>audio %1</source>
         <translation>аудіо %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="819" />
+        <location filename="../src/core/tgapi.cpp" line="852" />
         <source>audio</source>
         <translation>аудіо</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="820" />
+        <location filename="../src/core/tgapi.cpp" line="853" />
         <source>image</source>
         <translation>зображення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="822" />
+        <location filename="../src/core/tgapi.cpp" line="855" />
         <source>%1 MB</source>
         <translation>%1 МБ</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="823" />
+        <location filename="../src/core/tgapi.cpp" line="856" />
         <source>%1 KB</source>
         <translation>%1 КБ</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="823" />
+        <location filename="../src/core/tgapi.cpp" line="856" />
         <source>%1 B</source>
         <translation>%1 Б</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="824" />
+        <location filename="../src/core/tgapi.cpp" line="857" />
         <source>file: %1 (%2)</source>
         <translation>файл: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="826" />
+        <location filename="../src/core/tgapi.cpp" line="859" />
         <source>unsupported attachment</source>
         <translation>непідтримуване вкладення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="827" />
+        <location filename="../src/core/tgapi.cpp" line="860" />
         <source>attachment</source>
         <translation>вкладення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="968" />
+        <location filename="../src/core/tgapi.cpp" line="1001" />
         <source>created the group "%1"</source>
         <translation>створив(ла) групу «%1»</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="969" />
+        <location filename="../src/core/tgapi.cpp" line="1002" />
         <source>created the channel "%1"</source>
         <translation>створив(ла) канал «%1»</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="974" />
+        <location filename="../src/core/tgapi.cpp" line="1007" />
         <source>added %1</source>
         <translation>додав(ла) %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="976" />
+        <location filename="../src/core/tgapi.cpp" line="1009" />
         <source>removed %1</source>
         <translation>видалив(ла) %1</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="977" />
+        <location filename="../src/core/tgapi.cpp" line="1010" />
         <source>joined by invite link</source>
         <translation>приєднався(-лась) за посиланням-запрошенням</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="978" />
+        <location filename="../src/core/tgapi.cpp" line="1011" />
         <source>pinned a message</source>
         <translation>закріпив(ла) повідомлення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="979" />
+        <location filename="../src/core/tgapi.cpp" line="1012" />
         <source>joined Telegram</source>
         <translation>приєднався(-лась) до Telegram</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="980" />
+        <location filename="../src/core/tgapi.cpp" line="1013" />
         <source>cleared the history</source>
         <translation>очистив(ла) історію</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="981" />
+        <location filename="../src/core/tgapi.cpp" line="1014" />
         <source>service message</source>
         <translation>службове повідомлення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="989" />
+        <location filename="../src/core/tgapi.cpp" line="1022" />
         <source>empty message</source>
         <translation>порожнє повідомлення</translation>
     </message>
     <message>
-        <location filename="../src/core/tgapi.cpp" line="1197" />
+        <location filename="../src/core/tgapi.cpp" line="1230" />
         <source>Folder</source>
         <translation>Тека</translation>
     </message>
@@ -2585,29 +2751,40 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="171" />
+        <location filename="../qml/main.qml" line="177" />
         <source>Use this proxy?</source>
         <translation>Використати цей проксі?</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="172" />
+        <location filename="../qml/main.qml" line="178" />
         <source>Route Symbigram through the MTProto proxy %1? This reconnects.</source>
         <translation>Спрямувати Symbigram через проксі MTProto %1? Відбудеться перепідключення.</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="173" />
+        <location filename="../qml/main.qml" line="179" />
         <source>Route Symbigram through the SOCKS5 proxy %1? This reconnects.</source>
         <translation>Спрямувати Symbigram через проксі SOCKS5 %1? Відбудеться перепідключення.</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="174" />
+        <location filename="../qml/main.qml" line="180" />
         <source>Use it</source>
         <translation>Використати</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="175" />
+        <location filename="../qml/main.qml" line="181" />
+        <location filename="../qml/main.qml" line="195" />
         <source>Cancel</source>
         <translation>Скасувати</translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="192" />
+        <source>Join this chat?</source>
+        <translation>Приєднатися до цього чату?</translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="194" />
+        <source>Join</source>
+        <translation>Приєднатися</translation>
     </message>
 </context>
 </TS>

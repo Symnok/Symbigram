@@ -141,6 +141,11 @@ void TgPeerCache::absorbChat(const TlObject &c)
     info.membersCount = c.intOr("participants_count", info.membersCount);
     info.isBroadcast = channel && c.flag("flags", 5) && !c.flag("flags", 8);
     info.isForum = channel && c.flag("flags", 30);   // organised into topics
+    // flags.2 is "left" on both channel# and chat#. A min object (a forward or a mention from a
+    // chat we are not in) carries only context-valid fields, so it must not overwrite what a full
+    // object said - the same reasoning as the access_hash above. channelForbidden has no such bit
+    // and cannot be joined anyway, so it leaves the value alone.
+    if (!min && c.ctor() != Tl::ChannelForbidden) info.isLeft = c.flag("flags", 2);
     if (c.has("photo")) {
         TlObject photo = c.obj("photo");
         info.photoId = photo.ctor() == Tl::ChatPhoto ? photo.longOr("photo_id") : 0;
@@ -511,6 +516,34 @@ QByteArray TgApi::leaveChannel(const TgPeer &channel)
 {
     TlWriter w(24);
     w.writeConstructor(Tl::ChannelsLeaveChannel).writeRaw(inputChannel(channel));
+    return w.toByteArray();
+}
+
+// channels.joinChannel#24b524c5, messages.checkChatInvite#3eadb1bb and
+// messages.importChatInvite#6c50051c. The first and last are absent from the generated schema
+// table, so their ids were recomputed from the TL signature (a constructor id is the CRC32 of the
+// normalised line) and the method was validated against ids the table does carry - leaveChannel,
+// checkChatInvite, getFullChannel, deleteChannel, chatInviteAlready and chatInvitePeek all come
+// out exactly as generated. Writing a request needs only the id; the replies are Updates and
+// ChatInvite, both of which the table does describe.
+QByteArray TgApi::joinChannel(const TgPeer &channel)
+{
+    TlWriter w(24);
+    w.writeConstructor(Tl::ChannelsJoinChannel).writeRaw(inputChannel(channel));
+    return w.toByteArray();
+}
+
+QByteArray TgApi::checkChatInvite(const QString &inviteHash)
+{
+    TlWriter w(40);
+    w.writeConstructor(Tl::MessagesCheckChatInvite).writeString(inviteHash);
+    return w.toByteArray();
+}
+
+QByteArray TgApi::importChatInvite(const QString &inviteHash)
+{
+    TlWriter w(40);
+    w.writeConstructor(Tl::MessagesImportChatInvite).writeString(inviteHash);
     return w.toByteArray();
 }
 
@@ -1256,4 +1289,80 @@ QString TgApi::normaliseUsername(const QString &value)
     int slash = name.lastIndexOf(QLatin1Char('/'));
     if (slash >= 0 && slash + 1 < name.size()) name = name.mid(slash + 1);
     return name;
+}
+
+QString TgApi::inviteHash(const QString &link)
+{
+    // Four shapes, all of them in circulation: the current t.me/+hash, the older
+    // t.me/joinchat/hash, the in-app tg://join?invite=hash, and a bare "+hash" typed or pasted
+    // into Find. Everything else - a username, a phone number, a name - returns empty, which is
+    // what tells the callers to fall back to the normal lookup.
+    QString rest = link.trimmed();
+    if (rest.startsWith(QLatin1String("tg://join"), Qt::CaseInsensitive)) {
+        const int at = rest.indexOf(QLatin1String("invite="), 0, Qt::CaseInsensitive);
+        if (at < 0) return QString();
+        rest = rest.mid(at + 7).section(QLatin1Char('&'), 0, 0);
+        return rest.trimmed();
+    }
+    if (rest.startsWith(QLatin1String("https://"), Qt::CaseInsensitive)) rest = rest.mid(8);
+    else if (rest.startsWith(QLatin1String("http://"), Qt::CaseInsensitive)) rest = rest.mid(7);
+    if (rest.startsWith(QLatin1String("www."), Qt::CaseInsensitive)) rest = rest.mid(4);
+
+    const int slash = rest.indexOf(QLatin1Char('/'));
+    if (slash < 0) {
+        // No host at all: only a bare "+hash" counts. A phone number typed into Find starts with
+        // a + too, and sending that to checkChatInvite would break looking people up by number -
+        // so the tail has to look like a base64url hash: no spaces, and at least one letter,
+        // which no phone number has.
+        if (!rest.startsWith(QLatin1Char('+')) || rest.size() < 6) return QString();
+        const QString tail = rest.mid(1);
+        bool letter = false;
+        for (int i = 0; i < tail.size(); ++i) {
+            const QChar ch = tail.at(i);
+            const bool alnum = (ch >= QLatin1Char('a') && ch <= QLatin1Char('z'))
+                            || (ch >= QLatin1Char('A') && ch <= QLatin1Char('Z'))
+                            || (ch >= QLatin1Char('0') && ch <= QLatin1Char('9'));
+            if (ch >= QLatin1Char('a') && ch <= QLatin1Char('z')) letter = true;
+            if (ch >= QLatin1Char('A') && ch <= QLatin1Char('Z')) letter = true;
+            if (!alnum && ch != QLatin1Char('_') && ch != QLatin1Char('-')) return QString();
+        }
+        return letter ? tail : QString();
+    }
+    const QString host = rest.left(slash).toLower();
+    if (host != QLatin1String("t.me") && host != QLatin1String("telegram.me")
+        && host != QLatin1String("telegram.dog")) return QString();
+
+    QString path = rest.mid(slash + 1).section(QLatin1Char('?'), 0, 0).section(QLatin1Char('#'), 0, 0);
+    while (path.endsWith(QLatin1Char('/'))) path.chop(1);
+    if (path.startsWith(QLatin1Char('+'))) return path.mid(1);
+    if (path.startsWith(QLatin1String("joinchat/"), Qt::CaseInsensitive)) {
+        const QString hash = path.mid(9);
+        return hash.contains(QLatin1Char('/')) ? QString() : hash;
+    }
+    return QString();
+}
+
+TgInvite TgApi::readInvite(const TlObject &response, TgPeerCache &cache)
+{
+    TgInvite inv;
+    if (response.isNull()) return inv;
+    // chatInviteAlready / chatInvitePeek carry the chat itself: we are already in it (or may read
+    // it for a while), so there is nothing to join - the caller just opens it.
+    if (response.ctor() == Tl::ChatInviteAlready || response.ctor() == Tl::ChatInvitePeek) {
+        const TlObject chat = response.obj("chat");
+        cache.absorbChat(chat);
+        inv.chatInHand = true;
+        inv.peer = TgPeer(chat.ctor() == Tl::Channel || chat.ctor() == Tl::ChannelForbidden
+                              ? TgPeer::Channel : TgPeer::Chat,
+                          chat.longOr("id"), chat.longOr("access_hash"));
+        inv.peer = cache.withHash(inv.peer);
+        inv.title = cache.title(inv.peer);
+        return inv;
+    }
+    inv.title = TextSafety::limitCombiningMarks(response.str("title"));
+    inv.membersCount = response.intOr("participants_count");
+    inv.isBroadcast = response.flag("flags", 1);     // broadcast
+    inv.isMegagroup = response.flag("flags", 3);     // megagroup
+    inv.requestNeeded = response.flag("flags", 6);   // an admin has to approve
+    return inv;
 }

@@ -28,6 +28,7 @@ class QNetworkSession;
 class QTimer;
 class QDeclarativeView;
 struct TgMessage;
+struct TgInvite;
 struct TgPeer;
 
 class AppController : public QObject
@@ -220,6 +221,8 @@ public slots:
     /// Opens a chat with a peer we already know - used by the tappable "Forwarded from" name.
     /// Says so politely when the peer cannot be addressed (no access hash for it).
     Q_INVOKABLE void openPeer(const QString &peerKey);
+    /// Joins the invite link last offered through inviteOffered (the user said yes).
+    Q_INVOKABLE void joinInvite(const QString &inviteHash);
     /// Saves a phonebook entry for a Telegram username (its Web Address becomes t.me/<name>).
     Q_INVOKABLE void addLocalContact(const QString &firstName, const QString &lastName,
                                      const QString &phone, const QString &url);
@@ -280,6 +283,9 @@ signals:
     void recordingChanged();
     /// A chat was found by findPeer; the list page opens it.
     void peerFound(const QString &peerKey);
+    /// A private invite link was tapped or typed and checked: what it points at, for the
+    /// confirm dialog. `detail` is already-worded ("Channel - 1 234 members").
+    void inviteOffered(const QString &inviteHash, const QString &title, const QString &detail);
     /// A proxy link was tapped: `target` is "server:port", `mtproto` picks the wording.
     void proxyLinkOffered(const QString &target, bool mtproto);
     /// A t.me link that points at one message: open peerKey and jump to msgId.
@@ -298,6 +304,9 @@ private slots:
     void onLoginChanged();
     void onMessage(const TgMessage &message);
     void onPeerResolved(const TgPeer &peer);
+    void onInviteChecked(const TgInvite &invite);
+    void onJoined(const TgPeer &peer);
+    void onLeftChat(const TgPeer &peer);
     void onPeersFound(const QString &query, const QList<TgPeer> &peers);
     void onResolveFailed(const QString &error);
     void onReconnectTimer();

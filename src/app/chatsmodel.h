@@ -49,7 +49,9 @@ public:
         AvatarRole,     // file:// url of the profile picture, or "" (fall back to initials)
         SecretRole,     // true for an end-to-end secret chat row
         SecretStateRole,// 0 requested-by-me, 1 requested-to-me, 2 ready
-        ForumRole       // true for a forum supergroup (unread shown as a dot, not a count)
+        ForumRole,      // true for a forum supergroup (unread shown as a dot, not a count)
+        BroadcastRole,  // true for a channel rather than a group: "Leave channel" vs "Leave group"
+        LeftRole        // we are not a member: it can be joined, not left
     };
 
     explicit ChatsModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -76,6 +78,7 @@ public:
     Q_INVOKABLE void clearHistory(const QString &peerKey);
     Q_INVOKABLE void discardSecret(const QString &peerKey);
     Q_INVOKABLE void deleteChat(const QString &peerKey, bool forEveryone);
+    Q_INVOKABLE void leaveChat(const QString &peerKey);     // groups and channels; keeps the chat
     Q_INVOKABLE void archiveChat(const QString &peerKey, bool archived);
     Q_INVOKABLE void moveToFolder(const QString &peerKey, int filterId, bool remove);
     /// "Move" a chat into exactly one folder (removed from all others); destFilterId -1 = no folder.

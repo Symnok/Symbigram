@@ -186,6 +186,9 @@ AppController::AppController(QObject *parent)
     connect(m_session, SIGNAL(secretChatReady(int)), this, SLOT(onSecretReady(int)));
     connect(m_session, SIGNAL(secretMessageReceived(int,qint64,QString,int,bool,int)), this, SLOT(onSecretMessage(int,qint64,QString,int,bool,int)));
     connect(m_session, SIGNAL(resolveFailed(QString)), this, SLOT(onResolveFailed(QString)));
+    connect(m_session, SIGNAL(inviteChecked(TgInvite)), this, SLOT(onInviteChecked(TgInvite)));
+    connect(m_session, SIGNAL(joined(TgPeer)), this, SLOT(onJoined(TgPeer)));
+    connect(m_session, SIGNAL(leftChat(TgPeer)), this, SLOT(onLeftChat(TgPeer)));
     connect(m_session, SIGNAL(notice(QString)), this, SLOT(onNotice(QString)));
     connect(m_session, SIGNAL(log(QString)), this, SLOT(onSessionLog(QString)));
     connect(m_chat, SIGNAL(sendFailed(QString)), this, SLOT(onNotice(QString)));
@@ -1185,7 +1188,43 @@ void AppController::findPeer(const QString &query)
 {
     if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
     m_linkMsgId = 0;
+    // An invite link pasted into Find looks nothing like a username: resolveUsername would reject
+    // "+AbCd" outright. Check it instead, and the user gets the same confirm dialog as for a
+    // link tapped in a message.
+    const QString invite = TgApi::inviteHash(query);
+    if (!invite.isEmpty()) { m_session->checkInvite(invite); return; }
     m_session->resolve(query);
+}
+
+void AppController::joinInvite(const QString &inviteHash)
+{
+    if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return; }
+    m_session->joinByInvite(inviteHash);
+}
+
+void AppController::onInviteChecked(const TgInvite &invite)
+{
+    // Already in it (or allowed to peek at it): opening is the only sensible action.
+    if (invite.chatInHand) {
+        if (!invite.peer.isNull()) emit peerFound(invite.peer.key());
+        return;
+    }
+    QString detail = invite.isBroadcast ? tr("Channel") : tr("Group");
+    if (invite.membersCount > 0) detail += QLatin1String(" - ") + tr("%1 members").arg(invite.membersCount);
+    if (invite.requestNeeded) detail += QLatin1String("\n") + tr("An admin has to approve new members.");
+    emit inviteOffered(invite.hash, invite.title, detail);
+}
+
+void AppController::onJoined(const TgPeer &peer)
+{
+    const QString name = m_session->peers().title(peer);
+    setNotice(name.isEmpty() ? tr("Joined.") : tr("Joined %1.").arg(name));
+}
+
+void AppController::onLeftChat(const TgPeer &peer)
+{
+    const QString name = m_session->peers().title(peer);
+    setNotice(name.isEmpty() ? tr("Left.") : tr("Left %1.").arg(name));
 }
 
 void AppController::addLocalContact(const QString &firstName, const QString &lastName,
@@ -1261,10 +1300,20 @@ bool AppController::openInternalLink(const QString &url)
         || name.compare(QLatin1String("socks"), Qt::CaseInsensitive) == 0)
         return offerProxyLink(url);
 
-    // Private invites (t.me/+hash, /joinchat/) and the special links are not usernames and we
-    // cannot resolve them - let the browser deal with those.
+    // A private invite link (t.me/+hash, t.me/joinchat/hash) is not a username: ask the server
+    // what it points at and offer to join, rather than handing it to the browser - which on this
+    // phone would only open a page saying to install Telegram.
+    const QString invite = TgApi::inviteHash(url);
+    if (!invite.isEmpty()) {
+        if (!m_session->isOnline()) { setNotice(tr("Not connected.")); return true; }
+        m_session->checkInvite(invite);
+        return true;
+    }
     if (name.startsWith(QLatin1Char('+'))) return false;
     static const char *const reserved[] = {
+        // "joinchat" stays here even though the invite branch above handles the real ones:
+        // a malformed t.me/joinchat/... link falls through to this list, and without the
+        // entry it would be looked up as if "joinchat" were somebody's username.
         "joinchat", "s", "c", "proxy", "socks", "addstickers", "addtheme", "addemoji",
         "addlist", "share", "iv", "setlanguage", "confirmphone", "login", "bg",
         "invoice", "giftcode", "contact", "boost", 0

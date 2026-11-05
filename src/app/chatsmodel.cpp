@@ -35,6 +35,8 @@ ChatsModel::ChatsModel(TelegramSession *session, MediaCache *media, QObject *par
     roles[SecretRole] = "secret";
     roles[SecretStateRole] = "secretState";
     roles[ForumRole] = "isForum";
+    roles[BroadcastRole] = "isChannel";
+    roles[LeftRole] = "isLeft";
     setRoleNames(roles);
 
     connect(session, SIGNAL(dialogsChanged()), this, SLOT(onDialogsChanged()));
@@ -189,6 +191,8 @@ QVariant ChatsModel::data(const QModelIndex &index, int role) const
     case PinnedRole: return d.pinned;
     case GroupRole: return d.peer.isGroup();
     case ForumRole: return info.isForum;
+    case BroadcastRole: return info.isBroadcast;
+    case LeftRole: return info.isLeft;
     case OnlineRole: return d.peer.kind == TgPeer::User && info.online;
     case TypingRole: return m_typingUntil.value(key, 0) > now();
     case InitialsRole: return initials(m_session->peers().title(d.peer));
@@ -275,6 +279,7 @@ void ChatsModel::blockUser(const QString &peerKey) { TgPeer p = TgPeer::fromKey(
 void ChatsModel::clearHistory(const QString &peerKey) { m_session->deleteHistory(TgPeer::fromKey(peerKey)); }
 void ChatsModel::discardSecret(const QString &peerKey) { if (peerKey.startsWith(QLatin1String("secret:"))) m_session->discardSecretChat(peerKey.mid(7).toInt()); }
 void ChatsModel::deleteChat(const QString &peerKey, bool forEveryone) { m_session->deleteChat(TgPeer::fromKey(peerKey), forEveryone); }
+void ChatsModel::leaveChat(const QString &peerKey) { m_session->leaveChat(TgPeer::fromKey(peerKey)); }
 void ChatsModel::archiveChat(const QString &peerKey, bool archived) { m_session->archiveChat(TgPeer::fromKey(peerKey), archived); }
 void ChatsModel::moveToFolder(const QString &peerKey, int filterId, bool remove) { m_session->moveToFolder(TgPeer::fromKey(peerKey), filterId, remove); }
 

@@ -111,6 +111,17 @@ public:
     void markTopicRead(const TgPeer &peer, int topicId, int maxId);
     /// "Mark all as read": a normal chat/channel reads its whole history; a forum reads every topic.
     void markAllRead(const TgPeer &peer);
+    /// Joins a public channel or supergroup we are only reading. A basic group has no such
+    /// call - it can only be joined through an invite link.
+    void joinChannel(const TgPeer &peer);
+    /// A private invite link: ask what it points at (inviteChecked), then join it. Split in two
+    /// so the user confirms a title and a size rather than a hash.
+    void checkInvite(const QString &inviteHash);
+    void joinByInvite(const QString &inviteHash);
+    /// Leaves a channel, supergroup or basic group without deleting the chat: it stays
+    /// readable (and re-joinable, if public) until the user deletes it. deleteChat() is the
+    /// other half - that one removes it from the list as well.
+    void leaveChat(const TgPeer &peer);
     /// Blocks a user (1:1). Reports through notice.
     void blockUser(const TgPeer &peer);
     /// Reacts to a message; an empty emoticon takes our reaction back.
@@ -217,6 +228,12 @@ signals:
     void readOutbox(const TgPeer &peer, int maxId);
     void peerResolved(const TgPeer &peer);
     void resolveFailed(const QString &error);
+    /// What a private invite link turned out to point at.
+    void inviteChecked(const TgInvite &invite);
+    /// We are now a member of peer (joined by username or by invite link).
+    void joined(const TgPeer &peer);
+    /// We are no longer a member of peer.
+    void leftChat(const TgPeer &peer);
     void peersFound(const QString &query, const QList<TgPeer> &peers);   // forward-picker search
     void notice(const QString &text);
     void log(const QString &line);
@@ -257,7 +274,8 @@ private:
         GetDhConfig, RequestEncryption, AcceptEncryption, SendEncrypted, DiscardEncryption,
         ArchivePeer, DeleteChat, MoveFolder,
         SendCode, SignIn, ResendCode, EditMessage, ForwardMessages, SearchPeers,
-        GetForumTopics, GetReplies, ReadDiscussion, BlockUser, SendReaction
+        GetForumTopics, GetReplies, ReadDiscussion, BlockUser, SendReaction,
+        JoinChannel, CheckInvite, ImportInvite, LeaveChat
     };
     struct Request
     {

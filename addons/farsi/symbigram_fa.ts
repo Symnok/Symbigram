@@ -36,356 +36,398 @@
 <context>
     <name>AppController</name>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="313" />
-        <location filename="../../src/app/appcontroller.cpp" line="325" />
-        <location filename="../../src/app/appcontroller.cpp" line="340" />
+        <location filename="../../src/app/appcontroller.cpp" line="316" />
+        <location filename="../../src/app/appcontroller.cpp" line="328" />
+        <location filename="../../src/app/appcontroller.cpp" line="343" />
         <source>%1 MB</source>
         <translation>%1 مگابایت</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="314" />
-        <location filename="../../src/app/appcontroller.cpp" line="326" />
-        <location filename="../../src/app/appcontroller.cpp" line="341" />
+        <location filename="../../src/app/appcontroller.cpp" line="317" />
+        <location filename="../../src/app/appcontroller.cpp" line="329" />
+        <location filename="../../src/app/appcontroller.cpp" line="344" />
         <source>%1 KB</source>
         <translation>%1 کیلوبایت</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="314" />
-        <location filename="../../src/app/appcontroller.cpp" line="327" />
-        <location filename="../../src/app/appcontroller.cpp" line="341" />
+        <location filename="../../src/app/appcontroller.cpp" line="317" />
+        <location filename="../../src/app/appcontroller.cpp" line="330" />
+        <location filename="../../src/app/appcontroller.cpp" line="344" />
         <source>%1 B</source>
         <translation>%1 بایت</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="315" />
+        <location filename="../../src/app/appcontroller.cpp" line="318" />
         <source>%1 in %2</source>
         <translation>%1 در %2</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="342" />
+        <location filename="../../src/app/appcontroller.cpp" line="345" />
         <source>Cache cleared (%1 freed).</source>
         <translation>حافظهٔ موقت پاک شد (%1 آزاد شد).</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="359" />
-        <location filename="../../src/app/appcontroller.cpp" line="709" />
-        <location filename="../../src/app/appcontroller.cpp" line="1186" />
-        <location filename="../../src/app/appcontroller.cpp" line="1279" />
-        <location filename="../../src/app/appcontroller.cpp" line="1399" />
+        <location filename="../../src/app/appcontroller.cpp" line="362" />
+        <location filename="../../src/app/appcontroller.cpp" line="712" />
+        <location filename="../../src/app/appcontroller.cpp" line="1189" />
+        <location filename="../../src/app/appcontroller.cpp" line="1201" />
+        <location filename="../../src/app/appcontroller.cpp" line="1308" />
+        <location filename="../../src/app/appcontroller.cpp" line="1325" />
+        <location filename="../../src/app/appcontroller.cpp" line="1445" />
         <source>Not connected.</source>
         <translation>متصل نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="360" />
+        <location filename="../../src/app/appcontroller.cpp" line="363" />
         <source>Connecting...</source>
         <translation>در حال اتصال...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="360" />
+        <location filename="../../src/app/appcontroller.cpp" line="363" />
         <source>Connecting and creating the encryption key...</source>
         <translation>در حال اتصال و ساختن کلید رمزنگاری...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="362" />
+        <location filename="../../src/app/appcontroller.cpp" line="365" />
         <source>Checking the password (this takes a few seconds)...</source>
         <translation>در حال بررسی گذرواژه (چند ثانیه طول می‌کشد)...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="363" />
+        <location filename="../../src/app/appcontroller.cpp" line="366" />
         <source>This account has two-step verification. Enter the password.</source>
         <translation>این حساب تأیید دومرحله‌ای دارد. گذرواژه را وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="365" />
-        <location filename="../../src/app/appcontroller.cpp" line="369" />
+        <location filename="../../src/app/appcontroller.cpp" line="368" />
+        <location filename="../../src/app/appcontroller.cpp" line="372" />
         <source>Signing in...</source>
         <translation>در حال ورود...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="365" />
+        <location filename="../../src/app/appcontroller.cpp" line="368" />
         <source>Enter the code Telegram sent to %1.</source>
         <translation>کدی را که تلگرام به %1 فرستاد وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="366" />
+        <location filename="../../src/app/appcontroller.cpp" line="369" />
         <source>Requesting a code...</source>
         <translation>در حال درخواست کد...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="366" />
+        <location filename="../../src/app/appcontroller.cpp" line="369" />
         <source>Enter your phone number, with the country code, to get a code.</source>
         <translation>برای دریافت کد، شمارهٔ تلفن خود را همراه با کد کشور وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="368" />
+        <location filename="../../src/app/appcontroller.cpp" line="371" />
         <source>Requesting a sign-in code...</source>
         <translation>در حال درخواست کد ورود...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="368" />
+        <location filename="../../src/app/appcontroller.cpp" line="371" />
         <source>Waiting for the code to be scanned...</source>
         <translation>در انتظار اسکن شدن کد...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="435" />
+        <location filename="../../src/app/appcontroller.cpp" line="438" />
         <source>Low</source>
         <translation>کم</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="435" />
-        <location filename="../../src/app/appcontroller.cpp" line="554" />
+        <location filename="../../src/app/appcontroller.cpp" line="438" />
+        <location filename="../../src/app/appcontroller.cpp" line="557" />
         <source>Medium</source>
         <translation>متوسط</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="435" />
+        <location filename="../../src/app/appcontroller.cpp" line="438" />
         <source>Loud</source>
         <translation>بلند</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="454" />
+        <location filename="../../src/app/appcontroller.cpp" line="457" />
         <source>Short (0.4 s)</source>
         <translation>کوتاه (0.4 ثانیه)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="454" />
+        <location filename="../../src/app/appcontroller.cpp" line="457" />
         <source>1 second</source>
         <translation>1 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="454" />
+        <location filename="../../src/app/appcontroller.cpp" line="457" />
         <source>2 seconds</source>
         <translation>2 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="455" />
+        <location filename="../../src/app/appcontroller.cpp" line="458" />
         <source>3 seconds</source>
         <translation>3 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="455" />
+        <location filename="../../src/app/appcontroller.cpp" line="458" />
         <source>5 seconds</source>
         <translation>5 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="467" />
+        <location filename="../../src/app/appcontroller.cpp" line="470" />
         <source>Off</source>
         <translation>خاموش</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="467" />
+        <location filename="../../src/app/appcontroller.cpp" line="470" />
         <source>First message only</source>
         <translation>فقط پیام اول</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="467" />
+        <location filename="../../src/app/appcontroller.cpp" line="470" />
         <source>Every message</source>
         <translation>هر پیام</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="554" />
+        <location filename="../../src/app/appcontroller.cpp" line="557" />
         <source>Extra small</source>
         <translation>خیلی کوچک</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="554" />
+        <location filename="../../src/app/appcontroller.cpp" line="557" />
         <source>Small</source>
         <translation>کوچک</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="555" />
+        <location filename="../../src/app/appcontroller.cpp" line="558" />
         <source>Large</source>
         <translation>بزرگ</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="555" />
+        <location filename="../../src/app/appcontroller.cpp" line="558" />
         <source>Extra large</source>
         <translation>خیلی بزرگ</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="564" />
+        <location filename="../../src/app/appcontroller.cpp" line="567" />
         <source>Thumbnail</source>
         <translation>بندانگشتی</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="564" />
+        <location filename="../../src/app/appcontroller.cpp" line="567" />
         <source>Full</source>
         <translation>کامل</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="564" />
+        <location filename="../../src/app/appcontroller.cpp" line="567" />
         <source>None</source>
         <translation>هیچ</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="633" />
+        <location filename="../../src/app/appcontroller.cpp" line="636" />
         <source>Phone memory</source>
         <translation>حافظهٔ گوشی</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="634" />
+        <location filename="../../src/app/appcontroller.cpp" line="637" />
         <source>Mass memory</source>
         <translation>حافظهٔ انبوه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="635" />
+        <location filename="../../src/app/appcontroller.cpp" line="638" />
         <source>Memory card</source>
         <translation>کارت حافظه</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="681" />
+        <location filename="../../src/app/appcontroller.cpp" line="684" />
         <source>Choose download folder</source>
         <translation>انتخاب پوشهٔ دریافت</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="711" />
+        <location filename="../../src/app/appcontroller.cpp" line="714" />
         <source>Cannot record a voice message here.</source>
         <translation>در اینجا نمی‌توان پیام صوتی ضبط کرد.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="734" />
+        <location filename="../../src/app/appcontroller.cpp" line="737" />
         <source>Sending the voice message...</source>
         <translation>در حال ارسال پیام صوتی...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="797" />
+        <location filename="../../src/app/appcontroller.cpp" line="800" />
         <source>That does not look like a proxy link.</source>
         <translation>این شبیه پیوند پراکسی نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="806" />
+        <location filename="../../src/app/appcontroller.cpp" line="809" />
         <source>The link is missing the server or port.</source>
         <translation>در این پیوند سرور یا درگاه نیامده است.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="827" />
+        <location filename="../../src/app/appcontroller.cpp" line="830" />
         <source>That secret is not a valid length.</source>
         <translation>طول این رمز درست نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="865" />
+        <location filename="../../src/app/appcontroller.cpp" line="868" />
         <source>Proxy set to %1:%2.</source>
         <translation>پراکسی روی %1:%2 تنظیم شد.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="993" />
+        <location filename="../../src/app/appcontroller.cpp" line="996" />
         <source>Connection lost: %1. Reconnecting...</source>
         <translation>اتصال قطع شد: %1. در حال اتصال مجدد...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="994" />
+        <location filename="../../src/app/appcontroller.cpp" line="997" />
         <source>Connection failed: %1. Retrying...</source>
         <translation>اتصال ناموفق بود: %1. تلاش مجدد...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1099" />
+        <location filename="../../src/app/appcontroller.cpp" line="1102" />
         <source>Enter the password.</source>
         <translation>گذرواژه را وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1124" />
+        <location filename="../../src/app/appcontroller.cpp" line="1127" />
         <source>Enter your phone number.</source>
         <translation>شمارهٔ تلفن خود را وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1134" />
+        <location filename="../../src/app/appcontroller.cpp" line="1137" />
         <source>Enter the code.</source>
         <translation>کد را وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1196" />
+        <location filename="../../src/app/appcontroller.cpp" line="1212" />
+        <source>Channel</source>
+        <translation>کانال</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1212" />
+        <source>Group</source>
+        <translation>گروه</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1213" />
+        <source>%1 members</source>
+        <translation>%1 عضو</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1214" />
+        <source>An admin has to approve new members.</source>
+        <translation>عضوهای جدید را باید یک مدیر تأیید کند.</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1221" />
+        <source>Joined.</source>
+        <translation>پیوستید.</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1221" />
+        <source>Joined %1.</source>
+        <translation>به %1 پیوستید.</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1227" />
+        <source>Left.</source>
+        <translation>ترک شد.</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1227" />
+        <source>Left %1.</source>
+        <translation>%1 ترک شد.</translation>
+    </message>
+    <message>
+        <location filename="../../src/app/appcontroller.cpp" line="1235" />
         <source>Added to Contacts.</source>
         <translation>به مخاطبان افزوده شد.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1196" />
+        <location filename="../../src/app/appcontroller.cpp" line="1235" />
         <source>%1 added to Contacts.</source>
         <translation>%1 به مخاطبان افزوده شد.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1209" />
-        <location filename="../../src/app/appcontroller.cpp" line="1253" />
+        <location filename="../../src/app/appcontroller.cpp" line="1248" />
+        <location filename="../../src/app/appcontroller.cpp" line="1292" />
         <source>That chat is not in your list.</source>
         <translation>آن گفتگو در فهرست شما نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1280" />
+        <location filename="../../src/app/appcontroller.cpp" line="1326" />
         <source>Opening @%1...</source>
         <translation>در حال باز کردن @%1...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1354" />
+        <location filename="../../src/app/appcontroller.cpp" line="1400" />
         <source>Secret chats can only be started with a person.</source>
         <translation>گفتگوی مخفی را فقط با یک شخص می‌توان آغاز کرد.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1356" />
+        <location filename="../../src/app/appcontroller.cpp" line="1402" />
         <source>Starting a secret chat...</source>
         <translation>در حال آغاز گفتگوی مخفی...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1363" />
+        <location filename="../../src/app/appcontroller.cpp" line="1409" />
         <source>Someone wants to start a secret chat.</source>
         <translation>کسی می‌خواهد گفتگوی مخفی آغاز کند.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1364" />
+        <location filename="../../src/app/appcontroller.cpp" line="1410" />
         <source>%1 wants to start a secret chat.</source>
         <translation>%1 می‌خواهد گفتگوی مخفی آغاز کند.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1366" />
-        <location filename="../../src/app/appcontroller.cpp" line="1387" />
+        <location filename="../../src/app/appcontroller.cpp" line="1412" />
+        <location filename="../../src/app/appcontroller.cpp" line="1433" />
         <source>Secret chat</source>
         <translation>گفتگوی مخفی</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1366" />
+        <location filename="../../src/app/appcontroller.cpp" line="1412" />
         <source>%1 wants to start a secret chat</source>
         <translation>%1 می‌خواهد گفتگوی مخفی آغاز کند</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1373" />
+        <location filename="../../src/app/appcontroller.cpp" line="1419" />
         <source>Secret chat is ready.</source>
         <translation>گفتگوی مخفی آماده است.</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1387" />
+        <location filename="../../src/app/appcontroller.cpp" line="1433" />
         <source>Encrypted message</source>
         <translation>پیام رمزنگاری‌شده</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1401" />
+        <location filename="../../src/app/appcontroller.cpp" line="1447" />
         <source>Images (*.jpg *.jpeg *.png *.gif *.bmp)</source>
         <translation>تصاویر (*.jpg *.jpeg *.png *.gif *.bmp)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1401" />
+        <location filename="../../src/app/appcontroller.cpp" line="1447" />
         <source>All files (*)</source>
         <translation>همهٔ فایل‌ها (*)</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1402" />
+        <location filename="../../src/app/appcontroller.cpp" line="1448" />
         <source>Choose an image</source>
         <translation>انتخاب تصویر</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1402" />
+        <location filename="../../src/app/appcontroller.cpp" line="1448" />
         <source>Choose a file</source>
         <translation>انتخاب فایل</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1410" />
+        <location filename="../../src/app/appcontroller.cpp" line="1456" />
         <source>Sending the image...</source>
         <translation>در حال ارسال تصویر...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1410" />
+        <location filename="../../src/app/appcontroller.cpp" line="1456" />
         <source>Sending the file...</source>
         <translation>در حال ارسال فایل...</translation>
     </message>
     <message>
-        <location filename="../../src/app/appcontroller.cpp" line="1421" />
+        <location filename="../../src/app/appcontroller.cpp" line="1467" />
         <source>Copied.</source>
         <translation>کپی شد.</translation>
     </message>
@@ -444,306 +486,341 @@
     </message>
     <message>
         <location filename="../../qml/ChatPage.qml" line="79" />
-        <location filename="../../qml/ChatPage.qml" line="214" />
+        <location filename="../../qml/ChatPage.qml" line="232" />
         <source>Self-destruct timer</source>
         <translation>زمان‌سنج خودتخریبی</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="84" />
-        <location filename="../../qml/ChatPage.qml" line="204" />
+        <location filename="../../qml/ChatPage.qml" line="89" />
+        <location filename="../../qml/ChatPage.qml" line="222" />
         <source>Delete secret chat</source>
         <translation>حذف گفتگوی مخفی</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="96" />
+        <location filename="../../qml/ChatPage.qml" line="102" />
+        <source>Leave "%1"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.</source>
+        <translation>«%1» ترک شود؟ دیگر مطالب آن را دریافت نمی‌کنید و از فهرست گفتگوهای شما حذف می‌شود. اگر عمومی باشد بعداً می‌توانید دوباره عضو شوید.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="114" />
         <source>Forwarded to %1</source>
         <translation>به %1 فرستاده شد</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="106" />
-        <location filename="../../qml/ChatPage.qml" line="333" />
+        <location filename="../../qml/ChatPage.qml" line="124" />
+        <location filename="../../qml/ChatPage.qml" line="351" />
         <source>React</source>
         <translation>واکنش</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="107" />
-        <location filename="../../qml/ChatPage.qml" line="146" />
-        <location filename="../../qml/ChatPage.qml" line="207" />
-        <location filename="../../qml/ChatPage.qml" line="698" />
+        <location filename="../../qml/ChatPage.qml" line="105" />
+        <location filename="../../qml/ChatPage.qml" line="125" />
+        <location filename="../../qml/ChatPage.qml" line="164" />
+        <location filename="../../qml/ChatPage.qml" line="225" />
+        <location filename="../../qml/ChatPage.qml" line="732" />
         <source>Cancel</source>
         <translation>لغو</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="145" />
+        <location filename="../../qml/ChatPage.qml" line="84" />
+        <location filename="../../qml/ChatPage.qml" line="100" />
+        <location filename="../../qml/ChatPage.qml" line="104" />
+        <source>Leave channel</source>
+        <translation>ترک کانال</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="84" />
+        <location filename="../../qml/ChatPage.qml" line="100" />
+        <location filename="../../qml/ChatPage.qml" line="104" />
+        <source>Leave group</source>
+        <translation>ترک گروه</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="103" />
+        <source>Leave "%1"? You will stop receiving its messages. Rejoining needs an invite link.</source>
+        <translation>«%1» ترک شود؟ دیگر پیام‌های آن را دریافت نمی‌کنید. بازگشت به آن به پیوند دعوت نیاز دارد.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="163" />
         <source>Forward to</source>
         <translation>فرستادن به</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="156" />
+        <location filename="../../qml/ChatPage.qml" line="174" />
         <source>search chats and people</source>
         <translation>جستجوی گفتگوها و افراد</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="176" />
+        <location filename="../../qml/ChatPage.qml" line="194" />
         <source>not in your chats</source>
         <translation>در گفتگوهای شما نیست</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="197" />
+        <location filename="../../qml/ChatPage.qml" line="215" />
         <source>Saved</source>
         <translation>ذخیره شد</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="198" />
+        <location filename="../../qml/ChatPage.qml" line="216" />
         <source>File saved to: %1</source>
         <translation>فایل در %1 ذخیره شد</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="199" />
+        <location filename="../../qml/ChatPage.qml" line="217" />
         <source>OK</source>
         <translation>تأیید</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="205" />
+        <location filename="../../qml/ChatPage.qml" line="223" />
         <source>End this secret chat? Its messages, which live only on this device, will be removed here.</source>
         <translation>این گفتگوی مخفی پایان یابد؟ پیام‌های آن که فقط روی این دستگاه هستند، از اینجا حذف می‌شوند.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="206" />
+        <location filename="../../qml/ChatPage.qml" line="224" />
         <source>Delete</source>
         <translation>حذف</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>Off</source>
         <translation>خاموش</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>5 seconds</source>
         <translation>5 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>30 seconds</source>
         <translation>30 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>1 minute</source>
         <translation>1 دقیقه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>1 hour</source>
         <translation>1 ساعت</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>1 day</source>
         <translation>1 روز</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="216" />
+        <location filename="../../qml/ChatPage.qml" line="234" />
         <source>1 week</source>
         <translation>1 هفته</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="223" />
+        <location filename="../../qml/ChatPage.qml" line="241" />
         <source>Encryption key</source>
         <translation>کلید رمزنگاری</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="224" />
-        <location filename="../../qml/ChatPage.qml" line="769" />
+        <location filename="../../qml/ChatPage.qml" line="242" />
+        <location filename="../../qml/ChatPage.qml" line="803" />
         <source>Close</source>
         <translation>بستن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="237" />
+        <location filename="../../qml/ChatPage.qml" line="255" />
         <source>If this key matches on both phones, no one is intercepting the chat. Compare it with %1 in person or over a trusted channel.</source>
         <translation>اگر این کلید در هر دو گوشی یکسان باشد، کسی گفتگو را شنود نمی‌کند. آن را حضوری یا از راهی مورد اعتماد با %1 مقایسه کنید.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="291" />
+        <location filename="../../qml/ChatPage.qml" line="309" />
         <source>Image from Gallery (Slow)</source>
         <translation>تصویر از گالری (کند)</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="292" />
+        <location filename="../../qml/ChatPage.qml" line="310" />
         <source>Image from File System</source>
         <translation>تصویر از سیستم فایل</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="293" />
-        <location filename="../../qml/ChatPage.qml" line="552" />
+        <location filename="../../qml/ChatPage.qml" line="311" />
+        <location filename="../../qml/ChatPage.qml" line="570" />
         <source>File</source>
         <translation>فایل</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="303" />
+        <location filename="../../qml/ChatPage.qml" line="321" />
         <source>Reply</source>
         <translation>پاسخ</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="308" />
+        <location filename="../../qml/ChatPage.qml" line="326" />
         <source>Forward</source>
         <translation>فرستادن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="313" />
+        <location filename="../../qml/ChatPage.qml" line="331" />
         <source>Edit</source>
         <translation>ویرایش</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="323" />
+        <location filename="../../qml/ChatPage.qml" line="341" />
         <source>Save to phone</source>
         <translation>ذخیره در گوشی</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="328" />
+        <location filename="../../qml/ChatPage.qml" line="346" />
         <source>Open</source>
         <translation>باز کردن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="338" />
+        <location filename="../../qml/ChatPage.qml" line="356" />
         <source>Copy link</source>
         <translation>کپی پیوند</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="343" />
+        <location filename="../../qml/ChatPage.qml" line="361" />
         <source>Copy text</source>
         <translation>کپی متن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="348" />
+        <location filename="../../qml/ChatPage.qml" line="366" />
         <source>Retry</source>
         <translation>تلاش مجدد</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="353" />
+        <location filename="../../qml/ChatPage.qml" line="371" />
         <source>Delete for me</source>
         <translation>حذف برای من</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="358" />
+        <location filename="../../qml/ChatPage.qml" line="376" />
         <source>Delete for everyone</source>
         <translation>حذف برای همه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="403" />
+        <location filename="../../qml/ChatPage.qml" line="421" />
         <source>connecting...</source>
         <translation>در حال اتصال...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="403" />
+        <location filename="../../qml/ChatPage.qml" line="421" />
         <source>offline</source>
         <translation>آفلاین</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="405" />
+        <location filename="../../qml/ChatPage.qml" line="423" />
         <source>online</source>
         <translation>آنلاین</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="428" />
+        <location filename="../../qml/ChatPage.qml" line="446" />
         <source>%1 wants to start an end-to-end encrypted chat.</source>
         <translation>%1 می‌خواهد گفتگویی با رمزنگاری سرتاسری آغاز کند.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="429" />
+        <location filename="../../qml/ChatPage.qml" line="447" />
         <source>Waiting for the other side to come online and accept...</source>
         <translation>در انتظار آنلاین شدن و پذیرش طرف دیگر...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="434" />
+        <location filename="../../qml/ChatPage.qml" line="452" />
         <source>Accept</source>
         <translation>پذیرفتن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="435" />
+        <location filename="../../qml/ChatPage.qml" line="453" />
         <source>Decline</source>
         <translation>رد کردن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="438" />
+        <location filename="../../qml/ChatPage.qml" line="456" />
         <source>Cancel request</source>
         <translation>لغو درخواست</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="460" />
+        <location filename="../../qml/ChatPage.qml" line="478" />
         <source>Older messages</source>
         <translation>پیام‌های قدیمی‌تر</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="480" />
+        <location filename="../../qml/ChatPage.qml" line="498" />
         <source>Newer messages</source>
         <translation>جدیدتر</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="481" />
+        <location filename="../../qml/ChatPage.qml" line="499" />
         <source>Latest</source>
         <translation>به انتها</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="534" />
+        <location filename="../../qml/ChatPage.qml" line="552" />
         <source>Could not load the messages: %1</source>
         <translation>بارگیری پیام‌ها ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="534" />
+        <location filename="../../qml/ChatPage.qml" line="552" />
         <source>No messages yet.</source>
         <translation>هنوز پیامی نیست.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="552" />
+        <location filename="../../qml/ChatPage.qml" line="570" />
         <source>Image</source>
         <translation>تصویر</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="581" />
+        <location filename="../../qml/ChatPage.qml" line="599" />
         <source>Editing message</source>
         <translation>ویرایش پیام</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="581" />
+        <location filename="../../qml/ChatPage.qml" line="599" />
         <source>Replying to</source>
         <translation>پاسخ به</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="582" />
+        <location filename="../../qml/ChatPage.qml" line="600" />
         <source>edit the text, then tap Save</source>
         <translation>متن را ویرایش کنید، سپس ذخیره را بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="606" />
+        <location filename="../../qml/ChatPage.qml" line="630" />
+        <source>Join channel</source>
+        <translation>عضویت در کانال</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="630" />
+        <source>Join group</source>
+        <translation>عضویت در گروه</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatPage.qml" line="640" />
         <source>channel - only its admins can post</source>
         <translation>کانال - فقط مدیران آن می‌توانند پیام بگذارند</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="635" />
+        <location filename="../../qml/ChatPage.qml" line="669" />
         <source>add a caption</source>
         <translation>افزودن توضیح</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="635" />
+        <location filename="../../qml/ChatPage.qml" line="669" />
         <source>encrypted message</source>
         <translation>پیام رمزنگاری‌شده</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="635" />
+        <location filename="../../qml/ChatPage.qml" line="669" />
         <source>message</source>
         <translation>پیام</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="651" />
-        <location filename="../../qml/ChatPage.qml" line="766" />
+        <location filename="../../qml/ChatPage.qml" line="685" />
+        <location filename="../../qml/ChatPage.qml" line="800" />
         <source>Save</source>
         <translation>ذخیره</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatPage.qml" line="651" />
-        <location filename="../../qml/ChatPage.qml" line="693" />
+        <location filename="../../qml/ChatPage.qml" line="685" />
+        <location filename="../../qml/ChatPage.qml" line="727" />
         <source>Send</source>
         <translation>ارسال</translation>
     </message>
@@ -751,53 +828,53 @@
 <context>
     <name>ChatsModel</name>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="108" />
-        <location filename="../../src/app/chatsmodel.cpp" line="118" />
+        <location filename="../../src/app/chatsmodel.cpp" line="110" />
+        <location filename="../../src/app/chatsmodel.cpp" line="120" />
         <source>All chats</source>
         <translation>همهٔ گفتگوها</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="111" />
+        <location filename="../../src/app/chatsmodel.cpp" line="113" />
         <source>Archive</source>
         <translation>بایگانی</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="155" />
+        <location filename="../../src/app/chatsmodel.cpp" line="157" />
         <source>Yesterday</source>
         <translation>دیروز</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="176" />
+        <location filename="../../src/app/chatsmodel.cpp" line="178" />
         <source>%1 is typing...</source>
         <translation>%1 در حال نوشتن است...</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="177" />
+        <location filename="../../src/app/chatsmodel.cpp" line="179" />
         <source>typing...</source>
         <translation>در حال نوشتن...</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="181" />
+        <location filename="../../src/app/chatsmodel.cpp" line="183" />
         <source>You: %1</source>
         <translation>شما: %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="212" />
+        <location filename="../../src/app/chatsmodel.cpp" line="216" />
         <source>Secret chat</source>
         <translation>گفتگوی مخفی</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="217" />
+        <location filename="../../src/app/chatsmodel.cpp" line="221" />
         <source>wants to start a secret chat</source>
         <translation>می‌خواهد گفتگوی مخفی آغاز کند</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="218" />
+        <location filename="../../src/app/chatsmodel.cpp" line="222" />
         <source>waiting to be accepted...</source>
         <translation>در انتظار پذیرش...</translation>
     </message>
     <message>
-        <location filename="../../src/app/chatsmodel.cpp" line="219" />
+        <location filename="../../src/app/chatsmodel.cpp" line="223" />
         <source>secret chat</source>
         <translation>گفتگوی مخفی</translation>
     </message>
@@ -851,8 +928,9 @@
         <location filename="../../qml/ChatsPage.qml" line="75" />
         <location filename="../../qml/ChatsPage.qml" line="82" />
         <location filename="../../qml/ChatsPage.qml" line="110" />
-        <location filename="../../qml/ChatsPage.qml" line="179" />
-        <location filename="../../qml/ChatsPage.qml" line="239" />
+        <location filename="../../qml/ChatsPage.qml" line="196" />
+        <location filename="../../qml/ChatsPage.qml" line="205" />
+        <location filename="../../qml/ChatsPage.qml" line="265" />
         <source>Cancel</source>
         <translation>لغو</translation>
     </message>
@@ -878,7 +956,7 @@
     </message>
     <message>
         <location filename="../../qml/ChatsPage.qml" line="107" />
-        <location filename="../../qml/ChatsPage.qml" line="157" />
+        <location filename="../../qml/ChatsPage.qml" line="158" />
         <source>Clear history</source>
         <translation>پاک کردن تاریخچه</translation>
     </message>
@@ -889,157 +967,181 @@
     </message>
     <message>
         <location filename="../../qml/ChatsPage.qml" line="109" />
-        <location filename="../../qml/ChatsPage.qml" line="238" />
+        <location filename="../../qml/ChatsPage.qml" line="264" />
         <source>Delete</source>
         <translation>حذف</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="120" />
+        <location filename="../../qml/ChatsPage.qml" line="121" />
         <source>Unmute</source>
         <translation>باصدا کردن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="120" />
+        <location filename="../../qml/ChatsPage.qml" line="121" />
         <source>Mute</source>
         <translation>بی‌صدا کردن</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="127" />
+        <location filename="../../qml/ChatsPage.qml" line="128" />
         <source>Mute all topics</source>
         <translation>بی‌صدا کردن همهٔ موضوع‌ها</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="132" />
+        <location filename="../../qml/ChatsPage.qml" line="133" />
         <source>Unmute all topics</source>
         <translation>باصدا کردن همهٔ موضوع‌ها</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="137" />
+        <location filename="../../qml/ChatsPage.qml" line="138" />
         <source>Block user</source>
         <translation>مسدود کردن کاربر</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="142" />
+        <location filename="../../qml/ChatsPage.qml" line="143" />
         <source>Mark all as read</source>
         <translation>علامت‌زدن همه به‌عنوان خوانده‌شده</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="147" />
+        <location filename="../../qml/ChatsPage.qml" line="148" />
         <source>Unarchive chat</source>
         <translation>خارج کردن گفتگو از بایگانی</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="147" />
+        <location filename="../../qml/ChatsPage.qml" line="148" />
         <source>Archive chat</source>
         <translation>بایگانی کردن گفتگو</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="152" />
-        <location filename="../../qml/ChatsPage.qml" line="200" />
+        <location filename="../../qml/ChatsPage.qml" line="153" />
+        <location filename="../../qml/ChatsPage.qml" line="226" />
         <source>Move to folder</source>
         <translation>انتقال به پوشه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="162" />
-        <location filename="../../qml/ChatsPage.qml" line="178" />
+        <location filename="../../qml/ChatsPage.qml" line="165" />
+        <location filename="../../qml/ChatsPage.qml" line="191" />
+        <location filename="../../qml/ChatsPage.qml" line="195" />
+        <source>Leave channel</source>
+        <translation>ترک کانال</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatsPage.qml" line="165" />
+        <location filename="../../qml/ChatsPage.qml" line="191" />
+        <location filename="../../qml/ChatsPage.qml" line="195" />
+        <source>Leave group</source>
+        <translation>ترک گروه</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatsPage.qml" line="174" />
+        <location filename="../../qml/ChatsPage.qml" line="204" />
         <source>Delete chat</source>
         <translation>حذف گفتگو</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="167" />
-        <location filename="../../qml/ChatsPage.qml" line="236" />
+        <location filename="../../qml/ChatsPage.qml" line="179" />
+        <location filename="../../qml/ChatsPage.qml" line="262" />
         <source>Delete secret chat</source>
         <translation>حذف گفتگوی مخفی</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="179" />
+        <location filename="../../qml/ChatsPage.qml" line="193" />
+        <source>Leave "%1"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.</source>
+        <translation>«%1» ترک شود؟ دیگر مطالب آن را دریافت نمی‌کنید و از فهرست گفتگوهای شما حذف می‌شود. اگر عمومی باشد بعداً می‌توانید دوباره عضو شوید.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatsPage.qml" line="194" />
+        <source>Leave "%1"? You will stop receiving its messages. Rejoining needs an invite link.</source>
+        <translation>«%1» ترک شود؟ دیگر پیام‌های آن را دریافت نمی‌کنید. بازگشت به آن به پیوند دعوت نیاز دارد.</translation>
+    </message>
+    <message>
+        <location filename="../../qml/ChatsPage.qml" line="205" />
         <source>Myself</source>
         <translation>خودم</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="179" />
+        <location filename="../../qml/ChatsPage.qml" line="205" />
         <source>All</source>
         <translation>همه</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="188" />
+        <location filename="../../qml/ChatsPage.qml" line="214" />
         <source>Delete the chat "%1"? "All" also removes it for the other side.</source>
         <translation>گفتگوی «%1» حذف شود؟ گزینهٔ «همه» آن را برای طرف دیگر هم حذف می‌کند.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="223" />
+        <location filename="../../qml/ChatsPage.qml" line="249" />
         <source>All chats (no folder)</source>
         <translation>همهٔ گفتگوها (بدون پوشه)</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="237" />
+        <location filename="../../qml/ChatsPage.qml" line="263" />
         <source>End the secret chat with "%1"? Its messages live only on this device and will be removed here.</source>
         <translation>گفتگوی مخفی با «%1» پایان یابد؟ پیام‌های آن فقط روی این دستگاه هستند و از اینجا حذف می‌شوند.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="268" />
+        <location filename="../../qml/ChatsPage.qml" line="294" />
         <source>tap to switch folder</source>
         <translation>برای تغییر پوشه بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="268" />
-        <location filename="../../qml/ChatsPage.qml" line="270" />
+        <location filename="../../qml/ChatsPage.qml" line="294" />
+        <location filename="../../qml/ChatsPage.qml" line="296" />
         <source>connecting...</source>
         <translation>در حال اتصال...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="268" />
-        <location filename="../../qml/ChatsPage.qml" line="270" />
+        <location filename="../../qml/ChatsPage.qml" line="294" />
+        <location filename="../../qml/ChatsPage.qml" line="296" />
         <source>offline</source>
         <translation>آفلاین</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="269" />
+        <location filename="../../qml/ChatsPage.qml" line="295" />
         <source>online</source>
         <translation>آنلاین</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="296" />
+        <location filename="../../qml/ChatsPage.qml" line="322" />
         <source>All chats</source>
         <translation>همهٔ گفتگوها</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="335" />
+        <location filename="../../qml/ChatsPage.qml" line="361" />
         <source>loading...</source>
         <translation>در حال بارگیری...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="335" />
+        <location filename="../../qml/ChatsPage.qml" line="361" />
         <source>Older chats</source>
         <translation>گفتگوهای قدیمی‌تر</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="480" />
+        <location filename="../../qml/ChatsPage.qml" line="506" />
         <source>Connecting...</source>
         <translation>در حال اتصال...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="480" />
+        <location filename="../../qml/ChatsPage.qml" line="506" />
         <source>Offline. Use the menu to connect.</source>
         <translation>آفلاین. برای اتصال از منو استفاده کنید.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="481" />
+        <location filename="../../qml/ChatsPage.qml" line="507" />
         <source>Loading chats...</source>
         <translation>در حال بارگیری گفتگوها...</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="482" />
+        <location filename="../../qml/ChatsPage.qml" line="508" />
         <source>The archive is empty.</source>
         <translation>بایگانی خالی است.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="483" />
+        <location filename="../../qml/ChatsPage.qml" line="509" />
         <source>No chats in this folder.</source>
         <translation>در این پوشه گفتگویی نیست.</translation>
     </message>
     <message>
-        <location filename="../../qml/ChatsPage.qml" line="484" />
+        <location filename="../../qml/ChatsPage.qml" line="510" />
         <source>No chats yet. Tap + to find someone.</source>
         <translation>هنوز گفتگویی نیست. برای یافتن کسی + را بزنید.</translation>
     </message>
@@ -1258,82 +1360,82 @@
 <context>
     <name>MessageDelegate</name>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="127" />
+        <location filename="../../qml/MessageDelegate.qml" line="137" />
         <source>Forwarded from %1</source>
         <translation>فرستاده‌شده از %1</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="206" />
+        <location filename="../../qml/MessageDelegate.qml" line="216" />
         <source>Tap to load</source>
         <translation>برای بارگیری بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="217" />
+        <location filename="../../qml/MessageDelegate.qml" line="227" />
         <source>Failed - tap to retry</source>
         <translation>ناموفق - برای تلاش مجدد بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="259" />
+        <location filename="../../qml/MessageDelegate.qml" line="269" />
         <source>Voice message</source>
         <translation>پیام صوتی</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="260" />
+        <location filename="../../qml/MessageDelegate.qml" line="270" />
         <source>Video</source>
         <translation>ویدیو</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="268" />
+        <location filename="../../qml/MessageDelegate.qml" line="278" />
         <source>playing... tap to stop</source>
         <translation>در حال پخش... برای توقف بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="269" />
+        <location filename="../../qml/MessageDelegate.qml" line="279" />
         <source>loading %1%</source>
         <translation>در حال بارگیری %1%</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="269" />
+        <location filename="../../qml/MessageDelegate.qml" line="279" />
         <source>tap to play</source>
         <translation>برای پخش بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="271" />
+        <location filename="../../qml/MessageDelegate.qml" line="281" />
         <source>buffering %1%... opening player</source>
         <translation>میان‌گیری %1%... در حال باز کردن پخش‌کننده</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="271" />
+        <location filename="../../qml/MessageDelegate.qml" line="281" />
         <source>tap to play in player</source>
         <translation>برای پخش در پخش‌کننده بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="272" />
+        <location filename="../../qml/MessageDelegate.qml" line="282" />
         <source>tap to open</source>
         <translation>برای باز کردن بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="272" />
+        <location filename="../../qml/MessageDelegate.qml" line="282" />
         <source>downloading %1%</source>
         <translation>در حال دریافت %1%</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="272" />
+        <location filename="../../qml/MessageDelegate.qml" line="282" />
         <source>tap to download</source>
         <translation>برای دریافت بزنید</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="295" />
+        <location filename="../../qml/MessageDelegate.qml" line="305" />
         <source>GIF file</source>
         <translation>فایل GIF</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="302" />
+        <location filename="../../qml/MessageDelegate.qml" line="312" />
         <source>not supported</source>
         <translation>پشتیبانی نمی‌شود</translation>
     </message>
     <message>
-        <location filename="../../qml/MessageDelegate.qml" line="411" />
+        <location filename="../../qml/MessageDelegate.qml" line="421" />
         <source>edited</source>
         <translation>ویرایش‌شده</translation>
     </message>
@@ -1386,127 +1488,127 @@
         <translation>پخش این صدا ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1057" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1087" />
         <source>online</source>
         <translation>آنلاین</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1061" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1091" />
         <source>last seen at %1</source>
         <translation>آخرین بازدید در %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1062" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1092" />
         <source>last seen yesterday at %1</source>
         <translation>آخرین بازدید دیروز در %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1063" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1093" />
         <source>last seen %1</source>
         <translation>آخرین بازدید %1</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1065" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1095" />
         <source>last seen recently</source>
         <translation>آخرین بازدید به‌تازگی</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1066" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1096" />
         <source>last seen within a week</source>
         <translation>آخرین بازدید در هفتهٔ گذشته</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1067" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1097" />
         <source>last seen within a month</source>
         <translation>آخرین بازدید در ماه گذشته</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1068" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1098" />
         <source>last seen a long time ago</source>
         <translation>آخرین بازدید مدت‌ها پیش</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1083" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1113" />
         <source>wants to start a secret chat</source>
         <translation>می‌خواهد گفتگوی مخفی آغاز کند</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1084" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1114" />
         <source>waiting to be accepted...</source>
         <translation>در انتظار پذیرش...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1085" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1115" />
         <source>end-to-end encrypted, self-destruct %1s</source>
         <translation>رمزنگاری سرتاسری، خودتخریبی %1 ثانیه</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1086" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1116" />
         <source>end-to-end encrypted</source>
         <translation>رمزنگاری سرتاسری</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1092" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1122" />
         <source>%1 is typing...</source>
         <translation>%1 در حال نوشتن است...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1093" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1123" />
         <source>typing...</source>
         <translation>در حال نوشتن...</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1097" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1127" />
         <source>bot</source>
         <translation>ربات</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1098" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1128" />
         <source>Saved Messages</source>
         <translation>پیام‌های ذخیره‌شده</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1101" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1131" />
         <source>channel, %1 subscribers</source>
         <translation>کانال، %1 مشترک</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1101" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1131" />
         <source>channel</source>
         <translation>کانال</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1102" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1132" />
         <source>%1 members</source>
         <translation>%1 عضو</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1102" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1132" />
         <source>group</source>
         <translation>گروه</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1632" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1662" />
         <source>reply</source>
         <translation>پاسخ</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1634" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1664" />
         <source>You</source>
         <translation>شما</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1645" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1675" />
         <source>Not connected.</source>
         <translation>متصل نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1715" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1745" />
         <source>photo</source>
         <translation>عکس</translation>
     </message>
     <message>
-        <location filename="../../src/app/messagesmodel.cpp" line="1731" />
+        <location filename="../../src/app/messagesmodel.cpp" line="1761" />
         <source>The message was not sent: %1</source>
         <translation>پیام ارسال نشد: %1</translation>
     </message>
@@ -2007,16 +2109,18 @@
         <location filename="../../src/core/telegramsession.cpp" line="281" />
         <location filename="../../src/core/telegramsession.cpp" line="556" />
         <location filename="../../src/core/telegramsession.cpp" line="562" />
-        <location filename="../../src/core/telegramsession.cpp" line="1127" />
-        <location filename="../../src/core/telegramsession.cpp" line="1588" />
+        <location filename="../../src/core/telegramsession.cpp" line="1172" />
+        <location filename="../../src/core/telegramsession.cpp" line="1680" />
         <source>Signed out.</source>
         <translation>از حساب خارج شدید.</translation>
     </message>
     <message>
         <location filename="../../src/core/telegramsession.cpp" line="252" />
         <location filename="../../src/core/telegramsession.cpp" line="880" />
-        <location filename="../../src/core/telegramsession.cpp" line="2186" />
-        <location filename="../../src/core/telegramsession.cpp" line="2214" />
+        <location filename="../../src/core/telegramsession.cpp" line="931" />
+        <location filename="../../src/core/telegramsession.cpp" line="940" />
+        <location filename="../../src/core/telegramsession.cpp" line="2311" />
+        <location filename="../../src/core/telegramsession.cpp" line="2339" />
         <source>Not connected.</source>
         <translation>متصل نیست.</translation>
     </message>
@@ -2027,7 +2131,7 @@
     </message>
     <message>
         <location filename="../../src/core/telegramsession.cpp" line="369" />
-        <location filename="../../src/core/telegramsession.cpp" line="1578" />
+        <location filename="../../src/core/telegramsession.cpp" line="1670" />
         <source>Enter the code.</source>
         <translation>کد را وارد کنید.</translation>
     </message>
@@ -2042,193 +2146,255 @@
         <translation>یک نام کاربری، شمارهٔ تلفن یا نام وارد کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="948" />
-        <location filename="../../src/core/telegramsession.cpp" line="980" />
+        <location filename="../../src/core/telegramsession.cpp" line="907" />
+        <source>This group can only be joined through an invite link.</source>
+        <translation>به این گروه فقط با پیوند دعوت می‌توان پیوست.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="910" />
+        <source>That chat is not in your list.</source>
+        <translation>آن گفتگو در فهرست شما نیست.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="993" />
+        <location filename="../../src/core/telegramsession.cpp" line="1025" />
         <source>That folder no longer exists.</source>
         <translation>آن پوشه دیگر وجود ندارد.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1090" />
+        <location filename="../../src/core/telegramsession.cpp" line="1135" />
         <source>This account has no password set.</source>
         <translation>برای این حساب گذرواژه‌ای تنظیم نشده است.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1091" />
+        <location filename="../../src/core/telegramsession.cpp" line="1136" />
         <source>Unsupported password method.</source>
         <translation>روش گذرواژه پشتیبانی نمی‌شود.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1120" />
-        <location filename="../../src/core/telegramsession.cpp" line="1580" />
+        <location filename="../../src/core/telegramsession.cpp" line="1165" />
+        <location filename="../../src/core/telegramsession.cpp" line="1672" />
         <source>No Telegram account uses this number. Sign-up isn't supported here.</source>
         <translation>هیچ حساب تلگرامی با این شماره نیست. ثبت‌نام در اینجا پشتیبانی نمی‌شود.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1318" />
+        <location filename="../../src/core/telegramsession.cpp" line="1410" />
         <source>User blocked.</source>
         <translation>کاربر مسدود شد.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1386" />
+        <location filename="../../src/core/telegramsession.cpp" line="1478" />
         <source>the server rejected a part of the file</source>
         <translation>سرور بخشی از فایل را نپذیرفت</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1409" />
+        <location filename="../../src/core/telegramsession.cpp" line="1501" />
         <source>the file is served from a CDN, which is not supported</source>
         <translation>فایل از یک CDN ارائه می‌شود که پشتیبانی نمی‌شود</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1410" />
+        <location filename="../../src/core/telegramsession.cpp" line="1502" />
         <source>unexpected reply</source>
         <translation>پاسخ نامنتظره</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1413" />
+        <location filename="../../src/core/telegramsession.cpp" line="1505" />
         <source>could not write the file</source>
         <translation>نوشتن فایل ممکن نشد</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1440" />
-        <location filename="../../src/core/telegramsession.cpp" line="1449" />
-        <location filename="../../src/core/telegramsession.cpp" line="1637" />
+        <location filename="../../src/core/telegramsession.cpp" line="1532" />
+        <location filename="../../src/core/telegramsession.cpp" line="1541" />
+        <location filename="../../src/core/telegramsession.cpp" line="1729" />
         <source>Nobody found.</source>
         <translation>کسی یافت نشد.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1510" />
+        <location filename="../../src/core/telegramsession.cpp" line="1602" />
         <source>The session was ended (%1). Please sign in again.</source>
         <translation>این نشست پایان یافت (%1). لطفاً دوباره وارد شوید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1547" />
+        <location filename="../../src/core/telegramsession.cpp" line="1639" />
         <source>Wrong password.</source>
         <translation>گذرواژه نادرست است.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1548" />
-        <location filename="../../src/core/telegramsession.cpp" line="1557" />
-        <location filename="../../src/core/telegramsession.cpp" line="1582" />
+        <location filename="../../src/core/telegramsession.cpp" line="1640" />
+        <location filename="../../src/core/telegramsession.cpp" line="1649" />
+        <location filename="../../src/core/telegramsession.cpp" line="1674" />
         <source>Too many attempts. Wait %1 seconds.</source>
         <translation>تلاش‌های بسیار زیاد. %1 ثانیه صبر کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1558" />
+        <location filename="../../src/core/telegramsession.cpp" line="1650" />
         <source>That phone number is not valid.</source>
         <translation>آن شمارهٔ تلفن معتبر نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1559" />
+        <location filename="../../src/core/telegramsession.cpp" line="1651" />
         <source>That phone number is banned from Telegram.</source>
         <translation>آن شمارهٔ تلفن در تلگرام ممنوع شده است.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1560" />
+        <location filename="../../src/core/telegramsession.cpp" line="1652" />
         <source>Too many codes requested for this number. Try again later.</source>
         <translation>برای این شماره کدهای بسیار زیادی درخواست شده است. بعداً تلاش کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1561" />
+        <location filename="../../src/core/telegramsession.cpp" line="1653" />
         <source>Too many attempts. Try again later.</source>
         <translation>تلاش‌های بسیار زیاد. بعداً تلاش کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1562" />
+        <location filename="../../src/core/telegramsession.cpp" line="1654" />
         <source>This build's Telegram API key was rejected.</source>
         <translation>کلید API تلگرام این نسخه پذیرفته نشد.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1574" />
+        <location filename="../../src/core/telegramsession.cpp" line="1666" />
         <source>Wrong code. Check it and try again.</source>
         <translation>کد نادرست است. آن را بررسی کنید و دوباره تلاش کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1576" />
+        <location filename="../../src/core/telegramsession.cpp" line="1668" />
         <source>The code expired. Request a new one.</source>
         <translation>کد منقضی شد. کد تازه‌ای درخواست کنید.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1593" />
+        <location filename="../../src/core/telegramsession.cpp" line="1685" />
         <source>Could not load the chat list: %1</source>
         <translation>بارگیری فهرست گفتگوها ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1648" />
+        <location filename="../../src/core/telegramsession.cpp" line="1740" />
         <source>Could not start the secret chat: %1</source>
         <translation>آغاز گفتگوی مخفی ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1651" />
+        <location filename="../../src/core/telegramsession.cpp" line="1743" />
         <source>Could not accept the secret chat: %1</source>
         <translation>پذیرش گفتگوی مخفی ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1672" />
+        <location filename="../../src/core/telegramsession.cpp" line="1764" />
         <source>Could not edit the message: %1</source>
         <translation>ویرایش پیام ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1675" />
+        <location filename="../../src/core/telegramsession.cpp" line="1767" />
         <source>Could not forward the message: %1</source>
         <translation>فرستادن پیام ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1679" />
+        <location filename="../../src/core/telegramsession.cpp" line="1771" />
         <source>That reaction is not allowed in this chat.</source>
         <translation>آن واکنش در این گفتگو مجاز نیست.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1681" />
+        <location filename="../../src/core/telegramsession.cpp" line="1773" />
         <source>Could not react: %1</source>
         <translation>ثبت واکنش ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1684" />
+        <location filename="../../src/core/telegramsession.cpp" line="1776" />
         <source>Could not block the user: %1</source>
         <translation>مسدود کردن کاربر ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1693" />
+        <location filename="../../src/core/telegramsession.cpp" line="1784" />
+        <source>Request sent. You will join once an admin approves it.</source>
+        <translation>درخواست فرستاده شد. پس از تأیید مدیر عضو می‌شوید.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1786" />
+        <source>You are already a member.</source>
+        <translation>شما از پیش عضو هستید.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1788" />
+        <location filename="../../src/core/telegramsession.cpp" line="1805" />
+        <source>That invite link has expired.</source>
+        <translation>این پیوند دعوت منقضی شده است.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1790" />
+        <location filename="../../src/core/telegramsession.cpp" line="1807" />
+        <source>That invite link is not valid.</source>
+        <translation>این پیوند دعوت معتبر نیست.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1792" />
+        <source>You have joined too many groups and channels.</source>
+        <translation>شما به گروه‌ها و کانال‌های بسیار زیادی پیوسته‌اید.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1794" />
+        <source>That group is full.</source>
+        <translation>این گروه پر است.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1796" />
+        <source>Your request to join is still waiting for approval.</source>
+        <translation>درخواست شما هنوز در انتظار تأیید است.</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1798" />
+        <source>Could not join: %1</source>
+        <translation>پیوستن ممکن نشد: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1801" />
+        <source>Could not leave: %1</source>
+        <translation>ترک کردن ممکن نشد: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1809" />
+        <source>Could not read that invite link: %1</source>
+        <translation>خواندن این پیوند دعوت ممکن نشد: %1</translation>
+    </message>
+    <message>
+        <location filename="../../src/core/telegramsession.cpp" line="1818" />
         <source>That folder must keep at least one chat, so the chat stays in it too.</source>
         <translation>آن پوشه باید دست‌کم یک گفتگو داشته باشد، پس این گفتگو هم در آن می‌ماند.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="1695" />
+        <location filename="../../src/core/telegramsession.cpp" line="1820" />
         <source>Could not change the folder: %1</source>
         <translation>تغییر پوشه ممکن نشد: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2063" />
+        <location filename="../../src/core/telegramsession.cpp" line="2188" />
         <source>could not create the file</source>
         <translation>ساختن فایل ممکن نشد</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2138" />
+        <location filename="../../src/core/telegramsession.cpp" line="2263" />
         <source>the file is empty</source>
         <translation>فایل خالی است</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2171" />
+        <location filename="../../src/core/telegramsession.cpp" line="2296" />
         <source>could not read the file</source>
         <translation>خواندن فایل ممکن نشد</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2182" />
+        <location filename="../../src/core/telegramsession.cpp" line="2307" />
         <source>the file is too large</source>
         <translation>فایل بسیار بزرگ است</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2206" />
+        <location filename="../../src/core/telegramsession.cpp" line="2331" />
         <source>could not read the recording</source>
         <translation>خواندن ضبط ممکن نشد</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2347" />
+        <location filename="../../src/core/telegramsession.cpp" line="2472" />
         <source>Secret chats can only be opened with a person.</source>
         <translation>گفتگوی مخفی را فقط با یک شخص می‌توان باز کرد.</translation>
     </message>
     <message>
-        <location filename="../../src/core/telegramsession.cpp" line="2397" />
+        <location filename="../../src/core/telegramsession.cpp" line="2522" />
         <source>The secret chat is not ready.</source>
         <translation>گفتگوی مخفی آماده نیست.</translation>
     </message>
@@ -2254,203 +2420,203 @@
         <translation>حساب حذف‌شده</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="777" />
-        <location filename="../../src/core/tgapi.cpp" line="818" />
+        <location filename="../../src/core/tgapi.cpp" line="810" />
+        <location filename="../../src/core/tgapi.cpp" line="851" />
         <source>video</source>
         <translation>ویدیو</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="777" />
+        <location filename="../../src/core/tgapi.cpp" line="810" />
         <source>photo</source>
         <translation>عکس</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="782" />
+        <location filename="../../src/core/tgapi.cpp" line="815" />
         <source>location %1, %2</source>
         <translation>موقعیت %1، %2</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="783" />
+        <location filename="../../src/core/tgapi.cpp" line="816" />
         <source>location</source>
         <translation>موقعیت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="785" />
+        <location filename="../../src/core/tgapi.cpp" line="818" />
         <source>location: %1</source>
         <translation>موقعیت: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="786" />
+        <location filename="../../src/core/tgapi.cpp" line="819" />
         <source>contact: %1 %2 %3</source>
         <translation>مخاطب: %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="791" />
+        <location filename="../../src/core/tgapi.cpp" line="824" />
         <source>poll: %1</source>
         <translation>نظرسنجی: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="793" />
+        <location filename="../../src/core/tgapi.cpp" line="826" />
         <source>dice: %1</source>
         <translation>تاس: %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="794" />
+        <location filename="../../src/core/tgapi.cpp" line="827" />
         <source>game</source>
         <translation>بازی</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="795" />
+        <location filename="../../src/core/tgapi.cpp" line="828" />
         <source>invoice</source>
         <translation>صورت‌حساب</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="796" />
+        <location filename="../../src/core/tgapi.cpp" line="829" />
         <source>story</source>
         <translation>استوری</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="799" />
+        <location filename="../../src/core/tgapi.cpp" line="832" />
         <source>file</source>
         <translation>فایل</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="814" />
+        <location filename="../../src/core/tgapi.cpp" line="847" />
         <source>sticker</source>
         <translation>برچسب</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="814" />
+        <location filename="../../src/core/tgapi.cpp" line="847" />
         <source>sticker %1</source>
         <translation>برچسب %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="815" />
+        <location filename="../../src/core/tgapi.cpp" line="848" />
         <source>voice message %1</source>
         <translation>پیام صوتی %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="815" />
+        <location filename="../../src/core/tgapi.cpp" line="848" />
         <source>voice message</source>
         <translation>پیام صوتی</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="816" />
+        <location filename="../../src/core/tgapi.cpp" line="849" />
         <source>video message %1</source>
         <translation>پیام ویدیویی %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="816" />
+        <location filename="../../src/core/tgapi.cpp" line="849" />
         <source>video message</source>
         <translation>پیام ویدیویی</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="817" />
+        <location filename="../../src/core/tgapi.cpp" line="850" />
         <source>GIF</source>
         <translation>GIF</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="818" />
+        <location filename="../../src/core/tgapi.cpp" line="851" />
         <source>video %1</source>
         <translation>ویدیوی %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="819" />
+        <location filename="../../src/core/tgapi.cpp" line="852" />
         <source>audio %1</source>
         <translation>صدای %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="819" />
+        <location filename="../../src/core/tgapi.cpp" line="852" />
         <source>audio</source>
         <translation>صدا</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="820" />
+        <location filename="../../src/core/tgapi.cpp" line="853" />
         <source>image</source>
         <translation>تصویر</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="822" />
+        <location filename="../../src/core/tgapi.cpp" line="855" />
         <source>%1 MB</source>
         <translation>%1 مگابایت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="823" />
+        <location filename="../../src/core/tgapi.cpp" line="856" />
         <source>%1 KB</source>
         <translation>%1 کیلوبایت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="823" />
+        <location filename="../../src/core/tgapi.cpp" line="856" />
         <source>%1 B</source>
         <translation>%1 بایت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="824" />
+        <location filename="../../src/core/tgapi.cpp" line="857" />
         <source>file: %1 (%2)</source>
         <translation>فایل: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="826" />
+        <location filename="../../src/core/tgapi.cpp" line="859" />
         <source>unsupported attachment</source>
         <translation>پیوست پشتیبانی‌نشده</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="827" />
+        <location filename="../../src/core/tgapi.cpp" line="860" />
         <source>attachment</source>
         <translation>پیوست</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="968" />
+        <location filename="../../src/core/tgapi.cpp" line="1001" />
         <source>created the group "%1"</source>
         <translation>گروه «%1» را ساخت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="969" />
+        <location filename="../../src/core/tgapi.cpp" line="1002" />
         <source>created the channel "%1"</source>
         <translation>کانال «%1» را ساخت</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="974" />
+        <location filename="../../src/core/tgapi.cpp" line="1007" />
         <source>added %1</source>
         <translation>%1 را افزود</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="976" />
+        <location filename="../../src/core/tgapi.cpp" line="1009" />
         <source>removed %1</source>
         <translation>%1 را حذف کرد</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="977" />
+        <location filename="../../src/core/tgapi.cpp" line="1010" />
         <source>joined by invite link</source>
         <translation>با پیوند دعوت پیوست</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="978" />
+        <location filename="../../src/core/tgapi.cpp" line="1011" />
         <source>pinned a message</source>
         <translation>پیامی را سنجاق کرد</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="979" />
+        <location filename="../../src/core/tgapi.cpp" line="1012" />
         <source>joined Telegram</source>
         <translation>به تلگرام پیوست</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="980" />
+        <location filename="../../src/core/tgapi.cpp" line="1013" />
         <source>cleared the history</source>
         <translation>تاریخچه را پاک کرد</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="981" />
+        <location filename="../../src/core/tgapi.cpp" line="1014" />
         <source>service message</source>
         <translation>پیام سرویس</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="989" />
+        <location filename="../../src/core/tgapi.cpp" line="1022" />
         <source>empty message</source>
         <translation>پیام خالی</translation>
     </message>
     <message>
-        <location filename="../../src/core/tgapi.cpp" line="1197" />
+        <location filename="../../src/core/tgapi.cpp" line="1230" />
         <source>Folder</source>
         <translation>پوشه</translation>
     </message>
@@ -2585,29 +2751,40 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../../qml/main.qml" line="171" />
+        <location filename="../../qml/main.qml" line="177" />
         <source>Use this proxy?</source>
         <translation>از این پراکسی استفاده شود؟</translation>
     </message>
     <message>
-        <location filename="../../qml/main.qml" line="172" />
+        <location filename="../../qml/main.qml" line="178" />
         <source>Route Symbigram through the MTProto proxy %1? This reconnects.</source>
         <translation>Symbigram از طریق پراکسی MTProto %1 هدایت شود؟ اتصال مجدد انجام می‌شود.</translation>
     </message>
     <message>
-        <location filename="../../qml/main.qml" line="173" />
+        <location filename="../../qml/main.qml" line="179" />
         <source>Route Symbigram through the SOCKS5 proxy %1? This reconnects.</source>
         <translation>Symbigram از طریق پراکسی SOCKS5 %1 هدایت شود؟ اتصال مجدد انجام می‌شود.</translation>
     </message>
     <message>
-        <location filename="../../qml/main.qml" line="174" />
+        <location filename="../../qml/main.qml" line="180" />
         <source>Use it</source>
         <translation>استفاده</translation>
     </message>
     <message>
-        <location filename="../../qml/main.qml" line="175" />
+        <location filename="../../qml/main.qml" line="181" />
+        <location filename="../../qml/main.qml" line="195" />
         <source>Cancel</source>
         <translation>لغو</translation>
+    </message>
+    <message>
+        <location filename="../../qml/main.qml" line="192" />
+        <source>Join this chat?</source>
+        <translation>به این گفتگو پیوسته شود؟</translation>
+    </message>
+    <message>
+        <location filename="../../qml/main.qml" line="194" />
+        <source>Join</source>
+        <translation>پیوستن</translation>
     </message>
 </context>
 </TS>

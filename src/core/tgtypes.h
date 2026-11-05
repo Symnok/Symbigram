@@ -33,7 +33,7 @@ struct TgPeer
 /// A user or a chat, as far as the responses have said so far.
 struct TgPeerInfo
 {
-    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false), isForum(false), photoId(0), photoDcId(0) {}
+    TgPeerInfo() : isBot(false), isSelf(false), isDeleted(false), isContact(false), online(false), lastSeen(0), statusKind(0), membersCount(0), isBroadcast(false), isForum(false), isLeft(false), photoId(0), photoDcId(0) {}
     TgPeer peer;
     QString title;         // display name or chat title
     QString firstName, lastName, username, phone;
@@ -44,8 +44,28 @@ struct TgPeerInfo
     int membersCount;
     bool isBroadcast;      // a channel (not a megagroup)
     bool isForum;          // a supergroup organised into topics (forum)
+    bool isLeft;           // we are not a member: a public channel/group can be read, then joined
     qint64 photoId;        // profile / chat picture, 0 when none
     int photoDcId;
+};
+
+/// What a private invite link turns out to point at. Checked before joining so the user sees
+/// what they are about to join rather than a bare hash.
+struct TgInvite
+{
+    TgInvite() : membersCount(0), isBroadcast(false), isMegagroup(false),
+                 requestNeeded(false), chatInHand(false) {}
+    QString hash;          // the link's hash, to pass back to importChatInvite
+    QString title;
+    int membersCount;
+    bool isBroadcast;      // a channel rather than a group
+    bool isMegagroup;
+    bool requestNeeded;    // joining only files a request an admin has to approve
+    // chatInviteAlready (we are in it) or chatInvitePeek (we may read it for a while without
+    // joining): either way the reply carried the chat itself, so the caller opens peer rather
+    // than offering to join a bare title. A peek still shows the Join bar once it is open.
+    bool chatInHand;
+    TgPeer peer;           // set when chatInHand
 };
 
 /// One reaction on a message: which emoji, how many people, and whether we are one of them.
@@ -206,6 +226,7 @@ struct TgUpdateState
 };
 
 Q_DECLARE_METATYPE(TgPeer)
+Q_DECLARE_METATYPE(TgInvite)
 Q_DECLARE_METATYPE(TgMessage)
 Q_DECLARE_METATYPE(TgDialog)
 Q_DECLARE_METATYPE(QList<TgMessage>)

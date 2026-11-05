@@ -898,6 +898,51 @@ void TelegramSession::searchPeers(const QString &query)
     send(SearchPeers, TgApi::contactsSearch(q, 10), r);
 }
 
+void TelegramSession::joinChannel(const TgPeer &peer)
+{
+    TgPeer p = m_peers.withHash(peer);
+    if (p.kind != TgPeer::Channel) {
+        // Basic groups have no join call at all: Telegram only lets you in by invite link, and
+        // the link is what carries the permission. Say so instead of sending a doomed request.
+        emit notice(tr("This group can only be joined through an invite link."));
+        return;
+    }
+    if (p.accessHash == 0) { emit notice(tr("That chat is not in your list.")); return; }
+    Request r;
+    r.peer = p;
+    send(JoinChannel, TgApi::joinChannel(p), r);
+}
+
+void TelegramSession::leaveChat(const TgPeer &peer)
+{
+    TgPeer p = m_peers.withHash(peer);
+    if (!p.isGroup()) return;                  // nothing to leave in a 1:1 chat
+    Request r;
+    r.peer = p;
+    // A basic group has no leaveChannel: you remove yourself from its member list instead.
+    // revoke=false - leaving must not delete anyone else's copy of the history.
+    send(LeaveChat, p.kind == TgPeer::Channel ? TgApi::leaveChannel(p)
+                                              : TgApi::deleteChatUser(p.id, false), r);
+}
+
+void TelegramSession::checkInvite(const QString &inviteHash)
+{
+    if (inviteHash.isEmpty()) return;
+    if (!m_client->isReady()) { emit notice(tr("Not connected.")); return; }
+    Request r;
+    r.query = inviteHash;
+    send(CheckInvite, TgApi::checkChatInvite(inviteHash), r);
+}
+
+void TelegramSession::joinByInvite(const QString &inviteHash)
+{
+    if (inviteHash.isEmpty()) return;
+    if (!m_client->isReady()) { emit notice(tr("Not connected.")); return; }
+    Request r;
+    r.query = inviteHash;
+    send(ImportInvite, TgApi::importChatInvite(inviteHash), r);
+}
+
 void TelegramSession::deleteHistory(const TgPeer &peer)
 {
     Request r;
@@ -1268,6 +1313,59 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             TlSchema::readObject(r);
             loadFolders();          // reconcile the cached filters with the server's truth
             break;
+        case JoinChannel: {
+            // The Updates carry the channel again, this time without its "left" flag, so
+            // absorbing them is what makes canJoin go false and the Join bar disappear.
+            applyUpdatesResult(TlSchema::readObject(r));
+            ensureDialog(req.peer);            // show it in the chat list straight away
+            emit peerChanged(req.peer);
+            emit joined(req.peer);
+            refreshDialogs();                  // and let the server settle the real order/unread
+            break;
+        }
+        case LeaveChat: {
+            // The channel comes back with its "left" flag set, which is what puts the Join bar
+            // where the composer was, so an open chat page stays readable. The chat list is a
+            // different matter: the server drops a left channel from getDialogs, so refreshDialogs
+            // takes it out of the list. That is what the confirmation text promises.
+            applyUpdatesResult(TlSchema::readObject(r));
+            emit peerChanged(req.peer);
+            emit leftChat(req.peer);
+            refreshDialogs();
+            break;
+        }
+        case CheckInvite: {
+            TgInvite inv = TgApi::readInvite(TlSchema::readObject(r), m_peers);
+            inv.hash = req.query;
+            emit inviteChecked(inv);
+            break;
+        }
+        case ImportInvite: {
+            TlObject o = TlSchema::readObject(r);
+            // The chat we just joined is in this reply's chats list and nowhere else - an invite
+            // hash is not a peer, so this is the only chance to learn its id and access hash.
+            applyUpdatesResult(o);
+            TgPeer joinedPeer;
+            QVariantList chats = o.vec("chats");
+            // Normally one chat, but a migrated group can bring its old half along, so take the
+            // one we are actually in (flags.2 is "left") rather than whichever came first.
+            for (int i = 0; i < chats.size(); ++i) {
+                TlObject c = TlSchema::toObject(chats.at(i));
+                if (c.ctor() != Tl::Channel && c.ctor() != Tl::Chat) continue;
+                if (c.flag("flags", 2)) continue;
+                joinedPeer = m_peers.withHash(TgPeer(c.ctor() == Tl::Channel ? TgPeer::Channel
+                                                                            : TgPeer::Chat,
+                                                     c.longOr("id"), c.longOr("access_hash")));
+                break;
+            }
+            if (!joinedPeer.isNull()) {
+                ensureDialog(joinedPeer);
+                emit peerChanged(joinedPeer);
+                emit joined(joinedPeer);
+            }
+            refreshDialogs();
+            break;
+        }
         case DeleteChat: {
             TlObject o = TlSchema::readObject(r);
             if (o.has("pts")) {                    // messages.affectedHistory (deleting a 1:1 chat)
@@ -1682,6 +1780,39 @@ void TelegramSession::onRpcError(quint64 requestId, int code, const QString &typ
         break;
     case BlockUser:
         emit notice(tr("Could not block the user: %1").arg(type));
+        break;
+    case JoinChannel:
+    case ImportInvite:
+        // INVITE_REQUEST_SENT is not a failure: the link needs an admin's approval and the
+        // request is now filed. It is also the reliable way to learn that, since the preview's
+        // request_needed flag is only advisory.
+        if (type == QLatin1String("INVITE_REQUEST_SENT"))
+            emit notice(tr("Request sent. You will join once an admin approves it."));
+        else if (type == QLatin1String("USER_ALREADY_PARTICIPANT"))
+            emit notice(tr("You are already a member."));
+        else if (type == QLatin1String("INVITE_HASH_EXPIRED"))
+            emit notice(tr("That invite link has expired."));
+        else if (type == QLatin1String("INVITE_HASH_INVALID"))
+            emit notice(tr("That invite link is not valid."));
+        else if (type == QLatin1String("CHANNELS_TOO_MUCH"))
+            emit notice(tr("You have joined too many groups and channels."));
+        else if (type == QLatin1String("USERS_TOO_MUCH"))
+            emit notice(tr("That group is full."));
+        else if (type == QLatin1String("INVITE_REQUEST_ALREADY_SENT"))
+            emit notice(tr("Your request to join is still waiting for approval."));
+        else
+            emit notice(tr("Could not join: %1").arg(type));
+        break;
+    case LeaveChat:
+        emit notice(tr("Could not leave: %1").arg(type));
+        break;
+    case CheckInvite:
+        if (type == QLatin1String("INVITE_HASH_EXPIRED"))
+            emit notice(tr("That invite link has expired."));
+        else if (type == QLatin1String("INVITE_HASH_INVALID"))
+            emit notice(tr("That invite link is not valid."));
+        else
+            emit notice(tr("Could not read that invite link: %1").arg(type));
         break;
     case SearchPeers:
         emit peersFound(req.query, QList<TgPeer>());   // search failed - keep the local matches only

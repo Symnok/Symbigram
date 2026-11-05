@@ -81,11 +81,29 @@ Page {
                 onClicked: ttlDialog.open()
             }
             MenuItem {
+                text: chat.peerIsChannel ? qsTr("Leave channel") : qsTr("Leave group")
+                visible: chat.canLeave
+                onClicked: leaveDialog.open()
+            }
+            MenuItem {
                 text: qsTr("Delete secret chat")
                 visible: chat.isSecret
                 onClicked: discardDialog.open()
             }
         }
+    }
+
+    // Confirmed, not immediate: a private group cannot be rejoined without another invite,
+    // and the menu item sits one row away from the ones that only mute or mark read.
+    QueryDialog {
+        id: leaveDialog
+        titleText: chat.peerIsChannel ? qsTr("Leave channel") : qsTr("Leave group")
+        message: chat.peerIsChannel
+                 ? qsTr("Leave \"%1\"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.").arg(chat.title)
+                 : qsTr("Leave \"%1\"? You will stop receiving its messages. Rejoining needs an invite link.").arg(chat.title)
+        acceptButtonText: chat.peerIsChannel ? qsTr("Leave channel") : qsTr("Leave group")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: chat.leave()
     }
 
     function reopen() { var k = chat.peerKey; chat.close(); chat.open(k) }
@@ -595,19 +613,35 @@ Page {
     Item {
         id: composerRow
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        height: chat.peerIsChannel ? channelNote.height + 2 * platformStyle.paddingMedium : composer.height + 2 * platformStyle.paddingSmall
+        // A public channel or group can be read before joining, so this row carries one of three
+        // things: the Join button, the "admins only" note, or the composer.
+        height: chat.canJoin ? joinButton.height + 2 * platformStyle.paddingMedium
+              : chat.peerIsChannel ? channelNote.height + 2 * platformStyle.paddingMedium
+              : composer.height + 2 * platformStyle.paddingSmall
 
+        Button {
+            id: joinButton
+            visible: chat.canJoin
+            anchors {
+                left: parent.left; right: parent.right
+                margins: platformStyle.paddingLarge
+                verticalCenter: parent.verticalCenter
+            }
+            text: chat.peerIsChannel ? qsTr("Join channel") : qsTr("Join group")
+            enabled: app.connection == "online"
+            onClicked: chat.join()
+        }
         Label {
             id: channelNote
             anchors.centerIn: parent
-            visible: chat.peerIsChannel
+            visible: chat.peerIsChannel && !chat.canJoin
             color: platformStyle.colorNormalMid
             font.pixelSize: platformStyle.fontSizeSmall
             text: qsTr("channel - only its admins can post")
         }
         ToolButton {
             id: attachButton
-            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording
+            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && !chat.canJoin
             anchors { left: parent.left; leftMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             iconSource: "toolbar-add"
             enabled: app.connection == "online"
@@ -615,7 +649,7 @@ Page {
         }
         TextArea {
             id: composer
-            visible: !chat.peerIsChannel && !app.recording
+            visible: !chat.peerIsChannel && !app.recording && !chat.canJoin
             // Most of what looks like empty space beside this field is padding INSIDE the
             // controls next to it - a ToolButton's box is close to twice the width of the glyph
             // it draws - plus the width the row reserves for "Send" even while the narrower
@@ -643,7 +677,7 @@ Page {
         }
         Button {
             id: sendButton
-            visible: !chat.peerIsChannel && !app.recording && (composer.text.length > 0 || page.pendingFile != "")
+            visible: !chat.peerIsChannel && !app.recording && !chat.canJoin && (composer.text.length > 0 || page.pendingFile != "")
             anchors { right: parent.right; rightMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             // A floor for the tap target, not a reservation: the 80 held the field back
             // by whatever "Send" did not need.
@@ -655,7 +689,7 @@ Page {
         // a round record button when there is nothing typed and no file staged
         Rectangle {
             id: micButton
-            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && composer.text.length == 0 && page.pendingFile == ""
+            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && !chat.canJoin && composer.text.length == 0 && page.pendingFile == ""
             // Centred on the Send button rather than on the screen edge: the two share
             // one slot, so the field keeps its width whichever of them is showing.
             anchors { horizontalCenter: sendButton.horizontalCenter; verticalCenter: parent.verticalCenter }

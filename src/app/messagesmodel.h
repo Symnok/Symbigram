@@ -31,6 +31,11 @@ class MessagesModel : public QAbstractListModel
     Q_PROPERTY(bool peerTyping READ peerTyping NOTIFY peerChanged)
     Q_PROPERTY(bool peerIsGroup READ peerIsGroup NOTIFY chatChanged)
     Q_PROPERTY(bool peerIsChannel READ peerIsChannel NOTIFY chatChanged)
+    // A public channel or supergroup can be read before joining; this says the Join bar
+    // belongs at the bottom of the page instead of the composer.
+    Q_PROPERTY(bool canJoin READ canJoin NOTIFY peerChanged)
+    // The other direction: a group or channel we are a member of can be left.
+    Q_PROPERTY(bool canLeave READ canLeave NOTIFY peerChanged)
     Q_PROPERTY(bool peerMuted READ peerMuted NOTIFY peerChanged)
     Q_PROPERTY(QString initials READ initials NOTIFY peerChanged)
     Q_PROPERTY(QString peerUsername READ peerUsername NOTIFY peerChanged)
@@ -100,6 +105,8 @@ public:
     bool peerTyping() const;
     bool peerIsGroup() const { return m_peer.isGroup(); }
     bool peerIsChannel() const;
+    bool canJoin() const;
+    bool canLeave() const;
     bool peerMuted() const;
     QString initials() const;
     QString peerUsername() const;   // public @name, or "" when there is none
@@ -176,6 +183,8 @@ public:
     /// Called by the composer as the text changes: drives the typing notification.
     Q_INVOKABLE void composing(const QString &text);
     Q_INVOKABLE void setMuted(bool muted);
+    Q_INVOKABLE void join();
+    Q_INVOKABLE void leave();
     /// Secret chats: accept an incoming request, close/discard, change TTL, and the
     /// key fingerprint (SHA-256 of the shared key) as spaced hex for the verify screen.
     Q_INVOKABLE void acceptSecret();

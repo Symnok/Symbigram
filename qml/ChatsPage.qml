@@ -115,6 +115,7 @@ Page {
         id: contextMenu
         property variant item
         property bool isSecret: item ? item.secret === true : false
+        property bool isChannel: item ? item.isChannel === true : false
         MenuLayout {
             MenuItem {
                 text: contextMenu.item && contextMenu.item.muted ? qsTr("Unmute") : qsTr("Mute")
@@ -159,6 +160,17 @@ Page {
                 onClicked: { clearDialog.peerKey = contextMenu.item.peerKey; clearDialog.title = contextMenu.item.title; clearDialog.open() }
             }
             MenuItem {
+                // Only for chats we are in - the list can also hold a public channel we are
+                // merely reading, and that one is offered Join on its own page instead.
+                text: contextMenu.isChannel ? qsTr("Leave channel") : qsTr("Leave group")
+                visible: !contextMenu.isSecret && contextMenu.item && contextMenu.item.isGroup === true
+                         && contextMenu.item.isLeft !== true
+                onClicked: { leaveChatDialog.peerKey = contextMenu.item.peerKey
+                             leaveChatDialog.title = contextMenu.item.title
+                             leaveChatDialog.channel = contextMenu.isChannel
+                             leaveChatDialog.open() }
+            }
+            MenuItem {
                 text: qsTr("Delete chat")
                 visible: !contextMenu.isSecret
                 onClicked: { deleteChatDialog.peerKey = contextMenu.item.peerKey; deleteChatDialog.title = contextMenu.item.title; deleteChatDialog.open() }
@@ -169,6 +181,20 @@ Page {
                 onClicked: { secretDeleteDialog.peerKey = contextMenu.item.peerKey; secretDeleteDialog.title = contextMenu.item.title; secretDeleteDialog.open() }
             }
         }
+    }
+
+    QueryDialog {
+        id: leaveChatDialog
+        property string peerKey
+        property string title
+        property bool channel: false
+        titleText: channel ? qsTr("Leave channel") : qsTr("Leave group")
+        message: channel
+                 ? qsTr("Leave \"%1\"? You will stop receiving its posts and it leaves your chat list. You can rejoin it later if it is public.").arg(title)
+                 : qsTr("Leave \"%1\"? You will stop receiving its messages. Rejoining needs an invite link.").arg(title)
+        acceptButtonText: channel ? qsTr("Leave channel") : qsTr("Leave group")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: app.chats.leaveChat(peerKey)
     }
 
     CommonDialog {

@@ -1032,6 +1032,36 @@ bool MessagesModel::peerIsChannel() const
     return m_peer.kind == TgPeer::Channel && m_session->peers().info(m_peer).isBroadcast;
 }
 
+bool MessagesModel::canJoin() const
+{
+    // Only for a channel or supergroup we are reading without being a member. Secret chats and
+    // 1:1 chats have nothing to join, and a basic group can only be joined by invite link, so
+    // offering a button there would promise something joinChannel cannot do.
+    if (m_secretId != 0 || m_peer.kind != TgPeer::Channel) return false;
+    if (m_peer.accessHash == 0) return false;
+    return m_session->peers().info(m_peer).isLeft;
+}
+
+void MessagesModel::join()
+{
+    if (!canJoin()) return;
+    m_session->joinChannel(m_peer);
+}
+
+bool MessagesModel::canLeave() const
+{
+    // Groups and channels only, and only while we are still in them - otherwise the page would
+    // offer Join and Leave at the same time.
+    if (m_secretId != 0 || !m_peer.isGroup()) return false;
+    return !m_session->peers().info(m_peer).isLeft;
+}
+
+void MessagesModel::leave()
+{
+    if (!canLeave()) return;
+    m_session->leaveChat(m_peer);
+}
+
 bool MessagesModel::peerMuted() const
 {
     return m_session->dialog(m_peer).isMuted(now());

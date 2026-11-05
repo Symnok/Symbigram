@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<TlObject>("TlObject");
     qRegisterMetaType<TgPeer>("TgPeer");
+    qRegisterMetaType<TgInvite>("TgInvite");
     qRegisterMetaType<TgMessage>("TgMessage");
     qRegisterMetaType<QList<TgMessage> >("QList<TgMessage>");
     qRegisterMetaType<AuthKey>("AuthKey");

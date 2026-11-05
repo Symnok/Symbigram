@@ -152,6 +152,14 @@ namespace Tl
     const quint32 MessagesDeleteHistory = 0xb08f922a;
     const quint32 MessagesDeleteChatUser = 0xa2185cab;
     const quint32 ChannelsLeaveChannel = 0xf836aa95;
+    const quint32 ChannelsJoinChannel = 0x24b524c5;
+    // Private invite links: check first (title and size, so the user is not joining blind),
+    // then import. Both ids are CRC32 of their TL signature; see the note in tgapi.cpp.
+    const quint32 MessagesCheckChatInvite = 0x3eadb1bb;
+    const quint32 MessagesImportChatInvite = 0x6c50051c;
+    const quint32 ChatInvite = 0x5c9d3702;          // the preview: title, size, flags
+    const quint32 ChatInviteAlready = 0x5a686d7c;   // already a member - carries the chat
+    const quint32 ChatInvitePeek = 0x61695cb0;      // readable for a while without joining
     const quint32 FoldersEditPeerFolders = 0x6847d0ab;
     const quint32 InputFolderPeer = 0xfbd2c296;
     const quint32 MessagesUpdateDialogFilter = 0x1ad4a04a;

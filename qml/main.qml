@@ -120,6 +120,12 @@ PageStackWindow {
             proxyLinkDialog.mtproto = mtproto
             proxyLinkDialog.open()
         }
+        onInviteOffered: {
+            inviteDialog.hash = inviteHash
+            inviteDialog.what = title
+            inviteDialog.detail = detail
+            inviteDialog.open()
+        }
         onOpenChatRequested: {
             if (app.state != "ready") return
             if (pageStack.currentPage != chatsPage && app.chat.peerKey != "") pageStack.pop()
@@ -174,6 +180,20 @@ PageStackWindow {
         acceptButtonText: qsTr("Use it")
         rejectButtonText: qsTr("Cancel")
         onAccepted: app.acceptProxyLink()
+    }
+
+    // A private invite link, checked before it is used: an invite hash says nothing about what it
+    // leads to, so the name and size are fetched first and the user joins a group they can see.
+    QueryDialog {
+        id: inviteDialog
+        property string hash: ""
+        property string what: ""
+        property string detail: ""
+        titleText: qsTr("Join this chat?")
+        message: what + (detail != "" ? "\n" + detail : "")
+        acceptButtonText: qsTr("Join")
+        rejectButtonText: qsTr("Cancel")
+        onAccepted: app.joinInvite(hash)
     }
 
     InfoBanner {
