@@ -1491,10 +1491,12 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
                 rq.randomId = u.randomId;
                 if (u.voice)
                     send(SendMedia, TgApi::sendUploadedVoice(u.peer, u.fileId, u.parts, u.big, u.fileName,
-                                                             u.durationSec, u.waveform, u.randomId), rq);
+                                                             u.durationSec, u.waveform, u.randomId,
+                                                             u.replyToId, u.topicId), rq);
                 else
                     send(SendMedia, TgApi::sendUploadedMedia(u.peer, u.fileId, u.parts, u.big, u.fileName, u.asPhoto,
-                                                             TgApi::mimeTypeFor(u.fileName), u.caption, u.randomId), rq);
+                                                             TgApi::mimeTypeFor(u.fileName), u.caption, u.randomId,
+                                                             u.replyToId, u.topicId), rq);
             } else {
                 sendNextPart(u);
             }
@@ -2285,7 +2287,8 @@ void TelegramSession::failAllTransfers(const QString &error)
     for (int i = 0; i < ups.size(); ++i) finishUpload(ups.at(i), error);
 }
 
-qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption)
+qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption,
+                                 int replyToId, int topicId)
 {
     Upload u;
     u.randomId = qint64(Crypto::randomUInt64());
@@ -2294,6 +2297,8 @@ qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bo
     u.fileName = QFileInfo(filePath).fileName();
     u.caption = caption;
     u.asPhoto = asPhoto;
+    u.replyToId = replyToId;
+    u.topicId = topicId;
     u.file = new QFile(filePath, this);
     if (!u.file->open(QIODevice::ReadOnly) || u.file->size() <= 0) {
         delete u.file;
@@ -2319,7 +2324,8 @@ qint64 TelegramSession::sendFile(const TgPeer &peer, const QString &filePath, bo
     return u.randomId;
 }
 
-qint64 TelegramSession::sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform)
+qint64 TelegramSession::sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform,
+                                  int replyToId, int topicId)
 {
     Upload u;
     u.randomId = qint64(Crypto::randomUInt64());
@@ -2329,6 +2335,8 @@ qint64 TelegramSession::sendVoice(const TgPeer &peer, const QString &oggPath, in
     u.voice = true;
     u.durationSec = durationSec;
     u.waveform = waveform;
+    u.replyToId = replyToId;
+    u.topicId = topicId;
     u.file = new QFile(oggPath, this);
     if (!u.file->open(QIODevice::ReadOnly) || u.file->size() <= 0) {
         delete u.file;

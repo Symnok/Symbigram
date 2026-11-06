@@ -186,9 +186,11 @@ public:
     void cancelDownload(int jobId);
     /// Uploads a file and sends it, as a photo or as a document; returns the random id
     /// that uploadProgress and messageSent/messageFailed will carry.
-    qint64 sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption);
+    qint64 sendFile(const TgPeer &peer, const QString &filePath, bool asPhoto, const QString &caption,
+                    int replyToId = 0, int topicId = 0);
     /// Sends an already-recorded Ogg/Opus file as a voice message.
-    qint64 sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform);
+    qint64 sendVoice(const TgPeer &peer, const QString &oggPath, int durationSec, const QByteArray &waveform,
+                     int replyToId = 0, int topicId = 0);
 
 signals:
     void stateChanged();
@@ -355,7 +357,7 @@ private:
     };
     struct Upload
     {
-        Upload() : randomId(0), file(0), fileId(0), parts(0), nextPart(0), size(0), big(false), asPhoto(false), voice(false), durationSec(0) {}
+        Upload() : randomId(0), file(0), fileId(0), parts(0), nextPart(0), size(0), big(false), asPhoto(false), voice(false), durationSec(0), replyToId(0), topicId(0) {}
         qint64 randomId;
         TgPeer peer;
         QString path, fileName, caption;
@@ -367,6 +369,10 @@ private:
         bool voice;
         int durationSec;
         QByteArray waveform;
+        // Where this attachment belongs: the message it answers, and the forum topic it is in.
+        // Both are only known when the user taps Send, and both are needed much later, when the
+        // last part has gone up and the sendMedia is finally written.
+        int replyToId, topicId;
     };
     struct DcLink
     {

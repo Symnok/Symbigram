@@ -126,9 +126,11 @@ public:
     static QByteArray saveFilePart(qint64 fileId, int part, int totalParts, bool big, const QByteArray &bytes);
     /// messages.sendMedia with an uploaded file as a photo or as a document.
     static QByteArray sendUploadedVoice(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
-                                        int durationSec, const QByteArray &waveform, qint64 randomId);
+                                        int durationSec, const QByteArray &waveform, qint64 randomId,
+                                        int replyToId = 0, int topMsgId = 0);
     static QByteArray sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
-                                        bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId);
+                                        bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId,
+                                        int replyToId = 0, int topMsgId = 0);
     static QByteArray inputUser(const TgPeer &user);
     // -- secret chats --
     static QByteArray getDhConfig(int version, int randomLength);

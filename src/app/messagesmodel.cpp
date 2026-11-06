@@ -1725,23 +1725,35 @@ void MessagesModel::onMessageSent(const TgPeer &peer, qint64 randomId, const TgM
     emit dataChanged(index(row), index(row));
 }
 
-void MessagesModel::noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto, const QString &caption)
+int MessagesModel::takeReplyTo()
 {
-    if (m_peer.isNull()) return;
+    const int id = m_replyToId;
+    if (m_replyToId) { m_replyToId = 0; emit replyChanged(); }
+    return id;
+}
+
+void MessagesModel::sendAttachment(const QString &path, bool asPhoto, const QString &caption)
+{
+    if (m_peer.isNull() || path.isEmpty()) return;
     if (m_hasNewer) jumpToEnd();   // same as send(): the pending row goes at the end
+    // Taken before the upload starts and carried by it: the upload outlives the composer, and by
+    // the time its last part is in, the reply bar has been closed - by the user or by this call.
+    const int replyToId = takeReplyTo();
+    const qint64 randomId = m_session->sendFile(m_peer, path, asPhoto, caption, replyToId, m_topicId);
     Row r;
     r.m.peer = m_peer;
     r.m.out = true;
     r.m.date = now();
     r.m.fromId = m_session->selfId();
     r.m.text = caption;              // show the caption straight away, under the attachment
+    r.m.replyToId = replyToId;       // so the pending row shows the reply preview too
     r.randomId = randomId;
     r.pending = true;
     // Show the file being sent straight away, from the local copy.
     r.m.media.kind = asPhoto ? TgMedia::Photo : TgMedia::Document;
-    r.m.media.fileName = QFileInfo(localPath).fileName();
-    if (asPhoto) r.thumbPath = localPath;
-    else r.fullPath = localPath;
+    r.m.media.fileName = QFileInfo(path).fileName();
+    if (asPhoto) r.thumbPath = path;
+    else r.fullPath = path;
     r.m.note = asPhoto ? tr("photo") : r.m.media.fileName;
     beginInsertRows(QModelIndex(), m_rows.size(), m_rows.size());
     m_rows.append(r);

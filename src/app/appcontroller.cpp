@@ -733,7 +733,9 @@ void AppController::cancelRecording()
 void AppController::onRecorded(const QString &oggPath, int durationSec, const QByteArray &waveform)
 {
     if (m_chat->peerKey().isEmpty()) { emit recordingChanged(); return; }
-    m_session->sendVoice(m_chat->peer(), oggPath, durationSec, waveform);
+    // A voice message answers a reply and belongs to a topic exactly as a photo does.
+    m_session->sendVoice(m_chat->peer(), oggPath, durationSec, waveform,
+                         m_chat->takeReplyTo(), m_chat->topicId());
     setNotice(tr("Sending the voice message..."));
     emit recordingChanged();
 }
@@ -1454,8 +1456,9 @@ QString AppController::pickAttachment(bool asPhoto)
 void AppController::sendAttachment(const QString &path, bool asPhoto, const QString &caption)
 {
     if (path.isEmpty() || m_chat->peerKey().isEmpty()) return;
-    qint64 randomId = m_session->sendFile(m_chat->peer(), path, asPhoto, caption.trimmed());
-    m_chat->noteOutgoingMedia(randomId, path, asPhoto, caption.trimmed());
+    // The model sends it: the reply target and the open topic live there, and taking them any
+    // later than this would lose whichever the user had set.
+    m_chat->sendAttachment(path, asPhoto, caption.trimmed());
     setNotice(asPhoto ? tr("Sending the image...") : tr("Sending the file..."));
 }
 

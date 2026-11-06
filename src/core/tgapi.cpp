@@ -309,18 +309,28 @@ QByteArray TgApi::getHistory(const TgPeer &peer, int offsetId, int limit, int ad
     return w.toByteArray();
 }
 
+/// The inputReplyToMessage both sendMessage and sendMedia carry, or nothing when there is no
+/// reply and no topic. reply_to is flags.0 in sendMessage AND in sendMedia, so the same bytes and
+/// the same flag serve both - which is the point of having one writer: a reply that works for
+/// text and silently vanishes for a photo is exactly the bug this replaced.
+static QByteArray inputReplyTo(int replyToId, int topMsgId)
+{
+    if (!replyToId && !topMsgId) return QByteArray();
+    // reply_to_msg_id is always written; top_msg_id (flags.0) places the message in a forum
+    // topic. Posting to a topic with no specific reply targets the topic root.
+    const int replyMsg = replyToId ? replyToId : topMsgId;
+    TlWriter w(16);
+    w.writeConstructor(Tl::InputReplyToMessage).writeInt(topMsgId ? 1 : 0).writeInt(replyMsg);
+    if (topMsgId) w.writeInt(topMsgId);
+    return w.toByteArray();
+}
+
 QByteArray TgApi::sendMessage(const TgPeer &peer, const QString &text, qint64 randomId, int replyToId, int topMsgId)
 {
+    const QByteArray replyTo = inputReplyTo(replyToId, topMsgId);
     TlWriter w(text.size() * 3 + 64);
-    const bool hasReply = replyToId || topMsgId;
-    w.writeConstructor(Tl::MessagesSendMessage).writeInt(hasReply ? 1 : 0).writeRaw(inputPeer(peer));
-    if (hasReply) {
-        // inputReplyToMessage: reply_to_msg_id is always written; top_msg_id (flags.0) places the
-        // message in a forum topic. Posting to a topic with no specific reply targets the topic root.
-        const int replyMsg = replyToId ? replyToId : topMsgId;
-        w.writeConstructor(Tl::InputReplyToMessage).writeInt(topMsgId ? 1 : 0).writeInt(replyMsg);
-        if (topMsgId) w.writeInt(topMsgId);
-    }
+    w.writeConstructor(Tl::MessagesSendMessage).writeInt(replyTo.isEmpty() ? 0 : 1).writeRaw(inputPeer(peer));
+    if (!replyTo.isEmpty()) w.writeRaw(replyTo);
     w.writeString(text).writeLong(randomId);
     return w.toByteArray();
 }
@@ -615,7 +625,8 @@ QByteArray TgApi::saveFilePart(qint64 fileId, int part, int totalParts, bool big
 }
 
 QByteArray TgApi::sendUploadedVoice(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
-                                    int durationSec, const QByteArray &waveform, qint64 randomId)
+                                    int durationSec, const QByteArray &waveform, qint64 randomId,
+                                    int replyToId, int topMsgId)
 {
     TlWriter file(64);
     if (big) file.writeConstructor(Tl::InputFileBig).writeLong(fileId).writeInt(parts).writeString(fileName);
@@ -630,14 +641,17 @@ QByteArray TgApi::sendUploadedVoice(const TgPeer &peer, qint64 fileId, int parts
          .writeRaw(file.toByteArray()).writeString(QLatin1String("audio/ogg"))
          .writeConstructor(Tl::Vector).writeInt(1).writeRaw(attr.toByteArray());
 
+    const QByteArray replyTo = inputReplyTo(replyToId, topMsgId);
     TlWriter w(media.length() + 96);
-    w.writeConstructor(Tl::MessagesSendMedia).writeInt(0).writeRaw(inputPeer(peer)).writeRaw(media.toByteArray())
-     .writeString(QString()).writeLong(randomId);
+    w.writeConstructor(Tl::MessagesSendMedia).writeInt(replyTo.isEmpty() ? 0 : 1).writeRaw(inputPeer(peer));
+    if (!replyTo.isEmpty()) w.writeRaw(replyTo);
+    w.writeRaw(media.toByteArray()).writeString(QString()).writeLong(randomId);
     return w.toByteArray();
 }
 
 QByteArray TgApi::sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts, bool big, const QString &fileName,
-                                    bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId)
+                                    bool asPhoto, const QString &mimeType, const QString &caption, qint64 randomId,
+                                    int replyToId, int topMsgId)
 {
     TlWriter file(64);
     if (big) file.writeConstructor(Tl::InputFileBig).writeLong(fileId).writeInt(parts).writeString(fileName);
@@ -652,9 +666,11 @@ QByteArray TgApi::sendUploadedMedia(const TgPeer &peer, qint64 fileId, int parts
              .writeConstructor(Tl::Vector).writeInt(1)
              .writeConstructor(Tl::DocumentAttributeFilename).writeString(fileName);
     }
+    const QByteArray replyTo = inputReplyTo(replyToId, topMsgId);
     TlWriter w(media.length() + 96);
-    w.writeConstructor(Tl::MessagesSendMedia).writeInt(0).writeRaw(inputPeer(peer)).writeRaw(media.toByteArray())
-     .writeString(caption).writeLong(randomId);
+    w.writeConstructor(Tl::MessagesSendMedia).writeInt(replyTo.isEmpty() ? 0 : 1).writeRaw(inputPeer(peer));
+    if (!replyTo.isEmpty()) w.writeRaw(replyTo);
+    w.writeRaw(media.toByteArray()).writeString(caption).writeLong(randomId);
     return w.toByteArray();
 }
 

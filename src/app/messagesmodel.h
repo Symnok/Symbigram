@@ -217,8 +217,13 @@ public:
     int audioRow() const { return m_audioRow; }
     int audioBuffer() const { return m_audioBuffer; }
     Q_INVOKABLE bool canDeleteForEveryone(int row) const;
-    /// Adds an optimistic outgoing row for a file being uploaded (matched later by random id).
-    void noteOutgoingMedia(qint64 randomId, const QString &localPath, bool asPhoto, const QString &caption = QString());
+    /// Uploads and sends a staged file as the current chat's next message, with the reply bar's
+    /// target and the open topic, and adds the optimistic row for it.
+    void sendAttachment(const QString &path, bool asPhoto, const QString &caption);
+    /// The pending reply target, cleared as it is handed over - so the bar closes exactly when
+    /// the message that uses it is on its way, and nothing else can claim the same reply.
+    int takeReplyTo();
+    int topicId() const { return m_topicId; }
     /// AppController sets this to the user-chosen drive folder; empty = platform default.
     void setDownloadFolder(const QString &dir) { m_downloadFolder = dir; }
 
