@@ -1314,9 +1314,12 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             loadFolders();          // reconcile the cached filters with the server's truth
             break;
         case JoinChannel: {
-            // The Updates carry the channel again, this time without its "left" flag, so
-            // absorbing them is what makes canJoin go false and the Join bar disappear.
             applyUpdatesResult(TlSchema::readObject(r));
+            // Then say so outright. Absorbing the reply's Updates is not enough - it need not
+            // carry the channel with its "left" flag cleared, and when it does not, the Join bar
+            // stays until the chat is reopened (which is exactly how this was reported). The
+            // request succeeded, so membership is not in question; record it and notify.
+            m_peers.setLeft(req.peer, false);
             ensureDialog(req.peer);            // show it in the chat list straight away
             emit peerChanged(req.peer);
             emit joined(req.peer);
@@ -1324,11 +1327,13 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             break;
         }
         case LeaveChat: {
-            // The channel comes back with its "left" flag set, which is what puts the Join bar
-            // where the composer was, so an open chat page stays readable. The chat list is a
-            // different matter: the server drops a left channel from getDialogs, so refreshDialogs
-            // takes it out of the list. That is what the confirmation text promises.
             applyUpdatesResult(TlSchema::readObject(r));
+            // Mirror of JoinChannel, and after the absorb for the same reason: the call
+            // succeeding is what makes us a non-member, so the Join bar takes the composer's
+            // place on this tap rather than after a reopen, and the page stays readable. The
+            // chat list is a different matter - the server drops a left channel from getDialogs,
+            // so refreshDialogs takes it out of the list, which is what the confirmation promises.
+            m_peers.setLeft(req.peer, true);
             emit peerChanged(req.peer);
             emit leftChat(req.peer);
             refreshDialogs();
@@ -1359,6 +1364,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
                 break;
             }
             if (!joinedPeer.isNull()) {
+                m_peers.setLeft(joinedPeer, false);
                 ensureDialog(joinedPeer);
                 emit peerChanged(joinedPeer);
                 emit joined(joinedPeer);

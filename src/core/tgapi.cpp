@@ -167,6 +167,16 @@ void TgPeerCache::setUserStatusInfo(TgPeerInfo &info, const TlObject &status)
     }
 }
 
+void TgPeerCache::setLeft(const TgPeer &p, bool left)
+{
+    const QString key = p.key();
+    if (!m_infos.contains(key)) return;
+    TgPeerInfo info = m_infos.value(key);
+    if (info.isLeft == left) return;
+    info.isLeft = left;
+    m_infos.insert(key, info);
+}
+
 void TgPeerCache::setUserStatus(qint64 userId, const TlObject &status)
 {
     QString key = TgPeer(TgPeer::User, userId).key();

@@ -34,6 +34,10 @@ public:
     void clear() { m_infos.clear(); }
     /// Applies a status object (userStatus*) to a cached user.
     void setUserStatus(qint64 userId, const TlObject &status);
+    /// Records that we have joined or left a group/channel. A successful joinChannel or
+    /// leaveChannel is itself the server's answer, so it is written here rather than waited for
+    /// in the shape of a refreshed Chat object that may not arrive with that reply at all.
+    void setLeft(const TgPeer &p, bool left);
 
 private:
     static void setUserStatusInfo(TgPeerInfo &info, const TlObject &status);
