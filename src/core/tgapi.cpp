@@ -1179,6 +1179,36 @@ TgDialogPage TgApi::readDialogs(const TlObject &response, TgPeerCache &cache, bo
     return page;
 }
 
+int TgApi::provenNewestId(int offsetId, int addOffset, const QList<TgMessage> &page)
+{
+    // messageEmpty is a deleted message's headstone: an id and nothing else, not even a date.
+    // Nobody can read it, so it cannot be the newest message in a chat - and skipping it is what
+    // lets a page that returns one in place of a deleted post still prove where the chat ends.
+    int newest = 0;
+    for (int i = 0; i < page.size(); ++i) {
+        const TgMessage &m = page.at(i);
+        if (m.id > newest && m.date > 0) newest = m.id;
+    }
+    if (offsetId == 0 && addOffset == 0) {
+        // "The newest page, please": whatever came back begins at the newest message there is,
+        // and an answer with nothing readable in it means the chat holds no messages at all.
+        return newest;
+    }
+    if (offsetId > 0 && addOffset < 0) {
+        // A window reaching above offset_id: -add_offset messages NEWER than it were asked for,
+        // and the server returns a contiguous run. Fewer than that came back only because the
+        // chat ends inside this page.
+        int above = 0;
+        for (int i = 0; i < page.size(); ++i)
+            if (page.at(i).id > offsetId && page.at(i).date > 0) ++above;
+        if (above >= -addOffset) return -1;      // the page came back full: there may well be more
+        return above ? newest : offsetId;        // nothing above it leaves offset_id itself newest
+    }
+    // Anything else - a plain older page, or a window reaching downwards - says nothing about
+    // where the chat ends, and must not be mistaken for saying it does.
+    return -1;
+}
+
 TgHistoryPage TgApi::readHistory(const TlObject &response, TgPeerCache &cache)
 {
     TgHistoryPage page;

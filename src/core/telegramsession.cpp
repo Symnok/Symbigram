@@ -753,7 +753,8 @@ void TelegramSession::loadHistory(const TgPeer &peer, int offsetId, int count, i
     Request r;
     r.peer = m_peers.withHash(peer);
     r.offsetId = offsetId;
-    r.more = count;
+    r.limit = count;
+    r.addOffset = addOffset;
     send(GetHistory, TgApi::getHistory(r.peer, offsetId, count, addOffset), r);
 }
 
@@ -780,7 +781,8 @@ void TelegramSession::loadTopicHistory(const TgPeer &peer, int topicId, int offs
     r.peer = m_peers.withHash(peer);
     r.offsetId = offsetId;
     r.topicId = topicId;
-    r.more = count;
+    r.limit = count;
+    r.addOffset = addOffset;
     send(GetReplies, TgApi::getReplies(r.peer, topicId, offsetId, count, addOffset), r);
 }
 
@@ -1387,8 +1389,15 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
             TlObject o = TlSchema::readObject(r);
             TgHistoryPage page = TgApi::readHistory(o, m_peers);
             for (int i = 0; i < page.messages.size(); ++i) fillSender(page.messages[i]);
-            bool more = page.messages.size() >= int(req.more);
+            // A page the server filled to the limit probably has more behind it; a short one is
+            // the end of the chat. (The limit used to be stuffed into the `more` flag, where it
+            // arrived as a bool, so every non-empty page claimed there was more behind it.)
+            bool more = req.limit > 0 ? page.messages.size() >= req.limit : !page.messages.isEmpty();
             if (o.ctor() == Tl::MessagesMessages) more = false;
+            // Before the signal, not after: the model recomputes "is there anything newer than
+            // what I have?" from the dialog while it handles this page, so the dialog has to be
+            // right by then or the correction is a page late.
+            if (req.kind == GetHistory) noteNewestFrom(req, page.messages);
             emit historyLoaded(req.peer, page.messages, req.offsetId, more);
             break;
         }
@@ -1944,6 +1953,18 @@ void TelegramSession::applyUpdate(const TlObject &u)
         emit messagesDeleted(TgPeer(), list);       // the peer is not named; models match by id
         break;
     }
+    case Tl::UpdateDeleteChannelMessages: {
+        // The channel half of the same update, which went unhandled: a message deleted in a
+        // channel or a supergroup - which is every group of any size - stayed on screen until the
+        // chat was reopened. A channel keeps its own pts, so this is not checked against the
+        // account's sequence, exactly as updateNewChannelMessage above is not.
+        TgPeer p = m_peers.withHash(TgPeer(TgPeer::Channel, u.longOr("channel_id")));
+        QVariantList ids = u.vec("messages");
+        QList<int> list;
+        for (int i = 0; i < ids.size(); ++i) list.append(ids.at(i).toInt());
+        if (!list.isEmpty()) emit messagesDeleted(p, list);   // this one names its peer
+        break;
+    }
     case Tl::UpdateUserTyping:
         emit typing(TgPeer(TgPeer::User, u.longOr("user_id")), u.longOr("user_id"));
         break;
@@ -2060,6 +2081,64 @@ void TelegramSession::applyUpdate(const TlObject &u)
         if (u.has("pts") && !u.has("channel_id")) checkPts(u);   // keep the sequence moving
         break;
     }
+}
+
+void TelegramSession::noteNewestFrom(const Request &req, const QList<TgMessage> &messages)
+{
+    // A dialog's top message id comes from getDialogs and from updates, and MTProto never says
+    // what the new newest message is when that one is deleted - so the id outlives the message it
+    // names. Everything that asks whether the loaded window reaches the end of the chat measures
+    // against that id, so a stale one shows a "Newer messages" footer for messages that do not
+    // exist, makes every forward page come back empty, and holds arrivals back to avoid a gap
+    // that is not there. That is the bug this exists for: after someone deleted the last message
+    // in a group, Newer/Latest did nothing and new posts only appeared after leaving the chat and
+    // coming back (by which time a newer message had bumped the id past the dead one).
+    if (req.topicId) return;            // a topic's newest message is not the chat's newest
+    const int proven = TgApi::provenNewestId(req.offsetId, req.addOffset, messages);
+    if (proven < 0) return;             // this page proves nothing about where the chat ends
+    // When the proof is one of the page's own messages we have its text too, so the chat list can
+    // stop offering the deleted message as its preview.
+    const TgMessage *newest = 0;
+    for (int i = 0; i < messages.size(); ++i)
+        if (messages.at(i).id == proven && messages.at(i).date > 0) { newest = &messages.at(i); break; }
+    applyNewest(req.peer, proven, newest);
+}
+
+void TelegramSession::noteNewest(const TgPeer &peer, const TgMessage &newest)
+{
+    if (newest.id <= 0) return;
+    applyNewest(peer, newest.id, &newest);
+}
+
+void TelegramSession::applyNewest(const TgPeer &peer, int proven, const TgMessage *newest)
+{
+    if (proven < 0) return;
+    const bool archived = m_archivedPeers.contains(peer.key());
+    QList<TgDialog> &list = archived ? m_archived : m_dialogs;
+    const int di = dialogIndexIn(list, peer);
+    if (di < 0) return;                 // nothing cached to correct
+    TgDialog &d = list[di];
+    if (d.topMessageId <= proven) return;               // nothing stale about it
+    d.topMessageId = proven;
+    if (newest) {
+        d.topMessageDate = newest->date;
+        d.lastText = newest->text.isEmpty() ? newest->note : newest->text;
+        d.lastOut = newest->out;
+        d.lastFromId = newest->fromId;
+    } else if (!proven) {               // the chat has nothing left in it at all
+        d.topMessageDate = 0;
+        d.lastText.clear();
+        d.lastOut = false;
+        d.lastFromId = 0;
+    }
+    // Without the message in hand the preview keeps the deleted message's text until getDialogs
+    // runs again: wrong words under a correct id, which wedges nothing.
+    //
+    // A badge cannot outlive the messages it counts either: with everything up to the real newest
+    // message read, there is nothing unread left to send the user back here for.
+    if (d.readInboxMaxId >= proven) d.unreadCount = 0;
+    if (archived) { emit archiveChanged(); }
+    else { sortDialogs(); emit dialogChanged(peer); emit dialogsChanged(); }
 }
 
 void TelegramSession::touchDialog(const TgMessage &m)

@@ -255,6 +255,7 @@ namespace Tl
     const quint32 UpdateNewChannelMessage = 0x62ba04d9;
     const quint32 UpdateMessageID = 0x4e90bfd6;
     const quint32 UpdateDeleteMessages = 0xa20db0e5;
+    const quint32 UpdateDeleteChannelMessages = 0xc32d5b12;
     const quint32 UpdateEditMessage = 0xe40370a3;
     const quint32 UpdateEditChannelMessage = 0x1b3f4df7;
     const quint32 UpdateUserTyping = 0x2a17bf5c;

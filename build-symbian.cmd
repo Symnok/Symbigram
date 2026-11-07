@@ -26,6 +26,12 @@ if errorlevel 1 exit /b 1
 for /f "delims=" %%v in ('python bump-version.py --print') do set VER=%%v
 echo === building Symbigram %VER%
 
+rem A .qm whose block table does not end exactly at the end of the file is rejected whole by
+rem QTranslator, and the app then falls back to English with nothing logged anywhere - which is
+rem how a corrupt symbigram_ru.qm shipped once and killed Russian entirely. Cheap to catch here.
+python tools\checkqm.py
+if errorlevel 1 exit /b 1
+
 qmake Symbigram.pro -spec symbian-sbsv2 CONFIG+=release
 if errorlevel 1 exit /b 1
 call sbs -c arm.v5.urel.gcce4_4_1

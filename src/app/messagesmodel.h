@@ -304,6 +304,9 @@ private:
 
     /// Fills a row's rendered-body cache if it is missing or stale.
     void ensureBody(const Row &r) const;
+    /// The id of the newest message in the loaded window, 0 when it holds none yet. Rows that
+    /// are still being sent have no id, so this is not simply the last row.
+    int newestLoadedId() const;
     /// Recomputes hasNewer from the dialog's newest message id.
     void updateHasNewer();
     void prepareMedia(Row &r);

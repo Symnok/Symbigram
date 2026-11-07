@@ -101,6 +101,11 @@ public:
     void refreshDialogs();
     void loadMoreDialogs();
     void loadFolders();
+    /// Records the newest message a chat really has, for a caller that can see it when the
+    /// server has not said so: a deletion leaves the dialog's top message id pointing at a
+    /// message that is gone, and everything that asks "does the window reach the end?" measures
+    /// against that id. Only ever lowers it, and only for a message the caller has in hand.
+    void noteNewest(const TgPeer &peer, const TgMessage &newest);
     /// Recent messages of a chat; offsetId 0 = the newest, otherwise older than that id.
     void loadHistory(const TgPeer &peer, int offsetId, int count, int addOffset = 0);
     /// Forum (topics) supergroups: fetch the topic list, and page one topic's messages (via
@@ -281,11 +286,16 @@ private:
     };
     struct Request
     {
-        Request() : kind(GetSelf), randomId(0), offsetId(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false), topicId(0), readAll(false), muteState(-1) {}
+        Request() : kind(GetSelf), randomId(0), offsetId(0), limit(0), addOffset(0), more(false), folderId(0), secretChatId(0), secret(0), revoke(false), topicId(0), readAll(false), muteState(-1) {}
         Kind kind;
         TgPeer peer;
         qint64 randomId;
         int offsetId;
+        // GetHistory/GetReplies: the page that was asked for. Kept because the reply alone cannot
+        // be read correctly - a short page means "that is the end" only against the limit that
+        // produced it, and a negative add_offset is what makes a page reach past offset_id.
+        int limit;
+        int addOffset;
         int topicId;            // GetReplies: the forum topic being paged
         bool readAll;           // GetForumTopics: mark every topic read on arrival
         int muteState;          // GetForumTopics: -1 none, else mute(1)/unmute(0) every topic
@@ -321,6 +331,12 @@ private:
     bool checkPts(const TlObject &u);
     void getDifference();
     void touchDialog(const TgMessage &m);
+    /// Writes back what a getHistory page proves about the newest message in a chat, correcting
+    /// a top message id left behind by a message that has since been deleted.
+    void noteNewestFrom(const Request &req, const QList<TgMessage> &messages);
+    /// The correction itself. `newest` is the message with that id when the caller has it, which
+    /// lets the chat list stop offering a deleted message as its preview; 0 when it does not.
+    void applyNewest(const TgPeer &peer, int proven, const TgMessage *newest);
     void fillSender(TgMessage &m) const;
     int dialogIndex(const TgPeer &peer) const;
     static int dialogIndexIn(const QList<TgDialog> &list, const TgPeer &peer);

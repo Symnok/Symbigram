@@ -161,6 +161,10 @@ public:
     /// A folderPeer's peer key + its folder id (from updateFolderPeers).
     static QString folderPeerKey(const TlObject &folderPeer, int &folderId);
     static TgHistoryPage readHistory(const TlObject &response, TgPeerCache &cache);
+    /// The newest message id a getHistory page PROVES the chat holds, 0 for "none at all", or -1
+    /// when the page proves nothing. Takes the request's own offset_id and add_offset, because
+    /// what a page proves depends entirely on what was asked for.
+    static int provenNewestId(int offsetId, int addOffset, const QList<TgMessage> &page);
     /// A messages.checkChatInvite reply: the preview, or an already-joined chat.
     static TgInvite readInvite(const TlObject &response, TgPeerCache &cache);
     static TgPeer readPeer(const TlObject &peer);

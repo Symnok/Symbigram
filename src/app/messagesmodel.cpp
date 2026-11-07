@@ -1307,15 +1307,20 @@ void MessagesModel::close()
     emit loadingChanged();
 }
 
+int MessagesModel::newestLoadedId() const
+{
+    for (int i = m_rows.size() - 1; i >= 0; --i)
+        if (m_rows.at(i).m.id > 0) return m_rows.at(i).m.id;
+    return 0;
+}
+
 void MessagesModel::updateHasNewer()
 {
     // Judged against the dialog's newest message rather than against the page size: a short page
     // from the server does not mean we have reached the end of the chat.
     bool newer = false;
     if (!m_peer.isNull() && !m_topicId && !m_secretId && !m_rows.isEmpty()) {
-        int newest = 0;
-        for (int i = m_rows.size() - 1; i >= 0; --i)
-            if (m_rows.at(i).m.id > 0) { newest = m_rows.at(i).m.id; break; }
+        const int newest = newestLoadedId();
         const TgDialog d = m_session->dialog(m_peer);
         newer = newest > 0 && d.topMessageId > newest;
     }
@@ -1346,9 +1351,7 @@ void MessagesModel::jumpToEnd()
 void MessagesModel::loadNewer()
 {
     if (m_peer.isNull() || m_loading || !m_hasNewer || m_rows.isEmpty()) return;
-    int newest = 0;
-    for (int i = m_rows.size() - 1; i >= 0; --i)
-        if (m_rows.at(i).m.id > 0) { newest = m_rows.at(i).m.id; break; }
+    const int newest = newestLoadedId();
     if (!newest) return;
     m_loading = true;
     m_pendingNewer = true;
@@ -1441,9 +1444,7 @@ void MessagesModel::onHistoryFailed(const TgPeer &peer, const QString &error)
 void MessagesModel::markRead()
 {
     if (m_peer.isNull() || m_secretId) return;
-    int maxId = 0;
-    for (int i = m_rows.size() - 1; i >= 0; --i)
-        if (m_rows.at(i).m.id > 0) { maxId = m_rows.at(i).m.id; break; }
+    int maxId = newestLoadedId();
     if (maxId <= 0) return;
     if (m_topicId) { m_session->markTopicRead(m_peer, m_topicId, maxId); return; }
     TgDialog d = m_session->dialog(m_peer);
@@ -1508,14 +1509,29 @@ void MessagesModel::onMessageEdited(const TgMessage &m)
 void MessagesModel::onMessagesDeleted(const TgPeer &peer, const QList<int> &ids)
 {
     if (!peer.isNull() && peer != m_peer) return;
+    bool removed = false;
     for (int i = 0; i < ids.size(); ++i) {
         int row = rowById(ids.at(i));
         if (row < 0) continue;
         beginRemoveRows(QModelIndex(), row, row);
         m_rows.removeAt(row);
         endRemoveRows();
+        removed = true;
     }
+    if (!removed) return;
     emit countChanged();
+    // The window reached the end of the chat before this, and it still does - a message leaving
+    // does not put anything above it - so the newest row left is now the newest message there is.
+    // Saying so stops the dialog's top message id from going on naming the deleted one: that id
+    // is what updateHasNewer() measures against, and it would raise the "Newer messages" footer
+    // over messages that do not exist the moment anything reloads here.
+    if (!m_hasNewer && !m_topicId && !m_secretId && !m_peer.isNull()) {
+        // Only with a surviving message in hand: an empty window proves nothing, because older
+        // messages we never loaded may well still be there.
+        const int newestId = newestLoadedId();
+        const int row = newestId > 0 ? rowById(newestId) : -1;
+        if (row >= 0) m_session->noteNewest(m_peer, m_rows.at(row).m);
+    }
 }
 
 void MessagesModel::onReadOutbox(const TgPeer &peer, int maxId)
