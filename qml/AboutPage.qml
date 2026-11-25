@@ -49,7 +49,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
-                text: "GPL-3.0-or-later."
+                text: qsTr("GPL-3.0-or-later. Emoji artwork: Noto Emoji, Apache-2.0, (C) Google.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
             Label { text: qsTr("Memory"); font.bold: true }

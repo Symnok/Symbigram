@@ -345,7 +345,10 @@ Item {
                     // 0/1-link case keeps the cheap StyledText path.
                     // RichText whenever there is anything to tap: Qt 4.7 only hit-tests anchors
                     // in RichText, and with hidden links even a single-link message needs it.
-                    textFormat: model.linkCount > 0 ? Text.RichText : Text.StyledText
+                    // RichText is also the only format that lays out the <img> tags emoji are
+                    // drawn with - StyledText drops them without a word, which showed a message
+                    // made only of emoji as an empty bubble.
+                    textFormat: (model.linkCount > 0 || model.hasEmoji) ? Text.RichText : Text.StyledText
                     // t.me/<name> opens that chat in Symbigram; anything else goes to the browser.
                     onLinkActivated: if (!app.openInternalLink(link)) Qt.openUrlExternally(link)
                     // Only for a message with nothing tappable: it exists so a long press on the

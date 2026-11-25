@@ -3,6 +3,7 @@
 #include "appcontroller.h"
 #include "chatsmodel.h"
 #include "messagesmodel.h"
+#include "emojitext.h"
 #include "topicsmodel.h"
 #include "phonebook.h"
 #include "imagepicker.h"
@@ -92,6 +93,7 @@ namespace
     const char *const KeyGroupNotifications = "ui/groupNotifications";
     const char *const KeyImagePreview = "ui/imagePreview";
     const char *const KeyFontSize = "ui/fontSize";
+    const char *const KeyEmojiMode = "ui/emojiMode";
     const char *const KeyLogging = "ui/logging";
     const char *const KeyDownloadDrive = "downloads/drive";
     const char *const KeyDownloadCustom = "downloads/folder";
@@ -143,6 +145,8 @@ AppController::AppController(QObject *parent)
     m_chats = new ChatsModel(m_session, m_media, this);
     m_chat = new MessagesModel(m_session, m_media, this);
     m_chat->setPreviewMode(imagePreview());   // 0 Thumbnail (default), 1 Full, 2 None
+    m_chat->setEmojiMode(emojiMode());        // 0 Off (default), 1 private chats only, 2 everywhere
+    m_chat->setEmojiPixelSize(emojiPixelSize());
     m_topics = new TopicsModel(m_session, this);
     m_contacts = new PhoneBook(this);
     // Before the picker: applyDownloadFolder settles where thumbnails go, and building the
@@ -550,7 +554,53 @@ void AppController::setFontSize(int index)
 {
     if (index < 0 || index > 4 || index == fontSize()) return;
     m_settings.setValue(QLatin1String(KeyFontSize), index);
+    if (m_chat) m_chat->setEmojiPixelSize(emojiPixelSize());   // emoji follow the text size
     emit settingsChanged();
+}
+
+int AppController::emojiMode() const
+{
+    // Default 0 = Off. See the note on the declaration for why.
+    const int v = m_settings.value(QLatin1String(KeyEmojiMode), 0).toInt();
+    return (v >= 0 && v <= 2) ? v : 0;
+}
+
+void AppController::setEmojiMode(int mode)
+{
+    if (mode < 0 || mode > 2 || mode == emojiMode()) return;
+    m_settings.setValue(QLatin1String(KeyEmojiMode), mode);
+    if (m_chat) m_chat->setEmojiMode(mode);
+    emit settingsChanged();
+}
+
+QStringList AppController::emojiModeNames() const
+{
+    return QStringList() << tr("Off") << tr("Private chats only") << tr("Everywhere");
+}
+
+int AppController::emojiPixelSize() const
+{
+    // Emoji read best a little larger than the text beside them, and the artwork is bundled at
+    // 24px - so Medium lands near 1:1 and nothing is upscaled much at either end.
+    return qRound(20.0 * fontScale());
+}
+
+QVariantList AppController::emojiPalette() const
+{
+    // paletteOrder() rather than the table's own order: the table is sorted by code point, which
+    // puts the classic yellow smileys nine rows down behind check marks, stars, hands and hearts.
+    // Those smileys are the ones most often wanted, so they come first.
+    const QList<uint> order = EmojiText::paletteOrder();
+    QVariantList out;
+    for (int i = 0; i < order.size(); ++i) {
+        const uint cp = order.at(i);
+        QVariantMap m;
+        m.insert(QLatin1String("url"), EmojiText::artworkUrl(cp));
+        m.insert(QLatin1String("code"), EmojiText::shortcodeFor(cp));
+        m.insert(QLatin1String("name"), EmojiText::name(cp));
+        out.append(m);
+    }
+    return out;
 }
 
 QStringList AppController::fontSizeNames() const

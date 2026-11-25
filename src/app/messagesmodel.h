@@ -87,7 +87,8 @@ public:
         ReactionsRole,      // [{ emoticon, icon, count, chosen }] for the reaction chips
         BodyHtmlRole,       // the body as rich text, with every tappable target already anchored
         LinkCountRole,      // how many of them there are
-        LinkTargetsRole     // those targets as plain URLs, in order
+        LinkTargetsRole,    // those targets as plain URLs, in order
+        HasEmojiRole        // the body holds emoji artwork, so it needs RichText
     };
 
     MessagesModel(TelegramSession *session, MediaCache *media, QObject *parent = 0);
@@ -146,10 +147,10 @@ public:
     /// the hidden-link entities with their offsets moved to match - they index the ORIGINAL text,
     /// so anything that shortens it must carry them along or the anchors land on the wrong words.
     static QString cleanBody(const QString &text, const QList<TgTextLink> &links,
-                             QList<TgTextLink> *outLinks);
+                             QList<TgTextLink> *outLinks, bool keepEmoji = false);
 
     static QString buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
-                                 QStringList *targets);
+                                 QStringList *targets, int emojiPixelSize = 0);
 
     static qint64 scratchBytes(const QString &chosenFolder);
     static qint64 clearScratch(const QString &chosenFolder);
@@ -202,6 +203,15 @@ public:
     /// 0 = Thumbnail (the blurred placeholder that rides along with the message, no fetch),
     /// 1 = Full (fetch the shown size up front), 2 = None (nothing at all until tapped).
     void setPreviewMode(int mode) { m_previewMode = mode; }
+
+    /// Enable emojis: 0 Off, 1 private (1:1) chats only, 2 everywhere. Changing either of these
+    /// invalidates every cached body, which is what m_bodyGen is for.
+    void setEmojiMode(int mode);
+    /// The size to draw emoji at, following the font-size setting.
+    void setEmojiPixelSize(int px);
+    /// True when emoji are drawn in THIS chat: everywhere, or a 1:1 chat when so configured.
+    /// A group, supergroup or channel is not a private chat; a secret chat is.
+    bool emojiShown() const;
     /// Photos: fetch the size to save and copy it out. Documents/video/etc.: fetch the
     /// whole file. Drives MediaStateRole/MediaProgressRole for the row.
     Q_INVOKABLE void downloadMedia(int row);
@@ -272,7 +282,7 @@ private slots:
 private:
     struct Row
     {
-        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), showLoaded(false), progress(0), ttl(0), expiresAt(0), bodyValid(false) {}
+        Row() : randomId(0), pending(false), failed(false), mediaLoading(false), mediaFailed(false), showLoaded(false), progress(0), ttl(0), expiresAt(0), bodyValid(false), bodyGen(-1), bodyHasEmoji(false) {}
         TgMessage m;
         qint64 randomId;      // outgoing: for matching the send result
         bool pending;
@@ -296,11 +306,16 @@ private:
         // Keyed on the text it was built from: a row's message is reassigned in a dozen places
         // and none of them has to remember to invalidate this.
         mutable bool bodyValid;
+        mutable int bodyGen;          // the model's m_bodyGen when this was built
+        mutable bool bodyHasEmoji;    // the html carries <img> artwork, so it needs RichText
         mutable QString bodySrc;
         mutable QString bodyPlain;
         mutable QString bodyHtml;
         mutable QStringList bodyTargets;
     };
+
+    /// Throws away every cached rendered body, after a setting that changes how they look.
+    void retireBodies();
 
     /// Fills a row's rendered-body cache if it is missing or stale.
     void ensureBody(const Row &r) const;
@@ -367,6 +382,9 @@ private:
     int m_topicId;                          // forum topic being viewed (0 = whole chat / not a forum)
     QString m_topicTitle;                   // the open topic's title (header)
     int m_previewMode;                      // Image preview: 0 Thumbnail, 1 Full, 2 None
+    int m_emojiMode;                        // Enable emojis: 0 Off, 1 private only, 2 everywhere
+    int m_emojiPixelSize;                   // how big to draw them, from the font-size setting
+    int m_bodyGen;                          // bumped to retire every cached body at once
     int m_openInboxMax;                     // readInboxMaxId captured when the chat opened (for unread)
     int m_openUnread;                       // unreadCount captured when the chat opened
 };

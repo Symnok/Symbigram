@@ -61,6 +61,7 @@ class AppController : public QObject
     Q_PROPERTY(bool groupNotifications READ groupNotifications WRITE setGroupNotifications NOTIFY settingsChanged)
     Q_PROPERTY(int imagePreview READ imagePreview WRITE setImagePreview NOTIFY settingsChanged)
     Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize NOTIFY settingsChanged)
+    Q_PROPERTY(int emojiMode READ emojiMode WRITE setEmojiMode NOTIFY settingsChanged)
     Q_PROPERTY(qreal fontScale READ fontScale NOTIFY settingsChanged)
     Q_PROPERTY(QVariantList peerSearchResults READ peerSearchResults NOTIFY peerSearchChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY settingsChanged)
@@ -153,6 +154,26 @@ public:
     /// [{ code, name }, ...] with "" first for the system default.
     Q_INVOKABLE QVariantList availableLanguages() const;
     /// Message text size: 0 Extra small .. 4 Extra large; 1 = Small is the original size.
+    /// Enable emojis: 0 = Off (default), 1 = private (1:1) chats only, 2 = everywhere.
+    ///
+    /// Off by default on purpose. The phone font cannot draw an emoji at all, so each one shown
+    /// is a separate bundled PNG laid out inside the message's rich text - affordable in a
+    /// conversation, much less so in a busy channel, which is also where emoji arrive by the
+    /// dozen. Anyone who wants them can say where.
+    int emojiMode() const;
+    void setEmojiMode(int mode);
+    Q_INVOKABLE QStringList emojiModeNames() const;
+    /// The pixel size emoji are drawn at, derived from the font-size setting.
+    int emojiPixelSize() const;
+
+    /// Everything the emoji picker offers: one entry per emoji with artwork, as
+    /// { "url": "qrc:/emoji/e_1f44d.png", "code": ":thumbs_up:", "name": "thumbs up" }.
+    ///
+    /// Only emoji WITH artwork are offered. Showing one that cannot be drawn would put a blank
+    /// cell in the grid, and inserting it would be a shortcode the user could not see the result
+    /// of. Nothing stops them typing any emoji with a real keyboard.
+    Q_INVOKABLE QVariantList emojiPalette() const;
+
     int fontSize() const;
     void setFontSize(int index);
     Q_INVOKABLE QStringList fontSizeNames() const;

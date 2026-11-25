@@ -84,6 +84,13 @@ Page {
         onAccepted: if (selectedIndex >= 0) app.fontSize = selectedIndex
     }
 
+    SelectionDialog {
+        id: emojiModeDialog
+        titleText: qsTr("Enable emojis (experimental)")
+        model: app.emojiModeNames()
+        onAccepted: if (selectedIndex >= 0) app.emojiMode = selectedIndex
+    }
+
     // A page, not a dialog: a text field inside a CommonDialog cannot be pasted into on this
     // platform. Shared with the login screen, which needs the same MTProto fields.
     Component { id: proxyPage; ProxyPage {} }
@@ -269,6 +276,31 @@ Page {
                 font.pixelSize: platformStyle.fontSizeSmall
                 color: platformStyle.colorNormalMid
                 text: qsTr("The size of the message text in chats. Small is the original size.")
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
+            ListItem {
+                id: emojiModeItem
+                subItemIndicator: true
+                Column {
+                    anchors { left: emojiModeItem.paddingItem.left; right: emojiModeItem.paddingItem.right; verticalCenter: parent.verticalCenter }
+                    ListItemText { width: parent.width; role: "Title"; text: qsTr("Enable emojis (experimental)") }
+                    Label {
+                        width: parent.width
+                        text: app.emojiModeNames()[app.emojiMode]
+                        color: "white"
+                        font.pixelSize: platformStyle.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+                onClicked: { emojiModeDialog.selectedIndex = app.emojiMode; emojiModeDialog.open() }
+            }
+            Label {
+                width: parent.width - 2 * platformStyle.paddingLarge
+                x: platformStyle.paddingLarge
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: qsTr("Experimental: emoji are new in this version and not yet proven on every phone. Turning them on makes a chat that contains them slower to draw and use more memory, which on a phone this size can matter; if chats become sluggish or a message looks wrong, set this back to Off. This phone's font cannot draw emoji, so each one has to be a small picture placed inside the message. Private chats only keeps that cost to one-to-one conversations and leaves groups and channels, where emoji usually arrive in bulk, as plain text. A message made up only of emoji is shown as names in words, such as [thumbs up], so that it is never blank.")
             }
             Item { width: 1; height: platformStyle.paddingLarge }
             Label {

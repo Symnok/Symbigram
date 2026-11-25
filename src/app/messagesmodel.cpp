@@ -1,6 +1,7 @@
 // Symbigram - a Telegram client for Symbian Anna/Belle.
 // Copyright (C) 2026 - GPL-3.0-or-later, see LICENSE.
 #include "messagesmodel.h"
+#include "emojitext.h"
 
 #include "textsafety.h"
 
@@ -85,18 +86,6 @@ namespace
         return QString();
     }
 
-    // The phone font has no emoji glyphs, so emoji render as empty boxes. Drop them from any text
-    // we display (message body, previews) rather than showing the boxes. Covers the emoji blocks
-    // plus the variation selector, ZWJ and keycap joiners that hold emoji sequences together.
-    bool isEmojiCodePoint(uint c)
-    {
-        return (c >= 0x1F000 && c <= 0x1FFFF)   // emoticons, pictographs, transport, flags, ...
-            || (c >= 0x2600 && c <= 0x27BF)     // misc symbols + dingbats
-            || (c >= 0x2B00 && c <= 0x2BFF)     // arrows/stars used as emoji
-            || (c >= 0xFE00 && c <= 0xFE0F)     // variation selectors
-            || c == 0x200D                      // zero-width joiner
-            || c == 0x20E3;                     // combining enclosing keycap
-    }
 
     /// Copies `text`, keeping only the UTF-16 units marked in `keep`, and fills `map` so that
     /// map[i] is where original unit i has moved to. Every transformation below is expressed this
@@ -115,21 +104,23 @@ namespace
     }
 
     /// Which units survive emoji removal. A surrogate pair is judged as one code point and both
-    /// of its units go together.
-    QVector<bool> keepAfterEmoji(const QString &s)
+    /// of its units go together. The test itself lives in EmojiText so that the code points this
+    /// deletes and the ones the renderer draws can never disagree.
+    ///
+    /// When emoji are being SHOWN, nothing is removed: leaving them in place costs no offset
+    /// remapping at all, and the HTML builder turns them into <img> tags further down. It also
+    /// means the plain body - what Copy puts on the clipboard - carries the real emoji, skin
+    /// tones and all, rather than a flattened version of them.
+    QVector<bool> keepAfterEmoji(const QString &s, bool keepEmoji)
     {
         QVector<bool> keep(s.size(), true);
+        if (keepEmoji) return keep;
         int i = 0;
         while (i < s.size()) {
-            uint cp = s.at(i).unicode();
-            int units = 1;
-            if (s.at(i).isHighSurrogate() && i + 1 < s.size() && s.at(i + 1).isLowSurrogate()) {
-                cp = QChar::surrogateToUcs4(s.at(i), s.at(i + 1));
-                units = 2;
-            }
-            if (isEmojiCodePoint(cp))
-                for (int k = 0; k < units; ++k) keep[i + k] = false;
-            i += units;
+            const int was = i;
+            const uint cp = EmojiText::codePointAt(s, i);
+            if (EmojiText::isEmoji(cp))
+                for (int k = was; k < i; ++k) keep[k] = false;
         }
         return keep;
     }
@@ -187,7 +178,8 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
       m_readOutboxMaxId(0),
       m_typingSent(false), m_peerTypingUser(0), m_secretId(0), m_voiceRow(-1), m_pendingPlayRow(-1), m_pendingSaveRow(-1),
       m_audioRow(-1), m_audioBuffer(0), m_audioJobId(0), m_audioOpened(false), m_audioHeadStart(0), m_replyToId(0), m_editId(0),
-      m_previewMode(0), m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
+      m_previewMode(0), m_emojiMode(0), m_emojiPixelSize(20), m_bodyGen(0),
+      m_openInboxMax(0), m_openUnread(0), m_initialLoad(false), m_jumpToId(0), m_topicId(0)
 {
     QHash<int, QByteArray> roles;
     roles[MsgIdRole] = "msgId";
@@ -195,6 +187,7 @@ MessagesModel::MessagesModel(TelegramSession *session, MediaCache *media, QObjec
     roles[BodyHtmlRole] = "bodyHtml";
     roles[LinkCountRole] = "linkCount";
     roles[LinkTargetsRole] = "linkTargets";
+    roles[HasEmojiRole] = "hasEmoji";
     roles[NoteRole] = "note";
     roles[OutRole] = "out";
     roles[SenderRole] = "sender";
@@ -311,6 +304,40 @@ namespace
         return out;
     }
 
+    /// Escapes `text` and, when emojiPx is non-zero, swaps each emoji for the bundled artwork.
+    /// Qt 4.7's QML Text does lay out <img> inside rich text (QDeclarativeText keeps a
+    /// QTextDocument with its own image resource loader), which is the only way to show an emoji
+    /// at all on a phone whose font has no glyph for one.
+    ///
+    /// An emoji with no artwork is dropped, exactly as before this existed: the alternative is
+    /// handing it to the font, which draws an empty box. Modifiers - skin tones, joiners,
+    /// variation selectors - are folded away, so a toned thumbs-up shows the plain one and the
+    /// parts of a joined sequence show separately.
+    QString escapeHtmlWithEmoji(const QString &text, int emojiPx)
+    {
+        if (emojiPx <= 0) return escapeHtml(text);
+        QString out;
+        int i = 0;
+        int plainFrom = 0;
+        while (i < text.size()) {
+            const int was = i;
+            const uint cp = EmojiText::codePointAt(text, i);
+            if (!EmojiText::isEmoji(cp)) continue;
+            out += escapeHtml(text.mid(plainFrom, was - plainFrom));
+            plainFrom = i;
+            if (EmojiText::isModifier(cp)) continue;
+            const QString url = EmojiText::artworkUrl(cp);
+            if (url.isEmpty()) continue;
+            const QString n = QString::number(emojiPx);
+            out += QLatin1String("<img src=") + QLatin1Char('"') + url + QLatin1Char('"')
+                 + QLatin1String(" width=") + QLatin1Char('"') + n + QLatin1Char('"')
+                 + QLatin1String(" height=") + QLatin1Char('"') + n + QLatin1Char('"')
+                 + QLatin1Char('>');
+        }
+        out += escapeHtml(text.mid(plainFrom));
+        return out;
+    }
+
     QString anchor(const QString &href, const QString &shown)
     {
         return QLatin1String("<a href=") + QLatin1Char('\"') + escapeHtml(href) + QLatin1Char('\"')
@@ -320,7 +347,7 @@ namespace
 
     /// Anchors the plain URLs and @mentions inside one stretch of ordinary text. An @name becomes
     /// a t.me link so it goes through the same "open it inside Symbigram" path as a real link.
-    QString linkifyPlain(const QString &text, QStringList *targets)
+    QString linkifyPlain(const QString &text, QStringList *targets, int emojiPx = 0)
     {
         static QRegExp re(QLatin1String("(https?://|www\\.)[^\\s<]+|(^|[\\s(\\[])@([A-Za-z][A-Za-z0-9_]{4,31})"));
         QString out;
@@ -330,28 +357,28 @@ namespace
             if (at < 0) break;
             const QString whole = re.cap(0);
             const QString mention = re.cap(3);
-            out += escapeHtml(text.mid(pos, at - pos));
+            out += escapeHtmlWithEmoji(text.mid(pos, at - pos), emojiPx);
             if (!mention.isEmpty()) {
                 // cap(2) is the single character before the @, which is not part of the link.
-                out += escapeHtml(re.cap(2));
+                out += escapeHtmlWithEmoji(re.cap(2), emojiPx);
                 const QString href = QLatin1String("https://t.me/") + mention;
                 out += anchor(href, escapeHtml(QLatin1Char('@') + mention));
                 if (targets) *targets << href;
             } else {
                 const QString href = whole.startsWith(QLatin1String("http"))
                                    ? whole : QLatin1String("http://") + whole;
-                out += anchor(href, escapeHtml(whole));
+                out += anchor(href, escapeHtmlWithEmoji(whole, emojiPx));
                 if (targets) *targets << href;
             }
             pos = at + whole.size();
         }
-        out += escapeHtml(text.mid(pos));
+        out += escapeHtmlWithEmoji(text.mid(pos), emojiPx);
         return out;
     }
 }
 
 QString MessagesModel::cleanBody(const QString &text, const QList<TgTextLink> &links,
-                                 QList<TgTextLink> *outLinks)
+                                 QList<TgTextLink> *outLinks, bool keepEmoji)
 {
     if (outLinks) outLinks->clear();
     if (text.isEmpty()) return text;
@@ -359,7 +386,7 @@ QString MessagesModel::cleanBody(const QString &text, const QList<TgTextLink> &l
     // Two passes, each recording where the text moved, then composed - so an entity offset taken
     // against the original still points at the same words afterwards.
     QVector<int> map1;
-    const QString afterEmoji = applyKeep(text, keepAfterEmoji(text), &map1);
+    const QString afterEmoji = applyKeep(text, keepAfterEmoji(text, keepEmoji), &map1);
     QVector<int> map2;
     QString out = applyKeep(afterEmoji, keepAfterBlankLines(afterEmoji), &map2);
 
@@ -411,9 +438,9 @@ QString MessagesModel::cleanBody(const QString &text, const QList<TgTextLink> &l
 }
 
 QString MessagesModel::buildBodyHtml(const QString &text, const QList<TgTextLink> &links,
-                                     QStringList *targets)
+                                     QStringList *targets, int emojiPixelSize)
 {
-    if (links.isEmpty()) return linkifyPlain(text, targets);
+    if (links.isEmpty()) return linkifyPlain(text, targets, emojiPixelSize);
 
     // Entity offsets index the original text, so it is walked in order and only the stretches
     // between entities get the plain-URL treatment.
@@ -429,23 +456,88 @@ QString MessagesModel::buildBodyHtml(const QString &text, const QList<TgTextLink
         if (l.offset < pos || l.offset > text.size()) continue;          // overlapping or past the end
         const int len = qMin(l.length, text.size() - l.offset);
         if (len <= 0) continue;
-        out += linkifyPlain(text.mid(pos, l.offset - pos), targets);
-        out += anchor(l.url, escapeHtml(text.mid(l.offset, len)));
+        out += linkifyPlain(text.mid(pos, l.offset - pos), targets, emojiPixelSize);
+        out += anchor(l.url, escapeHtmlWithEmoji(text.mid(l.offset, len), emojiPixelSize));
         if (targets) *targets << l.url;
         pos = l.offset + len;
     }
-    out += linkifyPlain(text.mid(pos), targets);
+    out += linkifyPlain(text.mid(pos), targets, emojiPixelSize);
     return out;
+}
+
+void MessagesModel::setEmojiMode(int mode)
+{
+    const int m = (mode >= 0 && mode <= 2) ? mode : 0;
+    if (m == m_emojiMode) return;
+    m_emojiMode = m;
+    retireBodies();
+}
+
+void MessagesModel::setEmojiPixelSize(int px)
+{
+    const int p = (px >= 8 && px <= 64) ? px : 20;
+    if (p == m_emojiPixelSize) return;
+    m_emojiPixelSize = p;
+    if (emojiShown()) retireBodies();      // nothing to redraw when none are being drawn
+}
+
+bool MessagesModel::emojiShown() const
+{
+    if (m_emojiMode == 2) return true;
+    if (m_emojiMode != 1) return false;
+    // "Private chats only" means a one-to-one conversation with a person: a user dialog, or a
+    // secret chat, which is always with one person. A group, a supergroup and a channel are all
+    // excluded - which is the point of the setting, since those are where emoji arrive in bulk.
+    return m_secretId != 0 || m_peer.kind == TgPeer::User;
+}
+
+void MessagesModel::retireBodies()
+{
+    // Every cached body was rendered under the old settings. Bumping the generation retires them
+    // all at once without touching a row, and dataChanged makes the views ask again.
+    ++m_bodyGen;
+    if (m_rows.isEmpty()) return;
+    emit dataChanged(index(0), index(m_rows.size() - 1));
 }
 
 void MessagesModel::ensureBody(const Row &r) const
 {
-    if (r.bodyValid && r.bodySrc == r.m.text) return;
-    QList<TgTextLink> links;
-    r.bodyPlain = cleanBody(r.m.text, r.m.textLinks, &links);
+    if (r.bodyValid && r.bodyGen == m_bodyGen && r.bodySrc == r.m.text) return;
+    const bool show = emojiShown();
+
+    // A message of nothing but emoji loses its entire body when they are taken out, and used to
+    // arrive as an empty bubble. Name them in words instead. The same applies when emoji ARE
+    // being shown but not one of them has artwork - an uncommon emoji, or a flag, which this
+    // client never draws - because the rendered body would come out just as empty.
+    bool nameThem = false;
+    if (EmojiText::isOnlyEmoji(r.m.text)) {
+        nameThem = true;
+        if (show) {
+            int i = 0;
+            while (i < r.m.text.size()) {
+                if (EmojiText::hasArtwork(EmojiText::codePointAt(r.m.text, i))) {
+                    nameThem = false;
+                    break;
+                }
+            }
+        }
+    }
+
     r.bodyTargets.clear();
-    r.bodyHtml = buildBodyHtml(r.bodyPlain, links, &r.bodyTargets);
+    if (nameThem) {
+        r.bodyPlain = EmojiText::toNames(r.m.text);
+        r.bodyHtml = buildBodyHtml(r.bodyPlain, QList<TgTextLink>(), &r.bodyTargets, 0);
+    } else {
+        QList<TgTextLink> links;
+        r.bodyPlain = cleanBody(r.m.text, r.m.textLinks, &links, show);
+        r.bodyHtml = buildBodyHtml(r.bodyPlain, links, &r.bodyTargets, show ? m_emojiPixelSize : 0);
+    }
+    // Qt 4.7 lays out <img> only in RichText; StyledText silently drops it, which showed an
+    // emoji-only message as an empty bubble. The delegate takes the cheap StyledText path when
+    // there is nothing to tap, so it has to be told when there is something to DRAW as well.
+    r.bodyHasEmoji = r.bodyHtml.contains(QLatin1String("<img "));
     r.bodySrc = r.m.text;
+    r.bodyGen = m_bodyGen;
     r.bodyValid = true;
 }
 
@@ -460,6 +552,7 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
     case BodyHtmlRole: ensureBody(r); return r.bodyHtml;
     case LinkCountRole: ensureBody(r); return r.bodyTargets.size();
     case LinkTargetsRole: ensureBody(r); return r.bodyTargets;
+    case HasEmojiRole: ensureBody(r); return r.bodyHasEmoji;
     case NoteRole: return cleanBody(m.note, QList<TgTextLink>(), 0);   // e.g. a poll's "poll: <question>" text
     case OutRole: return m.out;
     case SenderRole: return (m.out || !m_peer.isGroup() || m.service) ? QString() : m_session->peers().userName(m.fromId);
@@ -1543,8 +1636,11 @@ void MessagesModel::onReadOutbox(const TgPeer &peer, int maxId)
 
 // -- sending ------------------------------------------------------------------------------------------
 
-void MessagesModel::send(const QString &text)
+void MessagesModel::send(const QString &raw)
 {
+    // A shortcode from the emoji picker becomes the real character here, on the way out,
+    // so the message other clients receive is an ordinary emoji. See EmojiText.
+    const QString text = EmojiText::fromShortcodes(raw);
     QString t = text.trimmed();
     if (t.isEmpty()) return;
     // A sent message is appended to the end, so the end has to be loaded: without this it would
@@ -1613,8 +1709,9 @@ void MessagesModel::cancelEdit()
     emit editChanged();
 }
 
-void MessagesModel::commitEdit(const QString &text)
+void MessagesModel::commitEdit(const QString &raw)
 {
+    const QString text = EmojiText::fromShortcodes(raw);
     if (!m_editId || m_peer.isNull()) return;
     QString t = text.trimmed();
     int id = m_editId;
@@ -1748,8 +1845,9 @@ int MessagesModel::takeReplyTo()
     return id;
 }
 
-void MessagesModel::sendAttachment(const QString &path, bool asPhoto, const QString &caption)
+void MessagesModel::sendAttachment(const QString &path, bool asPhoto, const QString &rawCaption)
 {
+    const QString caption = EmojiText::fromShortcodes(rawCaption);
     if (m_peer.isNull() || path.isEmpty()) return;
     if (m_hasNewer) jumpToEnd();   // same as send(): the pending row goes at the end
     // Taken before the upload starts and carried by it: the upload outlives the composer, and by

@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.142
+VERSION = 1.0.146
 
 QT += core gui network declarative
 
@@ -46,7 +46,7 @@ SOURCES += \
     src/app/voicerecorder.cpp \
     src/app/piglernotifier.cpp
 
-RESOURCES += qml.qrc translations.qrc
+RESOURCES += qml.qrc translations.qrc emoji.qrc
 
 # The version reaches the About page and initConnection as an unquoted macro
 # (stringified in code), which survives every generator's quoting rules.

@@ -267,6 +267,24 @@ Page {
     }
 
     Component { id: imagePickerPage; ImagePickerPage {} }
+    Component { id: emojiPickerPage; EmojiPickerPage {} }
+
+    // The picker hands back a SHORTCODE, not the emoji itself, and it goes in at the cursor: the
+    // composer is drawn in the phone font, which has no emoji glyph, so a real character would
+    // show as an empty box that says nothing about what was picked. MessagesModel turns it back
+    // into a real emoji on the way out, so the recipient sees a normal one.
+    function openEmojiPicker() {
+        var picker = pageStack.push(emojiPickerPage)
+        picker.picked.connect(function(code) {
+            if (code == "") return
+            var at = composer.cursorPosition
+            var t = composer.text
+            composer.text = t.substring(0, at) + code + t.substring(at)
+            composer.cursorPosition = at + code.length
+            composer.forceActiveFocus()
+            composer.openSoftwareInputPanel()
+        })
+    }
 
     // Our own thumbnail grid, not the platform's Photos picker - that one froze or came up blank
     // on several phones (see imagepicker.h).
@@ -287,10 +305,12 @@ Page {
     Timer {
         id: attachTimer
         interval: 50
-        // 0 = our thumbnail grid, 1 = the file browser filtered to images, 2 = any file.
+        // 0 = our thumbnail grid, 1 = the file browser filtered to images, 2 = any file,
+        // 3 = the emoji grid.
         property int mode: 0
         onTriggered: {
             if (mode == 0) page.openImagePicker()
+            else if (mode == 3) page.openEmojiPicker()
             else page.pickFile(mode == 1)
         }
     }
@@ -306,9 +326,10 @@ Page {
     Menu {
         id: attachMenu
         MenuLayout {
-            MenuItem { text: qsTr("Image from Gallery (Slow)"); onClicked: page.startAttach(0) }
-            MenuItem { text: qsTr("Image from File System"); onClicked: page.startAttach(1) }
-            MenuItem { text: qsTr("File"); onClicked: page.startAttach(2) }
+            MenuItem { text: qsTr("Image from Gallery (Slow)"); visible: !chat.isSecret; onClicked: page.startAttach(0) }
+            MenuItem { text: qsTr("Image from File System"); visible: !chat.isSecret; onClicked: page.startAttach(1) }
+            MenuItem { text: qsTr("File"); visible: !chat.isSecret; onClicked: page.startAttach(2) }
+            MenuItem { text: qsTr("Emoji"); onClicked: page.startAttach(3) }
         }
     }
 
@@ -649,7 +670,9 @@ Page {
         }
         ToolButton {
             id: attachButton
-            visible: !chat.peerIsChannel && !chat.isSecret && !app.recording && !chat.canJoin
+            // Shown in a secret chat too, where the menu offers Emoji alone: attachments are not
+            // supported there, but an emoji is just text and works like any other message.
+            visible: !chat.peerIsChannel && !app.recording && !chat.canJoin
             anchors { left: parent.left; leftMargin: platformStyle.paddingSmall; verticalCenter: parent.verticalCenter }
             iconSource: "toolbar-add"
             enabled: app.connection == "online"

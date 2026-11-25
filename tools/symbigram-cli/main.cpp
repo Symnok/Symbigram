@@ -13,6 +13,8 @@
 //       dialogs | more | history <n> [count] | send <n|self> <text> | read <n>
 //       find <query> | mute <n> on|off | clear <n> | logout | quit
 #include <QSet>
+#include "emojitable.h"
+#include "emojitext.h"
 #include "crypto.h"
 #include "bigint.h"
 #include "dh.h"
@@ -406,6 +408,190 @@ static int selfTest()
             c.put(one);
         }
         check(!c.contains(TgPeer(TgPeer::User, 1)), "a demoted peer is eventually evicted");
+    }
+
+    say(QLatin1String("emoji"));
+    {
+        // Built from surrogate pairs rather than written as literals, so this file stays pure
+        // ASCII - a double-encoded source string has cost this repository a release before.
+        struct U { static QString s(uint cp) {
+            QString o;
+            if (cp > 0xFFFF) { o += QChar(QChar::highSurrogate(cp)); o += QChar(QChar::lowSurrogate(cp)); }
+            else o += QChar(ushort(cp));
+            return o;
+        } };
+        const QString thumb  = U::s(0x1F44D);      // thumbs up - in the basic set
+        const QString grin   = U::s(0x1F600);      // grinning  - in the basic set
+        const QString abacus = U::s(0x1FAA9);      // no artwork, but named
+        const QString flagIL = U::s(0x1F1EE) + U::s(0x1F1F1);
+        const QString tone   = U::s(0x1F3FD);      // a skin tone on its own
+
+        check(EmojiText::isEmoji(0x1F44D), "thumbs up is an emoji");
+        check(EmojiText::isEmoji(0x203C), "U+203C !! is an emoji (it used to reach the font)");
+        check(EmojiText::isEmoji(0x2139), "U+2139 info is an emoji");
+        check(EmojiText::isEmoji(0x231B), "U+231B hourglass is an emoji");
+        check(EmojiText::isEmoji(0x2935), "U+2935 curving arrow is an emoji");
+        check(!EmojiText::isEmoji('a') && !EmojiText::isEmoji(0x0416), "letters are not emoji");
+        check(!EmojiText::isEmoji(0x2018), "a typographic quote is not an emoji");
+
+        check(EmojiText::hasArtwork(0x1F44D) && EmojiText::hasArtwork(0x1F600), "the basic set has artwork");
+        check(!EmojiText::hasArtwork(0x1FAA9), "an emoji outside the basic set has no artwork");
+        check(!EmojiText::hasArtwork(0x1F1EE), "no artwork for a flag, by design");
+        check(EmojiText::artworkUrl(0x1F44D) == QLatin1String("qrc:/emoji/e_1f44d.png"), "artwork url");
+        // The four-digit padding matters: the generator writes e_00a9.png, not e_a9.png.
+        check(EmojiText::artworkUrl(0x00A9).isEmpty() || EmojiText::artworkUrl(0x00A9) == QLatin1String("qrc:/emoji/e_00a9.png"),
+              "a low code point pads its filename to four digits");
+        check(EmojiText::name(0x1F44D) == QLatin1String("thumbs up"), "named from the table");
+        check(!EmojiText::name(0x1FAA9).isEmpty(), "an emoji without artwork still has a name");
+
+        check(EmojiText::isOnlyEmoji(thumb), "a lone emoji is an emoji-only message");
+        check(EmojiText::isOnlyEmoji(thumb + QLatin1String("  ") + grin), "emoji and spaces only");
+        check(EmojiText::isOnlyEmoji(thumb + U::s(0x1F3FD)), "emoji plus a skin tone is still emoji-only");
+        check(!EmojiText::isOnlyEmoji(QLatin1String("hi ") + thumb), "text plus an emoji is not");
+        check(!EmojiText::isOnlyEmoji(QLatin1String("")), "empty text is not an emoji-only message");
+        check(!EmojiText::isOnlyEmoji(QLatin1String("   ")), "whitespace alone is not");
+        check(!EmojiText::isOnlyEmoji(tone), "a skin tone on its own is not a message");
+
+        check(EmojiText::toNames(thumb) == QLatin1String("[thumbs up]"), "named in words");
+        check(EmojiText::toNames(thumb + U::s(0x1F3FD)) == QLatin1String("[thumbs up]"),
+              "a skin tone is folded away, not named");
+        check(EmojiText::toNames(thumb + QLatin1String(" ") + thumb) == QLatin1String("[thumbs up] [thumbs up]"),
+              "whitespace between emoji is kept");
+        // A flag is named generically on purpose - WHICH flag is what this client never says -
+        // and the pair of regional indicators reads as one word, not two.
+        check(EmojiText::toNames(flagIL) == QLatin1String("[flag]"), "a flag is one generic [flag]");
+        check(EmojiText::toNames(flagIL + flagIL) == QLatin1String("[flag][flag]"), "two flags, two words");
+        check(EmojiText::toNames(QLatin1String("ok ") + thumb) == QLatin1String("ok [thumbs up]"),
+              "ordinary text survives naming");
+        check(!EmojiText::toNames(abacus).isEmpty() && EmojiText::toNames(abacus).startsWith(QLatin1Char('[')),
+              "an emoji without artwork is still named");
+
+        // The table has to be sorted, or the binary search silently misses entries.
+        bool sorted = true;
+        for (int i = 1; i < EmojiTable::KCount; ++i)
+            if (EmojiTable::KEntries[i].cp <= EmojiTable::KEntries[i - 1].cp) { sorted = false; break; }
+        check(sorted, "the generated table is strictly sorted by code point");
+        // Every code point with artwork must also be recognised as an emoji, or it would be
+        // handed to the font and drawn as a box while its PNG sat unused in the resources.
+        bool allKnown = true;
+        int withArt = 0;
+        for (int i = 0; i < EmojiTable::KCount; ++i) {
+            if (!EmojiTable::KEntries[i].art) continue;
+            ++withArt;
+            if (!EmojiText::isEmoji(EmojiTable::KEntries[i].cp)) { allKnown = false; break; }
+        }
+        check(allKnown, "every emoji with artwork is recognised by isEmoji");
+        check(withArt > 100, "the basic set actually got generated");
+
+        // -- composing: shortcode out, real emoji back in --
+        check(EmojiText::shortcodeFor(0x1F44D) == QLatin1String(":thumbs_up:"), "shortcode for thumbs up");
+        check(EmojiText::shortcodeFor(0x1FAA9).isEmpty(), "no shortcode without artwork to show");
+        check(EmojiText::fromShortcodes(QLatin1String(":thumbs_up:")) == thumb, "shortcode becomes the emoji");
+        check(EmojiText::fromShortcodes(QLatin1String("hi :thumbs_up: there"))
+              == QLatin1String("hi ") + thumb + QLatin1String(" there"), "shortcode mid-sentence");
+        check(EmojiText::fromShortcodes(QLatin1String(":thumbs_up::thumbs_up:")) == thumb + thumb,
+              "two shortcodes back to back");
+
+        // Text that merely contains colons must come through untouched - this is the risk the
+        // shortcode scheme carries, so it is pinned down rather than hoped for.
+        const char *untouched[] = {
+            "10:30", "see you at 10:30:00", "http://example.com:8080/a",
+            ":", "::", ":::", ":nope:", ":not_an_emoji:", "a:b:c",
+            "ratio 3:1", "", "no colons here at all"
+        };
+        bool clean = true;
+        for (int i = 0; i < 12; ++i) {
+            const QString in = QString::fromLatin1(untouched[i]);
+            if (EmojiText::fromShortcodes(in) != in) { clean = false; say(QString::fromLatin1("  changed: %1").arg(in)); }
+        }
+        check(clean, "ordinary text containing colons is left alone");
+
+        // A time written with a real emoji after it must not have the emoji eaten by the colons.
+        check(EmojiText::fromShortcodes(QLatin1String("at 10:30 :thumbs_up:"))
+              == QLatin1String("at 10:30 ") + thumb, "a colon before a shortcode does not swallow it");
+
+        // Every emoji the picker offers must survive the trip it is going to make: artwork ->
+        // shortcode -> back to exactly the same code point. A name that collided or that held a
+        // character the parser mishandles would show up here and nowhere else.
+        int trips = 0;
+        bool allTrip = true;
+        for (int i = 0; i < EmojiTable::KCount && allTrip; ++i) {
+            const EmojiTable::Entry &e = EmojiTable::KEntries[i];
+            if (!e.art) continue;
+            const QString code = EmojiText::shortcodeFor(e.cp);
+            if (code.isEmpty()) { allTrip = false; break; }
+            QString want;
+            if (e.cp > 0xFFFF) { want += QChar(QChar::highSurrogate(e.cp)); want += QChar(QChar::lowSurrogate(e.cp)); }
+            else want += QChar(ushort(e.cp));
+            if (EmojiText::fromShortcodes(code) != want) {
+                allTrip = false;
+                say(QString::fromLatin1("  round trip failed for U+%1 (%2)")
+                    .arg(e.cp, 0, 16).arg(code));
+                break;
+            }
+            ++trips;
+        }
+        check(allTrip && trips == withArt, "every offered emoji survives shortcode -> emoji");
+
+        // -- the order the picker offers them in --
+        // The picker shows exactly the emoji there is artwork for, reordered so the classic
+        // yellow smileys lead. Reordering is where an emoji quietly goes missing or appears
+        // twice, so the set is pinned to the artwork set rather than trusted.
+        const QList<uint> order = EmojiText::paletteOrder();
+        check(order.size() == withArt, "the picker offers every emoji with artwork, no more");
+
+        QSet<uint> seen;
+        QSet<uint> arted;
+        for (int i = 0; i < EmojiTable::KCount; ++i)
+            if (EmojiTable::KEntries[i].art) arted.insert(EmojiTable::KEntries[i].cp);
+        bool allDrawable = true;
+        for (int i = 0; i < order.size(); ++i) {
+            seen.insert(order.at(i));
+            if (!EmojiText::hasArtwork(order.at(i))) allDrawable = false;
+        }
+        check(seen.size() == order.size(), "no emoji is offered twice");
+        check(seen == arted, "the offered set is exactly the artwork set");
+        check(allDrawable, "every offered emoji has artwork to draw");
+
+        // The first row is what the user sees without scrolling, and the whole point of the
+        // reordering is that it holds smileys.
+        check(!order.isEmpty() && order.at(0) == 0x1F600, "the grinning face leads the picker");
+        bool firstRowFaces = order.size() >= 5;
+        for (int i = 0; i < 5 && i < order.size(); ++i)
+            if (order.at(i) < 0x1F600 || order.at(i) > 0x1F64A) firstRowFaces = false;
+        check(firstRowFaces, "the first row of five is all smileys");
+
+        // Faces before gestures before hearts before the rest, and Unicode order kept inside
+        // each band - that is what puts the related faces next to one another.
+        int lastBand = -1, lastCp = -1;
+        bool banded = true;
+        for (int i = 0; i < order.size(); ++i) {
+            const uint cp = order.at(i);
+            const bool face = (cp >= 0x1F600 && cp <= 0x1F64A)
+                           || (cp >= 0x1F910 && cp <= 0x1F9D0 && cp != 0x1F91D);
+            const bool heart = (cp >= 0x1F493 && cp <= 0x1F49C) || cp == 0x2764 || cp == 0x1F48B
+                            || cp == 0x1F5A4 || cp == 0x1F90D || cp == 0x1F9E1;
+            const bool hand = !face && !heart
+                           && ((cp >= 0x270A && cp <= 0x270C) || (cp >= 0x1F44A && cp <= 0x1F450)
+                               || cp == 0x1F4AA || cp == 0x1F64C || cp == 0x1F64F || cp == 0x1F91D);
+            const int band = face ? 0 : (hand ? 1 : (heart ? 2 : 3));
+            if (band < lastBand) banded = false;
+            if (band == lastBand && int(cp) < lastCp) banded = false;
+            lastBand = band;
+            lastCp = int(cp);
+        }
+        check(banded, "faces, then gestures, then hearts, then the rest; sorted within each");
+
+        // Every cell in the grid needs all three fields filled, or it draws blank or sends
+        // nothing when tapped.
+        bool cellsOk = true;
+        for (int i = 0; i < order.size(); ++i) {
+            const uint cp = order.at(i);
+            if (EmojiText::artworkUrl(cp).isEmpty() || EmojiText::shortcodeFor(cp).isEmpty()
+                || EmojiText::name(cp).isEmpty())
+                cellsOk = false;
+        }
+        check(cellsOk, "every picker cell has artwork, a shortcode and a name");
     }
 
     say(failures ? QString::fromLatin1("%1 FAILURE(S)").arg(failures) : QLatin1String("all passed"));
