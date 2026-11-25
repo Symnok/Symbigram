@@ -341,6 +341,9 @@ private:
     int dialogIndex(const TgPeer &peer) const;
     static int dialogIndexIn(const QList<TgDialog> &list, const TgPeer &peer);
     void sortDialogs();
+    /// Tells the peer cache which peers it must never evict: everything in the dialog list,
+    /// everything in the archive, and ourselves. Called whenever either list changes.
+    void refreshPeerProtection();
     bool isAuthGone(const QString &type) const;
     void handleMigrate(const QString &type);
     static int unixNow();

@@ -14,14 +14,32 @@
 #include <QCoreApplication>
 #include <QHash>
 #include <QList>
+#include <QSet>
 #include <QString>
 
+/// The users and chats that ride along with almost every response.
+///
+/// This grows on its own: absorb() runs on everything the server sends, so scrolling a busy
+/// supergroup files away every sender it mentions. Left alone that is unbounded - and the cost
+/// is not only the bytes but the six or seven small heap cells each entry needs, which is what
+/// actually fragments a Symbian RHeap until a large allocation fails with "Memory full".
+///
+/// So entries come in two kinds. Peers the client must always be able to name - the dialogs,
+/// the archive, the contacts and ourselves - are PROTECTED and never evicted; the session
+/// refreshes that set whenever the dialog list changes. Everything else is TRANSIENT and
+/// capped at KTransientLimit, evicted oldest-first. Oldest-first is what makes this safe
+/// without the models having to register anything: the senders in the chat on screen were
+/// absorbed most recently, so they are the last to go, and a peer dropped too eagerly is
+/// re-absorbed by the next response that mentions it.
 class TgPeerCache
 {
 public:
+    /// How many unprotected peers to keep. Roughly 400 bytes each, so this is under a megabyte.
+    static const int KTransientLimit = 2000;
+
     bool contains(const TgPeer &p) const { return m_infos.contains(p.key()); }
     TgPeerInfo info(const TgPeer &p) const { return m_infos.value(p.key()); }
-    void put(const TgPeerInfo &info) { m_infos.insert(info.peer.key(), info); }
+    void put(const TgPeerInfo &info) { insert(info.peer.key(), info); }
     /// The peer with its access hash filled in from the cache.
     TgPeer withHash(const TgPeer &p) const;
     QString title(const TgPeer &p) const;
@@ -31,7 +49,12 @@ public:
     void absorbUser(const TlObject &user);
     void absorbChat(const TlObject &chat);
     QList<TgPeerInfo> all() const { return m_infos.values(); }
-    void clear() { m_infos.clear(); }
+    void clear() { m_infos.clear(); m_protected.clear(); m_order.clear(); }
+    /// Replaces the set of peers exempt from eviction (dialog and archive peers, and ourselves).
+    /// Contacts are exempt too, but they are recognised by their own flag rather than listed here.
+    void protectOnly(const QSet<QString> &keys);
+    int count() const { return m_infos.size(); }
+    int transientCount() const { return m_order.size(); }
     /// Applies a status object (userStatus*) to a cached user.
     void setUserStatus(qint64 userId, const TlObject &status);
     /// Records that we have joined or left a group/channel. A successful joinChannel or
@@ -41,7 +64,13 @@ public:
 
 private:
     static void setUserStatusInfo(TgPeerInfo &info, const TlObject &status);
+    /// The single way an entry enters the cache: records a new unprotected peer in the eviction
+    /// queue and trims it. Updating an entry that is already here does not re-queue it.
+    void insert(const QString &key, const TgPeerInfo &info);
+    void evictIfNeeded();
     QHash<QString, TgPeerInfo> m_infos;
+    QSet<QString> m_protected;   // never evicted; the keys are shared with m_infos, so this is cheap
+    QList<QString> m_order;      // transient keys, oldest first
 };
 
 struct TgQrLoginStep

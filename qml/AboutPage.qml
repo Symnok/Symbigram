@@ -52,6 +52,21 @@ Page {
                 text: "GPL-3.0-or-later."
             }
             Item { width: 1; height: platformStyle.paddingLarge }
+            Label { text: qsTr("Memory"); font.bold: true }
+            Label {
+                id: memReadout
+                width: parent.width
+                wrapMode: Text.Wrap
+                font.pixelSize: platformStyle.fontSizeSmall
+                color: platformStyle.colorNormalMid
+                text: ""
+            }
+            Button {
+                width: parent.width
+                text: qsTr("Refresh memory")
+                onClicked: memReadout.text = app.memoryInfo()
+            }
+            Item { width: 1; height: platformStyle.paddingLarge }
             Label { text: qsTr("Log"); font.bold: true }
             Label {
                 width: parent.width
@@ -78,4 +93,6 @@ Page {
             }
         }
     }
+
+    Component.onCompleted: memReadout.text = app.memoryInfo()
 }

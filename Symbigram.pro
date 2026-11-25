@@ -7,7 +7,7 @@
 
 TEMPLATE = app
 TARGET = Symbigram
-VERSION = 1.0.140
+VERSION = 1.0.142
 
 QT += core gui network declarative
 
@@ -75,8 +75,10 @@ symbian {
     # envelope (aknnotify), vibration (hwrm), bringing the app forward (apgrfx, ws32).
     LIBS += -lavkon -laknnotify -lhwrmvibraclient -lcone -leikcore -lapgrfx -lws32
     LIBS += -lcntmodel            # the phone's address book (CContactDatabase)
+    LIBS += -lhal                 # free-RAM figure for the About page memory readout
     LIBS += -lmediaclientaudiostream -lmediaclientaudioinputstream -lmediaclientaudio
     INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform/mw
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/epoc32/include/platform   # hal.h, for the free-RAM figure
 
     # Pigler Notifications API client (third_party/pigler) - Belle status-bar notifications.
     # Compiled from source (an IPC client to a separately-installed Pigler server); needs only

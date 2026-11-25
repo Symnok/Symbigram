@@ -12,6 +12,7 @@
 //                                          needed; then commands from sgm-cmd.txt in cwd:
 //       dialogs | more | history <n> [count] | send <n|self> <text> | read <n>
 //       find <query> | mute <n> on|off | clear <n> | logout | quit
+#include <QSet>
 #include "crypto.h"
 #include "bigint.h"
 #include "dh.h"
@@ -285,6 +286,126 @@ static int selfTest()
         const qint16 *bp = reinterpret_cast<const qint16 *>(back.data.constData());
         for (int i = 0; i < back.frames(); ++i) en2 += qAbs(int(bp[i]));
         check(back.frames() > 13000 && back.frames() ? (en2 / back.frames() > 800) : false, "round-trip encode->decode keeps the tone");
+    }
+
+    say(QLatin1String("peer cache eviction"));
+    {
+        // The cache absorbs every sender the server mentions, so in a busy supergroup it is the
+        // one structure that grows without end. These checks pin down the two things that make
+        // bounding it safe: what must never be evicted, and the fact that what IS evicted is
+        // always the oldest - so the chat currently on screen, whose senders were absorbed most
+        // recently, keeps its names.
+        TgPeerCache c;
+        const int cap = TgPeerCache::KTransientLimit;
+
+        QSet<QString> keep;                       // five "dialogs"
+        for (int i = 1; i <= 5; ++i) keep.insert(TgPeer(TgPeer::User, i).key());
+        c.protectOnly(keep);
+
+        TgPeerInfo one;
+        for (int i = 1; i <= 5; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, i, 777);
+            one.title = QString::fromLatin1("dialog %1").arg(i);
+            c.put(one);
+        }
+        // One contact, well before the flood, recognised by its flag rather than by the set.
+        one = TgPeerInfo();
+        one.peer = TgPeer(TgPeer::User, 6, 777);
+        one.title = QLatin1String("a contact");
+        one.isContact = true;
+        c.put(one);
+
+        // Now scroll past three times the cap in strangers.
+        const int strangers = cap * 3;
+        for (int i = 0; i < strangers; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 1000 + i, 777);
+            one.title = QString::fromLatin1("stranger %1").arg(i);
+            c.put(one);
+        }
+
+        check(c.transientCount() <= cap, "the eviction queue stays within the cap");
+        check(c.count() <= cap + 8, "the cache stays within the cap plus the protected few");
+        for (int i = 1; i <= 5; ++i)
+            if (c.title(TgPeer(TgPeer::User, i)) != QString::fromLatin1("dialog %1").arg(i)) {
+                check(false, "a protected dialog peer survived the flood");
+                break;
+            }
+        check(c.title(TgPeer(TgPeer::User, 5)) == QLatin1String("dialog 5"), "protected dialog peers survive");
+        check(c.title(TgPeer(TgPeer::User, 6)) == QLatin1String("a contact"), "a contact survives even though it is not in the protected set");
+        check(c.withHash(TgPeer(TgPeer::User, 3)).accessHash == 777, "a protected peer keeps its access hash");
+
+        // Newest kept, oldest dropped: this is what protects the open chat.
+        check(c.contains(TgPeer(TgPeer::User, 1000 + strangers - 1)), "the newest stranger is still cached");
+        check(!c.contains(TgPeer(TgPeer::User, 1000)), "the oldest stranger was evicted");
+
+        // Re-absorbing a peer already present must not queue it a second time, or the queue
+        // would outgrow the cache it exists to bound.
+        const int before = c.transientCount();
+        for (int i = 0; i < 50; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 1000 + strangers - 1 - i, 777);
+            one.title = QLatin1String("seen again");
+            c.put(one);
+        }
+        check(c.transientCount() == before, "re-absorbing a cached peer does not re-queue it");
+        check(c.title(TgPeer(TgPeer::User, 1000 + strangers - 1)) == QLatin1String("seen again"), "re-absorbing still updates the entry");
+
+        // A stranger that later becomes a dialog stops being evictable.
+        keep.insert(TgPeer(TgPeer::User, 1000 + strangers - 1).key());
+        c.protectOnly(keep);
+        for (int i = 0; i < cap * 2; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 500000 + i, 777);
+            one.title = QLatin1String("later stranger");
+            c.put(one);
+        }
+        check(c.title(TgPeer(TgPeer::User, 1000 + strangers - 1)) == QLatin1String("seen again"),
+              "a peer promoted to protected is no longer evicted");
+
+        for (int i = 0; i < cap * 2; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 900000 + i, 777);
+            one.title = QLatin1String("final stranger");
+            c.put(one);
+        }
+        check(c.count() <= cap + 8, "the cap holds across repeated floods");
+    }
+    {
+        // A peer DEMOTED from protected - a chat left, a channel deleted - has to become
+        // evictable rather than lingering forever in a third state. Checked on a cache well
+        // below the cap, because protectOnly trims as it goes and a full queue cannot grow.
+        TgPeerCache c;
+        QSet<QString> keep;
+        for (int i = 1; i <= 3; ++i) keep.insert(TgPeer(TgPeer::User, i).key());
+        c.protectOnly(keep);
+        TgPeerInfo one;
+        for (int i = 1; i <= 3; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, i, 777);
+            one.title = QLatin1String("dialog");
+            c.put(one);
+        }
+        for (int i = 0; i < 10; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 2000 + i, 777);
+            one.title = QLatin1String("stranger");
+            c.put(one);
+        }
+        check(c.transientCount() == 10 && c.count() == 13, "protected peers stay out of the queue");
+        c.protectOnly(QSet<QString>());
+        check(c.transientCount() == 13, "peers that lose protection join the eviction queue");
+
+        // And they really do go when the pressure comes.
+        const int cap2 = TgPeerCache::KTransientLimit;
+        for (int i = 0; i < cap2 * 2; ++i) {
+            one = TgPeerInfo();
+            one.peer = TgPeer(TgPeer::User, 900000 + i, 777);
+            one.title = QLatin1String("flood");
+            c.put(one);
+        }
+        check(!c.contains(TgPeer(TgPeer::User, 1)), "a demoted peer is eventually evicted");
     }
 
     say(failures ? QString::fromLatin1("%1 FAILURE(S)").arg(failures) : QLatin1String("all passed"));

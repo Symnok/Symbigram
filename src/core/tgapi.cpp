@@ -89,7 +89,7 @@ void TgPeerCache::absorbUser(const TlObject &u)
     if (u.ctor() == Tl::UserEmpty) {
         info.title = TgApi::tr("deleted account");
         info.isDeleted = true;
-        m_infos.insert(info.peer.key(), info);
+        insert(info.peer.key(), info);
         return;
     }
     // A "min" user (flags.20) carries incomplete fields; keep what a full one gave us.
@@ -117,7 +117,7 @@ void TgPeerCache::absorbUser(const TlObject &u)
     } else if (!min) {
         info.photoId = 0;
     }
-    m_infos.insert(info.peer.key(), info);
+    insert(info.peer.key(), info);
 }
 
 void TgPeerCache::absorbChat(const TlObject &c)
@@ -151,7 +151,43 @@ void TgPeerCache::absorbChat(const TlObject &c)
         info.photoId = photo.ctor() == Tl::ChatPhoto ? photo.longOr("photo_id") : 0;
         info.photoDcId = photo.intOr("dc_id");
     }
-    m_infos.insert(peer.key(), info);
+    insert(peer.key(), info);
+}
+
+void TgPeerCache::protectOnly(const QSet<QString> &keys)
+{
+    // Anything that WAS protected and no longer is - a chat left, a channel deleted - was never
+    // put in the eviction queue, because protected peers skip it on the way in. Queue it now, so
+    // that every entry in the cache is either protected or evictable and there is no third state
+    // that quietly accumulates.
+    for (QSet<QString>::const_iterator it = m_protected.constBegin(); it != m_protected.constEnd(); ++it)
+        if (!keys.contains(*it) && m_infos.contains(*it)) m_order.append(*it);
+    m_protected = keys;
+    evictIfNeeded();
+}
+
+void TgPeerCache::insert(const QString &key, const TgPeerInfo &info)
+{
+    // A peer we have not seen before, and that nothing is protecting, joins the back of the
+    // eviction queue. Re-absorbing one that is already here only refreshes its fields: it must
+    // NOT be queued twice, or the queue would outgrow the cache it is meant to bound.
+    if (!m_infos.contains(key) && !m_protected.contains(key)) m_order.append(key);
+    m_infos.insert(key, info);
+    evictIfNeeded();
+}
+
+void TgPeerCache::evictIfNeeded()
+{
+    while (m_order.size() > KTransientLimit) {
+        const QString key = m_order.takeFirst();
+        // Leaving a key out of the queue without erasing it is how an entry graduates to
+        // protected: it became a dialog, or turned out to be a contact or ourselves.
+        if (m_protected.contains(key)) continue;
+        QHash<QString, TgPeerInfo>::iterator it = m_infos.find(key);
+        if (it == m_infos.end()) continue;
+        if (it.value().isSelf || it.value().isContact) continue;
+        m_infos.erase(it);
+    }
 }
 
 void TgPeerCache::setUserStatusInfo(TgPeerInfo &info, const TlObject &status)
@@ -174,7 +210,7 @@ void TgPeerCache::setLeft(const TgPeer &p, bool left)
     TgPeerInfo info = m_infos.value(key);
     if (info.isLeft == left) return;
     info.isLeft = left;
-    m_infos.insert(key, info);
+    insert(key, info);
 }
 
 void TgPeerCache::setUserStatus(qint64 userId, const TlObject &status)
@@ -183,7 +219,7 @@ void TgPeerCache::setUserStatus(qint64 userId, const TlObject &status)
     if (!m_infos.contains(key)) return;
     TgPeerInfo info = m_infos.value(key);
     setUserStatusInfo(info, status);
-    m_infos.insert(key, info);
+    insert(key, info);
 }
 
 // -- TgQrLoginStep -------------------------------------------------------------------------------------------

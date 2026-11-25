@@ -140,6 +140,12 @@ public:
     int imagePreview() const;                          // 0 = Thumbnail (default), 1 = Full, 2 = None
     void setImagePreview(int mode);
     Q_INVOKABLE QStringList imagePreviewNames() const; // ["Thumbnail", "Full", "None"]
+    /// A heap and RAM readout for the About page. Not a diagnostic luxury: on Symbian the
+    /// process heap is a free-list with no compaction, so "Memory full" can mean either that
+    /// the heap hit its 64 MB ceiling or that one large request found no contiguous block -
+    /// two very different problems that look identical from the outside. The largest-free-block
+    /// figure is what tells them apart, and the cell count is what predicts the second.
+    Q_INVOKABLE QString memoryInfo() const;
     /// Where add-on language packs install their .qm files. A pack dropped here is picked up
     /// without rebuilding the application.
     static QString translationsDir();

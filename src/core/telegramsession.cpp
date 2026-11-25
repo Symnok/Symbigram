@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QSet>
 #include <QTimer>
 
 namespace
@@ -647,6 +648,7 @@ void TelegramSession::applyArchive(const TgDialogPage &page, bool more)
         int mi = dialogIndex(page.dialogs.at(i).peer);
         if (mi >= 0) { m_dialogs.removeAt(mi); }
     }
+    refreshPeerProtection();
     emit archiveChanged();
     emit dialogsChanged();
 }
@@ -664,6 +666,7 @@ void TelegramSession::setArchived(const TgPeer &peer, bool archived)
             TgDialog d = m_dialogs.takeAt(mi);
             d.archived = true;
             if (dialogIndexIn(m_archived, peer) < 0) m_archived.append(d);
+            refreshPeerProtection();
             emit dialogsChanged();
             emit archiveChanged();
         }
@@ -675,6 +678,7 @@ void TelegramSession::setArchived(const TgPeer &peer, bool archived)
             d.archived = false;
             if (dialogIndex(peer) < 0) m_dialogs.append(d);
             sortDialogs();
+            refreshPeerProtection();
             emit dialogsChanged();
             emit archiveChanged();
         }
@@ -696,6 +700,7 @@ void TelegramSession::applyDialogs(const TgDialogPage &page, bool more)
     }
     m_dialogsHaveMore = page.hasMore;
     sortDialogs();
+    refreshPeerProtection();
     emit dialogsChanged();
 }
 
@@ -724,6 +729,17 @@ namespace
         if (a.pinned != b.pinned) return a.pinned;
         return a.topMessageDate > b.topMessageDate;
     }
+}
+
+void TelegramSession::refreshPeerProtection()
+{
+    // The dialogs and the archive have to stay nameable for as long as they are listed, however
+    // long the session runs and however many strangers' messages scroll past in between.
+    QSet<QString> keep;
+    for (int i = 0; i < m_dialogs.size(); ++i) keep.insert(m_dialogs.at(i).peer.key());
+    for (int i = 0; i < m_archived.size(); ++i) keep.insert(m_archived.at(i).peer.key());
+    if (m_selfId) keep.insert(TgPeer(TgPeer::User, m_selfId).key());
+    m_peers.protectOnly(keep);
 }
 
 void TelegramSession::sortDialogs()
@@ -1180,6 +1196,7 @@ void TelegramSession::onRpcResult(quint64 requestId, const QByteArray &result)
                 TlObject u = TlSchema::readObject(r);
                 m_peers.absorbUser(u);
                 m_selfId = u.longOr("id");
+                refreshPeerProtection();
                 m_stateDirty = true;
                 emit selfChanged();
             }

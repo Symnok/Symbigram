@@ -396,7 +396,15 @@ Page {
             color: chat.color != "" ? chat.color : "#3d5a80"
             clip: true
             Label { anchors.centerIn: parent; text: chat.initials; color: "white"; font.bold: true; visible: headerAvatar.status != Image.Ready }
-            Image { id: headerAvatar; anchors.fill: parent; source: chat.avatar; fillMode: Image.PreserveAspectCrop; smooth: true }
+            Image {
+                id: headerAvatar
+                anchors.fill: parent
+                source: chat.avatar
+                sourceSize.width: avatar.width       // decode to the circle, not to the sent size
+                sourceSize.height: avatar.height
+                fillMode: Image.PreserveAspectCrop
+                smooth: true
+            }
         }
         Column {
             anchors { left: avatar.right; leftMargin: platformStyle.paddingLarge; right: parent.right; rightMargin: platformStyle.paddingLarge; verticalCenter: parent.verticalCenter }
@@ -771,13 +779,22 @@ Page {
             Image {
                 id: viewerImage
                 source: viewer.path
-                // fit: scale the whole image into the screen. zoomed: 2.5x that (at least 1:1 pixels)
-                // so it overflows the viewport and the Flickable can pan it.
-                property real fitScale: (sourceSize.width > 0 && sourceSize.height > 0)
-                        ? Math.min(viewerFlick.width / sourceSize.width, viewerFlick.height / sourceSize.height) : 1
-                property real scaleF: viewer.zoomed ? Math.max(fitScale * 2.5, 1) : fitScale
-                width: sourceSize.width * scaleF
-                height: sourceSize.height * scaleF
+                // This opens the FULL-resolution file, so it is the one allocation in the app big
+                // enough to bring the process down on its own: a 1280x1280 photo wants 6.5 MB in
+                // a single contiguous block, which a long-running fragmented heap often cannot
+                // give even with megabytes free. So the decode is bounded by the viewport rather
+                // than by the file, and PreserveAspectFit does the fitting that the sourceSize
+                // arithmetic here used to do by hand.
+                //
+                // Zoomed, that bound doubles: 2:1 against a 360-pixel-wide screen is as much
+                // detail as panning can show, at a quarter of the memory. Changing sourceSize
+                // re-decodes, which is why it is asynchronous - and why un-zooming hands the
+                // larger buffer straight back.
+                property real zf: viewer.zoomed ? 2 : 1
+                sourceSize.width: Math.round(viewerFlick.width * zf)
+                sourceSize.height: Math.round(viewerFlick.height * zf)
+                width: viewerFlick.width * zf
+                height: viewerFlick.height * zf
                 x: Math.max(0, (viewerFlick.contentWidth - width) / 2)
                 y: Math.max(0, (viewerFlick.contentHeight - height) / 2)
                 fillMode: Image.PreserveAspectFit

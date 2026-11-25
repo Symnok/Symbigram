@@ -175,17 +175,27 @@ Item {
                     // "Tap to load" chip hanging off both sides, clipped by the screen edge - so
                     // there is a floor as well as a ceiling.
                     property real minW: Math.min(maxW, 140)
-                    property real naturalWidth: image.status == Image.Ready
-                                              ? Math.min(maxW, image.sourceSize.width, 260)
+                    // The block is sized from the dimensions the MESSAGE carries, never from the
+                    // decoded image. Two reasons: the image on screen may still be the stripped
+                    // placeholder, whose size says nothing about the photo; and sourceSize below
+                    // caps the decode, so reading it back would only return that cap.
+                    property real naturalWidth: model.mediaWidth > 0
+                                              ? Math.min(maxW, model.mediaWidth, 260)
                                               : Math.min(maxW, 200)
                     property real shownWidth: Math.max(minW, naturalWidth)
                     width: shownWidth
-                    height: shownWidth * (image.status == Image.Ready ? (image.sourceSize.height / image.sourceSize.width) : ar)
+                    height: shownWidth * ar
                     Rectangle { anchors.fill: parent; radius: 6; color: "#20000000"; visible: image.status != Image.Ready }
                     Image {
                         id: image
                         anchors.fill: parent
                         source: model.mediaThumb
+                        // Decode at the size it is DRAWN, not the size it was sent. The inline
+                        // size can be 400 pixels across - 640 KB decoded - to be painted into a
+                        // 260-pixel bubble, and a scrolled channel keeps a dozen of those alive
+                        // at once. Capping the decode here is most of the saving on this screen.
+                        sourceSize.width: Math.round(photo.shownWidth)
+                        sourceSize.height: Math.round(photo.height)
                         fillMode: Image.PreserveAspectCrop
                         clip: true
                         smooth: true

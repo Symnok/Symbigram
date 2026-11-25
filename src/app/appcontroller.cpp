@@ -32,6 +32,7 @@
 
 #ifdef Q_OS_SYMBIAN
 #include <e32base.h>
+#include <hal.h>
 #endif
 #include <QStringList>
 #include <QTimer>
@@ -562,6 +563,41 @@ qreal AppController::fontScale() const
 {
     static const qreal scale[5] = { 0.8, 1.0, 1.15, 1.3, 1.5 };
     return scale[fontSize()];
+}
+
+QString AppController::memoryInfo() const
+{
+    QStringList out;
+#ifdef Q_OS_SYMBIAN
+    // Available() and AllocSize() are statics on User; Size() and MaxLength() belong to the
+    // allocator itself. MaxLength() is the ceiling EPOCHEAPSIZE set, read rather than assumed.
+    TInt biggest = 0;
+    const TInt freeInHeap = User::Available(biggest);
+    TInt allocated = 0;
+    const TInt cells = User::AllocSize(allocated);
+    const TInt heapSize = User::Allocator().Size();
+    const TInt heapMax = User::Allocator().MaxLength();
+
+    out << tr("Heap in use: %1 KB in %2 blocks").arg(allocated / 1024).arg(cells);
+    out << tr("Heap committed: %1 KB of %2 KB max").arg(heapSize / 1024).arg(heapMax / 1024);
+    // The pair that tells the two failures apart. A large "free" beside a small "largest block"
+    // is fragmentation; both small means the ceiling above is simply in reach.
+    out << tr("Free in heap: %1 KB, largest block %2 KB").arg(freeInHeap / 1024).arg(biggest / 1024);
+    TInt freeRam = 0;
+    if (HAL::Get(HALData::EMemoryRAMFree, freeRam) == KErrNone)
+        out << tr("Free RAM (phone): %1 KB").arg(freeRam / 1024);
+#else
+    out << tr("Heap figures are only available on the phone.");
+#endif
+    if (m_session) {
+        const int total = m_session->peers().count();
+        const int transient = m_session->peers().transientCount();
+        // Growth here used to be unbounded, and it is the likeliest thing to be behind a
+        // "Memory full" after hours in busy groups, so it is worth being able to read off.
+        out << tr("Peers cached: %1 (%2 evictable, cap %3)")
+               .arg(total).arg(transient).arg(int(TgPeerCache::KTransientLimit));
+    }
+    return out.join(QLatin1String("\n"));
 }
 
 QStringList AppController::imagePreviewNames() const { return QStringList() << tr("Thumbnail") << tr("Full") << tr("None"); }

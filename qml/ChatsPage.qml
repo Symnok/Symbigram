@@ -389,6 +389,11 @@ Page {
                     id: avatarImage
                     anchors.fill: parent
                     source: model.avatar
+                    // A profile photo arrives larger than this 48-pixel circle; decode it to the
+                    // circle. With cacheBuffer keeping a screenful and a half of rows alive, the
+                    // difference across a long chat list is megabytes.
+                    sourceSize.width: avatar.width
+                    sourceSize.height: avatar.height
                     fillMode: Image.PreserveAspectCrop
                     smooth: true
                     asynchronous: true
